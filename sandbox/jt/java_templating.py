@@ -180,6 +180,8 @@ def recast_Placeholder_Selectors__Identifier(frag,paren):
     if not frag.Selectors: # !!!
         return jast_make(jast.IdentifierPlaceholder,frag.Placeholder)
 
+def recast___Identifier(frag,paren):
+    return make_id("")
 
 def recast___BlockStatements(frag,paren):
     return jast_make(jast.BlockStatements)
@@ -380,6 +382,8 @@ class Concat:
                 frag = frag.IDENTIFIER.value               
             elif isinstance(frag,jast.IdentifierPlaceholder):
                 frag = texpand(frag,arg.bindings)
+                if not frag:
+                    continue
                 if frag[0] == "`": # !!!
                     self_eval = 1
             else:
@@ -409,7 +413,7 @@ class Strfy:
             frag = frag.IDENTIFIER.value               
         elif isinstance(frag,jast.IdentifierPlaceholder):
             frag = texpand(frag,arg.bindings)
-            if frag[0] == "`": # !!!
+            if frag and frag[0] == "`": # !!!
                 self_eval = 1
         else:
             raise Exception,"can't recast as identifier for strfy: %s" % arg

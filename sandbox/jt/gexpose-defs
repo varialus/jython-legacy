@@ -138,20 +138,18 @@ define: binary
   if (ret == null)
     return Py.NotImplemented;
   return ret;
-define: nonzero
-  return self.`concat`(`typname,_,__nonzero__)()?Py.One:Py.Zero;
-define: (Expression)deleg name
-  self.`concat`(`typname,_,`name)(`all)
-define: vdeleg: name
-  `deleg`(`name);
-define: rdeleg: name
-  return `deleg`(`name);
-define: ideleg: name
-  return Py.newInteger(`deleg`(`name));
-define: bdeleg: name
-  return Py.newBoolean(`deleg`(`name));
-define: sdeleg: name
-  return new PyString(`deleg`(`name));
+define: (Expression)deleg name deleg_prefix
+  self.`concat`(`deleg_prefix,`name)(`all)
+define: vdeleg: name deleg_prefix
+  `deleg`(`name,`deleg_prefix);
+define: rdeleg: name deleg_prefix
+  return `deleg`(`name,`deleg_prefix);
+define: ideleg: name deleg_prefix
+  return Py.newInteger(`deleg`(`name,`deleg_prefix));
+define: bdeleg: name deleg_prefix
+  return Py.newBoolean(`deleg`(`name,`deleg_prefix));
+define: sdeleg: name deleg_prefix
+  return new PyString(`deleg`(`name,`deleg_prefix));
 define: void:
   return Py.None;
 define: expose_new

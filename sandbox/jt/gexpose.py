@@ -14,13 +14,16 @@ from java_templating import JavaTemplate,jast_make,jast, make_id, make_literal
 modif_re = re.compile(r"(?:\(([\w,]+)\))?(\w+)")
 ktg_re = re.compile("(?P<k>\w)(?P<opt>\?(:?\((?P<dfl>[^)]*)\))?)?(?:\{(?P<tg>[^}]*)\})?")
 
+def make_name(n):
+    return JavaTemplate(jast_make(jast.QualifiedIdentifier,[java_parser.make_id(n)]))
+
 class Gen:
 
     priority_order = ['require','define',
                       'type_as',
                       'type_name','type_class','type_base_class',
                       'expose_getset',
-                      'expose_unary','expose_binary','expose_nonzero',
+                      'expose_unary','expose_binary',
                       'expose_vanilla_cmp','expose_vanilla_pow',
                       'expose_key_getitem',
                       'expose_index_getitem',
@@ -104,7 +107,8 @@ class Gen:
     def dire_type_name(self,name,parm,body):
         if body is not None:
             self.invalid(name,'non-empty body')
-        self.type_name = JavaTemplate(jast_make(jast.QualifiedIdentifier,[java_parser.make_id(parm.strip())]))
+        self.type_name_plain = parm.strip()
+        self.type_name = make_name(self.type_name_plain)
         self.global_bindings['typname'] = self.type_name
             
     def dire_type_class(self,name,parm,body):
@@ -251,25 +255,30 @@ class Gen:
 
     def expose_meth_body(self, name, parm, body):
         parm = parm.strip()
+        if parm.find('>') != -1:
+            prefix, parm = parm.split('>', 1)
+        else:
+            prefix = self.type_name_plain+'_'
         if body is not None:
-            return parm, body
+            return parm, prefix, body
         if parm.startswith(':'):
             retk,rest = parm.split(None,1)
             body = {
                 ":i" : "`ideleg;",
                 ":b" : "`bdeleg;",
                 ":s" : "`sdeleg;",
-                ":-" : "`vdeleg; `void; "
+                ":-" : "`vdeleg; `void; ",
+                ":o" : "`rdeleg;"
                 }.get(retk, None)
             if not body:
                 self.invalid(name,retk)
-            return rest, body
+            return rest, prefix, body
         else:
-            return parm, "`rdeleg;"
+            return parm, prefix, "`rdeleg;"
 
 
     def dire_expose_meth(self,name,parm,body): # !!!
-        parm, body = self.expose_meth_body(name, parm, body)
+        parm, prefix, body = self.expose_meth_body(name, parm, body)
         expose = self.get_aux('expose_narrow_meth')
 
         type_class = getattr(self,'type_class',None)
@@ -284,6 +293,7 @@ class Gen:
         expose_bindings = {}
         expose_bindings['typ'] = type_class
         expose_bindings['name'] = JavaTemplate(parms[0])
+        expose_bindings['deleg_prefix'] = make_name(prefix)
 
         # !!!
         call_meths_bindings = expose_bindings.copy()
@@ -317,12 +327,6 @@ class Gen:
         for meth_name in meth_names:
             self.dire_expose_meth('expose_binary_1',"%s o" % meth_name,binary_body)
 
-    def dire_expose_nonzero(self,name,parm,body):
-        if body is not None:
-            self.invalid(name,'non-empty body')
-        nonzero_body = self.get_aux('nonzero').fragment
-        self.dire_expose_meth('expose_nonzero',"__nonzero__",nonzero_body)
-
     def dire_expose_key_getitem(self,name,parm,body):
         if body is not None:
             self.invalid(name,'non-empty body')
@@ -333,7 +337,7 @@ class Gen:
         if body is not None:
             self.invalid(name,'non-empty body')
         index_getitem_body = self.get_aux('index_getitem').fragment
-        self.dire_expose_meth('expose_index_getitem',"__cmp__ o",index_getitem_body)
+        self.dire_expose_meth('expose_index_getitem',"__getitem__ o",index_getitem_body)
         
     def dire_expose_vanilla_cmp(self,name,parm,body):
         if body is not None:
@@ -348,7 +352,7 @@ class Gen:
         self.dire_expose_meth('expose_vanilla_pow',"__pow__ oo?(null)",vanilla_pow_body)
 
     def dire_expose_wide_meth(self,name,parm,body): # !!!
-        parm, body = self.expose_meth_body(name, parm, body)
+        parm, prefix, body = self.expose_meth_body(name, parm, body)
         parms = parm.split()
         args = JavaTemplate("void(PyObject[] args,String[] keywords)")
         all = JavaTemplate("args, keywords",start='Expressions')
@@ -356,6 +360,7 @@ class Gen:
         if len(parms) not in (1,3):
             self.invalid(name,parm)
         bindings['name'] = JavaTemplate(parms[0])
+        bindings['deleg_prefix'] = make_name(prefix)
         bindings['all'] = all
         bindings['args'] = args
         for deleg_templ_name in ('void','deleg','vdeleg','rdeleg'):
@@ -436,7 +441,7 @@ class Gen:
             if hasattr(self,'type_base_class'):
                basic = (basic + 
                  JavaTemplate(
-                   "public static final Class exposed_base = `base.class",
+                   "public static final Class exposed_base = `base.class;",
                    start='ClassBodyDeclarations'))
                bindings['base'] = self.type_base_class
 
