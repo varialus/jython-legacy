@@ -1,0 +1,198 @@
+<pre>
+Jython NEWS
+
+26-Nov-2000 Jython 2.0 alpha 1
+
+  New features.
+    - Integrate the free ORO regular expression matcher from the apache
+      project.
+
+  CPython2.0 compatibility, including 
+    - List comprehension.
+    - Extended call syntax.
+    - Extended print statement
+    - Augmented assignment.
+    - Unicode support libraries and codecs.
+    - sre unicode regular expression.
+
+  Some backward incompatibility is introduced:
+    - The user configuration file is now called <user.home>/.jython
+    - Text files will pass data read and written through the default
+      codecs for the JVM. Binary files will write only the lower eight
+      bits of each unicode character.
+    - arrays passed to java code will no longer autocoerce just 
+      because the elements can be autocoerced.
+    - The precedence of java loading have changed. Now the sys.path
+      is searched for python modules before the CLASSPATH and sys.path
+      is searched for java class and java packages.
+    - The builtin exceptions are always classbased. -X is disable.
+      User exception can still be strings.
+
+  Bug fixes.
+    - Many, including the errata.
+    - Now the content of a java package is the union of the content of all 
+      locations with the corresponding valid hierarchical name 
+      from dirs and jars of CLASSPATH (and sys.path for dirs); i.e.
+      from jpkg import * works for jpkg in a dir too.
+
+  Improved CPython 2.0 compatibility
+    - codecs module
+    - sha module.
+
+26-Jan-2000 JPython 1.1 final released
+
+  - Only one small CPython compatibility patch to os.mkdir() and
+    os.makedirs() -- optional `mode' argument, which is ignored.
+
+21-Jan-2000 JPython 1.1 release candidate 1 released
+
+  New JPython features and bug fixes
+    - Race conditions when creating multiple PythonInterpreter objects
+      in an embedded multithreaded Java application have been fixed.
+    - Recursive print of a module's namespace no longer overflows the
+      JVM stack.
+    - Fixed backslashing of quotes inside triple quoted strings (Finn
+      Bock).
+    - Fixes to read(int) method on file objects, which used to return
+      the empty string before EOF was seen.
+    - Class-based exceptions are used in frozen (jpythonc) modules.
+    - Duplicate argument names in a function definition raise the
+      appropriate SyntaxError.
+    - os.path.getsize() has been added.
+    - mutability of tuples under some situations has been fixed.
+    - dictionary insertion order affecting dictionary equality has
+      been fixed (Finn Bock).
+    - Using the --package option with jpythonc has been fixed.
+
+  Improved CPython 1.5.2 compatibility
+    - optional sizehint argument implemented for readlines() method on
+      file objects.
+    - Better compatibility in %g formatting of floats.
+    - sys.stdout.softspace is now writeable.
+    - re.VERBOSE/re.X flags are implemented.
+    - traceback object's reprs are CPython conformant.
+    - In module os, os.error is equivalent to the builtin OSError.
+      Also, listdir(), mkdir(), makedirs(), remove(), rename(), and
+      rmdir() raise OSError directly.
+    - os.stat() raises an OSError if the file is missing.
+
+28-Oct-1999 JPython 1.1beta4 released
+
+  New JPython features and bug fixes
+    - fixed a bug related to loading anonymous inner classes (PR#201).
+      This is an experimental patch.  See registry file for entry
+      python.options.extendedClassLoader
+    - fixed Java exceptions when calling apply() with a bogus 3rd
+      argument (PR#208)
+    - fixed a 1.1beta3 problem with method objects having their
+      im_self mysteriously changed out from under them (PR#186).
+    - fixed problems with Python classes being deeply derived from
+      Java classes and interfaces (PR#178, PR#195).
+    - Improved memory footprint when using exec().
+    - Dead threads are now reaped from thread state cache (Drew
+      Morrissey).
+    - Tuples, dictionaries, and strings now use fast method lookup
+      mechanism.
+
+  Improved CPython 1.5.2 compatibility
+    - md5 module supported (no need to download anything extra)  
+    - dir() on function objects now returns a list containing __doc__,
+      func_doc, __namme__, func_name, func_globals, func_defaults,
+      func_code.  __doc__/func_doc is writable (but not func_defaults
+      and func_code, which are writable in CPython). (PR#192)
+    - dir() on code objects returns a list containing co_name,
+      co_argcount, co_varnames, co_filename, co_firstlineno, co_flags.
+      Not supported: co_nlocals, co_code, co_consts, co_names,
+      co_lnotab, co_stacksize.  All attributes are read-only.
+    - dir() on method objects returns a list containing im_self,
+      im_func, im_class, __doc__, __name__.  These attributes are
+      read-only.
+
+22-Sep-1999 JPython 1.1beta3 released
+
+  New JPython features and bug fixes
+
+    - JPython can now optionally access non-public members of Java
+      classes.  By setting the registry entry
+      python.security.respectJavaAccessibility=false, JPython can
+      access private, package-private, and protected fields, methods,
+      and constructors.  By default, normal Java access rules are
+      followed, i.e. only public members can be accessed.  This
+      feature only works if running with Java 1.2.  Thanks to Tony
+      Plate for his initial implementation.
+    - A new framework for looking up the methods for builtin types has 
+      been enabled.  This can speed up method calls by a factor of 2.
+      The feature is currently experimental and has only been
+      implemented for list objects, but will be implemented for other
+      builtin objects for the next release.
+    - Some workarounds for weird JIT bugs have been added, but this
+      may not fix all problems related to running JPython under JVMs
+      with JIT enabled.
+    - A wrapper for a free md5 builtin module is included, although
+      the md5 implementation is not.  See the comment in
+      org/python/modules/MD5Module.java for details.
+    - New semantics for registry key python.modules.builtin (and
+      correspondingly the org/python/modules/Setup.java file).
+
+  Improved CPython 1.5.2 compatibility
+
+    - sys.modules['__builtin__'] and "import __builtin__" has been
+      fixed.
+    - Builtin methods and functions now have the standard __name__,
+      __doc__, __self__, and __members__ attributes.
+    - Dictionaries and lists now have a __methods__ attribute, and
+      dir({}) or dir([]) return the list of members.
+    - repr(8to16bitstring) now prints standard octal escapes for 8bit
+      characters.  It still prints hex escapes for 16bit characters.
+    - Added abspath() to os.path (i.e. javapath)
+    - Code objects now have a co_flags attribute
+    - Frame objects now have f_trace attribute, and dir(frame) works
+    - None() now raises a TypeError
+    - tuple(somelist) immutability patch
+    - re match objects now have groupdict() method
+    - Finn Bock patch for setting of a module's __name__ after reload
+
+16-Jun-1999 JPython 1.1beta2 released
+
+    - Updates and bug fixes to jpythonc tool.  New registry entries
+      python.jpythonc.compiler, python.jpythonc.classpath, and
+      python.jpythonc.compileropts.  getopt style long/short option
+      names (old options are deprecated).  New -J/--compileropts
+      option.
+    - syncing string object methods with experimental CPython 1.6
+      string methods.  This includes new optional arguments on
+      startswith() and endswith() and the moving of join() to a method 
+      of the separator string.
+    - Many other bug fixes and CPython syncs
+
+04-Jun-1999 JPython 1.1beta1 released
+
+  Highlights of changes since JPython 1.0.3
+
+    - New and improved jpythonc tool by Jim Hugunin
+    - New modules contributed by Finn Bock: cStringIO, cPickle,
+      struct, binascii
+    - New module synchronize, equivalent to Java's synchronized
+      keyword
+    - Operator module now complete
+    - sys.add_package() no longer necessary, "import java.lang" just works
+    - Class-based standard exceptions (w/ support for -X option)
+    - super__ methods are deprecated, use regular Python style
+    - time.strftime() added
+    - Java 1.2 style collections support
+    - Multiple interpreter states
+    - Most CPython 1.5.2 features have been implemented
+    - String objects now have methods -- expected CPython 1.6 feature
+    - Improved performance
+    - Java inner class support
+    - keywords are allowed in some locations (e.g. as attribute names)
+    - New license
+    - bug fixes
+
+	
+
+Local Variables:
+mode: indented-text
+indent-tabs-mode: nil
+End:
+</pre>'
