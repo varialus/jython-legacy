@@ -3,6 +3,8 @@ type_name: type
 type_class: PyType
 define: void
    return Py.None;
+# gesets
+expose_getset: __dict__ getDict
 # exposed methods
 expose_meth: __getattribute__ n{attribute name}
    String name = `arg0;
@@ -13,10 +15,10 @@ expose_meth: __setattr__ n{attribute name}o
    String name = `arg0;
    self.type___setattr__(name,`arg1);
    `void;
-expose_meth: __delattr__ n{attribute name}
-   String name = `arg0;
-   self.type___delattr__(name);
-   `void;
+expose_meth: :- __delattr__ n{attribute name}
+#    String name = `arg0;
+#    self.type___delattr__(name);
+#    `void;
 expose_meth: __subclasses__
    return self.type_getSubclasses();
 # TODO:

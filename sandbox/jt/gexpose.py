@@ -8,7 +8,7 @@ scriptdir = os.path.dirname(__file__)
 import directives
 import java_parser
 import java_templating
-from java_templating import JavaTemplate,jast_make,jast
+from java_templating import JavaTemplate,jast_make,jast, make_id, make_literal
 
 
 modif_re = re.compile(r"(?:\(([\w,]+)\))?(\w+)")
@@ -19,6 +19,7 @@ class Gen:
     priority_order = ['require','define',
                       'type_as',
                       'type_name','type_class','type_base_class',
+                      'expose_getset',
                       'expose_unary','expose_binary','expose_nonzero',
                       'expose_vanilla_cmp','expose_vanilla_pow',
                       'expose_key_getitem',
@@ -117,6 +118,32 @@ class Gen:
             self.invalid(name,'non-empty body')
         self.type_base_class = JavaTemplate(parm.strip())
 
+    def dire_expose_getset(self,name,parm,body):
+        if body is not None:
+            self.invalid(name,'non-empty body')
+
+        parms = parm.strip().split()
+
+        if len(parms) not in (2,3):
+            self.invalid(name, parm)
+        
+        name = parms[0]
+        get = '"%s"' % parms[1]
+        if len(parms) == 3:
+            set = '"%s"' % parms[2]
+        else:
+            set = "null"
+
+        getset_bindings = self.global_bindings.copy()
+
+        getset_bindings['name'] = JavaTemplate(make_id(name))
+        getset_bindings['get'] = JavaTemplate(make_literal(get))
+        getset_bindings['set'] = JavaTemplate(make_literal(set))
+
+        getset = self.get_aux('getset')
+
+        self.statements.append(getset.tbind(getset_bindings))
+        
     NOARGS = JavaTemplate("void()")
     EMPTYALL = JavaTemplate(jast_make(jast.Expressions))
 
@@ -187,8 +214,8 @@ class Gen:
             for k,tg in everything[:tot-dflc]:
                 argj = "arg%d" % j
                 args += JavaTemplate("void(PyObject %s)" % argj)
-                all += JavaTemplate(jast_make(jast.Expressions,[java_parser.parse(argj,start="Expression")]))
                 new_body_bindings[argj],err = getattr(self,'arg_%s' % k)(argj,j,tg)
+                all += JavaTemplate(jast_make(jast.Expressions,[new_body_bindings[argj].fragment]))
                 if err:
                     conv_errors.setdefault(err,[]).append(j)
                 j += 1
@@ -373,6 +400,7 @@ class Gen:
         body = body.tbind(body_bindings)
         templ = expose_new.tbind(body_bindings)
         self.statements.append(templ.tbind({'body': body}))
+
 
     def dire_rest(self,name,parm,body):
         if parm:
