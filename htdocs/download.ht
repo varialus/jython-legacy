@@ -1,0 +1,83 @@
+Title: Download Jython
+
+<h3>Download Jython</h3>
+
+<em><b>Developers note:</b> The latest snapshopts of the Jython
+source code is now <a href="http://sourceforge.net/cvs/?group_id=12867">
+available via CVS</a>!</em>
+
+<p>Here are the steps you need to perform in order to download Jython.
+Once you've done this, you should read the
+<a href="install.html">installation instructions</a>.
+
+<ol>
+
+<li><b>Check that you have a working Java 1.1 or 1.2 compatible JVM
+    installed</b>
+
+    <P>If you already know that you have a JVM which is Java 1.1 or
+    1.2 compliant, go on to step 2.  Otherwise, you should read this
+    information on <A HREF="platform.html">finding and installing an
+    appropriate JVM for your platform</A>.
+
+<p><li><b>Download Jython</b>
+
+    <p>Please use the following links to view and accept the licenses
+    for Jython 2.0.  
+
+    <p><ul>
+    <li><a href="license.html">Read the license</a>
+    <li><a href="http://sourceforge.net/project/showfiles.php?group_id=12867">
+        Download Jython 2.0 alpha 1</a>
+    <li><a href="install.html">View Installation instructions</a>
+    </ul>
+
+<p><li><b>Subscribe to the Jython-users mailing list (<i>optional</i>)</b>
+
+    <P>The
+    <A HREF="http://lists.sourceforge.net/mailman/listinfo/jython-users">
+    Jython-users</a>
+    mailing list is used to discuss using Jython effectively,
+    what features Jython needs, and to make announcements of new
+    releases. The web page below will allow you to subscribe to the
+    list. It will also let you view the past archives of the list.
+    This mailing list is managed by
+    <a href="http://www.list.org/">Mailman</a>.
+
+<p><li><b>Send a short note telling us what you're doing/what you need
+    (<i>optional</i>)</b>
+
+    <P>We'd really like to hear what people are doing with Jython as
+    well as what they'd like to do but can't because some feature is
+    missing.  You can drop us a note at
+    <a href="mailto:jython-dev@lists.sourceforge.net">jython-dev</a>.
+    Example comments:
+
+    <p><HR ALIGN="CENTER">
+	<TT>I'd love to build an amazing new FooBar with Jython, but
+	I can't because it's too slow/doesn't support applets well
+	enough/has a too restrictive license/needs to support the
+	foo.py module/has too many bugs/doesn't have enough
+	documentation/...</TT>
+
+    <BR>
+    <HR ALIGN="CENTER">
+	<TT>I'm building an amazing FooBar with Jython by doing X, Y,
+	and Z, and it is so easy in Jython that my boss thinks I'm a
+	genius!</TT><BR>
+	
+    <HR ALIGN="CENTER">
+
+    <p>We'd love it too, if you send a short blurb about yourself,
+    your project, or your company, so we can add it to the
+    <a href="users.html">Jython Users</a> page.
+
+<p><li><b>Join the PSA (<i>optional</i>)</b>
+
+    <p>Show you support for Python and Jython by joining the
+    <a href="http://www.python.org/psa/">Python
+    Software Activity</a>!
+
+</UL>
+
+<p>

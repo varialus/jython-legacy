@@ -1,0 +1,50 @@
+Title: Button Example
+
+<h3>Using Buttons</h3>
+
+<p>This example shows how to use Buttons from Jython. Three buttons should be
+displayed in the applet below.
+
+<applet code="ButtonDemo" archive="appletdemo.jar" width = 500 height = 35
+        alt="This browser doesn't support JDK 1.1 applets.">
+<param name=cabbase0 value="appletdemo.cab">
+<h3>Something has gone wrong loading this applet.</h3>
+</applet>
+
+<p>The complete source code for this example is included below.
+<blockquote><pre><hr>
+from java import awt, applet
+
+class ButtonDemo(applet.Applet):
+    def init(self):
+        self.b1 = awt.Button('Disable middle button', actionPerformed=self.disable)
+        self.b2 = awt.Button('Middle button')
+        self.b3 = awt.Button('Enable middle button', enabled=0, actionPerformed=self.enable)
+
+        self.add(self.b1)
+        self.add(self.b2)
+        self.add(self.b3)
+
+    def enable(self, event):
+        self.b1.enabled = self.b2.enabled = 1
+        self.b3.enabled = 0
+
+    def disable(self, event):
+        self.b1.enabled = self.b2.enabled = 0
+        self.b3.enabled = 1
+<hr></pre></blockquote>
+
+
+The init method creates three buttons with the appropriate labels.  
+It also specifies the actions to be performed when the first and 
+third buttons are clicked.  
+These actions are specified using 
+<a href="../docs/properties.html">event properties</a>.  
+Finally, this method adds these three buttons to the applet 
+(which is using the default FlowLayout).
+
+<p>The enable and disable methods change the states of the buttons 
+as appropriate. Notice that this is done using the enabled 
+<a href="../docs/properties.html">property</a> of the Buttons.
+
+<p>

@@ -1,0 +1,72 @@
+Title: Easy Applets with Jython
+
+<H3>Jython Applet Demos</H3>
+
+<UL>
+	<B>Note: You must be running a <A HREF="problems.html">JDK 1.1 compliant web browser</A> to view the applets on
+	this page.</B>
+</UL>
+
+<P>&nbsp;
+<CENTER>
+<APPLET Code="JythonLoader" WIDTH="220" HEIGHT="90" ALIGN="BOTTOM">
+</APPLET>
+</CENTER>
+Wait until the Jython library has completely loaded before continuing.
+This library is about 200K and should take around 1 minute to download 
+over a 28.8 modem. You should expect considerably faster download times
+if you have a better network connection.
+<em>Here is the <a href="JythonLoader.java">Java source</a> code for the 
+Jython loading display you see above.</em>
+
+<P>Once the library has loaded, your first Jython applet will appear below:
+<CENTER>
+<APPLET ARCHIVE="appletdemo.jar" CODE="HelloWorld" WIDTH="160" HEIGHT="50" ALIGN="BOTTOM" alt="This browser doesn't support JDK 1.1 applets.">
+<PARAM NAME="cabbase0" VALUE="appletdemo.cab">
+<H3>Something has gone wrong loading this applet.</H3>
+</APPLET>
+</CENTER>
+If you don't see the text &quot;Hello from Jython!&quot; above, 
+then something has gone wrong.
+See <A HREF="problems.html">what to do when Jython applets don't work</A> 
+for suggestions on how to fix the problem.
+
+<P>The complete source code for this applet is displayed below: <BR>
+
+<blockquote><pre>
+<HR>
+from java.applet import Applet
+
+class HelloWorld(Applet):
+    def paint(self, g):
+        g.drawString(&quot;Hello from Jython!&quot; 20, 30)
+<HR>
+</pre></blockquote>
+
+<H3>More Examples of Jython Applets</H3>
+
+Examples based on <A HREF="http://java.sun.com/docs/books/tutorial">The Java Tutorial</A> Examples
+
+<UL>
+	<LI>Using the basic AWT GUI elements
+	<UL>
+		<LI><A HREF="button.html">ButtonDemo</A>
+		<LI><A HREF="checkbox.html">CheckboxDemo</A>
+		<LI><A HREF="choice.html">ChoiceDemo</A>
+		<LI><A HREF="label.html">LabelDemo</A>
+		<LI><A HREF="list.html">ListDemo</A>
+	</UL>
+	<LI>Low-level drawing
+	<UL>
+		<LI><A HREF="coordinates.html">CoordinatesDemo</A>
+	</UL>
+	<LI>Putting it all together
+	<UL>
+		<LI><A HREF="converter.html">Converter</A> - a simple metric to english conversion applet
+	</UL>
+</UL>
+
+
+</BODY>
+
+</HTML>

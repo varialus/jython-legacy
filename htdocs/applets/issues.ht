@@ -1,0 +1,47 @@
+Title: Applet Issues
+
+<h3>Jython Applet Issues</h3>
+
+<ol>
+<li>The Jython libraries add about 150K to the size of any applets.
+Due to the caching behavior of most browsers, this is a one-time cost that
+users must pay only the first time they download any applet (from your
+web pages) which uses Jython. Currently this problem is more severe
+as a result of Netscapes limitations on using multiple jar files for a
+single applet. This requires bundling the library and the applet
+code together. Netscape is aware of this problem and plans to fix
+it in a future release.
+
+<li>Can't use "exec" or "eval" in (unsigned) applets. Because Jython
+takes the approach of compiling Python source code directly to Java bytecodes,
+it can only dynamically interpret Python code if it can dynamically load
+Java bytecode. This is currently impossible without creating a custom
+ClassLoader and this operation violates Java's security model. Any
+applet that wants to dynamically execute arbitrary strings of Python code
+must be signed and given permission by the user.
+
+
+<p>This is much less of a problem for Python than it would be for most
+languages because the dynamic features of the language mean that exec and
+eval are actually needed very rarely in practice.
+
+<P>I'm hoping that JavaSoft will eventually fix the design of the ClassLoader
+API to make this possible in a secure fashion. It is currently possible
+to kludge together a solution by shipping the bytes for the new Python
+class back to the server and then downloading them back to the client,
+but I can't imagine this effort will be worthwhile. However, the
+fact that it can be done convinces me that there is no inherent security
+problem with the functionality that Jython wants.
+
+<P>If somebody has a really strong need for exec and/or eval in a Jython
+applet, it would certainly be possible to add this support. This
+would involve implementing a true Python interpreter instead of the current
+dynamic Python -> Java bytecode compiler. I haven't yet seen an application
+that is sufficiently compelling to convince me that this effort would be
+worth my time (not to mention the hassle of maintaining two parallel code
+bases - one for the interpreter and one for the compiler).
+
+<li>When will Netscape truly support JDK 1.1?
+</ul>
+
+<p>

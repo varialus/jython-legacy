@@ -1,0 +1,64 @@
+Title: Solving Applet Problems
+
+<H3>Solving Jython Applet Problems</H3>
+
+<P>If you are having problems getting a Jython applet to run on 
+your browser, you should follow the following steps.
+
+
+<p>1. Make sure that you have a jdk 1.1 compliant browser.
+   At the moment these include:
+
+  <OL>
+	<LI><A HREF="http://www.javasoft.com/products/hotjava">SUN's HotJava</A>
+	<UL>
+		<LI>Unsurprisingly, this browser works extremely well with Java applets
+	</UL>
+	<LI><A HREF="http://www.microsoft.com/ie/">Microsoft's Internet Explorer 4.0</A>
+	<UL>
+		<LI>Somewhat surprisingly, IE 4.0 is far superior to Netscape 
+		    4.0 for JDK 1.1 compliance and performance. This might 
+		    have finally been fixed with Navigator 4.06, but I haven't 
+		    had the time to do a detailed comparision recently.
+	</UL>
+	<LI><A HREF="http://home.netscape.com/browsers/">Netscape's Navigator 4.06 or later</A>
+	<UL>
+		<LI>The latest release of Netscape's browser finally 
+		    comes with acceptable JDK 1.1 support without needing
+		    any patches. All I can say is, it's about time!
+		<LI>Note: It has been reported that the JVM in the Linux 
+		    release of Navigator 4.06 has serious problems that render
+		    it unusable.  Similar problems might occur on other Unix platforms.
+	</UL>
+	<LI><I>SUN's Java Activator - not currently enabled</I>
+	<UL>
+		<LI><I>Jython applets should almost certainly work with the 
+		    Java Activator, but I haven't yet invested the time
+		    to get the demo of this up and running.</I>
+	</UL>
+</OL>
+
+<P>2. Make sure you don't have any old releases of Jython in your class path.
+
+<OL>
+	<LI>If you are running a SUN (or SUN-like) VM you need to make 
+	    sure your CLASSPATH environment variable is not
+	    pointing to any directories with Jython .class files
+	<LI>If you are running a MS VM, you should probably check 
+	    out the registry entry under
+	    LOCAL_MACHINE/Software/Microsoft/Java VM/Classpath
+</OL>
+
+<P>3. Send mail to <A HREF="mailto:jython-dev@lists.sourceforge.net">jython-dev</A> 
+   explaining your problem.&nbsp; Include the following information:
+
+<OL>
+	<LI>What OS (name and version) and Browser (name and version) you are running
+	<LI>A copy of your Java console window after failing to run an applet
+	<UL>
+		<LI>Under IE, you need to explicitly enable the Java console, or Java logging
+	</UL>
+	<LI>The URL of the applet that didn't work for you
+</OL>
+
+<p>

@@ -1,0 +1,103 @@
+Title: Simple Drawing Example
+
+<h3>Drawing to a Canvas</h3>
+
+<p>This example shows how to draw to a Canvas from Jython.
+This is low level drawing using the basic Java Graphics API's.
+
+<p>
+<applet code="CoordinatesDemo" archive="appletdemo.jar" width = 300 height = 200
+        alt="This browser doesn't support JDK 1.1 applets.">
+<param name=cabbase0 value="appletdemo.cab">
+<h3>Something has gone wrong loading this applet.</h3>
+</applet>
+
+<p>The complete source code for this example is included below.
+
+<blockquote><pre><hr>
+from java import applet, awt
+from pawt import GridBag
+
+class CoordinatesDemo(applet.Applet):
+    def init(self):
+        bag = GridBag(self)
+
+        self.framedArea = FramedArea(self)
+        bag.addRow(self.framedArea, weighty=1.0, fill='BOTH')
+
+        self.label = awt.Label('Click within the framed area')
+        bag.addRow(self.label, weightx=1.0, weighty=0.0, fill='HORIZONTAL')
+
+    def updateLabel(self, point):
+        text = 'Click occurred at coordinate (%d, %d).'
+        self.label.text = text % (point.x, point.y)
+
+class FramedArea(awt.Panel):
+    def __init__(self, controller):
+        awt.Panel.__init__(self)
+        self.background = awt.Color.lightGray
+        self.setLayout(awt.GridLayout(1,0))
+
+        self.add(CoordinateArea(controller))
+
+    def getInsets(self):
+        return awt.Insets(4,4,5,5)
+
+    def paint(self, g):
+        d = self.size
+
+        g.color = self.background
+        g.draw3DRect(0, 0, d.width-1, d.height-1, 1)
+        g.draw3DRect(3, 3, d.width-7, d.height-7, 1)
+
+class CoordinateArea(awt.Canvas):
+    def __init__(self, controller):
+        awt.Canvas.__init__(self)
+        self.mousePressed = self.push
+        self.controller = controller
+
+    def push(self, e):
+        try:
+            self.point.x = e.x
+            self.point.y = e.y
+        except AttributeError:
+            self.point = awt.Point(e.x, e.y)
+
+        self.repaint()
+
+    def paint(self, g):
+        if hasattr(self, 'point'):
+            self.controller.updateLabel(self.point)
+            g.fillRect(self.point.x-1, self.point.y-1, 2, 2)
+<hr></pre></blockquote>
+
+
+This example defines three classes.  The first is the actual applet, 
+CoordinatesDemo sets up the label where text is displayed, and the 
+FramedArea panel where drawing takes place.
+This is an example of using the GridBag utility class provided with 
+Jython to make using the GridBagLayout style easier.  
+This is a very powerful layout manager, and I strongly encourage 
+you to consider using it for your own applications.  
+Hopefully the GridBag utility class will make this powerful layout 
+manager much easier to use in Jython.
+
+<p>
+The second class is a very simple framed area.  
+It simply draws a border around an interior CoordinateArea.
+
+<p>
+The final class is the CoordinateArea which does the actual drawing. 
+At creation time, this class sets up the callback so that its push 
+method will be invoked when the user presses the mouse within its frame.
+The push method simply updates the current location of the point
+(setting it if it hasn't been defined yet).
+
+<p>
+The paint method does the actual drawing (only if the user has 
+clicked on some point). 
+It first updates its controller's label widget with the current 
+coordinates, and then it draws the point the user has selected 
+using the fillRect method on the Graphics object.
+
+<p>

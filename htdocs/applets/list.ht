@@ -1,0 +1,87 @@
+Title: List Example
+
+<h3>Using Lists</h3>
+
+<p>This example shows how to use Lists from Jython.
+
+<p>
+<applet code="ListDemo" archive="appletdemo.jar" width = 500 height = 150
+        alt="This browser doesn't support JDK 1.1 applets.">
+<h3>Something has gone wrong loading this applet.</h3>
+</applet>
+
+<p>The complete source code for this example is included below.
+
+<blockquote><pre><hr>
+from java import applet, awt
+from java.awt.event import ItemEvent
+from pawt import GridBag
+
+class ListDemo(applet.Applet):
+    def fillList(self, list, names):
+        list.actionPerformed=self.action
+        list.itemStateChanged=self.change
+
+        for name in names:
+            list.add(name)
+
+    def init(self):
+        self.spanish = awt.List(4, 1)
+        self.fillList(self.spanish, ['uno', 'dos', 'tres', 'cuatro',
+                            'cinco', 'seis', 'siete'])
+        self.italian = awt.List()
+        self.fillList(self.italian, ['uno', 'due', 'tre', 'quattro',
+                            'cinque', 'sei', 'sette'])
+
+        self.output = awt.TextArea(10, 40, editable=0)
+
+        bag = GridBag(self)
+        bag.add(self.output, fill='BOTH', weightx=1.0, weighty=1.0, gridheight=2)
+
+        bag.addRow(self.spanish, fill='VERTICAL')
+        bag.addRow(self.italian, fill='VERTICAL')
+
+        self.language = {self.spanish:'Spanish', self.italian:'Italian'}
+
+    def action(self, e):
+        list = e.source
+        text = 'Action event occurred on "%s" in %s.\n'
+        self.output.append(text % (list.selectedItem, self.language[list]))
+
+    def change(self, e):
+        list = e.source
+        if e.stateChange == ItemEvent.SELECTED:
+            select = 'Select'
+        else:
+            select = 'Deselect'
+
+        text = '%s event occurred on item #%d (%s) in %s.\n'
+        params = (select, e.item, list.getItem(e.item), self.language[list])
+        self.output.append(text % params)
+<hr></pre></blockquote>
+
+
+The fillList method is defined to take a list and a set of names 
+and insert those names as list items.  It also sets the action methods 
+for the list for both single and double clicking.
+
+<p>
+This init method creates and fills lists of spanish and italian numbers. 
+It uses a GridBag to layout the lists and a text widget in the applet.
+This GridBag is a wrapper placed on the awt.GridBagLayout and 
+GridBagConstraints classes to make this very powerful layout
+method easier to use.
+
+<p>
+The action method is invoked whener a list item is double clicked.  
+It uses Python's % operator on strings for convenient text formatting.
+
+<p>
+The change method is invoked when a list item is selected or deselected.  
+It's primary difference from the Java implementation is to use a 
+dictionary of languages instead of a case statement to determine 
+the appropriate text to display.  
+This is an example of the ease of use of standard data types 
+(lists and dictionaries) from Python.
+
+<p>

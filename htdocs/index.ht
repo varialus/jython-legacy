@@ -1,0 +1,47 @@
+Title: Jython Home Page
+
+<p>Welcome to the Jython homepage.  Jython is an implementation of
+the high-level, dynamic, object-oriented language
+<a href="http://www.python.org/">Python</a> written in 
+100% Pure Java, and seamlessly integrated with 
+the <a href="http://www.javasoft.com">Java</a> platform.  It thus
+allows you to run Python on any Java platform.
+
+
+<ul>
+<li>What is <A HREF="docs/whatis.html">Jython</A>
+<li><A HREF="download.html">Download</a> the lastest version.
+<li><A HREF="docs/index.html">Documentation</A>
+<li>The Jython <A HREF="docs/faq.html">FAQ</A>.
+</ul>
+
+
+<h3><em><font size=+1 color="red">Jython News</font></em></h3>
+
+<em><b>Note that these pages does not correctly reflect the current state
+of Jython. Most importantly, there does not yet exists a downloadable
+version.
+</b></em>
+
+<dl>
+<!--
+    <dt><b>Jython 2.0 alpha 1 released!</b>
+    <dd>Download Jython <a href="download.html">here</a>, or
+	<a href="NEWS">read a summary</a>
+	of recent changes. (XX-oct-2000).
+-->
+    <p><dt>Jython project announced
+    <dd>The Jython project have started on sourceforge. Read the 
+        <a href="http://www.python.org/pipermail/jpython-interest/2000-October/006417.html">
+        announcement</a>.
+</dl>
+
+
+<h3><em><font size=+1 color="red">Jython In the press</font></em></h3>
+
+<dl>
+    <dt>2000-11-08
+    <dd>JPython is mentioned in an 
+    <a href="http://www.javasoft.com/features/2000/11/dotnetvsms.html?frontpage-banner">
+    article</a> that compares the Java platform with MicroSoft's .NET 
+</dl>

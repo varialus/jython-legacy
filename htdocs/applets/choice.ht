@@ -1,0 +1,47 @@
+Title: Choice Example
+
+<h3>Using Choices</h3>
+
+<p>This example shows how to use Choices from Jython.
+
+<p>
+<applet code="ChoiceDemo" archive="appletdemo.jar" width = 350 height = 40
+        alt="This browser doesn't support JDK 1.1 applets.">
+<h2>Something has gone wrong loading this applet.</h2>
+</applet>
+
+<p>The complete source code for this example is included below.
+
+<blockquote><pre><hr>
+from java import awt, applet
+
+class ChoiceDemo(applet.Applet):
+    def init(self):
+        self.choices = awt.Choice(itemStateChanged = self.change)
+        for item in ['ichi', 'ni', 'san', 'yon']:
+            self.choices.addItem(item)
+
+        self.label = awt.Label()
+        self.change()
+
+        self.add(self.choices)
+        self.add(self.label)
+
+    def change(self, event=None):
+        selection = self.choices.selectedIndex, self.choices.selectedItem
+        self.label.text = 'Item #%d selected. Text = "%s".' % selection
+<hr></pre></blockquote>
+
+
+The init method first creates a Choice object and sets its 
+callback for when a new item is selected.  
+This callback is specified as the itemStateChanged
+<a href="../docs/properties.html">event property</a>.  
+Then four items are added to the choice object and the 
+rest of the layout is initialized.
+
+<p>
+The change method is invoked whenever the selection in the choice object changes.
+It uses Python string formatting operator to display the current state to the user.
+
+<p>

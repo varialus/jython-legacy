@@ -1,0 +1,54 @@
+Title: Checkbox Example
+
+<h3>Using Checkboxes</h3>
+
+<p>This example shows how to use Checkboxes from Jython.
+<p>
+
+<applet code="CheckboxDemo" archive="appletdemo.jar" width = 350 height = 90
+        alt="This browser doesn't support JDK 1.1 applets.">
+<h3>Something has gone wrong loading this applet.</h3>
+</applet>
+
+<p>The complete source code for this example is included below.
+
+<blockquote><pre><hr>
+from java import awt, applet
+
+class CheckboxDemo(applet.Applet):
+    def init(self):
+        cb1 = awt.Checkbox('Checkbox 1')
+        cb2 = awt.Checkbox('Checkbox 2')
+        cb3 = awt.Checkbox('Checkbox 3', state=1)
+
+        p1 = awt.Panel(layout=awt.FlowLayout())
+        p1.add(cb1)
+        p1.add(cb2)
+        p1.add(cb3)
+
+        cbg = awt.CheckboxGroup()
+        cb4 = awt.Checkbox('Checkbox 4', cbg, 0)
+        cb5 = awt.Checkbox('Checkbox 5', cbg, 0)
+        cb6 = awt.Checkbox('Checkbox 6', cbg, 0)
+
+        p2 = awt.Panel(layout=awt.FlowLayout())
+        p2.add(cb4)
+        p2.add(cb5)
+        p2.add(cb6)
+
+        self.setLayout(awt.GridLayout(0, 2))
+        self.add(p1)
+        self.add(p2)
+
+        self.validate()
+<hr></pre></blockquote>
+
+
+The first panel (p1) holds three checkboxes that are not 
+grouped together in any way. 
+The third checkbox is initially set to checked using its state
+<a href="../docs/properties.html">property</a> as a keyword argument.
+The second panel holds a group of three checkboxes that all belong 
+to the same checkbox group.
+
+<p>

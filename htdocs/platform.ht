@@ -1,0 +1,100 @@
+Title: Platform Specific Notes</TITLE>
+
+<H2>Platform Specific Information: <I>Finding a Good JVM</I></H2>
+
+<P>Jython is 100% Pure Java and should run successfully on any 
+bug-free fully 1.1 or 1.2 compliant JVM. 
+Unfortunately, such a beast can sometimes be hard to find. 
+The following is a collection of notes for getting Jython to run (and 
+run well) on specific OS's and JVM's. 
+Since performance can also vary considerably across JVM implementations, 
+this page will also contain information regarding Jython's performance 
+on different platforms.
+
+<P>This list of platform specific information is clearly incomplete. 
+If you find this information to be incorrect for your particular platform,
+or if you have tips for running Jython on a platform not mentioned 
+on this page, please send that information to <A REF="mailto:jython-dev@lists.sourceforge.net">jython-dev</A>.
+If your platform is not included in the list below, you might be able 
+to get useful information from SUN's 
+<A HREF="http://www.javasoft.com/cgi-bin/java-ports.cgi"> list of 
+third-party JVM's</A>.
+
+<H3 ALIGN="CENTER">Operating Systems</H3>
+
+<H3>Irix</H3>
+
+<H4><A HREF="http://www.sgi.com/developers/devtools/languages/java.html">
+Java Development Environment 3.1.1 from SGI</A></H4>
+
+<P>Jython will work with the 3.0.1 version of the JDE (which is based 
+on the 1.1.3 JVM), but there are a number of significant known bugs 
+in this release. I strongly recommend using to the 3.1 release on this 
+platform.
+
+<P>
+<H3>Linux</H3>
+
+<H4><A HREF="http://www.blackdown.org/java-linux.html">JDK 1.1.6 from blackdown.org</A></H4>
+
+<P>There should be no problems running Jython on this JVM.
+
+<H3>Macintosh</H3>
+
+<P>Mizutori Tetsuya has made available an application called 
+JPython Runner to make it easier to use JPython on this system. 
+More details on this system can be found at <A HREF="http://www.bekkoame.ne.jp/~mizutori/java/index.html#jpythonrunner">
+JPython Runner for Macintosh</A>. 
+
+This link also contains pointers to the lastest JVM for Macintosh.
+
+<P>Hopefully, future releases of Jython will be able to incorporate 
+either this technology or something like it to make life easier 
+for Macintosh users.
+
+<H3>Solaris</H3>
+
+<H4><A HREF="http://www.sun.com/solaris/jre/index.html">JRE 1.1.6 
+from SUN</A></H4>
+
+<P>Solaris 2.6 comes with JDK 1.1.3. The JIT compiler in this release 
+has a number of serious bugs that can lead to confusing errors. 
+You can type &quot;java -version&quot; to determine what release 
+you have installed on your machine. While Jython will generally 
+work with the 1.1.3 JVM, I strongly recommend that Solaris users 
+upgrade to this latest version to avoid being bitten by hard to 
+track down JIT related bugs.
+
+<H3>Windows NT, 95, and 98, Windows 2000</H3>
+
+<H4><A HREF="http://java.sun.com/j2se/1.3/">
+JDK/JRE 1.3 from SUN</A> <I>(My recommendation for this platform)</I></H4>
+
+<P>This is amoung the fastest of the JVM's for Windows, and it also the 
+most compatible with the official Java specification. I'd strongly 
+encourage people to start with this VM, and only consider trying 
+alternatives if they find performance to be a serious problem for 
+their application.
+
+<H4><A HREF="http://www.microsoft.com/java/">JView from Microsoft</A></H4>
+
+<P>If you have IE 4.0 installed, you almost certainly already have this VM.
+Type &quot;jview&quot; at a command prompt to be sure. Note: if the 
+copyright dates you see when you type &quot;jview&quot; do not include 
+1998, you have an older VM. Either download a recent version of IE 4.0, 
+or download the VM directly from the site above.
+
+<P>If you want to write Jython code that takes advantage of Windows 
+specific functionality (using win32 api's, interacting with COM objects, 
+...) then this VM will give you all of the platform specific 
+functionality you could desire.
+
+<H3 ALIGN="CENTER">Cross-Platform JVM's</H3>
+<H3>Kaffe</H3>
+<P>Jython does not work with the current version available from transvirtual.
+This appears to be both due to some small incompatibilities between this 
+Java VM and SUN's version, as well as at least one serious issue which is
+the lack of a java.math.BigInteger class -- this lack will be a problem for
+any VM that only implements the PersonalJava subset of the full Java spec. 
+It should be possible to get Jython working on this VM if someone has the 
+time to invest, please let us know if you have any success here or need any help.

@@ -1,0 +1,94 @@
+Title: Installing Jython
+
+<H3>Installation</H1>
+
+<P>Jython is distributed as a self-extracting .class file created by 
+<A HREF="http://liftoff.sourceforge.net">LiftOff</A>. 
+To install Jython, open the command line to the directory in which 
+you have placed the Jython-20a1.class file and then type:
+
+<BLOCKQUOTE>
+	<P>&lt;java interpreter&gt; Jython-20a1</P>
+</BLOCKQUOTE>
+
+<P>You will probably type one of the following three lines,
+depending on your system. <b>Be sure <em>not</em> to put &quot;.class&quot; 
+at the end of the file name.</b>
+
+<BLOCKQUOTE>
+	<P><TT>java Jython-20a1</TT></P>
+
+	<P><TT>jre Jython-20a1</TT></P>
+
+	<P><TT>jview Jython-20a1</TT>
+</BLOCKQUOTE>
+
+<p>It can be necessay to set the CLASSPATH to include the current directory
+
+<BLOCKQUOTE>
+	<P><TT>env CLASSPATH=. java Jython-20a1</TT>
+
+	<P><TT>java -cp . Jython-20a1</TT>
+
+	<P><TT>java -classpath . Jython-20a1</TT>
+
+	<P><TT>jview /cp:. Jython-20a1</TT>
+</BLOCKQUOTE>
+
+<P>Which command to use depends on your operating system and java version.
+
+<P>If you do not have a GUI, then add <tt>-o dir_to_install_to</tt> to the 
+command above. Jython will install to the specified directory without 
+bringing up the graphical installer. E.g. to install all modules to a 
+Jython-2.0 subdirectory in the current directory do: 
+
+<BLOCKQUOTE>
+  <P><TT>&lt;java interpreter&gt; Jython-20a1 -o Jython-2.0 demo lib source</TT>
+</BLOCKQUOTE>
+
+
+
+<P>After completing installation, you should be able to run Jython by typing:</P>
+
+<BLOCKQUOTE>
+	<P><TT>jython</TT></P>
+</BLOCKQUOTE>
+
+<H3>What Can Go Wrong</H3>
+
+<P>You should check out this section if your Jython installation 
+doesn't quite work right. It will contain tips for solving the 
+most common problems.
+
+<H4>Can't Access Standard Python Modules</H4>
+
+<P>By default, Jython only installs a small collection of the standard 
+Python modules. This is due the fact that much of the functionality of
+these modules is duplicated by Java packages. If you want to use parts 
+standard Python library that are not included with Jython, you have 
+select the "Library" during installation or add pointer in python.path
+to the Lib directory of  a preexisting Python 2.0 distribution. This 
+requires editing your &quot;registry&quot; file.
+
+<H4>Other Problems</H4>
+
+<P>Any other problems with the installation should be reported to 
+<A HREF="mailto:python-dev@lists.sourceforge.net">jython-dev</A>.
+
+<P>As a workaround you can extract the jython-20a1.class manually.
+The class file is basicly a .zip file and most unzip programs can
+manage to extract the contents of the class into a directory.
+After doing that, you must 
+<ul>
+<li>Remove the <tt>net</tt> directory. It isn't needed.
+<li>Create the startup script by hand. Use the <tt>template*</tt> files
+    as a starting point in doing so.
+</ul>
+
+<H4>Platform Specific Notes</H4>
+
+<P>If all else fails, you might find that your problem is unique to 
+your platform, and has a solution mentioned on the 
+<A HREF="platform.html">Platform Specific Information</A> page.
+
+<p>
