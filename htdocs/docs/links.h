@@ -3,7 +3,7 @@
 <li><a href="../index.html">Overview</a>
 <li><a href="../license.html">License</a>
 <li><a href="../download.html">Jython 2.0</a>
-<li><a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=45862">Jython 2.1a3</a>
+<li><a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=64027">Jython 2.1b1</a>
 <li><a href="../install.html">Installing</a>
 <li><a href="../platform.html">JVM Compatibility</a>
 
@@ -22,6 +22,7 @@
 <li><a href="subclassing.html">Subclassing</a>
 <li><a href="jythonc.html">Building applets, servlets, beans...</a>
 <li><a href="jreload.html">Reloading java classes</a>
+<li><a href="zxjdbc.html">zxJDBC</a>
 
 <h3>Python Docs (exits)</h3>
 <li><a href="http://www.python.org/doc/tut/tut.html">Python Tutorial</a>
