@@ -8,26 +8,57 @@ the <a href="http://www.javasoft.com">Java</a> platform.  It thus
 allows you to run Python on any Java platform.
 
 <ul>
-<li>What is <A HREF="docs/whatis.html">Jython</A>
+<li>What is <A HREF="docs/whatis.html">Jython</A>?
 <li><A HREF="download.html">Download</a> the latest version.
 <li><A HREF="docs/index.html">Documentation</A>
 <li>The Jython <A HREF="http://www.jython.org/cgi-bin/faqw.py?req=index">FAQ</A>.
 </ul>
 
+    <dd><i><blockquote>
+        Jython, lest you do not know of it, is the most compelling weapon the Java platform has for its survival into the 21st century:-)
+        <br>&#8212; <cite><a href="http://seanmcgrath.blogspot.com/2003_07_27_seanmcgrath_archive.html#105971971904416520">Sean McGrath, CTO, Propylon</a></cite>
+        </blockquote></i>
 
 <h3><font size=+1 color="#666699">Jython News</font></h3>
 
 
 <dl>
-    <p><dt><b>Newstyle branch work, prospectives</b>
-    <dd><i><blockquote>
-        Jython, lest you do not know of it, is the most compelling weapon the Java platform has for its survival into the 21st century:-)
-        <br>&#8212; <cite><a href="http://seanmcgrath.blogspot.com/2003_07_27_seanmcgrath_archive.html#105971971904416520">Sean McGrath, CTO, Propylon</a></cite>
-        </blockquote></i>
-     <dd> Work is undergoing since the beginning of the year to implement new-style classes
-        features (the biggest quantum-leap post 2.1 missing feature for a new release) on the newstyle-branch in the CVS (see e.g. <a href="http://cvs.sourceforge.net/viewcvs.py/jython/jython/org/python/core/Attic/PyType.java?only_with_tag=newstyle-branch">this check-in</a>). <b> There will be a new alpha release when this branch will be merged to the trunk. We expect then a new release for the summer, with 2.2 and some 2.3 features. Leading up to the release this site will be revamped. (Apr 2004) </b>
+<p><dt><b>25 October 2004: website revamp announced</b></dt></p>
 
-    <p><dt><b>Jython 2.2 alpha 0 available</b>
+<p>Over the next short while, the Jython website will be
+revamped. Suggestions for the revamp welcome. Send suggestions to the
+Jython developer mailing list.</p>
+
+<p><dt><b>25 October 2004: Progress on new-style classes
+implementation</b></dt></p>
+
+<p>
+Samuele Pedroni is making strong progress in the end-to-end
+modifications required to the Jython code-base in order to support
+new-style classes. The implementation of new style classes in Jython
+is a key moment on the road to compatibility with CPython 2.3 and
+beyond.
+
+Samuele plans to make an initial check-in of the branch on or around
+<b>15 November 2004</b>. Stay tuned for further updates.
+
+For more details about the state of play, see the jython-dev archive <a href="http://sourceforge.net/mailarchive/forum.php?thread_id=5754593&forum_id=5587">here</a> and <a href="http://sourceforge.net/mailarchive/message.php?msg_id=9838528">here</a>
+
+<p><dt><b>25 October 2004: Jython tutorial</b></dt></p>
+
+<p>
+Barry Feigenbaum has written a substantial two part Jython tutorial on
+using Jython. The tutorial consists of two PDF files: <a
+href="j-jython1-ltr.pdf">Part 1</a> (82 pages) and <a
+href="j-jython2-ltr.pdf">Part 2</a> (100 pages). First published by IBM developerWorks at <a
+href="http://www.ibm.com/developerWorks/">http://www.ibm.com/developerWorks/</a>.
+</p>
+
+    <p><dt><b>April 2004: Newstyle branch work.</b>
+     <dd> Work is undergoing since the beginning of the year to implement new-style classes
+        features (the biggest quantum-leap post 2.1 missing feature for a new release) on the newstyle-branch in the CVS (see e.g. <a href="http://cvs.sourceforge.net/viewcvs.py/jython/jython/org/python/core/Attic/PyType.java?only_with_tag=newstyle-branch">this check-in</a>). <b> There will be a new alpha release when this branch will be merged to the trunk. We expect then a new release for the summer, with 2.2 and some 2.3 features. Leading up to the release this site will be revamped.</b>
+
+    <p><dt><b>31 July 2003 : Jython 2.2 alpha 0 available</b>
 
     <dd>Experimental, unstable release of Jython now available. This is an
         alpha release, in that it is not feature complete for a Jython 2.2
@@ -42,7 +73,11 @@ allows you to run Python on any Java platform.
 	<p>
         <a href="jython22a0.zip">jython22a0.zip</a>|
         <a href="README.txt">readme.txt<br></a>
-        (31-jul-2003)
+
+</dl>
+<hr>
+<dl>
+	<p><b>Older news items from the Jython project</b></p>
 
     <p><dt><b>Work in progress</b>
     <dd>Something from history:
