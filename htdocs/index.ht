@@ -18,21 +18,13 @@ allows you to run Python on any Java platform.
 <h3><em><font size=+1 color="red">Jython News</font></em></h3>
 
 
-<b><em>Note</em>: A downloadable version of Jython is
-not yet available.</b>
-
-<p>The current state of Jython development is not accurately
-represented in these pages.  Consider joining the Jython
-mailing lists for more current information. <br>
-
-
 <dl>
-<!--
+
     <dt><b>Jython 2.0 alpha 1 released!</b>
     <dd>Download Jython <a href="download.html">here</a>, or
-	<a href="NEWS">read a summary</a>
-	of recent changes. (XX-oct-2000).
--->
+	<a href="NEWS.html">read a summary</a>
+	of recent changes. (26-nov-2000).
+
     <p><dt><b>Jython project announced</b>
     <dd>The Jython project have been created on sourceforge. Read the 
         <a href="http://www.python.org/pipermail/jpython-interest/2000-October/006417.html">
