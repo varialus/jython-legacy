@@ -1,0 +1,29 @@
+# setup
+type_name: object
+type_class: PyObject
+define: void
+   return Py.None;
+# exposed methods
+expose_meth: __str__
+   return self.__repr__();
+expose_meth: __getattribute__ n{attribute name}
+   String name = `arg0;
+   PyObject ret = self.object___findattr__(name);
+   if (ret == null) self.noAttributeError(name);
+   return ret;
+expose_meth: __setattr__ n{attribute name}o
+   String name = `arg0;
+   self.object___setattr__(name,`arg1);
+   `void;
+expose_meth: __delattr__ n{attribute name}
+   String name = `arg0;
+   self.object___delattr__(name);
+   `void;
+expose_meth: __hash__
+   return new PyInteger(self.object_hashCode());
+expose_meth: __repr__
+   return new PyString(self.object_toString());
+expose_new_mutable:
+# TODO:
+#       __init__,__reduce__,
+#       (__class__,__new__, __doc__)
