@@ -1,6 +1,6 @@
 This is a placeholder for the generated documentation .html file.
 The files here are generated a little bit differently than the .html
-files in jython/Doc. See the Makefile for details.
+files in jython/Doc. See the ../build.xml for details.
 
 The differences are:
 - This uses another template.
