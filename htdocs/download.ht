@@ -32,7 +32,7 @@ Once you've done this, you should read the
     <p><ul>
     <li><a href="license.html">Read the license</a>
     <li><a href="http://sourceforge.net/project/showfiles.php?group_id=12867">
-        Download Jython 2.0 beta 2</a>
+        Download Jython 2.0 release candidate 1</a>
     <li><a href="install.html">View Installation instructions</a>
     </ul>
 
@@ -75,12 +75,6 @@ Once you've done this, you should read the
     <p>We'd love it too, if you send a short blurb about yourself,
     your project, or your company, so we can add it to the
     <a href="users.html">Jython Users</a> page.
-
-<p><li><b>Join the PSA (<i>optional</i>)</b>
-
-    <p>Show you support for Python and Jython by joining the
-    <a href="http://www.python.org/psa/">Python
-    Software Activity</a>!
 
 </UL>
 
