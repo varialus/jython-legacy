@@ -35,7 +35,13 @@ at the end of the file name.</b>
 	<P><TT>jview /cp:. jython-20a1</TT>
 </BLOCKQUOTE>
 
-<P>Which command to use depends on your operating system and java version.
+<P>Which command to use depends on your operating system and java version. 
+If you have more than one java installed, you may have to supply an explicit 
+path the java command. When installing the JDK 1.2 from javasoft, the 
+default is it install both the JDK and a plugin JRE. The plugin JRE is added
+to your PATH, so running the <tt>java jython-20a</tt> command will make jython
+use the JRE. Specify the full path if you want to use JDK instead, ie:
+<tt>c:\Programs\JDK1.2\bin\java -cp . jython-20a1</tt>.
 
 <P>If you do not have a GUI, then add <tt>-o dir_to_install_to</tt> to the 
 command above. Jython will install to the specified directory without 
