@@ -10,6 +10,7 @@ Title: Easy Applets with Jython
 <P>&nbsp;
 <CENTER>
 <APPLET Code="JythonLoader" WIDTH="220" HEIGHT="90" ALIGN="BOTTOM">
+<param name=waitFor value="HelloWorld">
 </APPLET>
 </CENTER>
 Wait until the Jython library has completely loaded before continuing.
@@ -21,9 +22,13 @@ Jython loading display you see above.</em>
 
 <P>Once the library has loaded, your first Jython applet will appear below:
 <CENTER>
-<APPLET ARCHIVE="appletdemo.jar" CODE="HelloWorld" WIDTH="160" HEIGHT="50" ALIGN="BOTTOM" alt="This browser doesn't support JDK 1.1 applets.">
-<PARAM NAME="cabbase0" VALUE="appletdemo.cab">
-<H3>Something has gone wrong loading this applet.</H3>
+<APPLET CODE="HelloWorld" WIDTH="160" HEIGHT="50"
+	ARCHIVE="appletdemo.jar" 
+	NAME="HelloWorld"
+	ALIGN="BOTTOM" 
+	alt="This browser doesn't support JDK 1.1 applets.">
+ <PARAM NAME="cabbase0" VALUE="appletdemo.cab">
+ <H3>Something has gone wrong loading this applet.</H3>
 </APPLET>
 </CENTER>
 If you don't see the text &quot;Hello from Jython!&quot; above, 
