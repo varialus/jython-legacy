@@ -18,6 +18,22 @@ jython-dev@lists.sourceforge.net.
 <dl>
 
 <p>
+<dt><b><a href="http://sulu.sourceforge.net/">Sulu</a></b>
+<dd>
+Sulu is an LGPL Mozilla XUL
+rendering engine written in Java that uses Jython instead of
+JavaScript.
+</dd>
+
+<p>
+<dt><b><a href="http://www.jedit.org/">jEdit</a></b>
+<dd>
+jEdit is a programmer's text editor which has a
+plugin (JythonInterpreter) that provides support for writing jEdit macros
+in Python.
+</dd>
+
+<p>
 <dt><b><a href="http://drools.org">Drools</a></b>
 <dd>
 An expert system written in java with semantics for Python. You can use valid Python
