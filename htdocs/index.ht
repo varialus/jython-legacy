@@ -61,7 +61,8 @@ allows you to run Python on any Java platform.
         scripting examples using Jython and Rhino (javascript).
 
     <p><dt><b>18-dec-2000</b>
-    <dd>Jon Udell <a href="http://www.byte.com/column/BYT20001214S0009">talks</a>
+    <dd>Jon Udell
+      <a href="http://www.byte.com/documents/s=505/BYT20001214S0006/">talks</a>
         about using the JVM to implement other languages, among them JPython.
 
     <p><dt><b>8-dec-2000</b>
