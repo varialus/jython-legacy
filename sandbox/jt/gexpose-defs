@@ -119,22 +119,22 @@ define: index_getitem
        throw Py.IndexError("index out of range: "+`arg0);
    }
    return ret;
-define: vanilla_cmp
-  int ret = self.`concat`(`typname,_,__cmp__)(`arg0); 
+define: vanilla_cmp deleg_prefix
+  int ret = self.`concat`(`deleg_prefix,__cmp__)(`arg0); 
   if (ret == -2) {
     throw Py.TypeError(`strfy`(`typname)+".__cmp__(x,y) requires y to be '"+
                        `strfy`(`typname)+"', not a '"+(`arg0).getType().fastGetName()+"'");
   }
   return Py.newInteger(ret);
-define: vanilla_pow
-  PyObject ret =  self.`concat`(`typname,_,__pow__)(`arg0,`arg1);  
+define: vanilla_pow deleg_prefix
+  PyObject ret =  self.`concat`(`deleg_prefix,__pow__)(`arg0,`arg1);  
   if (ret == null)
     return Py.NotImplemented;
   return ret;
-define: unary
-  return self.`concat`(`typname,_,`name)();
-define: binary
-  PyObject ret =  self.`concat`(`typname,_,`name)(`arg0);  
+define: unary deleg_prefix
+  return self.`concat`(`deleg_prefix,`name)();
+define: binary deleg_prefix
+  PyObject ret =  self.`concat`(`deleg_prefix,`name)(`arg0);  
   if (ret == null)
     return Py.NotImplemented;
   return ret;

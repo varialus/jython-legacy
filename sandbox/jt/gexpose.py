@@ -315,6 +315,8 @@ class Gen:
         if body is not None:
             self.invalid(name,'non-empty body')
         meth_names = parm.split()
+        if meth_names[0].endswith('>'):
+            meth_names = ["%s %s" % (meth_names[0], n) for n in meth_names[1:]]
         unary_body = self.get_aux('unary').fragment
         for meth_name in meth_names:
             self.dire_expose_meth('expose_unary_1',meth_name,unary_body)
@@ -323,6 +325,8 @@ class Gen:
         if body is not None:
             self.invalid(name,'non-empty body')
         meth_names = parm.split()
+        if meth_names[0].endswith('>'):
+            meth_names = ["%s %s" % (meth_names[0], n) for n in meth_names[1:]]
         binary_body = self.get_aux('binary').fragment
         for meth_name in meth_names:
             self.dire_expose_meth('expose_binary_1',"%s o" % meth_name,binary_body)
@@ -330,26 +334,38 @@ class Gen:
     def dire_expose_key_getitem(self,name,parm,body):
         if body is not None:
             self.invalid(name,'non-empty body')
+        prefix = ""
+        if parm.endswith('>'):
+            prefix = parm
         key_getitem_body = self.get_aux('key_getitem').fragment
-        self.dire_expose_meth('expose_key_getitem',"__getitem__ o",key_getitem_body)
+        self.dire_expose_meth('expose_key_getitem',"%s __getitem__ o" % prefix,key_getitem_body)
 
     def dire_expose_index_getitem(self,name,parm,body):
         if body is not None:
             self.invalid(name,'non-empty body')
+        prefix = ""
+        if parm.endswith('>'):
+            prefix = parm
         index_getitem_body = self.get_aux('index_getitem').fragment
-        self.dire_expose_meth('expose_index_getitem',"__getitem__ o",index_getitem_body)
+        self.dire_expose_meth('expose_index_getitem',"%s __getitem__ o" % prefix,index_getitem_body)
         
     def dire_expose_vanilla_cmp(self,name,parm,body):
         if body is not None:
             self.invalid(name,'non-empty body')
+        prefix = ""
+        if parm.endswith('>'):
+            prefix = parm
         vanilla_cmp_body = self.get_aux('vanilla_cmp').fragment
-        self.dire_expose_meth('expose_vanilla_cmp',"__cmp__ o",vanilla_cmp_body)
+        self.dire_expose_meth('expose_vanilla_cmp',"%s __cmp__ o" % prefix,vanilla_cmp_body)
 
     def dire_expose_vanilla_pow(self,name,parm,body):
         if body is not None:
             self.invalid(name,'non-empty body')
+        prefix = ""
+        if parm.endswith('>'):
+            prefix = parm
         vanilla_pow_body = self.get_aux('vanilla_pow').fragment
-        self.dire_expose_meth('expose_vanilla_pow',"__pow__ oo?(null)",vanilla_pow_body)
+        self.dire_expose_meth('expose_vanilla_pow',"%s __pow__ oo?(null)" % prefix,vanilla_pow_body)
 
     def dire_expose_wide_meth(self,name,parm,body): # !!!
         parm, prefix, body = self.expose_meth_body(name, parm, body)
