@@ -6,6 +6,7 @@ public class JythonLoader extends Applet implements Runnable {
     public Label etime, l1, l1a;
     Thread timer;
     long initialTime;
+    String waitFor = "HelloWorld";
 
     public void init() {
         setFont(new Font("Normal", Font.BOLD, 15));
@@ -37,6 +38,10 @@ public class JythonLoader extends Applet implements Runnable {
         c.weightx = 0.0;
         bag.setConstraints(etime, c);
         add(etime);
+
+        String n = getParameter("waitFor"); 
+        if (n != null)
+            waitFor = n;
     }
 
     public void paint(Graphics g) {
@@ -50,14 +55,10 @@ public class JythonLoader extends Applet implements Runnable {
     }
 
     private int activeApplets() {
-	Enumeration e = getAppletContext().getApplets();
-        int n;
-        for (n=0; e.hasMoreElements(); ) {
-            Applet a = (Applet)e.nextElement();
-            if (a != null && a.isActive())
-		n++;
-        }
-        return n;
+        Applet a = getAppletContext().getApplet(waitFor);
+        if (a != null)
+            return 2;
+        return 1;
     }
 
     private void updateText() {
