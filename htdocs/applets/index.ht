@@ -44,7 +44,7 @@ from java.applet import Applet
 
 class HelloWorld(Applet):
     def paint(self, g):
-        g.drawString(&quot;Hello from Jython!&quot; 20, 30)
+        g.drawString(&quot;Hello from Jython!&quot;, 20, 30)
 <HR>
 </pre></blockquote>
 
