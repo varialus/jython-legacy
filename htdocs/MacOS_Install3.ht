@@ -1,0 +1,31 @@
+Title: Running the jython installer
+
+<h3>Running the jython installer</h3>
+
+<a href="MacOS_Install2.html">Previous</a> <a href="MacOS_Install4.html">Next</a> 
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  Now the install process should start:
+</td></tr></table><p>
+
+
+<img SRC="mac/Jython_Install_1.gif" height=737 width=936>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  At the first step you have to choose, which pakets will be installed
+</td></tr></table><p>
+
+<img SRC="mac/Jython_Install_2.gif" height=465 width=750>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  The System is going to be inspected
+</td></tr></table><p>
+
+<img SRC="mac/Jython_Install_3.gif" height=463 width=747>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  The install process is running
+</td></tr></table><p>
+
+<a href="MacOS_Install2.html">Previous</a> <a href="MacOS_Install4.html">Next</a> 
+

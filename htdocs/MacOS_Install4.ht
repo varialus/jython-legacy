@@ -1,0 +1,43 @@
+Title: Create binding for jython.jar
+
+<h3>Create binding for jython.jar</h3>
+
+<a href="MacOS_Install3.html">Previous</a> <a href="MacOS_Install5.html">Next</a> 
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  After installing, you'll find some new created folders
+</td></tr></table><p>
+
+<img SRC="mac/Jython_dest.gif" height=388 width=639>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  Next, the jython.jar - file has to be used to be started.
+  <p>Here you have to put some data into JBindery:
+  <br>at first the class name has to be choosen:
+  <br><strong>org.python.util.jython</strong>
+</td></tr></table><p>
+
+<img SRC="mac/Jython_Klick1.gif" height=382 width=625>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  Then the classpath has to be adjusted, so it includes the jython.jar
+  (I added the Lib-Folder to), you may put any elements you need on this
+  List.
+</td></tr></table><p>
+
+<img SRC="mac/Jython_klick_2.gif" height=360 width=497>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  Properties have to be set: this is the location, where your Jython-Home
+  is located.
+</td></tr></table><p>
+
+
+<img SRC="mac/Jython_Klick_3.gif" height=357 width=499>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  After all this little steps, <strong>Save Settings</strong> 
+  and then <strong>Run</strong>
+</td></tr></table><p>
+
+<a href="MacOS_Install3.html">Previous</a> <a href="MacOS_Install5.html">Next</a> 

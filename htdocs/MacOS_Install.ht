@@ -1,0 +1,18 @@
+Title: How to install Jython on Macintosh
+
+<h3>How to install Jython on Macintosh</h3>
+
+<ul>
+<li>Install the java development kit: <a 
+    href="ftp://ftp.apple.com/developer/Development_Kits/MRJ_SDK_2.2_Install.sit.bin">
+    ftp://ftp.apple.com/developer/Development_Kits/MRJ_SDK_2.2_Install.sit.bin</a>.
+    <br>It is from <a href="http://developer.apple.com/java/download.html">
+    http://developer.apple.com/java/download.html</a>. 
+    <br>Don't choose MRJ 2.2.3, because it has does not have _batteries included_.
+<li>The Jython installer: <a href="http://jython.sourceforge.net/download.html">http://jython.sourceforge.net/download.html</a>
+<li><a href="MacOS_Install2.html">Start the the jython installer</a>.
+<li><a href="MacOS_Install3.html">Running the jython installer</a>.
+<li><a href="MacOS_Install4.html">Create binding for jython.jar</a>.
+<li><a href="MacOS_Install5.html">Run the jython interpreter</a>.
+<ul>
+	

@@ -51,6 +51,9 @@ Following blackdown versions have been used with jython.
 
 <H3>Macintosh</H3>
 
+<P>A guide for installation on Macintosh is available <a href="MacOS_Install.html">
+here</a>
+
 <P>Mizutori Tetsuya has made available an application called 
 JPython Runner to make it easier to use JPython on this system. 
 More details on this system can be found at <A HREF="http://www.bekkoame.ne.jp/~mizutori/java/index.html#jpythonrunner">

@@ -15,6 +15,11 @@ HTMLFILES = \
 	install.html \
 	users.html \
 	license.html \
+	MacOS_Install.html \
+	MacOS_Install2.html \
+	MacOS_Install3.html \
+	MacOS_Install4.html \
+	MacOS_Install5.html \
 
 
 all:  $(HTMLFILES)

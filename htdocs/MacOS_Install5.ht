@@ -1,0 +1,18 @@
+Title: Run the jython interpreter
+
+<h3>Run the jython interpreter</h3>
+
+<a href="MacOS_Install4.html">Previous</a> 
+
+<p>
+
+<img SRC="mac/Jython_RUN_1.gif" height=254 width=928>
+
+<p><table bgcolor="#dddddd" width=100%><tr><td>
+  The jar-Files are (the first time you start it up) processed, and 
+  the Jython-Interpreter is started:
+</td></tr></table><p>
+
+<img SRC="mac/Jython_Console.gif" height=169 width=793>
+
+<a href="MacOS_Install4.html">Previous</a> 
