@@ -7,7 +7,6 @@ the high-level, dynamic, object-oriented language
 the <a href="http://www.javasoft.com">Java</a> platform.  It thus
 allows you to run Python on any Java platform.
 
-
 <ul>
 <li>What is <A HREF="docs/whatis.html">Jython</A>
 <li><A HREF="download.html">Download</a> the lastest version.
@@ -18,10 +17,14 @@ allows you to run Python on any Java platform.
 
 <h3><em><font size=+1 color="red">Jython News</font></em></h3>
 
-<em><b>Note that these pages does not correctly reflect the current state
-of Jython. Most importantly, there does not yet exists a downloadable
-version.
-</b></em>
+
+<b><em>Note</em>: A downloadable version of Jython is
+not yet available.</b>
+
+<p>The current state of Jython development is not accurately
+represented in these pages.  Consider joining the Jython
+mailing lists for more current information. <br>
+
 
 <dl>
 <!--
@@ -30,8 +33,8 @@ version.
 	<a href="NEWS">read a summary</a>
 	of recent changes. (XX-oct-2000).
 -->
-    <p><dt>Jython project announced
-    <dd>The Jython project have started on sourceforge. Read the 
+    <p><dt><b>Jython project announced</b>
+    <dd>The Jython project have been created on sourceforge. Read the 
         <a href="http://www.python.org/pipermail/jpython-interest/2000-October/006417.html">
         announcement</a>.
 </dl>
@@ -40,8 +43,10 @@ version.
 <h3><em><font size=+1 color="red">Jython In the press</font></em></h3>
 
 <dl>
-    <dt>2000-11-08
+    <dt>8-nov-2000
     <dd>JPython is mentioned in an 
     <a href="http://www.javasoft.com/features/2000/11/dotnetvsms.html?frontpage-banner">
     article</a> that compares the Java platform with MicroSoft's .NET 
 </dl>
+
+<font size=-1> last updated 12-now-2000 </font>"
