@@ -215,9 +215,27 @@ class Gen:
 
         return inst_call_meths,tot-rng+1,tot
 
+    def expose_meth_body(self, name, parm, body):
+        parm = parm.strip()
+        if body is not None:
+            return parm, body
+        if parm.startswith(':'):
+            retk,rest = parm.split(None,1)
+            body = {
+                ":i" : "`ideleg;",
+                ":b" : "`bdeleg;",
+                ":s" : "`sdeleg;",
+                ":-" : "`vdeleg; `void; "
+                }.get(retk, None)
+            if not body:
+                self.invalid(name,retk)
+            return rest, body
+        else:
+            return parm, "`rdeleg;"
+
+
     def dire_expose_meth(self,name,parm,body): # !!!
-        if body is None:
-            self.invalid(name,'missing body')
+        parm, body = self.expose_meth_body(name, parm, body)
         expose = self.get_aux('expose_narrow_meth')
 
         type_class = getattr(self,'type_class',None)
@@ -296,8 +314,7 @@ class Gen:
         self.dire_expose_meth('expose_vanilla_pow',"__pow__ oo?(null)",vanilla_pow_body)
 
     def dire_expose_wide_meth(self,name,parm,body): # !!!
-        if body is None:
-            self.invalid(name,'missing body')
+        parm, body = self.expose_meth_body(name, parm, body)
         parms = parm.split()
         args = JavaTemplate("void(PyObject[] args,String[] keywords)")
         all = JavaTemplate("args, keywords",start='Expressions')
