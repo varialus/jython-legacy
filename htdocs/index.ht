@@ -19,11 +19,14 @@ allows you to run Python on any Java platform.
 
 
 <dl>
-    <p><dt><b>Jython 2.1 alpha 2 released!</b>
+    <p><dt><b>Jython 2.1 alpha 3 released!</b>
     <dd>Download the lastest release of Jython 
-        <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=44111">here</a>, or 
+        <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=45862">here</a>, or 
         <a href="NEWS.html">read a summary</a>
-	of recent changes. (18-jul-2001).
+	of recent changes. (29-jul-2001).
+
+    <p><dt><b>Jython 2.1a2 released!</b>
+    <dd>The second alpha release of Jython 2.1 is available (18-jul-2001)
 
     <p><dt><b>Jython 2.1a1 released!</b>
     <dd>The first alpha release of Jython 2.1 is available (14-mar-2001)
