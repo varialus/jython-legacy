@@ -7,7 +7,7 @@
 #
 # When this program is added to the loginfo file, it can be used to
 # edit the repository every time the file is commited.
-#
+# 
 
 import binascii, sys, os, string
 
