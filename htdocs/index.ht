@@ -19,15 +19,9 @@ allows you to run Python on any Java platform.
 
 
 <dl>
-    <p><dt><b>Jython 2.1 beta 2 released!</b>
-    <dd>Download the latest release of Jython 
-        <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=66632">here</a>, or 
-        <a href="NEWS.html">read a summary</a>
-	of recent changes. (21-dec-2001).
-
-    <p><dt><b>Jython 2.0 released!</b>
+    <p><dt><b>Jython 2.1 released!</b>
     <dd>Download the latest stable relase of Jython 
-        <a href="download.html">here</a> (17-jan-2001).
+        <a href="download.html">here</a> (31-dec-2001).
 
     <p><dt><b>New website layout.</b>
     <dd>New colors and an jython icon created by Ivan Kougaenko. (15-jan-2001).
@@ -81,6 +75,6 @@ allows you to run Python on any Java platform.
 
 </dl>
 
-<font size=-1> last updated 21-dec-2001 </font>
+<font size=-1> last updated 31-dec-2001 </font>
 
 
