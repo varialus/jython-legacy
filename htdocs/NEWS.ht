@@ -1,6 +1,27 @@
 <pre>
 Jython NEWS
 
+18-jul-2001 Jython 2.1 alpha 2
+
+  New features.
+   - Added ReadlineConsole class. This class will make it a lot easier
+     to integrate Bablok's readline support.
+   - Display Hook for Interactive Use (pep-0217)
+   - Added zlib, gzip and zipfile modules.
+   - Added nested scope to jythonc (pep-0227).
+
+  Bug fixes.
+   - Fixed obscure __import__ error message #437800
+   - Prevent a NPE during import when running with a security manager
+   - Fixed multi-level Java method overriding #222819.
+   - Fix for dependency problem with jythonc. #415933
+   - Fix a lost syntax error when auto importing submodules.
+   - Use quotes around classpath, but only for win+jdk1.1.
+   - Find the complete list of fixed bug on SF:
+        http://sourceforge.net/tracker/?group_id=12867&atid=112867
+     Select Status=Any and Group=Fixed in 2.1a2
+
+
 14-mar-2001 Jython 2.1 alpha 1
 
   New features.
@@ -27,6 +48,8 @@ Jython NEWS
      instead of the wrapped java object.
    - Include a LineNumberTable in the compiled class files.
    - Fixed a java version test bug in the installer.
+   - Added workaround for class initialization bug in MRJ2.2.4
+   - Added support for three argument getattr() calls.
 
 17-Jan-2001 Jython 2.0 final release
 
