@@ -1,6 +1,50 @@
 <pre>
 Jython NEWS
 
+17-Dec-2000 Jython 2.0 alpha 2
+
+  New features.
+    - Added -v (verbose) option to jython command. It will trace
+      import statements. Use three -v's for maximum information.
+    - Added new registry option python.options.internalTablesImpl
+      which is a list of choices (':' separated) for internal 
+      tables implementations. These tables contain the mapping of 
+      classes to PyJavaClasses.
+      Long running applications that unloads classes can avoid a
+      memory leak by setting the property to "weak" or "soft". 
+      That will use a table implementation which use weak or soft 
+      refrences.
+    - Use a SecureClassLoader for loading compiled python modules.
+      This should allow jython to be used with the java plugin and
+      its fine grained security.
+
+  CPython-2.0 compatibility
+    - Added support for formatting of long values in "%d %x %X %o".
+      The support does not match CPython2.0 exactly, but matches
+      what CPython2.1 will do.
+    - The \x escape will only eat two hex characters and will 
+      always create a character with values < 256. Use the \u
+      escape for high-byte values.
+    - A ucnhash module to support the \n{name} escape.
+
+  Backward incompatibility:
+    - The python.path property is appended to sys.path instead of
+      being inserted at position 1 in sys.path.
+
+  Bug fixes.
+    - Package relative import works in jythonc, at least when the dotted 
+      package name match the directory structure.
+    - Fixed oct(0) to return "0"
+    - Added a os.__file__ attribute. CPython's site.py expects that.
+    - Fixed a exception when calling int("0", 16)
+    - Delay closing a socket until all sock.makefile() files are closed.
+    - Avoided a duplicate call to Class.getMethods(). This will improve 
+      performance.
+    - Allow from import * to modify the locals in a function (bug 122834).
+    - Classes with the same name do no longer clash (bug 122820).
+    - Avoid a memory leak where many threads get started and stopped. The 
+      fix only works on java2.
+
 26-Nov-2000 Jython 2.0 alpha 1
 
   New features.
@@ -190,7 +234,8 @@ Jython NEWS
     - bug fixes
 
 	
-
+
+
 Local Variables:
 mode: indented-text
 indent-tabs-mode: nil
