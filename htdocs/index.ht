@@ -63,7 +63,7 @@ allows you to run Python on any Java platform.
 
     <p><dt><b>8-dec-2000</b>
     <dd>Bruce Eckel has release a new revision of his
-        <a href="http://www.mindview.net/TIPatterns/index.html">
+        <a href="http://www.mindview.net/Books/TIPatterns/">
         Thinking in Patterns with Java</a> book and chapter 9 has been updated to
         cover Jython.
 
