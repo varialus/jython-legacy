@@ -23,4 +23,10 @@ school lessons. Jython is used as the scripting language.
 <dd>FamilyRelations is a GPLed bioinformatics graphical user interface for
 exploring genomic sequence similarity.  It is written entirely in Jython.
 
+<p><dt><b><a href="http://www.propylon.com">Propylon</a></b>
+<dd>Propylon use Jython to bring the power of Python to complex XML
+processing on the Java Virtual Machine. Propylon also use Jython to
+provide enhanced server-side scripting and integration in its pervasive
+portal server product: Mission Control. 
+
 </dl>
