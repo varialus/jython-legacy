@@ -1,0 +1,12 @@
+show/compare test results saved with regrtest.py -m RES option:
+
+report.py res          : just show
+report.py res old-res  : compare with old result
+
+report.py [-locs LOCS] res [old-res]
+
+LOCS is a file with lines:
+<directory-path> = <nick>
+...
+
+see locs.example, useful to coalesce test locations so to be able to compare results from different machines...
