@@ -65,15 +65,15 @@ most common problems.
 <P>By default, Jython only installs a small collection of the standard 
 Python modules. This is due the fact that much of the functionality of
 these modules is duplicated by Java packages. If you want to use parts 
-standard Python library that are not included with Jython, you have 
-select the "Library" during installation or add pointer in python.path
-to the Lib directory of  a preexisting Python 2.0 distribution. This 
+of the standard Python library that are included with Jython, you have 
+to select the "Library" during installation or add a directory to your
+python.path that points to  a preexisting Python 2.0 distribution. This 
 requires editing your &quot;registry&quot; file.
 
 <H4>Other Problems</H4>
 
 <P>Any other problems with the installation should be reported to 
-<A HREF="mailto:python-dev@lists.sourceforge.net">jython-dev</A>.
+<A HREF="mailto:jython-dev@lists.sourceforge.net">jython-dev</A>.
 
 <P>As a workaround you can extract the jython-20a1.class manually.
 The class file is basicly a .zip file and most unzip programs can
@@ -81,8 +81,8 @@ manage to extract the contents of the class into a directory.
 After doing that, you must 
 <ul>
 <li>Remove the <tt>net</tt> directory. It isn't needed.
-<li>Create the startup script by hand. Use the <tt>template*</tt> files
-    as a starting point in doing so.
+<li>Create the startup script by hand. Use the <tt>installer/template*</tt>
+    files as a starting point in doing so.
 </ul>
 
 <H4>Platform Specific Notes</H4>
