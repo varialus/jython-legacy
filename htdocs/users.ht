@@ -55,4 +55,11 @@ existing business objects.
 visualization and analysis of numerical data. It uses Jython to define
 an easy-to-use scripting language.
 
+<p><dt><b><a href="http://luxor-xul.sourceforge.net">Luxor</a></b>
+<dd>Luxor is an open-source XML User Interface Language
+(XUL) toolkit in Java that supports handpicked Mozilla
+XUL goodies and includes a web server, a portal engine
+(supporting RSS), a template engine (Velocity), a
+scripting interpreter (Python) and more.
+
 </dl>
