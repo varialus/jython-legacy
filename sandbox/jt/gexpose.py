@@ -166,21 +166,28 @@ class Gen:
         dfls = [ dfl for k,opt,dfl,tg in argspecs if opt]
         return everything,dfls
 
+    def arg_i(self, argj, j, tg):
+        if tg:
+            err = "%s must be an integer" % tg
+        else:
+            err = "expected an integer"
+        return JavaTemplate("%s.asInt(%s)" % (argj, j)), err # !!!
+
     def arg_o(self,argj,j,tg):
         return JavaTemplate(argj),None
 
     def arg_s(self,argj,j,tg):
         if tg:
-            err = "%s must be string" % tg
+            err = "%s must be a string" % tg
         else:
-            err = "expected string"
+            err = "expected a string"
         return JavaTemplate("%s.asString(%s)" % (argj,j)),err # !!!
 
     def arg_n(self,argj,j,tg):
         if tg:
-            err = "%s must be string" % tg
+            err = "%s must be a string" % tg
         else:
-            err = "expected string"
+            err = "expected a string"
         return JavaTemplate("%s.asName(%s)" % (argj,j)),err # !!!
 
     def make_call_meths(self,n,bindings):
