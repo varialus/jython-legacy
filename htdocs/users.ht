@@ -19,4 +19,8 @@ Wizard player and develop new game areas and objects using Jython.
 can be used to create lessons which are more like adventure games than 
 school lessons. Jython is used as the scripting language.
 
+<p><dt><b><a href="http://family.caltech.edu">FamilyRelations</a></b>
+<dd>FamilyRelations is a GPLed bioinformatics graphical user interface for
+exploring genomic sequence similarity.  It is written entirely in Jython.
+
 </dl>
