@@ -72,6 +72,14 @@ allows you to run Python on any Java platform.
 <h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
+    <p><dt><b>10-jun-2003</b>
+    <dd><a href="http://today.java.net/pub/a/today/2003/06/10/jython.html">Scripting with Jython Instead of XML</a>,
+        Jonathan Simon on <a href="http://java.net/">java.net</a>
+
+    <p><dt><b>6-may-2003</b>
+    <dd>Uche Ogbuij in IBM developerWorks
+        <a href="http://www-106.ibm.com/developerworks/java/library/j-jython.html">Charming Jython</a>
+
     <p><dt><b>11-apr-2002</b>
     <dd>Noel Rappin has written another
         <a href="http://www.onjava.com/pub/a/onjava/2002/03/27/jython.html">
@@ -129,6 +137,6 @@ allows you to run Python on any Java platform.
 
 </dl>
 
-<font size=-1> last updated 13-jan-2003 </font>
+<font size=-1> last updated 20-jun-2003 </font>
 
 
