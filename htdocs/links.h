@@ -16,7 +16,7 @@
 <h3>Doc Quick Links</h3>
 <li><a href="docs/whatis.html">What is Jython</a>
 <li><a href="docs/index.html">All Documentation</a>
-<li><a href="docs/faq.html">FAQ</a>
+<li><a href="http://jython.sourceforge.net/cgi-bin/faqw.py?req=index">FAQ</a>
 <li><a href="http://www.jpython.org/jpython-talk-1.ppt">JimH's Slides</a>
 <br>(PowerPoint, ~239KB)
 
