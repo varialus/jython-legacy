@@ -25,7 +25,5 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 
-CVSROOT /usr/bin/python $CVSROOT/CVSROOT/fixrepo %{s}
-
 DEFAULT /usr/bin/python $CVSROOT/CVSROOT/syncmail %{sVv} jython-checkins@lists.sourceforge.net
 
