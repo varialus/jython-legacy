@@ -11,7 +11,7 @@ allows you to run Python on any Java platform.
 <li>What is <A HREF="docs/whatis.html">Jython</A>
 <li><A HREF="download.html">Download</a> the lastest version.
 <li><A HREF="docs/index.html">Documentation</A>
-<li>The Jython <A HREF="docs/faq.html">FAQ</A>.
+<li>The Jython <A HREF="http://jython.sourceforge.net/cgi-bin/faqw.py?req=index">FAQ</A>.
 </ul>
 
 
@@ -19,10 +19,13 @@ allows you to run Python on any Java platform.
 
 
 <dl>
-    <p><dt><b>Jython 2.0 beta 1 released!</b>
+    <p><dt><b>Jython 2.0 beta 2 released!</b>
     <dd>Download the lastest relase of Jython <a href="download.html">here</a>, 
         or <a href="NEWS.html">read a summary</a>
-	of recent changes. (31-dec-2000).
+	of recent changes. (10-jan-2001).
+
+    <p><dt><b>Jython 2.0 beta 1 released!</b>
+    <dd>The first beta release of Jython is available (31-dec-2000).
 
     <p><dt><b>Step by step installation instruction for MacOS.</b>
     <dd>L. Humbert has contributed a <a href="MacOS_Install.html">guide</a>
@@ -66,6 +69,6 @@ allows you to run Python on any Java platform.
 
 </dl>
 
-<font size=-1> last updated 25-dec-2000 </font>
+<font size=-1> last updated 10-jan-2001 </font>
 
 
