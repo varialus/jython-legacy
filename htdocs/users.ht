@@ -18,6 +18,12 @@ jython-dev@lists.sourceforge.net.
 <dl>
 
 <p>
+<dt><b><a href="http://staf.sourceforge.net/index.php">STAF (Software Testing Automation Framework)</a></b>
+<dd>
+uses Jython for its execution engine <a href="http://staf.sourceforge.net/index.php#STAXOverview">STAX</a>.
+</dd>
+
+<p>
 <dt><b><a href="http://sulu.sourceforge.net/">Sulu</a></b>
 <dd>
 Sulu is an LGPL Mozilla XUL
