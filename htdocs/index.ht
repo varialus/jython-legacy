@@ -21,6 +21,22 @@ allows you to run Python on any Java platform.
 
 <h3><font size=+1 color="#666699">Jython News</font></h3>
 
+<dl>
+<p><dt><b>14 January 2005</b></dt></p>
+
+<p>The PSF recently published its <a
+href="http://www.python.org/psf/grants/">list of projects</a> to
+recieve grant funding. Brian Zimmer will manage the project <a
+href="http://www.python.org/psf/grants/Jython_PSF_Grant_Proposal.pdf">Moving
+Jython Forward</a>.
+
+<p>A new article on <a
+href="http://www.devx.com/Java/Article/26602">writing Eclipse JUnit
+tests in Jython</a></p>
+
+<p>Random Jython Spotlight: <a
+<a href="http://staf.sourceforge.net/index.php">STAF (Software Testing Automation Framework)</a> uses Jython for its execution engine <a href="http://staf.sourceforge.net/index.php#STAXOverview">STAX</a> (Added to <a href="users.html">Jython users page</a>.
+</dl>
 
 <dl>
 <p><dt><b>21 December 2004</b></dt></p>
