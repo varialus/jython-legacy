@@ -35,7 +35,13 @@ allows you to run Python on any Java platform.
 <h3><em><font size=+1 color="red">Jython In the press</font></em></h3>
 
 <dl>
-    <dt><b>5-dec-2000</b>
+    <dt><b>8-dec-2000</b>
+    <dd>Bruce Eckel have release a new revision of his
+        <a href="http://www.mindview.net/TIPatterns/index.html">
+        Thinking in Patterns with Java</a> book and chapter 9 have been updated to
+        cover Jython.
+
+    <p><dt><b>5-dec-2000</b>
     <dd>David Mertz have done an 
         <a href="http://gnosis.cx/publish/programming/charming_python_10.txt">interview</a>
         with some of the jython developers
@@ -44,8 +50,10 @@ allows you to run Python on any Java platform.
     <dd>JPython is mentioned in an 
         <a href="http://www.javasoft.com/features/2000/11/dotnetvsms.html?frontpage-banner">
         article</a> that compares the Java platform with MicroSoft's .NET 
+
+
 </dl>
 
-<font size=-1> last updated 5-dec-2000 </font>
+<font size=-1> last updated 8-dec-2000 </font>
 
 
