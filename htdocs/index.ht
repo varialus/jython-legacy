@@ -19,11 +19,11 @@ allows you to run Python on any Java platform.
 
 
 <dl>
-    <p><dt><b>Jython 2.1 beta 1 released!</b>
+    <p><dt><b>Jython 2.1 beta 2 released!</b>
     <dd>Download the latest release of Jython 
-        <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=64027">here</a>, or 
+        <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=66632">here</a>, or 
         <a href="NEWS.html">read a summary</a>
-	of recent changes. (03-dec-2001).
+	of recent changes. (21-dec-2001).
 
     <p><dt><b>Jython 2.0 released!</b>
     <dd>Download the latest stable relase of Jython 
@@ -81,6 +81,6 @@ allows you to run Python on any Java platform.
 
 </dl>
 
-<font size=-1> last updated 03-dec-2001 </font>
+<font size=-1> last updated 21-dec-2001 </font>
 
 
