@@ -21,7 +21,9 @@ allows you to run Python on any Java platform.
 <dl>
     <p><dt><b>Jython 2.1 released!</b>
     <dd>Download the latest stable relase of Jython 
-        <a href="download.html">here</a> (31-dec-2001).
+        <a href="download.html">here</a> and
+        <a href="NEWS.html">read a summary</a> of recent changes.<br>
+        (31-dec-2001).
 
     <p><dt><b>New website layout.</b>
     <dd>New colors and an jython icon created by Ivan Kougaenko. (15-jan-2001).
