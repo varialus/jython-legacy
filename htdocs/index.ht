@@ -14,6 +14,8 @@ allows you to run Python on any Java platform.
 <li><A HREF="docs/index.html">Documentation</A>
 <li>The Jython <A HREF="http://www.jython.org/cgi-bin/faqw.py?req=index">FAQ</A>.
 <li>Brian Zimmer's <a href="http://www.ziclix.com/bzimmer/">Jython development blog</a></li>
+<li><a href="https://coyote.dev.java.net/">Jython support in NetBeans</a></li>
+
 </ul>
 
     <dd><i><blockquote>
@@ -22,6 +24,14 @@ allows you to run Python on any Java platform.
         </blockquote></i>
 
 <h3><font size=+1 color="#666699">Jython News</font></h3>
+
+<dl>
+<p><dt><b>16th March 2005</b></dt></p>
+<li>Jython support in <a href="http://www.netbeans.org">NetBeans</a> has been announced as part of a more general dynamic languages support initiative for NetBeans called <a href="https://coyote.dev.java.net/">Coyote</a>. See blog entries by <a href="http://www.tbray.org/ongoing/When/200x/2005/03/15/Coyote">Tim Bray</a> and <a href="http://blogs.sun.com/roller/page/webmink/20050315#doing_java_without_java">Simon Phipps</a> of Sun Microsystems.
+</li>
+</dl>
+
+
 
 <dl>
 <p><dt><b>14th February 2005</b></dt></p>
