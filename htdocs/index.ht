@@ -46,6 +46,13 @@ allows you to run Python on any Java platform.
 <h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
+
+    <p><dt><b>8-apr-2001</b>
+    <dd>Ross Lonstein has written an 
+       <a href="http://www.agoron.com/~lonstein/articles/jython-bsf.html">article</a>
+       on how Jython can be integrated with 
+       <a href="http://oss.software.ibm.com/developerworks/projects/bsf">BSF</a>.
+
     <p><dt><b>12-mar-2001</b>
     <dd>Weiqi Gao <a href="http://www.ociweb.com/jnb/archive/jnbMar2001.html">shows</a>
         scripting examples using Jython and Rhino (javascript).
