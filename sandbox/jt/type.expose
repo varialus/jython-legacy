@@ -1,28 +1,24 @@
 # setup
 type_name: type
 type_class: PyType
-define: void
-   return Py.None;
-# gesets
+# getsets
 expose_getset: __dict__ getDict
+expose_getset: __name__ fastGetName
+expose_getset: __base__ getBase
+expose_getset: __bases__ getBases
 # exposed methods
 expose_meth: __getattribute__ n{attribute name}
    String name = `arg0;
    PyObject ret = self.type___findattr__(name);
    if (ret == null) self.noAttributeError(name);
    return ret;
-expose_meth: __setattr__ n{attribute name}o
-   String name = `arg0;
-   self.type___setattr__(name,`arg1);
-   `void;
+expose_meth: :- __setattr__ n{attribute name}o
 expose_meth: :- __delattr__ n{attribute name}
-#    String name = `arg0;
-#    self.type___delattr__(name);
-#    `void;
 expose_meth: __subclasses__
    return self.type_getSubclasses();
+expose_wide_meth: __call__ -1 -1
+expose_new_immutable:
 # TODO:
-# __call__,
 # mro,__mro__
 # __cmp__
 # __repr__

@@ -178,4 +178,4 @@ define: mutable_new_body
                 }
                 return newobj;
 define: immutable_new_body
-                return `concat`(`typname,_new)(this,init,subtype,args,keyword);
+                return `concat`(`typname,_new)(this,init,subtype,args,keywords);

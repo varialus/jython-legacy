@@ -206,9 +206,9 @@ rest:
 	     try {
 	       return getattr.__get__(this,self_type).__call__(py_name!=null?py_name:new PyString(name));
 	     } catch(PyException e1) {
-	       if (Py.matchException(e1,Py.AttributeError)) return null;
-	       throw e1;
+	       if (!Py.matchException(e1,Py.AttributeError)) throw e1;
 	     }
+          return null;
       }
       throw e;
     }
@@ -232,6 +232,37 @@ rest:
       return;
     }
     super.__delattr__(name);
+  }
+
+  public PyObject __get__(PyObject obj, PyObject type) {
+      PyType self_type = getType();
+      PyObject impl = self_type.lookup("__get__");
+      if (impl != null) {
+          if (obj == null) obj = Py.None;
+          if (type == null) type = Py.None;
+          return impl.__get__(this, self_type).__call__(obj, type);
+      }
+      return super.__get__(obj, type);
+  }
+
+  public void __set__(PyObject obj, PyObject value) {
+      PyType self_type = getType();
+      PyObject impl = self_type.lookup("__set__");
+      if (impl != null) {
+          impl.__get__(this, self_type).__call__(obj, value);
+          return;
+      }
+      super.__set__(obj, value);
+  }
+
+  public void __delete__(PyObject obj) {
+      PyType self_type = getType();
+      PyObject impl = self_type.lookup("__delete__");
+      if (impl != null) {
+          impl.__get__(this, self_type).__call__(obj);
+          return;
+      }
+      super.__delete__(obj);
   }
 
   public void dispatch__init__(PyType type,PyObject[] args,String[] keywords) {
