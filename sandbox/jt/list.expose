@@ -11,12 +11,14 @@ expose_meth: pop i?
 expose_meth: :- remove o
 expose_meth: :- reverse
 expose_meth: :- sort o?
-expose_binary: __ne__ __eq__ __contains__
+expose_binary: __ne__ __eq__
+expose_meth: :b __contains__ o
 expose_meth: :i __len__
 expose_meth: __add__ o
 expose_meth: __iadd__ o
+expose_meth: __add__ o
 expose_meth: __imul__ o
-expose_meth: __reduce__
+#expose_meth: __reduce__
 expose_meth: __mul__ o
 expose_meth: __rmul__ o
 expose_meth: __hash__
@@ -29,3 +31,4 @@ expose_wide_meth: __init__ -1 -1
 expose_new_mutable:
 #expose_index_getitem:
 #expose_meth: :b __nonzero__
+
