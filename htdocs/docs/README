@@ -1,0 +1,9 @@
+This is a placeholder for the generated documentation .html file.
+The files here are generated a little bit differently than the .html
+files in jython/Doc. See the Makefile for details.
+
+The differences are:
+- This uses another template.
+- The root is the parent (..)
+- Here is another (larger) links.h file
+
