@@ -78,7 +78,8 @@ if 1:
             <fileset dir="${jython.home}/Doc" includes="*.ht"/>
         </copy>
         <copy todir="docs/javadoc">
-            <fileset dir="${jython.home}/Doc/javadoc" includes="**/*.html"/>
+            <fileset dir="${jython.home}/Doc/javadoc"
+                     includes="**/*.html,*.css"/>
         </copy>
         <execon executable="${python.home}/python" dir="docs">
             <arg line="${ht2html.dir}/ht2html.py"/>
