@@ -42,6 +42,18 @@ allows you to run Python on any Java platform.
 <h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
+    <p><dt><b>2-apr-2002</b>
+    <dd>Our second Jython book called 
+        <i><a href="http://www.oreilly.com/catalog/jythoness/">
+        Jython Essentials</a></i> was written by By Noel Rappin and
+        Samuele Pedroni and published by <a href="http://www.oreilly.com/">
+        O'Reilly</a>.
+
+    <p><dt><b>28-mar-2002</b>
+    <dd>Noel Rappin has written an
+        <a href="http://www.onjava.com/pub/a/onjava/2002/03/27/jython.html">
+        article</a> on how to script java with Jython.
+
     <p><dt><b>15-jan-2002</b>
     <dd>The very first Jython book called 
         <i><a href="http://www.newriders.com/books/title.cfm?isbn=0735711119">
