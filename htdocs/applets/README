@@ -6,6 +6,10 @@ file is created by this command in the Demo/applet directory:
 
    jythonc --core --deep --jar appletdemo.jar *.py
 
+Remember that the applets must be compiled with the same version of java as 
+they will use in the browser. The demo applets on the website must be 
+compiled with a JDK1.1. I have used JDK1.1.7A
+
 
 appletdemo.jar:	        This file is create by the command above.
 
