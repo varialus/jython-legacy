@@ -12,7 +12,6 @@ HTMLFILES = \
 	compile.html \
 	differences.html \
 	embedding.html \
-	faq.html \
 	index.html \
 	interpreter.html \
 	jarray.html \
