@@ -35,10 +35,17 @@ allows you to run Python on any Java platform.
 <h3><em><font size=+1 color="red">Jython In the press</font></em></h3>
 
 <dl>
-    <dt>8-nov-2000
+    <dt><b>5-dec-2000</b>
+    <dd>David Mertz have done an 
+        <a href="http://gnosis.cx/publish/programming/charming_python_10.txt">interview</a>
+        with some of the jython developers
+
+    <p><dt><b>8-nov-2000</b>
     <dd>JPython is mentioned in an 
-    <a href="http://www.javasoft.com/features/2000/11/dotnetvsms.html?frontpage-banner">
-    article</a> that compares the Java platform with MicroSoft's .NET 
+        <a href="http://www.javasoft.com/features/2000/11/dotnetvsms.html?frontpage-banner">
+        article</a> that compares the Java platform with MicroSoft's .NET 
 </dl>
 
-<font size=-1> last updated 26-now-2000 </font>
+<font size=-1> last updated 5-dec-2000 </font>
+
+
