@@ -22,5 +22,5 @@
 
 <h3>Exits</h3>
 <li><a href="http://www.python.org/">Python Language</a>
-<li><a href="http://www.python.org/psa">PSA</a>
+<li><a href="http://www.python.org/psf">PSF</a>
 <li><a href="http://www.javasoft.com">Java Language</a>
