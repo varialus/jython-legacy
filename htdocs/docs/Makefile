@@ -15,6 +15,7 @@ HTMLFILES = \
 	index.html \
 	interpreter.html \
 	jarray.html \
+	jreload.html \
 	jythonc.html \
 	properties.html \
 	registry.html \
