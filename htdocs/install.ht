@@ -5,10 +5,10 @@ Title: Installing Jython
 <P>Jython is distributed as a self-extracting .class file created by 
 <A HREF="http://liftoff.sourceforge.net">LiftOff</A>. 
 To install Jython, open the command line to the directory in which 
-you have placed the Jython-20a1.class file and then type:
+you have placed the jython-20a1.class file and then type:
 
 <BLOCKQUOTE>
-	<P>&lt;java interpreter&gt; Jython-20a1</P>
+	<P>&lt;java interpreter&gt; jython-20a1</P>
 </BLOCKQUOTE>
 
 <P>You will probably type one of the following three lines,
@@ -16,23 +16,23 @@ depending on your system. <b>Be sure <em>not</em> to put &quot;.class&quot;
 at the end of the file name.</b>
 
 <BLOCKQUOTE>
-	<P><TT>java Jython-20a1</TT></P>
+	<P><TT>java jython-20a1</TT></P>
 
-	<P><TT>jre Jython-20a1</TT></P>
+	<P><TT>jre jython-20a1</TT></P>
 
-	<P><TT>jview Jython-20a1</TT>
+	<P><TT>jview jython-20a1</TT>
 </BLOCKQUOTE>
 
 <p>It can be necessay to set the CLASSPATH to include the current directory
 
 <BLOCKQUOTE>
-	<P><TT>env CLASSPATH=. java Jython-20a1</TT>
+	<P><TT>env CLASSPATH=. java jython-20a1</TT>
 
-	<P><TT>java -cp . Jython-20a1</TT>
+	<P><TT>java -cp . jython-20a1</TT>
 
-	<P><TT>java -classpath . Jython-20a1</TT>
+	<P><TT>java -classpath . jython-20a1</TT>
 
-	<P><TT>jview /cp:. Jython-20a1</TT>
+	<P><TT>jview /cp:. jython-20a1</TT>
 </BLOCKQUOTE>
 
 <P>Which command to use depends on your operating system and java version.
@@ -43,7 +43,7 @@ bringing up the graphical installer. E.g. to install all modules to a
 Jython-2.0 subdirectory in the current directory do: 
 
 <BLOCKQUOTE>
-  <P><TT>&lt;java interpreter&gt; Jython-20a1 -o Jython-2.0 demo lib source</TT>
+  <P><TT>&lt;java interpreter&gt; jython-20a1 -o Jython-2.0 demo lib source</TT>
 </BLOCKQUOTE>
 
 
