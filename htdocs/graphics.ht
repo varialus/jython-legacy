@@ -33,5 +33,14 @@ suggesting a new colour scheme for our entire site.
   <td></td>
   <td><a href="graphics/sample01.html">sample page</a></td>
 </tr>
+
+<tr>
+  <td><hr><font size=+1>R. Lonstein</font></td>
+</tr>
+<tr>
+  <td><image src="graphics/small02.gif"></td>
+  <td></td>
+  <td></td>
+</tr>
 </table>
 
