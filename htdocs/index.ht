@@ -42,7 +42,11 @@ allows you to run Python on any Java platform.
 <h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
-    <dt><b>18-dec-2000</b>
+    <dt><b>12-mar-2001</b>
+    <dd>Weiqi Gao <a href="http://www.ociweb.com/jnb/archive/jnbMar2001.html">shows</a>
+        scripting examples using Jython and Rhino (javascript).
+
+    <p><dt><b>18-dec-2000</b>
     <dd>Jon Udell <a href="http://www.byte.com/column/BYT20001214S0009">talks</a>
         about using the JVM to implement other languages, among them JPython.
 
