@@ -1,4 +1,5 @@
 <!-- Copyright 2001 Finn Bock -->
+<!-- Copyright 2003 Samuele Pedroni -->
 <!--
  The "update" target requires that an bsf.jar file is available
  in the ant/lib directory.
@@ -53,43 +54,61 @@ if 1:
 
     </target>
 
-    <target name="generate" depends="init">
-        <!-- Create .html files in htdocs -->
+    <target name="generate-top" depends="init">
+    <!-- Create .html files in htdocs -->
         <execon executable="${python.home}/python">
+	    <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
-            <arg line="-s JPyGenerator"/>
+            <arg line="-s JyGenerator"/>
             <fileset dir=".">
                 <include name="*.ht" />
             </fileset>
         </execon>
+    </target>
 
-        <!-- Create .html files in htdocs/applets -->
+    <target name="generate-applets" depends="init">
+    <!-- Create .html files in htdocs/applets -->
         <execon executable="${python.home}/python" dir="applets">
+	    <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
-            <arg line="-s JPyGenerator"/>
+            <arg line="-s JyGenerator"/>
             <arg line="-r .."/>
             <fileset dir=".">
                 <include name="applets/*.ht" />
             </fileset>
         </execon>
+    </target>
 
-        <!-- Create .html files in htdocs/docs -->
+    <target name="inherit-docs" depends="init">
         <copy todir="docs">
             <fileset dir="${jython.home}/Doc" includes="*.ht"/>
         </copy>
+    </target>
+
+    <target name="inherit-javadoc" depends="init">
         <copy todir="docs/javadoc">
             <fileset dir="${jython.home}/dist/Doc/javadoc"
                      includes="**/*.html,*.css"/>
         </copy>
+    </target>	
+
+    <target name="generate-docs" depends="init">
+    <!-- Create .html files in htdocs/docs -->
         <execon executable="${python.home}/python" dir="docs">
+	    <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
-            <arg line="-s JPyGenerator"/>
+            <arg line="-s JyGenerator"/>
             <arg line="-r .."/>
             <fileset dir=".">
                 <include name="docs/*.ht" />
             </fileset>
         </execon>
     </target>
+
+    <target 
+       name="generate" 
+       depends="init, generate-top, generate-applets, 
+                inherit-docs, inherit-javadoc, generate-docs" />
 
     <target name="collect" depends="generate">
         <tar tarfile="${htdocs.tar}" basedir="."
@@ -119,4 +138,3 @@ if 1:
     </target>
 
 </project>
-
