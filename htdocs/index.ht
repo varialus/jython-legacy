@@ -9,7 +9,7 @@ allows you to run Python on any Java platform.
 
 <ul>
 <li>What is <A HREF="docs/whatis.html">Jython</A>
-<li><A HREF="download.html">Download</a> the lastest version.
+<li><A HREF="download.html">Download</a> the latest version.
 <li><A HREF="docs/index.html">Documentation</A>
 <li>The Jython <A HREF="http://www.jython.org/cgi-bin/faqw.py?req=index">FAQ</A>.
 </ul>
@@ -20,7 +20,7 @@ allows you to run Python on any Java platform.
 
 <dl>
     <p><dt><b>Jython 2.1 alpha 3 released!</b>
-    <dd>Download the lastest release of Jython 
+    <dd>Download the latest release of Jython 
         <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=45862">here</a>, or 
         <a href="NEWS.html">read a summary</a>
 	of recent changes. (29-jul-2001).
@@ -32,7 +32,7 @@ allows you to run Python on any Java platform.
     <dd>The first alpha release of Jython 2.1 is available (14-mar-2001)
 
     <p><dt><b>Jython 2.0 released!</b>
-    <dd>Download the lastest stable relase of Jython 
+    <dd>Download the latest stable relase of Jython 
         <a href="download.html">here</a> (17-jan-2001).
 
     <p><dt><b>New website layout.</b>
