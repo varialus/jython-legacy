@@ -42,6 +42,11 @@ allows you to run Python on any Java platform.
 <h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
+    <p><dt><b>11-apr-2002</b>
+    <dd>Noel Rappin has written another
+        <a href="http://www.onjava.com/pub/a/onjava/2002/03/27/jython.html">
+        article</a> with jython tips for python programmers.
+
     <p><dt><b>2-apr-2002</b>
     <dd>Our second Jython book called 
         <i><a href="http://www.oreilly.com/catalog/jythoness/">
