@@ -1,0 +1,37 @@
+Title: Graphics
+
+<h3>Graphics</h3>
+
+We need some new graphics on our homepage and in the installer. 
+
+<ul>
+<li>The top left image on the webpages is 152 x 50 pixels.
+<li>The image used by the installer is 78 x 399 pixels
+</ul>
+
+The images should in some way match the colours of the webpages, f.ex by 
+suggesting a new colour scheme for our entire site.
+
+<p>The general implementation of the webpages should stay the same. 
+<ul>
+<li>The links in the sidebar to the left should remain text
+<li>No frames
+<li>Very little javascript.
+</ul>
+
+
+<p>
+
+<h3>Submissions</h3>
+
+<table>
+<tr>
+  <td><hr><font size=+1>Jorge Mireles J.</font></td>
+</tr>
+<tr>
+  <td><image src="graphics/small01.jpg"></td>
+  <td></td>
+  <td><a href="graphics/sample01.html">sample page</a></td>
+</tr>
+</table>
+
