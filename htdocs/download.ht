@@ -7,8 +7,8 @@ source code is now <a href="http://sourceforge.net/cvs/?group_id=12867">
 available via CVS</a>!</em>
 
 <p>Nightly snapshots of the CVS repository are also available as 
-<a href="http://jython.sourceforge.net/cvssnaps/jython-nightly.tar.gz">.tar.gz</a>
-and <a href="http://jython.sourceforge.net/cvssnaps/jython-nightly.zip">.zip</a> files.
+<a href="http://www.jython.org/cvssnaps/jython-nightly.tar.gz">.tar.gz</a>
+and <a href="http://www.jython.org/cvssnaps/jython-nightly.zip">.zip</a> files.
 
 <p>Here are the steps you need to perform in order to download Jython.
 Once you've done this, you should read the
