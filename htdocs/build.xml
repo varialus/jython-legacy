@@ -98,8 +98,9 @@ if 1:
         <gzip zipfile="${htdocs.tgz}" src="${htdocs.tar}" />
     </target>
 
-    <target name="all" depends="init, update, generate, collect"/>
+    <target name="all" depends="init, generate, collect"/>
 
+    <target name="newrelease" depends="init, update, generate, collect"/>
 
     <target name="copy2sf" depends="init">
         <exec executable="${scp.command}">
