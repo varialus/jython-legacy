@@ -68,13 +68,14 @@ most common problems.
 
 <H4>Can't Access Standard Python Modules</H4>
 
-<P>By default, Jython only installs a small collection of the standard 
-Python modules. This is due the fact that much of the functionality of
-these modules is duplicated by Java packages. If you want to use parts 
-of the standard Python library that are included with Jython, you have 
-to select the "Library" during installation or add a directory to your
-python.path that points to  a preexisting Python 2.0 distribution. This 
-requires editing your &quot;registry&quot; file.
+<P>Not all the modules form CPython is available in Jython. Some modules
+require a C language dynamic link library that doesn't exists in java.
+Other modules are missing from Jython just because nobody have had a
+need for it before and no-one have tested the CPython module with Jython.
+If you discover that you are missing a module, try to copy the .py file
+from a CPython distribution to a directory on your Jython sys.path.
+If that works you are set. If it doesn't work, try asking on jython-users
+mailing list.
 
 <H4>Other Problems</H4>
 
