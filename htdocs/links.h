@@ -3,6 +3,7 @@
 <li><a href="./index.html">Overview</a>
 <li><a href="license.html">License</a>
 <li><a href="download.html">Jython 2.0</a>
+<li><a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=27187">Jython 2.1a1</a>
 <li><a href="install.html">Installing</a>
 <li><a href="platform.html">JVM Compatibility</a>
 

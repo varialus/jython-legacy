@@ -19,14 +19,18 @@ allows you to run Python on any Java platform.
 
 
 <dl>
+    <p><dt><b>Jython 2.1 alpha 1 released!</b>
+    <dd>Download the lastest relase of Jython 
+        <a href="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=27187">here</a>, or 
+        <a href="NEWS.html">read a summary</a>
+	of recent changes. (14-mar-2001).
+
     <p><dt><b>Jython 2.0 released!</b>
     <dd>Download the lastest stable relase of Jython 
-        <a href="download.html">here</a>, or 
-        <a href="NEWS.html">read a summary</a>
-	of recent changes. (17-jan-2001).
+        <a href="download.html">here</a> (17-jan-2001).
 
     <p><dt><b>New website layout.</b>
-    <dd>New colors and an icon created by Ivan Kougaenko. (15-jan-2001).
+    <dd>New colors and an jython icon created by Ivan Kougaenko. (15-jan-2001).
 
     <p><dt><b>Step by step installation instruction for MacOS.</b>
     <dd>L. Humbert has contributed a <a href="MacOS_Install.html">guide</a>
@@ -42,7 +46,7 @@ allows you to run Python on any Java platform.
 <h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
-    <dt><b>12-mar-2001</b>
+    <p><dt><b>12-mar-2001</b>
     <dd>Weiqi Gao <a href="http://www.ociweb.com/jnb/archive/jnbMar2001.html">shows</a>
         scripting examples using Jython and Rhino (javascript).
 
