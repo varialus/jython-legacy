@@ -15,14 +15,20 @@ allows you to run Python on any Java platform.
 </ul>
 
 
-<h3><em><font size=+1 color="red">Jython News</font></em></h3>
+<h3><font size=+1 color="#666699">Jython News</font></h3>
 
 
 <dl>
-    <p><dt><b>Jython 2.0 beta 2 released!</b>
+    <p><dt><b>Jython 2.0 release candidate 1 released!</b>
     <dd>Download the lastest relase of Jython <a href="download.html">here</a>, 
         or <a href="NEWS.html">read a summary</a>
-	of recent changes. (10-jan-2001).
+	of recent changes. (15-jan-2001).
+
+    <p><dt><b>New website layout.</b>
+    <dd>New colors and an icon created by Ivan Kougaenko. (15-jan-2001).
+
+    <p><dt><b>Jython 2.0 beta 2 released!</b>
+    <dd>The second beta release of Jython is available (10-jan-2001).
 
     <p><dt><b>Jython 2.0 beta 1 released!</b>
     <dd>The first beta release of Jython is available (31-dec-2000).
@@ -31,15 +37,6 @@ allows you to run Python on any Java platform.
     <dd>L. Humbert has contributed a <a href="MacOS_Install.html">guide</a>
         for installation and setup of Jython on MacOS. (27-dec-2000).
 
-    <p><dt><b>Jython 2.0 alpha 3 released!</b>
-    <dd>The second alpha release of Jython is available (25-dec-2000).
-
-    <p><dt><b>Jython 2.0 alpha 2 released!</b>
-    <dd>The second alpha release of Jython is available (17-dec-2000).
-
-    <p><dt><b>Jython 2.0 alpha 1 released!</b>
-    <dd>The first alpha release of Jython is available (26-nov-2000).
-
     <p><dt><b>Jython project announced</b>
     <dd>The Jython project have been created on sourceforge. Read the 
         <a href="http://www.python.org/pipermail/jpython-interest/2000-October/006417.html">
@@ -47,7 +44,7 @@ allows you to run Python on any Java platform.
 </dl>
 
 
-<h3><em><font size=+1 color="red">Jython In the press</font></em></h3>
+<h3><font size=+1 color="#666699">Jython In the press</font></h3>
 
 <dl>
     <dt><b>8-dec-2000</b>
@@ -69,6 +66,6 @@ allows you to run Python on any Java platform.
 
 </dl>
 
-<font size=-1> last updated 10-jan-2001 </font>
+<font size=-1> last updated 15-jan-2001 </font>
 
 
