@@ -2,12 +2,47 @@ Title: Who uses Jython
 
 <h3>Who uses Jython?</h3>
 
-Here's a partial list of projects and users of Jython. 
-If you are aware of any others, or would like to get your 
-projects listed here, just drop us a message at 
+Here's a partial list of projects and users of Jython (most recent
+additions first).  If you are aware of any others, or would like to
+get your projects listed here, just drop us a message at
 jython-dev@lists.sourceforge.net.
 
+<!--
+<p>
+<dt><b><a href=""></a></b>
+<dd>
+</dd>
+-->
+
+
 <dl>
+
+<p>
+<dt><b><a href="http://drools.org">Drools</a></b>
+<dd>
+An expert system written in java with semantics for Python. You can use valid Python
+syntax for any condition or consequence.  With drools you can easily
+process large amounts of data with logic and data separation, leaving
+your customers to concentrate just on the business rules and not how
+to process the data You just insert the facts into the system and drools
+executes the consequences on those facts based on the conditions
+</dd>
+</dt>
+
+
+<p>
+<dt><b><a href="http://www.jpk.com">JPK Instruments</a></b>
+<dd>
+JPK Instruments is a young biotech company in Berlin that develops
+atomic force microscopes for use in biological and soft-matter
+research.  The instrument control and imaging software is written
+mainly in Java and Jython.  Jython allows JPK's customers to write
+scripts to automate their experiments, provides a command-line
+interface for debugging and for accessing experimental features, and
+for dynamically configuring the standard software.
+
+</dd>
+
 
 <p><dt><b><a href="http://www.cabochon.com">Wyvern</a></b>
 <dd>Wyvern is a 100% free, extensible, multi-player online adventure
