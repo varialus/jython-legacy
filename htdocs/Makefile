@@ -20,7 +20,7 @@ HTMLFILES = \
 	MacOS_Install3.html \
 	MacOS_Install4.html \
 	MacOS_Install5.html \
-
+	NEWS.html
 
 all:  $(HTMLFILES)
 
