@@ -49,6 +49,15 @@ Following blackdown versions have been used with jython.
 <li><a href="http://www.ibm.com/java/jdk/118/linux/">IBMJava jdk for linux 1.1.8></a>
 </ul>
 
+<H4><A HREF="http://www.towerj.com">Tower Technology Corporation</A></H4>
+
+The <a href="http://www.towerj.com/productsservices/platform.htm">TowerJ VM</a>
+have shown impressive performance figures for some 
+Jython application. TowerJ is still a not a complete java environment, 
+but for some server type applications it can make performance around 2.6
+times faster than the IBM and Blackdown JVM's. TowerJ is a commercial
+product that also runs on WinNT, Irix, HP, Solaris and others.
+
 <H3>Macintosh</H3>
 
 <P>A guide for installation on Macintosh is available <a href="MacOS_Install.html">
@@ -96,6 +105,8 @@ or download the VM directly from the site above.
 specific functionality (using win32 api's, interacting with COM objects, 
 ...) then this VM will give you all of the platform specific 
 functionality you could desire.
+
+
 
 <H3 ALIGN="CENTER">Cross-Platform JVM's</H3>
 <H3>Kaffe</H3>
