@@ -19,11 +19,15 @@ allows you to run Python on any Java platform.
 
 
 <dl>
-    <p><dt><b>Jython 2.2 alpha 0 available</b>
+    <p><dt><b>Newstyle branch work, prospectives</b>
     <dd><i><blockquote>
         Jython, lest you do not know of it, is the most compelling weapon the Java platform has for its survival into the 21st century:-)
         <br>&#8212; <cite><a href="http://seanmcgrath.blogspot.com/2003_07_27_seanmcgrath_archive.html#105971971904416520">Sean McGrath, CTO, Propylon</a></cite>
         </blockquote></i>
+     <dd> Work is undergoing since the beginning of the year to implement new-style classes
+        features (the biggest quantum-leap post 2.1 missing feature for a new release) on the newstyle-branch in the CVS (see e.g. <a href="http://cvs.sourceforge.net/viewcvs.py/jython/jython/org/python/core/Attic/PyType.java?only_with_tag=newstyle-branch">this check-in</a>). <b> There will be a new alpha release when this branch will be merged to the trunk. We expect then a new release for the summer, with 2.2 and some 2.3 features. Leading up to the release this site will be revamped. (Apr 2004) </b>
+
+    <p><dt><b>Jython 2.2 alpha 0 available</b>
 
     <dd>Experimental, unstable release of Jython now available. This is an
         alpha release, in that it is not feature complete for a Jython 2.2
