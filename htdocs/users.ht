@@ -36,4 +36,12 @@ issues.  Jython provides dynamic elements to the
 simulation which are not easily replicated in other
 simulations.
 
+<p><dt><b><a href="http://www.pushtotest.com/ptt">TestMaker</a></b>
+<dd>A free open-source framework for building intelligent test agents to
+check Web Services (HTTP, HTTPS, SOAP, .NET, XML-RPC) for functionality,
+scalability and performance. TestMaker embeds Jython as a scripting language
+that calls a library of test objects. TestMaker is built on NetBeans so it
+offers Jython users a very nice graphical integrated development environment
+for general Jython development too.
+
 </dl>
