@@ -11,7 +11,6 @@
 <li><a href="http://sourceforge.net/mail/?group_id=12867">Mailling Lists (exit)</a>
 <li><a href="http://sourceforge.net/bugs/?group_id=12867">Bugs (exit)</a>
 <li><a href="users.html">Jython Users</a>
-<li><a href="graphics.html">Graphics submissions</a>
 
 <h3>Doc Quick Links</h3>
 <li><a href="docs/whatis.html">What is Jython</a>
