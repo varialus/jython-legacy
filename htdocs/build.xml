@@ -92,9 +92,17 @@ if 1:
 
     <target name="collect" depends="generate">
         <tar tarfile="${htdocs.tar}" basedir="."
-             includes="*.html docs/*.html docs/api applets/*.html
-                      applets/*.class applets/*.java applets/*.jar
-                      applets/*.cab graphics/*.* mac/*.*"/>
+             includes="*.html
+                       images/*.gif
+                       docs/*.html
+                       docs/javadoc/**
+                       applets/*.html
+                       applets/*.class
+                       applets/*.java
+                       applets/*.jar
+                       applets/*.cab
+                       graphics/*.*
+                       mac/*.*"/>
         <gzip zipfile="${htdocs.tgz}" src="${htdocs.tar}" />
     </target>
 
