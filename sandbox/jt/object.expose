@@ -3,6 +3,8 @@ type_name: object
 type_class: PyObject
 # getsets
 expose_getset: __class__ getType
+expose_getset: __doc__ getDoc
+
 # exposed methods
 expose_meth: __str__
    return self.__repr__();
@@ -23,4 +25,3 @@ expose_wide_meth: __init__ -1 -1
   `void;
 # TODO:
 #  __reduce__,
-#  __doc__
