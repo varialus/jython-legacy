@@ -14,4 +14,9 @@ jython-dev@lists.sourceforge.net.
 game that uses Jython as its extension language.  You can become a 
 Wizard player and develop new game areas and objects using Jython.
 
+<p><dt><b><a href="http://www.free-schooling.org">FreePlay</a></b>
+<dd>The Freeplay project is developing a free course authoring tool which 
+can be used to create lessons which are more like adventure games than 
+school lessons. Jython is used as the scripting language.
+
 </dl>
