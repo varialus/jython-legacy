@@ -5,10 +5,10 @@ Title: Installing Jython
 <P>Jython is distributed as a self-extracting .class file created by 
 <A HREF="http://liftoff.sourceforge.net">LiftOff</A>. 
 To install Jython, open the command line to the directory in which 
-you have placed the jython-20a3.class file and then type:
+you have placed the jython-20b1.class file and then type:
 
 <BLOCKQUOTE>
-	<P>&lt;java interpreter&gt; jython-20a3</P>
+	<P>&lt;java interpreter&gt; jython-20b1</P>
 </BLOCKQUOTE>
 
 <P>You will probably type one of the following three lines,
@@ -16,23 +16,23 @@ depending on your system. <b>Be sure <em>not</em> to put &quot;.class&quot;
 at the end of the file name.</b>
 
 <BLOCKQUOTE>
-	<P><TT>java jython-20a3</TT></P>
+	<P><TT>java jython-20b1</TT></P>
 
-	<P><TT>jre jython-20a3</TT></P>
+	<P><TT>jre jython-20b1</TT></P>
 
-	<P><TT>jview jython-20a3</TT>
+	<P><TT>jview jython-20b1</TT>
 </BLOCKQUOTE>
 
 <p>It can be necessay to set the CLASSPATH to include the current directory
 
 <BLOCKQUOTE>
-	<P><TT>env CLASSPATH=. java jython-20a3</TT>
+	<P><TT>env CLASSPATH=. java jython-20b1</TT>
 
-	<P><TT>java -cp . jython-20a3</TT>
+	<P><TT>java -cp . jython-20b1</TT>
 
-	<P><TT>java -classpath . jython-20a3</TT>
+	<P><TT>java -classpath . jython-20b1</TT>
 
-	<P><TT>jview /cp:. jython-20a3</TT>
+	<P><TT>jview /cp:. jython-20b1</TT>
 </BLOCKQUOTE>
 
 <P>Which command to use depends on your operating system and java version. 
@@ -41,7 +41,7 @@ path the java command. When installing the JDK 1.2 from javasoft, the
 default is it install both the JDK and a plugin JRE. The plugin JRE is added
 to your PATH, so running the <tt>java jython-20a</tt> command will make jython
 use the JRE. Specify the full path if you want to use JDK instead, ie:
-<tt>c:\Programs\JDK1.2\bin\java -cp . jython-20a3</tt>.
+<tt>c:\Programs\JDK1.2\bin\java -cp . jython-20b1</tt>.
 
 <P>If you do not have a GUI, then add <tt>-o dir_to_install_to</tt> to the 
 command above. Jython will install to the specified directory without 
@@ -49,7 +49,7 @@ bringing up the graphical installer. E.g. to install all modules to a
 Jython-2.0 subdirectory in the current directory do: 
 
 <BLOCKQUOTE>
-  <P><TT>&lt;java interpreter&gt; jython-20a3 -o Jython-2.0 demo lib source</TT>
+  <P><TT>&lt;java interpreter&gt; jython-20b1 -o Jython-2.0 demo lib source</TT>
 </BLOCKQUOTE>
 
 
@@ -81,7 +81,7 @@ requires editing your &quot;registry&quot; file.
 <P>Any other problems with the installation should be reported to 
 <A HREF="mailto:jython-dev@lists.sourceforge.net">jython-dev</A>.
 
-<P>As a workaround you can extract the jython-20a3.class manually.
+<P>As a workaround you can extract the jython-20b1.class manually.
 The class file is basicly a .zip file and most unzip programs can
 manage to extract the contents of the class into a directory.
 After doing that, you must 
