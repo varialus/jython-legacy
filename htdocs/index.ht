@@ -19,6 +19,36 @@ allows you to run Python on any Java platform.
 
 
 <dl>
+    <p><dt><b>Work in progress</b>
+    <dd>Something from history:
+      <ul><li> Python 1.5.2 was realeased on 14 Apr 1999.
+          <li> Python 2.0 was released on 20 Oct 2000.</ul>
+
+      Indeed 2.1 (corresponding feature-wise to CPython 2.1)  is becoming our 1.5.2,
+      it is not perfect but quite stable and can be used for real work, and is also
+      documented in print:
+      <ul>
+       <li><i><a href="http://www.oreilly.com/catalog/jythoness/">
+        Jython Essentials</a></i> by Samuele Pedroni, Noel Rappin,
+        <a href="http://www.oreilly.com/">O'Reilly</a>
+        <img border="0" align="middle"src="./images/JythonEss.jpg" 
+             alt="Jython Essentials cover" >
+        <li><i>Jython for Java Programmers</i> by Robert W. Bill,
+        <a href="http://www.newriders.com/">New Riders</a>.
+        <img border="0" align="middle"src="./images/Jython4JavaProgrammers.jpg" 
+             alt="Jython for Java Programmers cover" >  
+       </ul>
+
+      Last year we have been working toward a new release with CPython 2.2/2.3
+      features, and we are working on it. <br>
+
+      Development peekholes:
+      <ul>
+	<li><a href="http://sf.net/projects/jython/">Jython on SourceForge</a>
+        <li><a href="http://sf.net/cvs/?group_id=12867">Jython CVS</a>
+        <li><a href="http://sourceforge.net/mailarchive/forum.php?forum_id=5588">Jython checkins maillist</a>
+      </ul> (jan 2003).
+
     <p><dt><b>Jython 2.1 released!</b>
     <dd>Download the latest stable relase of Jython 
         <a href="download.html">here</a> and
