@@ -9,9 +9,11 @@ allows you to run Python on any Java platform.
 
 <ul>
 <li>What is <A HREF="docs/whatis.html">Jython</A>?
+<li>Jython <a href="http://www.jython.org/cgi-bin/wiki">WIKI</a>.
 <li><A HREF="download.html">Download</a> the latest version.
 <li><A HREF="docs/index.html">Documentation</A>
 <li>The Jython <A HREF="http://www.jython.org/cgi-bin/faqw.py?req=index">FAQ</A>.
+<li>Brian Zimmer's <a href="http://www.ziclix.com/bzimmer/">Jython development blog</a></li>
 </ul>
 
     <dd><i><blockquote>
@@ -20,6 +22,20 @@ allows you to run Python on any Java platform.
         </blockquote></i>
 
 <h3><font size=+1 color="#666699">Jython News</font></h3>
+
+<dl>
+<p><dt><b>14th February 2005</b></dt></p>
+<li>The Jython <a href="http://www.jython.org/cgi-bin/wiki">WIKI</a>
+is up and running. Thanks to <a
+href="http://www.dehora.net/journal/">Bill de h”ra</a> who did much of
+the running to get this set up.</li>
+</dl>
+
+<dl>
+<p><dt><b>24th January 2005</b></dt></p>
+<li>Brian Zimmer has started  a Jython development blog : <a href="http://www.ziclix.com/bzimmer/">http://www.ziclix.com/bzimmer/</a></li>
+
+</dl>
 
 <dl>
 <p><dt><b>14 January 2005</b></dt></p>
