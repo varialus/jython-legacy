@@ -44,4 +44,10 @@ that calls a library of test objects. TestMaker is built on NetBeans so it
 offers Jython users a very nice graphical integrated development environment
 for general Jython development too.
 
+<p><dt><b><a href="http://www.bison-group.com">BISON Solution</a></b>
+<dd>BISON Solution is the first process oriented Business Solution
+developed in 100% pure Java and fulfilling the J2EE Standards. 
+BISON Solution uses Jython for scripting and high-level customizing of
+existing business objects.
+
 </dl>
