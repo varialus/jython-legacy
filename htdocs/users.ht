@@ -50,4 +50,9 @@ developed in 100% pure Java and fulfilling the J2EE Standards.
 BISON Solution uses Jython for scripting and high-level customizing of
 existing business objects.
 
+<p><dt><b><a href="http://www.ssec.wisc.edu/~billh/visad.html">VisAD</a></b>
+<dd>VisAD is a Java component library for interactive and collaborative
+visualization and analysis of numerical data. It uses Jython to define
+an easy-to-use scripting language.
+
 </dl>
