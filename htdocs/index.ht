@@ -23,6 +23,15 @@ allows you to run Python on any Java platform.
 
 
 <dl>
+<p><dt><b>20 December 2004</b></dt></p>
+
+<p><a
+href="http://www.tbray.org/ongoing/When/200x/2004/12/19/NB4-plus">Tim
+Bray</a> announces an upcoming <a
+href="http://www.java.net">java.net</a> project to add
+dynamic-language infrastructure, including Jython, to the <a
+href="http://www.netbeans.org/">NetBeans</a> IDE.
+
 <p><dt><b>19 December 2004</b></dt></p>
 
 <p>Samuele Pedroni, Guido van Rossum and Sean McGrath represent the
