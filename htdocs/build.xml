@@ -57,7 +57,7 @@ if 1:
     <target name="generate-top" depends="init">
     <!-- Create .html files in htdocs -->
         <execon executable="${python.home}/python">
-	    <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
+            <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
             <arg line="-s JyGenerator"/>
             <fileset dir=".">
@@ -69,7 +69,7 @@ if 1:
     <target name="generate-applets" depends="init">
     <!-- Create .html files in htdocs/applets -->
         <execon executable="${python.home}/python" dir="applets">
-	    <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
+            <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
             <arg line="-s JyGenerator"/>
             <arg line="-r .."/>
@@ -90,12 +90,12 @@ if 1:
             <fileset dir="${jython.home}/dist/Doc/javadoc"
                      includes="**/*.html,*.css"/>
         </copy>
-    </target>	
+    </target>
 
     <target name="generate-docs" depends="init">
     <!-- Create .html files in htdocs/docs -->
         <execon executable="${python.home}/python" dir="docs">
-	    <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
+            <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
             <arg line="-s JyGenerator"/>
             <arg line="-r .."/>
