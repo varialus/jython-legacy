@@ -3,7 +3,7 @@ type_name: dict
 type_class: PyDictionary
 # exposed methods
 expose_meth: get oo?
-expose_meth: :- setdefault oo?
+expose_meth: setdefault oo?
 expose_new_mutable:
 expose_wide_meth: __init__ -1 -1
   `vdeleg`(init);
