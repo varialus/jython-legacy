@@ -22,6 +22,7 @@ class Gen:
     priority_order = ['require','define',
                       'type_as',
                       'type_name','type_class','type_base_class',
+                      'incl',
                       'expose_getset',
                       'expose_unary','expose_binary',
                       'expose_vanilla_cmp','expose_vanilla_pow',
@@ -121,6 +122,11 @@ class Gen:
         if body is not None:
             self.invalid(name,'non-empty body')
         self.type_base_class = JavaTemplate(parm.strip())
+
+    def dire_incl(self,name,parm,body):
+        if body is not None:
+            self.invalid(name,'non-empty body')
+        directives.execute(directives.load(parm.strip()+'.expose'),self)
 
     def dire_expose_getset(self,name,parm,body):
         if body is not None:
@@ -257,6 +263,7 @@ class Gen:
         parm = parm.strip()
         if parm.find('>') != -1:
             prefix, parm = parm.split('>', 1)
+            parm = parm.strip()
         else:
             prefix = self.type_name_plain+'_'
         if body is not None:
