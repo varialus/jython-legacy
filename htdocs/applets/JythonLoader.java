@@ -55,9 +55,13 @@ public class JythonLoader extends Applet implements Runnable {
     }
 
     private int activeApplets() {
-        Applet a = getAppletContext().getApplet(waitFor);
-        if (a != null)
-            return 2;
+        try {
+            Applet a = getAppletContext().getApplet(waitFor);
+            if (a != null)
+                return 2;
+        } catch (Exception ex) {
+            return 1;
+        }
         return 1;
     }
 
