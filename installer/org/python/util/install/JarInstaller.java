@@ -41,17 +41,17 @@ public class JarInstaller {
         try {
             List excludeDirs = _jarInfo.getExcludeDirs();
             if (!installationType.equals(Installation.ALL)) {
-                excludeDirs.add("Source");
+                // has to correspond with build.xml
+                excludeDirs.add("src");
             }
             if (installationType.equals(Installation.MINIMUM)) {
+                // has to correspond with build.xml
                 excludeDirs.add("Demo");
-                //TODO:oti exclude more from Lib (e.g. single files), and depending on the build process
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "compiler");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "distutils");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "email");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "encodings");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "hotshot");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "jxxload_help");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "lib-old");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "lib-tk");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "site-packages");
