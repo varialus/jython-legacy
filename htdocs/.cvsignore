@@ -1,1 +1,7 @@
 *.html htdocs.tgz htdocs.tar *.bat
+
+.classpath
+.project
+.ipr
+.iws
+.iml
