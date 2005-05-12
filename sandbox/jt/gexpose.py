@@ -183,6 +183,14 @@ class Gen:
             err = "expected an integer"
         return JavaTemplate("%s.asInt(%s)" % (argj, j)), err # !!!
 
+    def arg_l(self, argj, j, tg):
+        if tg:
+            err = "%s must be a long" % tg
+        else:
+            err = "expected a long"
+        return JavaTemplate("%s.asLong(%s)" % (argj, j)), err # !!!
+
+
     def arg_o(self,argj,j,tg):
         return JavaTemplate(argj),None
 
@@ -240,7 +248,7 @@ class Gen:
             for dv in dfls[rng-1-dflc:]:
                 new_body_bindings["arg%d" % j] = dv
                 j += 1
-            for deleg_templ_name in ('void','deleg','vdeleg','rdeleg','ideleg','bdeleg','sdeleg'):
+            for deleg_templ_name in ('void','deleg','vdeleg','rdeleg','ideleg','ldeleg','bdeleg','sdeleg'):
                 deleg_templ = self.get_aux(deleg_templ_name)
                 new_body_bindings[deleg_templ_name] = deleg_templ.tbind(new_body_bindings)
             body_jt = proto_body_jt.tbind(new_body_bindings)
@@ -272,6 +280,7 @@ class Gen:
             retk,rest = parm.split(None,1)
             body = {
                 ":i" : "`ideleg;",
+                ":l" : "`ldeleg;",
                 ":b" : "`bdeleg;",
                 ":s" : "`sdeleg;",
                 ":-" : "`vdeleg; `void; ",

@@ -146,6 +146,8 @@ define: rdeleg: name deleg_prefix
   return `deleg`(`name,`deleg_prefix);
 define: ideleg: name deleg_prefix
   return Py.newInteger(`deleg`(`name,`deleg_prefix));
+define: ldeleg: name deleg_prefix
+  return new PyLong(`deleg`(`name,`deleg_prefix));
 define: bdeleg: name deleg_prefix
   return Py.newBoolean(`deleg`(`name,`deleg_prefix));
 define: sdeleg: name deleg_prefix
