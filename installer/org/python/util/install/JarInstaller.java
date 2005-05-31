@@ -45,18 +45,11 @@ public class JarInstaller {
                 excludeDirs.add("src");
             }
             if (installationType.equals(Installation.MINIMUM)) {
-                // has to correspond with build.xml
+                // has to correspond with build.Lib.include.properties
                 excludeDirs.add("Demo");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "compiler");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "distutils");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "email");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "encodings");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "hotshot");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "lib-old");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "lib-tk");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "site-packages");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "test");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "xml");
             }
 
             int count = 0;
