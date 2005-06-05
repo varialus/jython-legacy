@@ -168,13 +168,15 @@ public class Installation {
     private static boolean useGUI(Map arguments) {
         if (arguments.containsKey(CONSOLE_OPTION)) {
             return false;
-        } else {
-            try {
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
-                return true;
-            } catch (Throwable t) {
-                return false;
-            }
+        }
+        if (Boolean.getBoolean("java.awt.headless")) {
+            return false;
+        }
+        try {
+            GraphicsEnvironment.getLocalGraphicsEnvironment();
+            return true;
+        } catch (Throwable t) {
+            return false;
         }
     }
 
