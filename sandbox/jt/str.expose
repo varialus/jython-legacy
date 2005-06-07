@@ -23,8 +23,10 @@ expose_meth: :i find s i? i?
 expose_meth: :i index s i? i?
 expose_meth: :b isalnum
 expose_meth: :b isalpha
+expose_meth: :b isdecimal
 expose_meth: :b isdigit
 expose_meth: :b islower
+expose_meth: :b isnumeric
 expose_meth: :b isspace
 expose_meth: :b istitle
 expose_meth: :b isupper
