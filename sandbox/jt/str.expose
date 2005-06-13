@@ -39,7 +39,7 @@ expose_meth: :i rfind s i? i?
 expose_meth: :i rindex s i? i?
 expose_meth: :s rjust i
 expose_meth: :s rstrip s?
-expose_meth: :o split s? i?
+expose_meth: :o split S? i?
 expose_meth: :o splitlines o?
 expose_meth: :b startswith s i? i?
 expose_meth: :s strip s?

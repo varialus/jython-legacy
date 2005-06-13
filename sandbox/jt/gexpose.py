@@ -194,6 +194,13 @@ class Gen:
     def arg_o(self,argj,j,tg):
         return JavaTemplate(argj),None
 
+    def arg_S(self,argj,j,tg):
+        if tg:
+            err = "%s must be a string or None" % tg
+        else:
+            err = "expected a string or None"
+        return JavaTemplate("%s.asStringOrNull(%s)" % (argj,j)),err # !!!
+
     def arg_s(self,argj,j,tg):
         if tg:
             err = "%s must be a string" % tg
