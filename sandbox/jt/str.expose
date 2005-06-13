@@ -29,6 +29,7 @@ expose_meth: :b islower
 expose_meth: :b isnumeric
 expose_meth: :b isspace
 expose_meth: :b istitle
+expose_meth: :b isunicode
 expose_meth: :b isupper
 expose_meth: :s join o
 expose_meth: :s ljust i
