@@ -34,16 +34,16 @@ expose_meth: :b isupper
 expose_meth: :s join o
 expose_meth: :s ljust i
 expose_meth: :s lower
-expose_meth: :s lstrip s?
+expose_meth: :s lstrip S?
 expose_meth: :s replace s s i?
 expose_meth: :i rfind s i? i?
 expose_meth: :i rindex s i? i?
 expose_meth: :s rjust i
-expose_meth: :s rstrip s?
+expose_meth: :s rstrip S?
 expose_meth: :o split S? i?
-expose_meth: :o splitlines o?
+expose_meth: :o splitlines b?
 expose_meth: :b startswith s i? i?
-expose_meth: :s strip s?
+expose_meth: :s strip S?
 expose_meth: :s swapcase
 expose_meth: :s title
 expose_meth: :s translate s s?
