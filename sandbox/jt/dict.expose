@@ -2,6 +2,7 @@
 type_name: dict
 type_class: PyDictionary
 # exposed methods
+expose_meth: fromkeys oo?
 expose_meth: get oo?
 expose_meth: setdefault oo?
 expose_new_mutable:
@@ -9,6 +10,7 @@ expose_wide_meth: __init__ -1 -1
   `vdeleg`(init);
   `void;
 expose_meth: popitem
+expose_meth: pop o o?
 expose_meth: :b has_key o
 expose_binary: __ne__ __eq__
 expose_meth: :b __contains__ o
@@ -33,7 +35,5 @@ expose_meth: __repr__
 expose_meth: __iter__
 # TODO:
 #  ('__getattribute__'), 
-#  'pop' ?
 #  '__lt__', '__gt__', '__ge__', __le__' 
 # (__doc__)
-# 'fromkeys'
