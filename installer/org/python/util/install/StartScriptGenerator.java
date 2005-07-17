@@ -99,7 +99,9 @@ public class StartScriptGenerator {
      */
     private String getUnixJythonTemplate() {
         StringBuffer buffer = getUnixHeaderTemplate();
-        buffer.append("\"{2}/bin/java\" -Dpython.home=\"{3}\" -classpath \"{3}/jython.jar:$CLASSPATH\" org.python.util.jython \"$@\"\n");
+        buffer.append("CP={3}/jython.jar\n");
+        buffer.append("if [ ! -z $CLASSPATH ]\nthen\n  CP=$CP:$CLASSPATH\nfi\n");
+        buffer.append("\"{2}/bin/java\" -Dpython.home=\"{3}\" -classpath \"$CP\" org.python.util.jython \"$@\"\n");
         return buffer.toString();
     }
 
