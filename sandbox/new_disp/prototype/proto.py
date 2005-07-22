@@ -60,6 +60,9 @@
 import java.lang
 import org.python.core
 
+tojava = org.python.core.PyJavaClass.lookup(org.python.core.PyObject).__tojava__
+
+
 def atyp(spec):
     d = spec.index('[')
     comp_ty = spec[:d]
@@ -840,7 +843,7 @@ def str_better_applicable(val,cand_cl,cl,parm_ar,j):
     if cl is lang.Class.forName("[B"):
         return -1
     if cand_cl is lang.Class.forName("[B"):
-        if parm_ar: parm_ar[j] = val.__tojava__(lang.Class.forName("[B"))
+        if parm_ar: parm_ar[j] = tojava(val, lang.Class.forName("[B"))
         return 1
 
     if cl is lang.Character:
