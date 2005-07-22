@@ -1,0 +1,6 @@
+IMPORTANT: String < char[] < byte[] < Character
+
+why ov35 vs ov49 test works?
+
+static vs instance method! declaring subclass vs. class, what about intf!
+
