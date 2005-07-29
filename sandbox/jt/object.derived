@@ -3,6 +3,7 @@ want_dict: true
 ctr:
 unary1: __str__ string
 unary1: __repr__ string
+unary1: __unicode__ unicode PyUnicode
 unary1: __hex__ string
 unary1: __oct__ string
 unary1: __int__ int PyObject
