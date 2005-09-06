@@ -190,6 +190,8 @@ class Gen:
             err = "expected a long"
         return JavaTemplate("%s.asLong(%s)" % (argj, j)), err # !!!
 
+    def arg_b(self, argj, j, tg):
+        return JavaTemplate("%s.__nonzero__()" % (argj)),None
 
     def arg_o(self,argj,j,tg):
         return JavaTemplate(argj),None
