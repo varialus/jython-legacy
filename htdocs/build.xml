@@ -17,6 +17,7 @@
         <!-- These properties should be assigned in one of the
              the ant.properties files
         <property name="python.home" value="d:\python\Python21\python"/>
+        <property name="python.exe" value="d:\python\Python21\python\python"/>
         <property name="jython.home" value="d:\jython"/>
         <property name="ht2html.dir" value="d:\jython\ht2html-1.1"/>
 
@@ -56,19 +57,19 @@ if 1:
 
     <target name="generate-top" depends="init">
     <!-- Create .html files in htdocs -->
-        <execon executable="${python.home}/python">
+        <apply executable="${python.exe}">
             <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
             <arg line="-s JyGenerator"/>
             <fileset dir=".">
                 <include name="*.ht" />
             </fileset>
-        </execon>
+        </apply>
     </target>
 
     <target name="generate-applets" depends="init">
     <!-- Create .html files in htdocs/applets -->
-        <execon executable="${python.home}/python" dir="applets">
+        <apply executable="${python.exe}" dir="applets">
             <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
             <arg line="-s JyGenerator"/>
@@ -76,7 +77,7 @@ if 1:
             <fileset dir=".">
                 <include name="applets/*.ht" />
             </fileset>
-        </execon>
+        </apply>
     </target>
 
     <target name="inherit-docs" depends="init">
@@ -94,7 +95,7 @@ if 1:
 
     <target name="generate-docs" depends="init">
     <!-- Create .html files in htdocs/docs -->
-        <execon executable="${python.home}/python" dir="docs">
+        <apply executable="${python.exe}" dir="docs">
             <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
             <arg line="${ht2html.dir}/ht2html.py"/>
             <arg line="-s JyGenerator"/>
@@ -102,7 +103,7 @@ if 1:
             <fileset dir=".">
                 <include name="docs/*.ht" />
             </fileset>
-        </execon>
+        </apply>
     </target>
 
     <target 
@@ -114,6 +115,7 @@ if 1:
         <tar tarfile="${htdocs.tar}" basedir="."
              includes="*.html
                        images/*.gif
+                       images/*.png
                        docs/*.html
                        docs/javadoc/**
                        applets/*.html
