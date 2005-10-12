@@ -15,35 +15,45 @@ public class ConsoleInstaller implements ProgressListener {
     private static final String BEGIN_ANSWERS = "[";
     private static final String END_ANSWERS = "]";
 
+    private Arguments _arguments;
     private JarInstaller _jarInstaller;
     private JarInfo _jarInfo;
 
-    public ConsoleInstaller(JarInfo jarInfo) {
+    public ConsoleInstaller(Arguments arguments, JarInfo jarInfo) {
+        _arguments = arguments;
         _jarInfo = jarInfo;
         _jarInstaller = new JarInstaller(this, jarInfo);
     }
 
     public void install() {
-        welcome();
-        selectLanguage();
-        String installationType = selectInstallationType();
-        checkVersion();
-        acceptLicense();
-        File targetDirectory = determineTargetDirectory();
-        promptForCopying(targetDirectory);
-        _jarInstaller.inflate(targetDirectory, installationType);
-        showReadme(targetDirectory);
-        success(targetDirectory);
+        if (!_arguments.isSilentMode()) {
+            welcome();
+            selectLanguage();
+            String installationType = selectInstallationType();
+            checkVersion();
+            acceptLicense();
+            File targetDirectory = determineTargetDirectory();
+            promptForCopying(targetDirectory);
+            _jarInstaller.inflate(targetDirectory, installationType);
+            showReadme(targetDirectory);
+            success(targetDirectory);
+        } else {
+            message(Installation.getText(TextKeys.C_SILENT_INSTALLATION));
+            checkTargetDirectorySilent(_arguments.getTargetDirectory());
+            checkVersionSilent();
+            _jarInstaller.inflate(_arguments.getTargetDirectory(), _arguments.getInstallationType());
+            success(_arguments.getTargetDirectory());
+        }
+    }
+
+    protected final static void message(String message) {
+        System.out.println(message); // this System.out.println is intended
     }
 
     private void welcome() {
         message(Installation.getText(TextKeys.C_WELCOME_TO_JYTHON));
         message(Installation.getText(TextKeys.C_VERSION_INFO, _jarInfo.getVersion()));
         message(Installation.getText(TextKeys.C_AT_ANY_TIME_CANCEL, CANCEL));
-    }
-
-    private void message(String message) {
-        System.out.println(message); // this is intended
     }
 
     /**
@@ -150,6 +160,15 @@ public class ConsoleInstaller implements ProgressListener {
             question(Installation.getText(TextKeys.C_PROCEED_ANYWAY), null);
         }
     }
+    
+    private void checkVersionSilent() {
+        if (!Installation.isValidOs()) {
+            message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
+        }
+        if (!Installation.isValidJava()) {
+            message(Installation.getText(TextKeys.C_UNSUPPORTED_JAVA));
+        }
+    }
 
     private void acceptLicense() {
         String read = question(Installation.getText(TextKeys.C_READ_LICENSE), getYNAnswers());
@@ -210,6 +229,31 @@ public class ConsoleInstaller implements ProgressListener {
         return targetDirectory;
     }
 
+    private void checkTargetDirectorySilent(File targetDirectory) {
+        try {
+            if (!targetDirectory.exists()) {
+                // create directory
+                if (!targetDirectory.mkdirs()) {
+                    throw new InstallerException(Installation.getText(TextKeys.C_UNABLE_CREATE_DIRECTORY,
+                            targetDirectory.getCanonicalPath()));
+                }
+            } else {
+                // assert it is an empty directory
+                if (!targetDirectory.isDirectory()) {
+                    throw new InstallerException(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, targetDirectory
+                            .getCanonicalPath()));
+                } else {
+                    if (targetDirectory.list().length > 0) {
+                        throw new InstallerException(Installation.getText(TextKeys.C_NON_EMPTY_TARGET_DIRECTORY,
+                                targetDirectory.getCanonicalPath()));
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            throw new InstallerException(ioe);
+        }
+    }
+    
     private void showReadme(final File targetDirectory) {
         String read = question(Installation.getText(TextKeys.C_READ_README), getYNAnswers());
         if (read.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {

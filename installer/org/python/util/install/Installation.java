@@ -7,14 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class Installation {
-    protected static final String OPTION_START = "-";
-    protected static final String CONSOLE_OPTION = "-console";
     protected static final String ALL = "1";
     protected static final String STANDARD = "2";
     protected static final String MINIMUM = "3";
@@ -28,32 +24,23 @@ public class Installation {
     private static ResourceBundle _textConstants = ResourceBundle.getBundle(RESOURCE_CLASS, Locale.getDefault());
 
     public static void main(String args[]) {
-        Map arguments = new HashMap();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith(OPTION_START)) {
-                arguments.put(args[i], Boolean.TRUE);
-                if (i < args.length - 1) {
-                    if (!args[i + 1].startsWith(OPTION_START)) {
-                        arguments.put(args[i], args[i + 1]);
-                        i++;
-                    }
-                }
-            } else {
-                i++;
-            }
-        }
         try {
             JarInfo jarInfo = new JarInfo();
-            if (!useGUI(arguments)) {
-                ConsoleInstaller consoleInstaller = new ConsoleInstaller(jarInfo);
-                consoleInstaller.install();
-                System.exit(0);
+            Arguments arguments = new Arguments(jarInfo);
+            if (!arguments.parse(args)) {
+                arguments.showUsage();
+                System.exit(1);
             } else {
-                new FrameInstaller(jarInfo);
+                if (!useGUI(arguments)) {
+                    ConsoleInstaller consoleInstaller = new ConsoleInstaller(arguments, jarInfo);
+                    consoleInstaller.install();
+                    System.exit(0);
+                } else {
+                    new FrameInstaller(jarInfo);
+                }
             }
         } catch (InstallationCancelledException ice) {
-            // this is intended:
-            System.out.println(Installation.getText(TextKeys.INSTALLATION_CANCELLED));
+            ConsoleInstaller.message((Installation.getText(TextKeys.INSTALLATION_CANCELLED)));
             System.exit(1);
         } catch (InstallerException ie) {
             ie.printStackTrace();
@@ -139,7 +126,7 @@ public class Installation {
         }
         return isJDK141;
     }
-    
+
     protected static String getReadmeText(String targetDirectory) {
         File readmeFile = new File(targetDirectory, "README.txt");
         BufferedReader reader = null;
@@ -164,9 +151,9 @@ public class Installation {
         }
         return buffer.toString();
     }
-    
-    private static boolean useGUI(Map arguments) {
-        if (arguments.containsKey(CONSOLE_OPTION)) {
+
+    private static boolean useGUI(Arguments arguments) {
+        if (arguments.isConsoleMode() || arguments.isSilentMode()) {
             return false;
         }
         if (Boolean.getBoolean("java.awt.headless")) {

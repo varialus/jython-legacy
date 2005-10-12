@@ -40,11 +40,11 @@ public class JarInstaller {
     public void inflate(final File targetDirectory, String installationType) {
         try {
             List excludeDirs = _jarInfo.getExcludeDirs();
-            if (!installationType.equals(Installation.ALL)) {
+            if (!Installation.ALL.equals(installationType)) {
                 // has to correspond with build.xml
                 excludeDirs.add("src");
             }
-            if (installationType.equals(Installation.MINIMUM)) {
+            if (Installation.MINIMUM.equals(installationType)) {
                 // has to correspond with build.Lib.include.properties
                 excludeDirs.add("Demo");
                 excludeDirs.add("Lib" + PATH_SEPARATOR + "email");
@@ -55,7 +55,8 @@ public class JarInstaller {
             int count = 0;
             int percent = 0;
             int numberOfIntervals = 100 / _progressListener.getInterval();
-            int threshold = _jarInfo.getNumberOfEntries() / numberOfIntervals + 1; // +1 = pessimistic
+            int numberOfEntries = approximateNumberOfEntries(installationType);
+            int threshold = numberOfEntries / numberOfIntervals + 1; // +1 = pessimistic
 
             // unzip
             ZipInputStream zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(_jarInfo
@@ -116,6 +117,16 @@ public class JarInstaller {
         } catch (IOException ioe) {
             throw new InstallerException(Installation.getText(TextKeys.ERROR_ACCESS_JARFILE), ioe);
         }
+    }
+
+    private int approximateNumberOfEntries(String installationType) throws IOException {
+        int numberOfEntries = _jarInfo.getNumberOfEntries();
+        if (Installation.MINIMUM.equals(installationType)) {
+            numberOfEntries = numberOfEntries / 3;
+        } else if (Installation.STANDARD.equals(installationType)) {
+            numberOfEntries = (numberOfEntries * 3) / 4;
+        }
+        return numberOfEntries;
     }
 
     private void createDirectories(final File targetDirectory, final String zipEntryName) {

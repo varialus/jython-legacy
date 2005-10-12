@@ -83,9 +83,14 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_ENGLISH, "Englisch" }, // language
         { C_GERMAN, "Deutsch" }, // language
         { C_INSTALL_TYPES, "Die folgenden Installationstypen sind verfuegbar:" }, // installation type
+        { C_INVALID_OPTION, "{0} ist keine gueltige Option" }, // error
+        { C_INVALID_TYPE, "{0} ist kein gueltiger Installationstyp" }, // error
         { C_JAVA_VERSION, "Ihre Java Version ist: {0} / {1}" }, // version
         { C_MINIMUM, "Minimum (Kern)" }, // installation type
+        { C_NEED_SILENT_MODE, "Die angegebenen Optionen ({0}) bedingen eine Installation ohne Benutzerinteraktion. Bitte geben Sie die Option {1} an." }, // error
+        { C_NEED_VALUE_FOR_OPTION, "Bitte geben Sie einen Wert an fuer die Option {0}" }, // error
         { C_NO, "n" }, // answer
+        { C_NON_EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis {0} enthaelt bereits Daten" }, // error
         { C_NOT_A_DIRECTORY, "{0} ist kein Verzeichnis. " }, // error
         { C_OS_VERSION, "Ihre Betriebssystem Version ist: {0} / {1}" }, // version
         { C_OVERWRITE_DIRECTORY, "Das Verzeichnis {0} enthaelt bereits Daten, und die Installation wuerde diese ueberschreiben - ok ?" }, // console
@@ -95,12 +100,19 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_READ_README, "Moechten Sie den Inhalt von README jetzt lesen ?" }, // readme
         { C_SELECT_INSTALL_TYPE, "Bitte waehlen Sie den Installationstyp" }, // installation type
         { C_SELECT_LANGUAGE, "Bitte waehlen Sie Ihre Sprache" }, // language
+        { C_SILENT_INSTALLATION, "Die Installation wird ohne Benutzerinteraktion ausgefuehrt" }, // installation mode
         { C_STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele)" }, // installation type
         { C_SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
+        { C_TARGET_DIRECTORY_NOT_SPECIFIED, "Sie haben kein Zielverzeichnis angegeben. Bitte benutzen Sie die {0} Option." }, // error
         { C_UNABLE_CREATE_DIRECTORY, "Fehler beim Erstellen von Verzeichnis {0}." }, // error
         { C_UNABLE_TO_DELETE, "Fehler beim Loeschen von {0}" }, // console
         { C_UNSUPPORTED_JAVA, "Diese Java Version ist nicht unterstuetzt." }, // version
         { C_UNSUPPORTED_OS, "Dieses Betriebssystem ist eventuell nicht vollstaendig unterstuetzt." }, // version
+        { C_USAGE_CONSOLE, "Konsole Installation mit Benutzerinteraktion" }, // usage
+        { C_USAGE_FRAME, "GUI Installation" }, // usage
+        { C_USAGE_SILENT_TYPE, "Installation ohne Benutzerinteraktion, mit einem speziellen Typ. Moegliche Typen sind: {0}." }, // usage
+        { C_USAGES, "Moegliche Aufrufe sind:" }, // usage
+        { C_USING_TYPE, "Installationstyp ist {0}" }, // installation type
         { C_VERSION_INFO, "Sie sind im Begriff, Jython Version {0} zu installieren." }, // version
         { C_WELCOME_TO_JYTHON, "Willkommen bei Jython !" }, // welcome
         { C_YES, "j" }, // answer

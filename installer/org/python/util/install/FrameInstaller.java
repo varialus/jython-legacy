@@ -5,7 +5,6 @@ import java.awt.event.WindowEvent;
 import java.util.Locale;
 import java.util.Properties;
 
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
 public class FrameInstaller {
