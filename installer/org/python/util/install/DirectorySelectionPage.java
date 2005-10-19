@@ -116,7 +116,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
         String jythonSubDirectoryName = "jython" + _jarInfo.getVersion();
         return new File(parentDirectory, jythonSubDirectoryName);
     }
-    
+
     private class BrowseButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String directoryName = _directory.getText();

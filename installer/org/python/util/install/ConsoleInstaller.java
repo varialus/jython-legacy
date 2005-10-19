@@ -160,7 +160,7 @@ public class ConsoleInstaller implements ProgressListener {
             question(Installation.getText(TextKeys.C_PROCEED_ANYWAY), null);
         }
     }
-    
+
     private void checkVersionSilent() {
         if (!Installation.isValidOs()) {
             message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
@@ -253,7 +253,7 @@ public class ConsoleInstaller implements ProgressListener {
             throw new InstallerException(ioe);
         }
     }
-    
+
     private void showReadme(final File targetDirectory) {
         String read = question(Installation.getText(TextKeys.C_READ_README), getYNAnswers());
         if (read.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {

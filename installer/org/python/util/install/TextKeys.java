@@ -104,9 +104,9 @@ public interface TextKeys {
     public static final String C_UNABLE_TO_DELETE = "C_UNABLE_TO_DELETE";
     public static final String C_UNSUPPORTED_JAVA = "C_UNSUPPORTED_JAVA";
     public static final String C_UNSUPPORTED_OS = "C_UNSUPPORTED_OS";
-    public static final String C_USAGE_CONSOLE ="C_USAGE_CONSOLE";
-    public static final String C_USAGE_FRAME ="C_USAGE_FRAME";
-    public static final String C_USAGE_SILENT_TYPE ="C_USAGE_SILENT_TYPE";
+    public static final String C_USAGE_CONSOLE = "C_USAGE_CONSOLE";
+    public static final String C_USAGE_FRAME = "C_USAGE_FRAME";
+    public static final String C_USAGE_SILENT_TYPE = "C_USAGE_SILENT_TYPE";
     public static final String C_USAGES = "C_USAGES";
     public static final String C_USING_TYPE = "C_USING_TYPE";
     public static final String C_VERSION_INFO = "C_VERSION_INFO";
