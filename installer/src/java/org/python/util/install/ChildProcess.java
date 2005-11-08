@@ -297,6 +297,10 @@ public class ChildProcess {
             // end properly
             if (isAlive()) { // sets the exit value in case process is dead
                 destroy();
+            } else {
+                if(isDebug()) {
+                    System.out.println("[ChildProcess] ended normally");
+                }
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
