@@ -18,7 +18,7 @@ public class ChmodTest {
 
         // create an empty test file in the current directory
         String curdir = System.getProperty("user.dir");
-        File testFile = new File(curdir, "test_chmod.sh");
+        File testFile = new File(curdir, "chmod.test");
         String path = testFile.getAbsolutePath();
         if (!testFile.exists()) {
             try {
