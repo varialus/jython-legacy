@@ -8,6 +8,8 @@ import java.util.Date;
 
 public class StartScriptGenerator {
 
+    private final static String EXECUTABLE_MODE = "755";
+
     private File _targetDirectory;
 
     public StartScriptGenerator(File targetDirectory) {
@@ -23,11 +25,11 @@ public class StartScriptGenerator {
     }
 
     protected final void generateJythonForUnix() throws IOException {
-        writeToFile("jython", getStartScript(getUnixJythonTemplate()));
+        makeExecutable(writeToFile("jython", getStartScript(getUnixJythonTemplate())));
     }
 
     protected final void generateJythoncForUnix() throws IOException {
-        writeToFile("jythonc", getStartScript(getUnixJythoncTemplate()));
+        makeExecutable(writeToFile("jythonc", getStartScript(getUnixJythoncTemplate())));
     }
 
     /**
@@ -137,17 +139,36 @@ public class StartScriptGenerator {
      * 
      * @throws IOException
      */
-    private void writeToFile(String fileName, String contents) throws IOException {
+    private File writeToFile(String fileName, String contents) throws IOException {
         File file = new File(_targetDirectory, fileName);
         if (file.exists()) {
             file.delete();
         }
         file.createNewFile();
-        if (file.canWrite()) {
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(contents);
-            fileWriter.flush();
-            fileWriter.close();
+        if (file.exists()) {
+            if (file.canWrite()) {
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.write(contents);
+                fileWriter.flush();
+                fileWriter.close();
+            }
+        }
+        return file;
+    }
+
+    /**
+     * do a chmod on the passed file
+     * 
+     * @param scriptFile
+     */
+    private void makeExecutable(File scriptFile) {
+        try {
+            String command = "chmod" + " " + EXECUTABLE_MODE + " " + scriptFile.getAbsolutePath();
+            long timeout = 3000;
+            ChildProcess childProcess = new ChildProcess(command, timeout);
+            childProcess.run();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
