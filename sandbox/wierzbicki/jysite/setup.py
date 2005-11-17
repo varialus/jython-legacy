@@ -4,7 +4,7 @@ from distutils.core import setup
 
 def do_setup():
     dist = setup(
-        name='jython-site--writer',
+        name='jython-site-writer',
         description='A HTML writer for constructing the jython site (w/navigation)',
         url='http://jython.sourceforg.net/sandbox/wierzbicki/jysite/',
         version='0.1',
