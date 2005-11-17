@@ -13,7 +13,7 @@ def do_setup():
         license='Public Domain',
         packages=['docutils.writers'],
         package_dir={'docutils.writers':'writer'},
-        scripts=['jysite.py']
+        scripts=['rst2jysite.py']
     )
     return dist
 
