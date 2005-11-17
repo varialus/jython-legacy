@@ -1,0 +1,10 @@
+link     | Contributing      | index.html
+link     | Contributors      | contributors.html
+section
+external | Wiki              | http://wiki.python.org/jython/
+external | Bug Tracker       | http://sourceforge.net/tracker/?group_id=12867&atid=112867 
+external | Mailing Lists     | http://sourceforge.net/mail/?group_id=12867
+section
+image    | ../css/PythonPoweredSmall.gif | http://www.python.org
+section
+image    | http://sourceforge.net/sflogo.php?group_id=12867    | http://sourceforge.net

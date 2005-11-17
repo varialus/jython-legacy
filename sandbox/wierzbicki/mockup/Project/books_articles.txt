@@ -1,0 +1,12 @@
+===============================
+Books and Articles about Jython
+===============================
+
+.. contents:: Table of Contents
+
+Articles
+========
+Write Eclipse JUnit Tests in Jython: http://www.devx.com/Java/Article/26602
+
+Books
+=====

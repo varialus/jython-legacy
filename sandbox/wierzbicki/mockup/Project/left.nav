@@ -1,0 +1,11 @@
+link     | Welcome | index.html
+link     | License | license.html
+link     | FAQ     | faq.html
+link     | News    | news.html
+link     | History | history.html
+section
+link     | Books and Articles | books_articles.html
+section
+image    | ../css/PythonPoweredSmall.gif | http://www.python.org
+section
+image    | http://sourceforge.net/sflogo.php?group_id=12867    | http://sourceforge.net

@@ -1,0 +1,183 @@
+==========================
+ Jython Developer's Guide
+==========================
+
+.. contents:: Table of Contents
+
+Introduction
+============
+This is an introduction to developing Jython, just to get someone started. It doesn't cover in any depth the source code or the design behind Jython. It's purely aimed at getting a development environment setup. It's definitely not complete so feel free to make it better!
+
+
+CVS
+===
+
+* Wiki:ConcurrentVersionControl
+* available on most \*nix systems or with cygwin on Windows
+* GUI clients are available on most platforms
+* Eclipse users, see [wiki:Self:/JythonDeveloperGuide/EclipseNotes#CVS Eclipse CVS notes]
+
+Login
+-----
+
+::
+
+  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython login
+    
+Checkout
+--------
+
+* NewStyleClasses: you'll want to checkout the newstyle classes branch:
+
+::
+       
+       cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P -d jython.newstyle-branch -r newstyle-branch jython
+
+* 2.1 Stable:
+
+::
+
+    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P -d jython.Release_2_1 -r Release_2_1 jython 
+
+* 2.2 Alpha 0:
+
+::
+
+    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P -d jython.Release_2_2alpha0 -r Release_2_2alpha0 jython 
+
+* The tip:
+
+::
+
+    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P jython 
+
+* Preparing a Patch on Unix command line: (note multiple changes can be concatencated into one patch file using >> as shown.
+
+::
+
+    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython diff -u PyFloat.java >> patchfile.txt 
+
+Python
+======
+
+  * http://www.python.org/2.2.3/
+  * Jython uses Python's standard library where possible. This means you will need a working copy of Python source files for the stdlib. We currently use Python 2.2 so you can grab the files from here if you don't already have 2.2 installed.
+
+
+JavaCC
+======
+
+  * https://javacc.dev.java.net/
+  * Parser generator for Java. Generally needed only for working on parser.
+  * It's not really required that you install this so I'd skip it.
+  * The latest version is JDK 1.5 compatible (uses 'e' rather than 'enum' as variable name).
+
+Ant
+===
+
+  * http://ant.apache.org/ A Java-based build tool.
+  * Eclipse users, see [wiki:Self:/JythonDeveloperGuide/EclipseNotes#ANT Eclipse ANT notes]
+  * The Makefiles in the repository are old and will be removed.
+  * Download the latest version and install so the bin/ is somewhere in your path.
+  * The build.xml is the file containing the compiler directives
+  * It uses a file called ant.properties to override default paths; here's mine:
+
+    build.compiler=modern
+    debug=on
+    optimize=off
+
+    javaccHome=/Users/bzimmer/Library/Java/Extras/javacc-3.2
+
+    ht2html.dir=
+    #python.home=
+    python.lib=/sw/lib/python2.2
+    python.exe=/sw/bin/python2.2
+
+    ### zxJDBC ###
+    oracle.jar=
+    mysql.jar=/Users/bzimmer/Library/Java/Extras/mysql-connector-java-3.1.6-bin.jar
+    informix.jar=
+    postgresql.jar=/Users/bzimmer/Library/Java/Extras/pg74.215.jdbc2.jar
+    jdbc.jar=
+    servlet.jar=
+
+
+Jars
+====
+
+  * Jython uses many optional jars
+  * These are not required for building locally but are for deployment with the installer
+  * The ant script takes care of conditional compilation
+
+IDEs
+====
+
+  * Any Java IDE will work
+    * IntelliJ
+    * Eclipse see /EclipseNotes
+    * Vim
+    * ...
+
+Tests
+=====
+
+After you've built the project, you may want to set up an excutable file on your path to make it easy to launch your build of jython. This file will need to:
+
+* Set the python home property to the `dist` directory of your build (otherwise, you'll get import errors on the standard lib stuff).
+* Execute the `jython.jar` in the `dist` produced by the build.      
+
+Here's a batch file that runs the built jython.jar (for windows): [[Anchor(sampleBatch)]]
+
+jytip.bat
+=========
+
+::
+
+  @echo off
+  set ARGS=
+
+  :: concatenate all the command line args into one
+  :loop
+  if [%1] == [] goto end
+          set ARGS=%ARGS% %1
+          shift
+          goto loop
+  :end
+
+  :: this is mine...
+  :: java -Dpython.home=C:\\workspace\\JythonTip\\jython\\dist -jar 
+  ::<cont> c:\workspace\JythonTip\jython\dist\jython.jar %ARGS%
+  :: fill in <placeholders> below:
+  java -Dpython.home=<path to dist directory>\\dist -jar <path to dist directory>\dist\jython.jar %ARGS%
+
+
+Now your ready to run tests...
+
+  * There are a couple different places to find test cases
+    * Jython's Lib/test
+    * Jython's bugtests repository
+    * Python2.2's Lib/test
+  * Run the particular test or you can run the whole suite by running `regrtest.py` with the `-a` option
+
+Directory layout
+================
+
+  * com       : zxJDBC related sources"
+  * Demo      : demo sources for the website and such"
+  * Doc       : the website documentation"
+  * installer : the current installer which apparently no longer works"
+  * Lib       : the python source files for Jython standard library implementations
+  * Lib/test  : test cases
+  * Misc      : random scripts which are not all used; some generate source
+  * org       : top level package for python and apache (used for regex)
+  * Tools     : JythonC and Freeze
+
+Coding Guidance
+===============
+
+  * CodingStandards     : The standards for writing Java code for Jython
+  * JythonModulesInJava : How to write a Jython module in Java
+  * JythonClassesInJava : How to write a Jython class in Java
+
+:Copyright: http://creativecommons.org/licenses/by/2.5/
+
