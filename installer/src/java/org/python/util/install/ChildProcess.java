@@ -299,7 +299,7 @@ public class ChildProcess {
                 destroy();
             } else {
                 if(isDebug()) {
-                    System.out.println("[ChildProcess] ended normally");
+                    System.out.println("[ChildProcess] ended itself");
                 }
             }
         } catch (IOException ioe) {
