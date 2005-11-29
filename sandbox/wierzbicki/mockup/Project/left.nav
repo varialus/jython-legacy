@@ -1,11 +1,19 @@
-link     | Welcome | index.html
-link     | License | license.html
-link     | FAQ     | faq.html
-link     | News    | news.html
-link     | History | history.html
-section
-link     | Books and Articles | books_articles.html
-section
+section  | About
+menupageitem     | Welcome | index.html
+menupageitem     | License | license.html
+menupageitem     | FAQ     | faq.html
+menupageitem     | News    | news.html
+menupageitem     | History | history.html
+external | Download 2.1 (Production) | http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=67726
+external | Download 2.2 (Development) | http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=342904
+section  | Documentation
+menupageitem     | Books and Articles | books_articles.html
+section  | Join Us
+menupageitem     | Hacking           | hacking.html
+menupageitem     | Contributors      | contributors.html
+external | Wiki              | http://wiki.python.org/jython/
+external | Bug Tracker       | http://sourceforge.net/tracker/?group_id=12867&atid=112867 
+external | Mailing Lists     | http://sourceforge.net/mail/?group_id=12867
 image    | ../css/PythonPoweredSmall.gif | http://www.python.org
-section
+section  | sf
 image    | http://sourceforge.net/sflogo.php?group_id=12867    | http://sourceforge.net

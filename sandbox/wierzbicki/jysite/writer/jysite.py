@@ -68,18 +68,22 @@ class HTMLTranslator(html4css1.HTMLTranslator):
                                       % (val[0], val[2], val[1]))
                 buffer.append('</ul>')
                 buffer.append('</div>')
-                buffer.append('</div></div>')
+                buffer.append('</div>')
             f = open(navleft, 'rt')
             lines = f.readlines()
             f.close()
-            buffer.append('<div id="main"><div id="publishedStrip">&nbsp;</div><div id="menu"><div class="menuitemgroup">')
-            buffer.append('<div class="menutitle">&nbsp;</div>')
+            buffer.append('<div id="main"><div id="menu"><div class="menupage">')
+            firstSection = True
             for line in lines:
                 val = line.split('|')
                 for i in range(len(val)):
                     val[i] = val[i].strip()
                 if val[0] == 'section':
-                    buffer.append('<div style="margin:2em"></div>')
+                    if firstSection:
+                        firstSection = False
+                    else:
+                        buffer.append('</ul>')
+                    buffer.append('<div class="menupagetitle">%s</div><ul>' % val[1])
                 elif val[0] == 'external':
                     buffer.append('<div class="%s">' \
                                   '<a target="_blank" href="%s"><img src="../css/moin-www.png" />%s</a></div> ' % (val[0], val[2], val[1]))
@@ -91,10 +95,11 @@ class HTMLTranslator(html4css1.HTMLTranslator):
                                   '<a href="%s">%s</a></div> ' % (val[0], val[2], val[1]))
             buffer.append('</div>')
             buffer.append('</div>')
+            buffer.append('</div>')
             buffer.append('<div id="content">')
         else:
             raise "%s does not exisi." % navleft
         return "\n".join(buffer)
 
     def get_body_suffix(self):
-        return '\n</div></body>\n'
+        return '\n</div></div></body>\n'

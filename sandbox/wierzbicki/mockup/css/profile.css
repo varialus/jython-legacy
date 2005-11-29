@@ -56,6 +56,10 @@ a.external  {
 #level2tabs a:visited { color: #000000; }
 #level2tabs a:hover { color: #000000; }
 
+#main {
+    border-top: solid 18px #f5f6b5;
+}
+
 .heading { background-color: #f5f6b5;} 
 
 .boxed { background-color: #000000;} 
@@ -71,14 +75,30 @@ color: #000000;
 background: #f5f6b5; 
 }
 
-#menu .menupagetitle  { background-color: #CFDCED}
+#menu .menupage {
+    margin: 0;
+    padding: 0;
+}
 
-#menu           { border-color: #999999;}
+#menu .menupagetitle  {
+    background-color: #CFDCED;
+    padding: 0;
+    margin: 0;
+    border-style: none;
+    border-width: 0;
+}
+
+#menu           {
+    border-color: #999999;
+    top: 0;
+    width: 10em;
+}
+
 #menu .menupagetitle  { border-color: #999999;}
 #menu .menupageitemgroup  { border-color: #999999;}
 
-#menu      { background-color: #f5f6b5;} 
-#menu  {  color: #000000;} 
+#menu { background-color: #f5f6b5;} 
+#menu {  color: #000000;} 
 #menu a:link {  color: #000000;} 
 #menu a:visited {  color: #000000;} 
 #menu a:hover {  
@@ -97,6 +117,10 @@ color: #000000;
 #menu .menupageitem a:hover {  
 background-color: #CFDCED;
 color: #0000ff;
+}
+
+#content {
+    padding: 20px 20px 20px 12em;
 }
 
 body{ 

@@ -104,7 +104,7 @@ html>body #top .searchbox {
     background-image: url(images/rc-t-l-5-1header-2searchbox-3searchbox.png);
     background-repeat: no-repeat;
     background-position: top left;
-    top: 0;
+    bottom: -1px; /* compensate for IE rendering issue */
 }
 
 #top .searchbox form {
