@@ -176,7 +176,7 @@ A normal (public) static method is from jython called on the parent java class:
 
    javaclass.method()
 
-Such a call does not originate from the subclass, but from internal reflection code in jython. If we want to add support for calling protected static methods from a jython subclass, the call will have to originate from the subclass (ie. the proxy class), so we will have to generate a referring method in subclass proxy like:
+Such a call does not originate from the subclass, but from internal reflection code in jython. If we want to add support for calling protected static methods from a jython subclass, the call will have to originate from the subclass (ie. the proxy class), so we will have to generate a referring method in subclass proxy like::
 
   public static void method() {
      javaclass.method()
@@ -343,14 +343,14 @@ There are several ways to do that. The best way depends on the needs of your app
 
 (See FAQ X.Y for other ways to access python classes from java)
 
-Create a python module (say Foo.py) and make a class with the same name as the python module. The class must inherit from a java class or interface. If you don't need a particular java superclass, just use java.lang.Object.
+Create a python module (say Foo.py) and make a class with the same name as the python module. The class must inherit from a java class or interface. If you don't need a particular java superclass, just use java.lang.Object.::
 
   import java
   class Foo(java.util.Date):
       def toString(self):
           return "Foo[" + java.util.Date.toString(self) + "]"
 
-The python class can overwrite all existing methods on the java superclass or interface and these overridden methods can be called from the java application. New methods can by default not be accessed from java. If we add a "bar" method, the method can be used from python, but not from java.
+The python class can overwrite all existing methods on the java superclass or interface and these overridden methods can be called from the java application. New methods can by default not be accessed from java. If we add a "bar" method, the method can be used from python, but not from java. ::
 
   import java
   class Foo(java.util.Date):
@@ -363,7 +363,7 @@ The python class can overwrite all existing methods on the java superclass or in
           cnt = self.bar()
           return "Foo[" + java.util.Date.toString(self) + " " + `cnt` + "]"
 
-The jythonc compiler can also create java methods for the python methods, but it need some additional help. This help is specified as a @sig line in the doc-string for the method. A doc-string is added to the example above.
+The jythonc compiler can also create java methods for the python methods, but it need some additional help. This help is specified as a @sig line in the doc-string for the method. A doc-string is added to the example above. ::
 
   import java
   class Foo(java.util.Date):
@@ -379,7 +379,7 @@ The jythonc compiler can also create java methods for the python methods, but it
 
 When this class is compiled with jythonc, A java class Foo.java and Foo.class is created with the java methods toString(), bar() and bar(int incr).
 
-When compiling the Foo.py class, make sure that the Foo actually extends the desired java class. You can check the output from the compilation. It should contain lines like:
+When compiling the Foo.py class, make sure that the Foo actually extends the desired java class. You can check the output from the compilation. It should contain lines like: ::
 
   Required packages:
     java.util
@@ -392,7 +392,7 @@ When compiling the Foo.py class, make sure that the Foo actually extends the des
 
 If jython fails to recognize the superclass as a java class, it will silently assume that it is a python class and will not generate the desired java methods.
 
-The new Foo class can be used from java java class like this:
+The new Foo class can be used from java java class like this: ::
 
    public class FooTest {
        public static void main(String[] args) {
@@ -416,7 +416,7 @@ The default value for sys.path in an embedded application depend on several thin
 
 2) The <python.home>/Lib directory is added.
 
-An application can override the python.path property by calling PythonInterpreter.initialize(..) before any other python code is called:
+An application can override the python.path property by calling PythonInterpreter.initialize(..) before any other python code is called: ::
 
     Properties props = new Properties();
     props.setProperty("python.path", "/home/modules:scripts");
