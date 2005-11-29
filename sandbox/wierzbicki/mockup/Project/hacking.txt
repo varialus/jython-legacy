@@ -179,5 +179,3 @@ Coding Guidance
   * JythonModulesInJava : How to write a Jython module in Java
   * JythonClassesInJava : How to write a Jython class in Java
 
-:Copyright: http://creativecommons.org/licenses/by/2.5/
-
