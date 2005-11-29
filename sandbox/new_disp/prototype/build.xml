@@ -1,0 +1,30 @@
+<project name="prototype" default="compile">
+
+    <path id="libs">
+        <!-- XXX: remove commons-lang when possible-->
+        <fileset dir=".">
+            <include name="commons-lang-2.1.jar"/>
+        </fileset>
+        <fileset dir="/Users/fwier/src/jython/dist/">
+            <include name="jython.jar"/>
+        </fileset>
+    </path>
+
+    <target name="init">
+        <property file="${user.home}/.ant" />
+    </target>
+
+    <target name="clean" depends="init">
+        <delete dir="classes"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <mkdir dir="classes"/>
+        <javac destdir="classes" source="1.3" target="1.3" debug="${debug}"
+                deprecation="false" optimize="false" failonerror="true">
+            <src path="."/>
+            <classpath refid="libs"/>
+        </javac>
+    </target>
+
+</project>
