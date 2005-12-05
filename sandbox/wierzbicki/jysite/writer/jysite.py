@@ -82,8 +82,10 @@ class HTMLTranslator(html4css1.HTMLTranslator):
                     if firstSection:
                         firstSection = False
                     else:
-                        buffer.append('</ul>')
-                    buffer.append('<div class="menupagetitle">%s</div><ul>' % val[1])
+                        pass
+                        #Maybe add menupagegroup here?
+                        #buffer.append('</ul>')
+                    buffer.append('<div class="menupagetitle">%s</div>' % val[1])
                 elif val[0] == 'external':
                     buffer.append('<div class="%s">' \
                                   '<a target="_blank" href="%s"><img src="../css/moin-www.png" />%s</a></div> ' % (val[0], val[2], val[1]))

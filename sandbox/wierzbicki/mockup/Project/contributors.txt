@@ -1,3 +1,69 @@
 ============
 Contributors
 ============
+
+________
+Inventor
+--------
+Jim Hugunin
+
+----------------
+Active Commiters
+----------------
+Kevin Butler
+Samuele Pedroni
+Frank Wierzbicki
+Brian Zimmer
+
+-------------------
+Emeritus Committers
+-------------------
+Finn Bock
+
+------------------
+Other Contributors
+------------------
+Harry Mantakos
+Cyrille Morvan
+Greg Ward
+Tony Plate
+Jim Althoff
+Drew Morrissey
+John Mudd
+Bryn Keller
+dsyer
+Tim Hochberg
+Bernhard Bablok
+Dj Walker-Morgan
+Ivan Kougaenko
+Ype Kingma
+Ian Castleden
+Kent Johnson
+Robert W. Bill
+Durant Schoon
+Phil Surette
+Michael Becke
+Randy Jay Yarger
+Matt Conway
+Noel (Nick) Lockwood
+Steffen Ries
+Ben Burton
+Josselin PUJO
+Steve Cohen
+Alexey N. Solofnenko
+Charles Duffy
+Rodrigo B. de Oliveira
+Nathan Franzen
+Aleks Totic
+Randolph Brown
+
+----------------------
+Corporate Contributors
+----------------------
+Corporation for National Research Initiatives
+cryptix
+
+----
+Logo
+----
+.. FIXME
