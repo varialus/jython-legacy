@@ -80,6 +80,11 @@ background: #f5f6b5;
     padding: 0;
 }
 
+#menu .menupageitem {
+    margin: 0;
+    padding: 0;
+}
+
 #menu .menupagetitle  {
     background-color: #CFDCED;
     padding: 0;
@@ -88,13 +93,19 @@ background: #f5f6b5;
     border-width: 0;
 }
 
-#menu           {
+#menu .menupageitem {
+    padding: 0;
+    margin-left: 0;
+}
+
+#menu {
     border-color: #999999;
     top: 0;
     width: 10em;
 }
 
 #menu .menupagetitle  { border-color: #999999;}
+
 #menu .menupageitemgroup  { border-color: #999999;}
 
 #menu { background-color: #f5f6b5;} 
