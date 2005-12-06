@@ -15,6 +15,6 @@ menupageitem     | Contributors      | contributors.html
 external | Wiki              | http://wiki.python.org/jython/
 external | Bug Tracker       | http://sourceforge.net/tracker/?group_id=12867&atid=112867 
 external | Mailing Lists     | http://sourceforge.net/mail/?group_id=12867
-image    | ../css/PythonPoweredSmall.gif | http://www.python.org
 section  | sf
+image    | ../css/PythonPoweredSmall.gif | http://www.python.org
 image    | http://sourceforge.net/sflogo.php?group_id=12867    | http://sourceforge.net
