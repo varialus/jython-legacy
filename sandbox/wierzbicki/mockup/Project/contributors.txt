@@ -2,68 +2,78 @@
 Contributors
 ============
 
-________
+--------
 Inventor
 --------
+
 Jim Hugunin
 
 ----------------
 Active Commiters
 ----------------
-Kevin Butler
-Samuele Pedroni
-Frank Wierzbicki
-Brian Zimmer
+
+* Otmar Humbel
+* Sean McGrath
+* Samuele Pedroni
+* Clark Updike
+* Frank Wierzbicki
+* Brian Zimmer
 
 -------------------
 Emeritus Committers
 -------------------
-Finn Bock
+
+* Finn Bock
+* Kevin J. Butler
+* Barry A. Warsaw
 
 ------------------
 Other Contributors
 ------------------
-Harry Mantakos
-Cyrille Morvan
-Greg Ward
-Tony Plate
-Jim Althoff
-Drew Morrissey
-John Mudd
-Bryn Keller
-dsyer
-Tim Hochberg
-Bernhard Bablok
-Dj Walker-Morgan
-Ivan Kougaenko
-Ype Kingma
-Ian Castleden
-Kent Johnson
-Robert W. Bill
-Durant Schoon
-Phil Surette
-Michael Becke
-Randy Jay Yarger
-Matt Conway
-Noel (Nick) Lockwood
-Steffen Ries
-Ben Burton
-Josselin PUJO
-Steve Cohen
-Alexey N. Solofnenko
-Charles Duffy
-Rodrigo B. de Oliveira
-Nathan Franzen
-Aleks Totic
-Randolph Brown
+
+* Jim Althoff
+* Bernhard Bablok
+* Michael Becke
+* Robert W. Bill
+* Randolph Brown
+* Ben Burton
+* Ian Castleden
+* Steve Cohen
+* Matt Conway
+* Charles Duffy
+* dsyer
+* Nathan Franzen
+* Tim Hochberg
+* Kent Johnson
+* Bryn Keller
+* Ype Kingma
+* Ivan Kougaenko
+* Noel (Nick) Lockwood
+* Harry Mantakos
+* Drew Morrissey
+* Cyrille Morvan
+* John Mudd
+* Rodrigo B. de Oliveira
+* Tony Plate
+* Josselin PUJO
+* Steffen Ries
+* Durant Schoon
+* Aleks Totic
+* Alexey N. Solofnenko
+* Phil Surette
+* Dj Walker-Morgan
+* Greg Ward
+* Randy Jay Yarger
 
 ----------------------
 Corporate Contributors
 ----------------------
-Corporation for National Research Initiatives
-cryptix
+
+* Corporation for National Research Initiatives
+* cryptix
 
 ----
 Logo
 ----
+
 .. FIXME
