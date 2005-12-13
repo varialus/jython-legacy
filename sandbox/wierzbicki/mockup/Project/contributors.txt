@@ -75,5 +75,4 @@ Corporate Contributors
 ----
 Logo
 ----
-
-.. FIXME
+Logo Design by Jesse Ross http://www.jesseross.com/ 
