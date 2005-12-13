@@ -81,7 +81,10 @@ background: #f5f6b5;
 }
 
 #menu .menupageitem {
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+    margin-left: 1em;
     padding: 0;
 }
 
@@ -91,11 +94,6 @@ background: #f5f6b5;
     margin: 0;
     border-style: none;
     border-width: 0;
-}
-
-#menu .menupageitem {
-    padding: 0;
-    margin-left: 0;
 }
 
 #menu {

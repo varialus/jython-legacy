@@ -10,3 +10,5 @@ rst2jysite.py --link-stylesheet --stylesheet=../css/html4css1.css Project/books_
 rst2jysite.py --link-stylesheet --stylesheet=../css/html4css1.css Project/hacking.txt Project/hacking.html 
 rst2jysite.py --link-stylesheet --stylesheet=../css/html4css1.css Project/contributors.txt Project/contributors.html 
 rst2jysite.py --link-stylesheet --stylesheet=../css/html4css1.css Project/userdoc.txt Project/userdoc.html 
+rst2jysite.py --link-stylesheet --stylesheet=../css/html4css1.css Project/bugs.txt Project/bugs.html 
+rst2jysite.py --link-stylesheet --stylesheet=../css/html4css1.css Project/download.txt Project/download.html

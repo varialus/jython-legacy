@@ -8,6 +8,13 @@ Introduction
 ============
 This is an introduction to developing Jython, just to get someone started. It doesn't cover in any depth the source code or the design behind Jython. It's purely aimed at getting a development environment setup. It's definitely not complete so feel free to make it better!
 
+The Wiki
+========
+Wiki          http://wiki.python.org/jython/
+
+Mailing Lists
+=============
+Mailing Lists http://sourceforge.net/mail/?group_id=12867
 
 CVS
 ===
