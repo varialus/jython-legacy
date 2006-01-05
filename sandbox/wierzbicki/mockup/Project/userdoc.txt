@@ -1,6 +1,6 @@
-=========================
-Jython User Documentation
-=========================
+=================
+Jython User Guide
+=================
 
 .. contents:: Table of Contents
 

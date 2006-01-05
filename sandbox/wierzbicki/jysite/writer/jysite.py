@@ -86,12 +86,14 @@ class HTMLTranslator(html4css1.HTMLTranslator):
                         #Maybe add menupagegroup here?
                         #buffer.append('</ul>')
                     buffer.append('<div class="menupagetitle">%s</div>' % val[1])
+                elif val[0] == 'raw':
+                    buffer.append(val[1])
                 elif val[0] == 'external':
                     buffer.append('<div class="%s">' \
                                   '<a target="_blank" href="%s"><img src="../css/moin-www.png" />%s</a></div> ' % (val[0], val[2], val[1]))
                 elif val[0] == 'image':
-                    buffer.append('<div class="%s">' \
-                                  '<a target="_blank" href="%s"><img src="%s" /></a></div> ' % (val[0], val[2], val[1]))
+                    buffer.append('<div class="menupageitem">' \
+                                  '<a target="_blank" href="%s"><img src="%s" /></a></div> ' % (val[2], val[1]))
                 else:
                     buffer.append('<div class="%s">' \
                                   '<a href="%s">%s</a></div> ' % (val[0], val[2], val[1]))
