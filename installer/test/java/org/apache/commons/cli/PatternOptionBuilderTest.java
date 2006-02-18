@@ -14,6 +14,7 @@ import junit.framework.TestSuite;
 
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 /** 
  * Test case for the PatternOptionBuilder class 
@@ -64,8 +65,8 @@ extends TestCase
            assertEquals("file flag e", new java.io.File("build.xml"), line.getOptionObject('e'));
            assertEquals("class flag f", java.util.Calendar.class, line.getOptionObject("f"));
            assertEquals("class flag f", java.util.Calendar.class, line.getOptionObject('f'));
-           assertEquals("number flag n", new Float(4.5), line.getOptionObject("n"));
-           assertEquals("number flag n", new Float(4.5), line.getOptionObject('n'));
+           assertEquals("number flag n", new BigDecimal("4.5"), line.getOptionObject("n"));
+           assertEquals("number flag n", new BigDecimal("4.5"), line.getOptionObject('n'));
            assertEquals("url flag t", new java.net.URL("http://jakarta.apache.org/"), line.getOptionObject("t"));
            assertEquals("url flag t", new java.net.URL("http://jakarta.apache.org/"), line.getOptionObject('t'));
            /// DATES NOT SUPPORTED YET.

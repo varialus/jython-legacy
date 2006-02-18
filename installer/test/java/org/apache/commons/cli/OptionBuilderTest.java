@@ -1,5 +1,7 @@
 package org.apache.commons.cli;
 
+import java.math.BigDecimal;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -25,14 +27,14 @@ public class OptionBuilderTest extends TestCase {
                                      .hasArg( )
                                      .isRequired( )
                                      .hasArgs( )
-                                     .withType( new Float( 10 ) )
+                                     .withType( new BigDecimal( "10" ) )
                                      .withDescription( "this is a simple option" )
                                      .create( 's' );
 
         assertEquals( "s", simple.getOpt() );
         assertEquals( "simple option", simple.getLongOpt() );
         assertEquals( "this is a simple option", simple.getDescription() );
-        assertEquals( simple.getType().getClass(), Float.class );
+        assertEquals( simple.getType().getClass(), BigDecimal.class );
         assertTrue( simple.hasArg() );
         assertTrue( simple.isRequired() );
         assertTrue( simple.hasArgs() );
@@ -43,14 +45,14 @@ public class OptionBuilderTest extends TestCase {
                                      .hasArg( )
                                      .isRequired( )
                                      .hasArgs( )
-                                     .withType( new Float( 10 ) )
+                                     .withType( new BigDecimal( "10" ) )
                                      .withDescription( "this is a simple option" )
                                      .create( 's' );
 
         assertEquals( "s", simple.getOpt() );
         assertEquals( "simple option", simple.getLongOpt() );
         assertEquals( "this is a simple option", simple.getDescription() );
-        assertEquals( simple.getType().getClass(), Float.class );
+        assertEquals( simple.getType().getClass(), BigDecimal.class );
         assertTrue( simple.hasArg() );
         assertTrue( simple.isRequired() );
         assertTrue( simple.hasArgs() );
