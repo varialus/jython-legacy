@@ -242,29 +242,29 @@ public class HelpFormatter
            // check if the option is part of an OptionGroup
            OptionGroup group = options.getOptionGroup( option );
 
-           // if the option is part of a group and the group has not already
-           // been processed
-           if( group != null && !list.contains(group)) {
-
-               // add the group to the processed list
-               list.add( group );
-
-               // get the names of the options from the OptionGroup
-               Collection names = group.getNames();
-
-               buff.append( "[" ); 
-
-               // for each option in the OptionGroup
-               for( Iterator iter = names.iterator(); iter.hasNext(); ) {
-                   buff.append( iter.next() );
-                   if( iter.hasNext() ) {
-                       buff.append( " | " );
+           // if the option is part of a group
+           if( group != null ) {
+               // if the group has not already been processed
+               if(!list.contains(group)) {
+    
+                   // add the group to the processed list
+                   list.add( group );
+    
+                   // get the names of the options from the OptionGroup
+                   Collection names = group.getNames();
+    
+                   buff.append( "[" ); 
+    
+                   // for each option in the OptionGroup
+                   for( Iterator iter = names.iterator(); iter.hasNext(); ) {
+                       buff.append( iter.next() );
+                       if( iter.hasNext() ) {
+                           buff.append( " | " );
+                       }
                    }
+                   buff.append( "] " );
                }
-               buff.append( "]" );
-           }
-           // if the Option is not part of an OptionGroup
-           else {
+           } else { // if the Option is not part of an OptionGroup
                // if the Option is not a required option
                if( !option.isRequired() ) {
                    buff.append( "[" );
