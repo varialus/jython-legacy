@@ -26,13 +26,13 @@ public class Installation {
     public static void main(String args[]) {
         try {
             JarInfo jarInfo = new JarInfo();
-            Arguments arguments = new Arguments(jarInfo);
-            if (!arguments.parse(args)) {
-                arguments.showUsage();
+            InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
+            if (!commandLine.setArgs(args)) {
+                commandLine.printHelp();
                 System.exit(1);
             } else {
-                if (!useGUI(arguments)) {
-                    ConsoleInstaller consoleInstaller = new ConsoleInstaller(arguments, jarInfo);
+                if (!useGUI(commandLine)) {
+                    ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
                     consoleInstaller.install();
                     System.exit(0);
                 } else {
@@ -152,8 +152,8 @@ public class Installation {
         return buffer.toString();
     }
 
-    private static boolean useGUI(Arguments arguments) {
-        if (arguments.isConsoleMode() || arguments.isSilentMode()) {
+    private static boolean useGUI(InstallerCommandLine commandLine) {
+        if (commandLine.hasConsoleOption() || commandLine.hasSilentOption()) {
             return false;
         }
         if (Boolean.getBoolean("java.awt.headless")) {

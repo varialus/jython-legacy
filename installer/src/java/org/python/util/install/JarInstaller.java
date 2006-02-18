@@ -37,7 +37,7 @@ public class JarInstaller {
      * @param targetDirectory
      * @param installationType
      */
-    public void inflate(final File targetDirectory, String installationType) {
+    public void inflate(final File targetDirectory, String installationType, File javaHome) {
         try {
             List excludeDirs = _jarInfo.getExcludeDirs();
             if (!Installation.ALL.equals(installationType)) {
@@ -103,7 +103,7 @@ public class JarInstaller {
             }
             // generate start scripts
             _progressListener.progressStartScripts();
-            StartScriptGenerator generator = new StartScriptGenerator(targetDirectory);
+            StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
             if (Installation.isWindows()) {
                 generator.generateJythonForWindows();
                 generator.generateJythoncForWindows();

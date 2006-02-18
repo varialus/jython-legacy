@@ -15,34 +15,37 @@ public class ConsoleInstaller implements ProgressListener {
     private static final String BEGIN_ANSWERS = "[";
     private static final String END_ANSWERS = "]";
 
-    private Arguments _arguments;
+    private InstallerCommandLine _commandLine;
     private JarInstaller _jarInstaller;
     private JarInfo _jarInfo;
 
-    public ConsoleInstaller(Arguments arguments, JarInfo jarInfo) {
-        _arguments = arguments;
+    public ConsoleInstaller(InstallerCommandLine commandLine, JarInfo jarInfo) {
+        _commandLine = commandLine;
         _jarInfo = jarInfo;
         _jarInstaller = new JarInstaller(this, jarInfo);
     }
 
     public void install() {
-        if (!_arguments.isSilentMode()) {
+        File targetDirectory;
+        if (!_commandLine.hasSilentOption()) {
             welcome();
             selectLanguage();
             String installationType = selectInstallationType();
+            File javaHome=null;//TODO:oti java home
             checkVersion();
             acceptLicense();
-            File targetDirectory = determineTargetDirectory();
+            targetDirectory = determineTargetDirectory();
             promptForCopying(targetDirectory);
-            _jarInstaller.inflate(targetDirectory, installationType);
+            _jarInstaller.inflate(targetDirectory, installationType, javaHome);
             showReadme(targetDirectory);
             success(targetDirectory);
         } else {
             message(Installation.getText(TextKeys.C_SILENT_INSTALLATION));
-            checkTargetDirectorySilent(_arguments.getTargetDirectory());
-            checkVersionSilent();
-            _jarInstaller.inflate(_arguments.getTargetDirectory(), _arguments.getInstallationType());
-            success(_arguments.getTargetDirectory());
+            targetDirectory = _commandLine.getTargetDirectory();
+            checkTargetDirectorySilent(targetDirectory);
+            checkVersionSilent();//TODO:oti java home, same as checkVersion above
+            _jarInstaller.inflate(targetDirectory, _commandLine.getInstallationType(), _commandLine.getJavaHome());
+            success(targetDirectory);
         }
     }
 

@@ -83,13 +83,9 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_ENTER_TARGET_DIRECTORY, "Please enter the target directory" }, // console
         { C_ENGLISH, "English" }, // language
         { C_GERMAN, "German" }, // language
-        { C_INVALID_TYPE, "{0} is not a valid installation type" }, // error
-        { C_INVALID_OPTION, "{0} is not a valid option" }, // error
         { C_INSTALL_TYPES, "The following installation types are available:" }, // installation type
         { C_JAVA_VERSION, "Your java version is: {0} / {1}" }, // version
         { C_MINIMUM, "Minimum (core)" }, // installation type
-        { C_NEED_SILENT_MODE, "The indicated options ({0}) require silent mode. Please use the {1} option." }, // error
-        { C_NEED_VALUE_FOR_OPTION, "Please specify a value for option {0}" }, // error
         { C_NO, "n" }, // answer
         { C_NON_EMPTY_TARGET_DIRECTORY, "Target directory {0} is not empty" }, // error
         { C_NOT_A_DIRECTORY, "{0} is not a directory. " }, // error
@@ -104,15 +100,10 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_SILENT_INSTALLATION, "Performing silent installation" }, // installation mode
         { C_STANDARD, "Standard (core, library modules, demos and examples)" }, // installation type
         { C_SUCCESS, "You successfully installed Jython {0} to directory {1}." }, // success
-        { C_TARGET_DIRECTORY_NOT_SPECIFIED, "Target directory not specified. Please use the {0} option." }, // error
         { C_UNABLE_CREATE_DIRECTORY, "Unable to create directory {0}." }, // error
         { C_UNABLE_TO_DELETE, "Unable to delete {0}" }, // error
         { C_UNSUPPORTED_JAVA, "This java version is not supported." }, // version
         { C_UNSUPPORTED_OS, "This operating system might not be fully supported." }, // version
-        { C_USAGE_CONSOLE, "Console installation with user interaction" }, // usage
-        { C_USAGE_FRAME, "GUI installation" }, // usage
-        { C_USAGE_SILENT_TYPE, "Silent installation with a predefined type. Possible types are: {0}." }, // usage
-        { C_USAGES, "Possible usages are:" }, // usage
         { C_USING_TYPE, "Using installation type {0}" }, // installation type
         { C_VERSION_INFO, "You are about to install Jython version {0}." }, // version
         { C_WELCOME_TO_JYTHON, "Welcome to Jython !" }, // welcome

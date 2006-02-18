@@ -11,9 +11,15 @@ public class StartScriptGenerator {
     private final static String EXECUTABLE_MODE = "755";
 
     private File _targetDirectory;
+    private File _javaHome;
 
-    public StartScriptGenerator(File targetDirectory) {
+    public StartScriptGenerator(File targetDirectory, File javaHome) {
         _targetDirectory = targetDirectory;
+        if( javaHome == null) {
+            // use default java home if nothing specified
+            javaHome = new File(System.getProperty("java.home"));
+        }
+        _javaHome = javaHome;
     }
 
     protected final void generateJythonForWindows() throws IOException {
@@ -37,14 +43,14 @@ public class StartScriptGenerator {
      * 
      * {0} : current date <br>
      * {1} : user.name <br>
-     * {2} : java.home <br>
+     * {2} : java home directory <br>
      * {3} : target directory <br>
      */
     private String getStartScript(String template) throws IOException {
         String parameters[] = new String[4];
         parameters[0] = new Date().toString();
         parameters[1] = System.getProperty("user.name");
-        parameters[2] = System.getProperty("java.home");
+        parameters[2] = _javaHome.getCanonicalPath();
         parameters[3] = _targetDirectory.getCanonicalPath();
         return MessageFormat.format(template, parameters);
     }
