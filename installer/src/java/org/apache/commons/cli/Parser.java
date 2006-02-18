@@ -65,7 +65,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 /**
  * <p><code>Parser</code> creates {@link CommandLine}s.</p>
@@ -236,7 +235,7 @@ public abstract class Parser implements CommandLineParser {
         }
 
         if( opt.getValues() == null && !opt.hasOptionalArg() ) {
-            throw new MissingArgumentException( "no argument for:" + opt.getOpt() );
+            throw new MissingArgumentException( "no argument for option: " + opt.getOpt() + " / " + opt.getLongOpt() );
         }
     }
 
