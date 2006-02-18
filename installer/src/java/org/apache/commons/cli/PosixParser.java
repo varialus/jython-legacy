@@ -153,14 +153,7 @@ public class PosixParser extends Parser {
 
             // handle SPECIAL TOKEN
             if( token.startsWith( "--" ) ) {
-                if( token.indexOf( '=' ) != -1 ) {
-                    tokens.add( token.substring( 0, token.indexOf( '=' ) ) );
-                    tokens.add( token.substring( token.indexOf( '=' ) + 1,
-                                                 token.length() ) );
-                }
-                else {
-                    tokens.add( token );
-                }	
+                processLongOptionToken(token, stopAtNonOption);
             }
             // single hyphen
             else if( "-".equals( token ) ) {
@@ -260,12 +253,47 @@ public class PosixParser extends Parser {
         if( this.options.hasOption( token ) ) {
             currentOption = this.options.getOption( token );
             tokens.add( token );
-        }
-        else if( stopAtNonOption ) {
-            eatTheRest = true;
+        } else {
+            if( stopAtNonOption ) {
+                eatTheRest = true;
+            } else {
+                tokens.add(token);
+            }
         }
     }
 
+    /**
+     * same stop logic as for single hyphen options
+     * @param longToken
+     * @param stopAtNonOption
+     */
+    private void processLongOptionToken(String longToken, boolean stopAtNonOption ) {
+        String token;
+        String value = null;
+        if( longToken.indexOf( '=' ) != -1 ) {
+            token = longToken.substring( 0, longToken.indexOf( '=' ));
+            value = longToken.substring( longToken.indexOf( '=' ) + 1, longToken.length() );
+        } else {
+            token = longToken;
+        }   
+        if( this.options.hasOption(token)) {
+            tokens.add(token);
+            if( value != null) {
+                tokens.add(value);
+            }
+        } else {
+            if(stopAtNonOption) {
+                eatTheRest = true;
+            } else {
+                tokens.add(token);
+                if( value != null) {
+                    tokens.add(value);
+                }
+            }
+        }
+    }
+    
+    
     /**
      * <p>Breaks <code>token</code> into its constituent parts
      * using the following algorithm.
