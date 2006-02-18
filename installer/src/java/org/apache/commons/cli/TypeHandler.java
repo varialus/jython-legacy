@@ -62,11 +62,10 @@
 package org.apache.commons.cli;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Date;
-
-import org.apache.commons.lang.NumberUtils;
 
 /**
   * This is a temporary implementation. TypeHandler will handle the 
@@ -175,7 +174,7 @@ public class TypeHandler {
         // Needs to be able to create
         try {
             // do searching for decimal point etc, but atm just make an Integer
-            return NumberUtils.createNumber(str);
+            return new BigDecimal(str);
         } catch (NumberFormatException nfe) {
             System.err.println(nfe.getMessage());
             return null;
