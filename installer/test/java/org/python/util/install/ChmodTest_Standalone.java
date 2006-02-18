@@ -6,7 +6,7 @@ import java.io.IOException;
 /**
  * Helper class to test of 'chmod' on different platforms
  */
-public class ChmodTest {
+public class ChmodTest_Standalone {
 
     private static String _mode = "755"; // default mode
 
@@ -50,7 +50,7 @@ public class ChmodTest {
     }
 
     private static String getPrefix() {
-        return "[ChmodTest] ";
+        return "[ChmodTest_Standalone] ";
     }
 
 }
