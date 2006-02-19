@@ -27,7 +27,7 @@ public class Installation {
         try {
             JarInfo jarInfo = new JarInfo();
             InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
-            if (!commandLine.setArgs(args)) {
+            if (!commandLine.setArgs(args) || commandLine.hasHelpOption()) {
                 commandLine.printHelp();
                 System.exit(1);
             } else {
