@@ -66,7 +66,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { UNEXPECTED_URL, "Unexpected URL {0} found for installation jar file." }, // error
         { VERSION_CHECK, "Version check" }, // version
         { VERSION_CHECK_DESCRIPTION, "This is a check of the installation requirements" }, // version
-        { VERSION_INFO, "You are about to install Jython version {0}." }, // version
+        { VERSION_INFO, "You are about to install Jython version {0}" }, // version
         { WELCOME_TO_JYTHON, "Welcome to Jython !" }, // welcome
         { ZIP_ENTRY_SIZE, "Size of zip entry {0} unknown." }, // error
         { ZIP_ENTRY_TOO_BIG, "Zip entry {0} too big." }, // error
@@ -105,7 +105,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_UNSUPPORTED_JAVA, "This java version is not supported." }, // version
         { C_UNSUPPORTED_OS, "This operating system might not be fully supported." }, // version
         { C_USING_TYPE, "Using installation type {0}" }, // installation type
-        { C_VERSION_INFO, "You are about to install Jython version {0}." }, // version
+        { C_VERSION_INFO, "You are about to install Jython version {0}" }, // version
         { C_WELCOME_TO_JYTHON, "Welcome to Jython !" }, // welcome
         { C_YES, "y" }, // answer
         
