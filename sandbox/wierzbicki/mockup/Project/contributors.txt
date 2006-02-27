@@ -2,12 +2,6 @@
 Contributors
 ============
 
---------
-Inventor
---------
-
-Jim Hugunin
-
 ----------------
 Active Commiters
 ----------------
@@ -25,6 +19,7 @@ Emeritus Committers
 
 * Finn Bock
 * Kevin J. Butler
+* Jim Hugunin
 * Barry A. Warsaw
 
 ------------------

@@ -4,45 +4,28 @@ Jython User Guide
 
 .. contents:: Table of Contents
 
------------------------------
-Jython Specific Documentation
------------------------------
+-----
+Intro
+-----
 
-There is a variety of documentation available to help you learn to use
-Jython. We will be expanding this information in the future so check
-back here often. You can use the sidebar you see on the left side of
-this page as a table of contents to easily jump to the documentation
-you're interested in. A more detailed description of these links is
-provided below.
+.. FIXME: need intro.
 
-The following documentation is specific to Jython:
-
-* For a one-page introduction to what Jython is, and why you should care,
-  check out What is Jython?.
-* Here is information on invoking the Jython interpreter by typing jython
-  at the shell prompt.
-* The Jython registry replaces environment variables for PYTHONPATH
-  and more.
-* The embedding document describes how to call Jython from a Java
-  application.
-* The generated JavaDoc documentation of the API is available as frame
-  and as non-frame versions.
-* You might also be interested in building Jython from the source code.
+For a look at the Jython internal API see the generated
+`JavaDoc documentation`_
 
 General Python Documentation
 ============================
 
-While Jython has only been publically available for eight months, the
-Python language has been around for many years. The majority of the
-standard Python documentation applies to Jython. A few very handy places
+Since Jython is an implementation of Python for the JVM, most of
+the standard Python documentation applies.  A few very handy places
 to look are:
 
-* The Python Tutorial (start here)
-* The Python Library Reference. Although many of these modules are not
+* The `Python Tutorial`_ (start here)
+* The `Python Library Reference`_. Although many of these modules are not
   yet implemented (those coded in C for CPython must be re-implemented
-  in Java for Jython), experience Python programmers keep the Library
-  Reference Manual under their pillow for easy access.
-* The Python Language Reference (for language lawyers).
+  in Java for Jython), those that are implemented follow the library
+  reference as closely as possible.
+* The `Python Language Reference`_ (for language lawyers).
 
 Other Useful Links
 ==================
@@ -51,24 +34,12 @@ Other Useful Links
   same language. There are naturally some differences between the
   two implementations, sometimes reflecting undefined aspects of
   the Python language, sometimes reflecting quirks of the independent
-  implementations. Here is a more detailed discussion and comparision of
-  Jython and CPython.
-* The Jython FAQ may already contain the answer to your question...
-* ...and if it doesn't, then the Jython-users mailing list archives
+  implementations. Here is a more detailed discussion and
+  `comparision of Jython and CPython`_.
+* The `Jython FAQ`_ may already contain the answer to your question...
+* if it doesn't, then the `Jython-users mailing list archives`_
   might help.
-* You might also be interested in reading Jim Hugunin's JPython paper,
-  which appeared in the proceedings of the 6th International Python
-  Conference.
-
-Peer-to-Peer Help
-=================
-
-If you still have unanswered questions you can usually get help from:
-
-* The jython-users mailing list.
-* The comp.lang.python newsgroup.
-* Jython's developers, who can be reached at
-  jython-dev@lists.sourceforge.net.
+* And if it still doesn't: you can ask the `Jython-users mailing list`_
 
 -------------------------------
 Invoking the Jython Interpreter
@@ -78,24 +49,30 @@ Jython can be invoked from the shell using the following command:
 
 jython [options] [-jar jar | -c cmd | file | -] [args]
 
-Options and arguments: ::
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+| Option      | Description                                                                                                                |
++=============+============================================================================================================================+
+|-i           | inspect interactively after running script, and force prompts, even if stdin does not appear to be a terminal              |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|-S           | don't imply import site on initialization                                                                                  |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|-Dprop=value | Set the jython property prop to value                                                                                      |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|-jar jar     | program to run is read from the __run__.py file in the specified jar file                                                  |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|-c cmd       | program to run is passed in as the cmd string. This option terminates the options list file run file as the program script |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+| \-          | program is read from standard-in (default; interactive mode is used if on a tty).                                          |
+|             | This flag allows you to pipe a file into Jython and                                                                        |
+|             | have it be treated correctly. This would be useful in a case like: filter file | jython -                                  |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|--help       | print a usage message and exit                                                                                             |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|--version    | print Jython version number and exit                                                                                       |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
+|args         | arguments passed to the program in sys.argv[1:]                                                                            |
++-------------+----------------------------------------------------------------------------------------------------------------------------+
 
-    -i inspect interactively after running script, and force prompts,
-    even if stdin does not appear to be a terminal
-    -S don't imply import site on initialization
-    -Dprop=value Set the jython property prop to value
-    -jar jar program to run is read from the __run__.py file in the
-    specified jar file
-    -c cmd program to run is passed in as the cmd string. This option
-    terminates the options list
-    file run file as the program script
-    - program is read from standard-in (default; interactive mode is used
-    if on a tty). This flag allows you to pipe a file into Jython and
-    have it be treated correctly. This would be useful in a case like:
-    filter file | jython -
-    --help print a usage message and exit
-    --version print Jython version number and exit
-    args arguments passed to the program in sys.argv[1:]
 
 Details
 =======
@@ -116,11 +93,11 @@ For this magic to work, you must have jython somewhere on your standard
 PATH. You also must also make the ".py" file executable. Typically this
 is done with the command: chmod +x foo.py.
 
-Note: "#! <...>/jython" will probably not work to make your script
-executable. This is because "jython" is itself a script, and the #! magic
-requires that the file to execute is a binary executable on most Unix
-variants. Using "/usr/bin/env" will get around this problem - and make
-your scripts more portable in the bargain.
+.. Note:: "#! <...>/jython" will probably not work to make your script
+  executable. This is because "jython" is itself a script, and the #! magic
+  requires that the file to execute is a binary executable on most Unix
+  variants. Using "/usr/bin/env" will get around this problem - and make
+  your scripts more portable in the bargain.
 
 -------------------
 The Jython Registry
@@ -212,7 +189,8 @@ class out of a Python class and then just use that Python class from
 Java code. The simplest approach to embedding Jython is to use the
 PythonInterpreter object.
 
-JavaDoc documentation for org.python.util.PythonInterpreter
+JavaDoc documentation for `org.python.util.PythonInterpreter`_
+
 The following example is distributed under Demo/embed/SimpleEmbedded.java
 ::
 
@@ -338,12 +316,10 @@ ant properties PyXmlHome and python.home must be configured and the ant
 task installXML must be executed.
 
 If you have further interest in the Jython source and Jython's continued
-development, you can read the archives for the Jython-dev mailing list
-or you can join the list.
+development, you can read the `Jython-users mailing list archives`_
+or join the `Jython-users mailing list`_
 
 Suggested tools and support software:
-
-.. FIXME: add links?
 
 * JavaCC
 * Ant
@@ -445,40 +421,57 @@ what Python objects can be converted to the given Java type. Notice the
 special behavior of String's when a java.lang.Object is expected. This
 behavior might change if it is shown to cause problems.
 
-.. FIXME: make a table
-
-Java Types	Allowed Python Types
-char	String (must have length 1)
-boolean		Integer (true = nonzero)
-byte, short, int, long	Integer
-float, double	Float
-java.lang.String,
-byte[], char[]	String
-java.lang.Class		Class or JavaClass (only if class subclasses
-from exactly one Java class; mutiple inheritance from more than one Java
-class is now illegal)
-Foo[]	Array (must contain objects of class or subclass of Foo)
-java.lang.Object	String->java.lang.String, all others unchanged
-org.python.core.PyObject	All unchanged
-Foo	Instance->Foo (if Instance is subclass of Foo);
-JavaInstance -> Foo (if JavaInstance is instance of Foo or subclass)
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| Java Types                       | Allowed Python Types                                                                                  |
++==================================+=======================================================================================================+
+| char                             | String (must have length 1)                                                                           |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| boolean                          | Integer (true = nonzero)                                                                              |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| byte, short, int, long           | Integer                                                                                               |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| float, double                    | Float                                                                                                 |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| java.lang.String, byte[], char[] | String                                                                                                |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| java.lang.Class Class            | (only if class subclasses from exactly one Java class; mutiple inheritance from more than one Java    |
+| or JavaClass                     | class is now illegal)                                                                                 |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| Foo[]                            |Array (must contain objects of class or subclass of Foo)                                               |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| java.lang.Object                 | String->java.lang.String, all others unchanged                                                        |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| org.python.core.PyObject         | All unchanged                                                                                         |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
+| Foo                              |Instance->Foo (if Instance is subclass of Foo);                                                        |
+|                                  |JavaInstance -> Foo (if JavaInstance is instance of Foo or subclass)                                   |
++----------------------------------+-------------------------------------------------------------------------------------------------------+
 
 Returned values from a Java method are also possibly coerced back to an
 object that is more readily usable in Python. The following table shows
 those coercions.
 
-.. FIXME: make a table
-
-Java Type	Returned Python Type
-char	String (of length 1)
-boolean		Integer (true = 1, false = 0)
-byte, short, int, long	Integer
-float, double	Float
-java.lang.String	String
-java.lang.Class		JavaClass which represents given Java class
-Foo[]	Array (containing objects of class or subclass of Foo)
-org.python.core.PyObject (or subclass)	Unchanged
-Foo	JavaInstance which represents the Java Class Foo
++----------------------------------------+---------------------------------------------------------+
+| Java Type                              | Returned Python Type                                    |
++========================================+=========================================================+
+| char                                   | String (of length 1)                                    |
++----------------------------------------+---------------------------------------------------------+
+| boolean                                | Integer (true = 1, false = 0)                           |
++----------------------------------------+---------------------------------------------------------+
+| byte, short, int, long                 | Integer                                                 |
++----------------------------------------+---------------------------------------------------------+
+| float, double                          | Float                                                   |
++----------------------------------------+---------------------------------------------------------+
+| java.lang.String                       | String                                                  |
++----------------------------------------+---------------------------------------------------------+
+| java.lang.Class                        | JavaClass which represents given Java class             |
++----------------------------------------+---------------------------------------------------------+
+| Foo[]                                  | Array (containing objects of class or subclass of Foo)  |
++----------------------------------------+---------------------------------------------------------+
+| org.python.core.PyObject (or subclass) | Unchanged                                               |
++----------------------------------------+---------------------------------------------------------+
+| Foo                                    | JavaInstance which represents the Java Class Foo        |
++----------------------------------------+---------------------------------------------------------+
 
 Overloaded Java Method Signatures
 =================================
@@ -491,7 +484,9 @@ be easily determined from the number of arguments passed to the method.
 When the difference is instead in the types of the arguments, more
 work is required. The possible signatures are sorted in a consistent
 order that should ensure the appropriate method is chosen first. TBD:
-documentation this order!
+document this order!
+
+.. FIXME -- really figure it out and document it.
 
 If you need to call a Java method with a particular signature and this
 is not happening in the easy way, you can use the following workaround:
@@ -503,6 +498,8 @@ call the second method you could write the following: ::
     foo(Byte(10))
 
 I'm not convinced that any better solution to this problem is possible.
+
+.. Note:: Look into IronPython's solution to this for ideas.
 
 Naming Conflicts with Python Keywords
 =====================================
@@ -522,6 +519,109 @@ or
 In the rare case where the conflict can't be resolved due to Python's
 grammar, you should modify the reserved word by appended an underscore
 to the end of it, e.g. `print_`
+
+-------------------
+JavaBean Properties
+-------------------
+
+Properties
+==========
+Jython uses JavaBean properties to make it easier to interact with most Java classes. These properties can be used as normal object attributes, and can also be specified to the class constructor as keyword arguments (this idea is stolen from TkInter where it seems to work extremely well).
+
+These properties are generated automatically using the JavaBean Introspector which identifies properties either from common design patterns, or from explicitly specified BeanInfo.
+
+As a first example, consider the case where you wish to create a button that is disabled.
+
+The first example shows how you would do this in the typical Java fashion:
+
+b = awt.Button()
+b.setEnabled(0)
+
+The second example shows how enabled can be set as a property:
+
+b = awt.Button()
+b.enabled = 0
+
+The final example sets this property at instantiation time using a keyword argument:
+
+b = awt.Button(enabled=0)
+
+Tuples
+======
+If the value of a property is specified as a tuple, then the property will be created by applying the constructor for the type of the property to the tuple. This is particularly handy for specifying sizes:
+
+frame = awt.Frame(size=(500,100))
+
+It can also be handy for specifying color as an RGB triple:
+
+frame.background = 255,255,0
+
+will set the background color of the frame to yellow.
+
+Event Properties
+================
+In standard Java, the event handlers for a widget are specified by passing in an instance of a class that implements the appropriate interface. This is the only reasonable approach to take in a language that doesn't have first-class functions. In Jython, for every event listener supported by a class, there will be a property added to the class for each method supplied by the event listener class. These properties can be set to give a function to be called when the appropriate event occurs.
+
+The standard Java style for setting an event listener is shown below:
+
+  class action(awt.event.ActionListener):
+      def actionPerformed(self,event):
+          java.lang.System.exit(0)
+
+button = awt.Button("Close Me!")
+button.addActionListener(action())
+
+This can be written in a more Pythonesque (and compact) style by using event properties as follows:
+
+::
+
+  def exit(event):
+      java.lang.System.exit(0)
+
+button = awt.Button("Close Me!", actionPerformed=exit)
+
+Methods, Properties and Event Properties
+========================================
+Jython have only one namespace for these three class attributes. Java can be seen as having a unique namespace for each of the three types. As a consequense, there can be conflicts between methods, properties and event properties. These conflicts are resolved so that:
+
+    properties < event-properties < fields < methods 
+
+This means that a method will override a field with the same name. Some carefull handling of properties and static fields allow for the existence of, and access to, both an instance property and a static field with the same name.
+
+-----------
+Java Arrays
+-----------
+Java Arrays in Jython - JArray
+Many Java methods require Java array objects as arguments. The way that these arguments are used means that they must correspond to fixed-length, mutable sequences, sometimes of primitive data types. The PyArray class is added to support these Java arrays and instances of this class will be automatically returned from any Java method call that produces an array. In addition, the "jarray" module is provided to allow users of Jython to create these arrays themselves, primarily for the purpose of passing them to a Java method.
+
+The jarray module exports two functions:
+
+array(sequence, type)
+zeros(length, type)
+
+array will create a new array of the same length as the input sequence and will populate it with the values in sequence. zeros will create a new array of the given length filled with zeros (or null's if appropriate).
+
+type can either be a single character typecode (using the same mappings as Python's array module) or it can be an instance of a JavaClass object. The valid typecodes are shown in the following table: 
+
++--------------------+-------------------------+
+| Character Typecode | Corresponding Java Type |
++====================+=========================+
+| z                  | boolean                 |
++--------------------+-------------------------+
+| c                  | char                    |
++--------------------+-------------------------+
+| b                  | byte                    |
++--------------------+-------------------------+
+| h                  | short                   |
++--------------------+-------------------------+
+| i                  | int                     |
++--------------------+-------------------------+
+| l                  | long                    |
++--------------------+-------------------------+
+| f                  | float                   |
++--------------------+-------------------------+
+| d                  | double                  |
++--------------------+-------------------------+
 
 ----------------------------------
 Subclassing Java Classes in Jython
@@ -1570,4 +1670,13 @@ Example session
 
   >>>
 
+.. _JavaDoc documentation: http://www.jython.org/docs/javadoc/index.html 
+.. _`Python Tutorial`: http://www.python.org/doc/tut/tut.html
+.. _Python Library Reference: http://www.python.org/doc/lib/lib.html
+.. _Python Language Reference: http://www.python.org/doc/current/ref/ref.html
+.. _comparision of Jython and CPython: http://www.jython.org/Project/differences.html
+.. _Jython FAQ: http://www.jython.org/Project/faq.html
+.. _Jython-users mailing list archives: http://sourceforge.net/mailarchive/forum.php?forum_id=5586
+.. _Jython-users mailing list: http://lists.sourceforge.net/lists/listinfo/jython-users
+.. _org.python.util.PythonInterpreter: http://www.jython.org/docs/javadoc/org/python/util/PythonInterpreter.html
 

@@ -6,6 +6,10 @@
 
 Introduction
 ============
+You might be interested in reading `Jim Hugunin's JPython paper`_,
+which appeared in the proceedings of the 6th International Python
+Conference.
+
 This is an introduction to developing Jython, just to get someone started. It doesn't cover in any depth the source code or the design behind Jython. It's purely aimed at getting a development environment setup. It's definitely not complete so feel free to make it better!
 
 The Wiki
@@ -185,4 +189,6 @@ Coding Guidance
   * CodingStandards     : The standards for writing Java code for Jython
   * JythonModulesInJava : How to write a Jython module in Java
   * JythonClassesInJava : How to write a Jython class in Java
+
+.. _Jim Hugunin's JPython paper: http://www.python.org/workshops/1997-10/proceedings/hugunin.html
 

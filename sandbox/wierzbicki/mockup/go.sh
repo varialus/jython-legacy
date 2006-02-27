@@ -2,6 +2,7 @@
 
 #Very crude -- need to automate this.
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/index.txt Project/index.html 
+rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/differences.txt Project/differences.html 
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/license.txt Project/license.html
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/news.txt Project/news.html
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/history.txt Project/history.html
