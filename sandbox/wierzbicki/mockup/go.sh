@@ -14,3 +14,5 @@ rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/userdoc.t
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/bugs.txt Project/bugs.html 
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/download.txt Project/download.html
 rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Project/todo.txt Project/todo.html
+rst2jysite --link-stylesheet --stylesheet=../css/html4css1.css Related/index.txt Related/index.html 
+

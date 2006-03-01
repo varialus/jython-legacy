@@ -40,7 +40,7 @@ class HTMLTranslator(html4css1.HTMLTranslator):
             buffer.append('<div id="top">')
             buffer.append('<div class="header">')
             buffer.append('<div class="grouplogo">')
-            buffer.append('<a href="????" ><img class="logoImage" alt="Jython" src="../css/jython.png" title="Apache XML"></a>')
+            buffer.append('<a href="http://www.jython.org" ><img class="logoImage" alt="Jython" src="../css/jython.png" title="Jython"></a>')
             buffer.append('</div>')
 
             #searchbox
@@ -75,6 +75,8 @@ class HTMLTranslator(html4css1.HTMLTranslator):
             buffer.append('<div id="main"><div id="menu"><div class="menupage">')
             firstSection = True
             for line in lines:
+                if line.startswith('#'):
+                  continue
                 val = line.split('|')
                 for i in range(len(val)):
                     val[i] = val[i].strip()
