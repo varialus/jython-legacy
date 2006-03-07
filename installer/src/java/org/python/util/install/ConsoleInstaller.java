@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.python.util.install.Installation.JavaVersionInfo;
+
 public class ConsoleInstaller implements ProgressListener {
     private static final String CANCEL = "c";
     private static final String PROMPT = ">>>";
@@ -26,15 +28,15 @@ public class ConsoleInstaller implements ProgressListener {
     }
 
     public void install() {
-        File targetDirectory;
+        File targetDirectory = null;
+        File javaHome = null;
         if (!_commandLine.hasSilentOption()) {
             welcome();
             selectLanguage();
-            String installationType = selectInstallationType();
-            File javaHome=null;//TODO:oti java home
-            checkVersion();
             acceptLicense();
+            String installationType = selectInstallationType();
             targetDirectory = determineTargetDirectory();
+            javaHome = checkVersion(determineJavaHome());
             promptForCopying(targetDirectory);
             _jarInstaller.inflate(targetDirectory, installationType, javaHome);
             showReadme(targetDirectory);
@@ -43,8 +45,8 @@ public class ConsoleInstaller implements ProgressListener {
             message(Installation.getText(TextKeys.C_SILENT_INSTALLATION));
             targetDirectory = _commandLine.getTargetDirectory();
             checkTargetDirectorySilent(targetDirectory);
-            checkVersionSilent();//TODO:oti java home, same as checkVersion above
-            _jarInstaller.inflate(targetDirectory, _commandLine.getInstallationType(), _commandLine.getJavaHome());
+            javaHome = checkVersionSilent(_commandLine.getJavaHome());
+            _jarInstaller.inflate(targetDirectory, _commandLine.getInstallationType(), javaHome);
             success(targetDirectory);
         }
     }
@@ -59,13 +61,25 @@ public class ConsoleInstaller implements ProgressListener {
         message(Installation.getText(TextKeys.C_AT_ANY_TIME_CANCEL, CANCEL));
     }
 
+    private String question(String question) {
+        return question(question, null, false);
+    }
+
+    private String question(String question, boolean answerRequired) {
+        return question(question, null, answerRequired);
+    }
+
+    private String question(String question, List answers) {
+        return question(question, answers, true);
+    }
+
     /**
      * question and answer
      * 
      * @param answers Possible answers (may be null)
      * @return (chosen) answer
      */
-    private String question(String question, List answers) {
+    private String question(String question, List answers, boolean answerRequired) {
         if (answers != null && answers.size() > 0) {
             question = question + " " + BEGIN_ANSWERS;
             Iterator answersAsIterator = answers.iterator();
@@ -91,6 +105,9 @@ public class ConsoleInstaller implements ProgressListener {
                 }
             } else {
                 match = true;
+                if (answerRequired && "".equals(answer)) {
+                    match = false;
+                }
             }
         }
         if (answer.equalsIgnoreCase(CANCEL)) {
@@ -143,34 +160,61 @@ public class ConsoleInstaller implements ProgressListener {
         return question(Installation.getText(TextKeys.C_SELECT_INSTALL_TYPE), answers);
     }
 
-    private void checkVersion() {
-        String osName = System.getProperty(Installation.OS_NAME);
-        String osVersion = System.getProperty(Installation.OS_VERSION);
-        String javaVendor = System.getProperty(Installation.JAVA_VENDOR);
-        String javaVersion = System.getProperty(Installation.JAVA_VERSION);
-        message(Installation.getText(TextKeys.C_OS_VERSION, osName, osVersion));
-        if (Installation.isValidOs()) {
-            question(Installation.getText(TextKeys.C_PROCEED), null);
-        } else {
-            message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
-            question(Installation.getText(TextKeys.C_PROCEED_ANYWAY), null);
-        }
-        message(Installation.getText(TextKeys.C_JAVA_VERSION, javaVendor, javaVersion));
-        if (Installation.isValidJava()) {
-            question(Installation.getText(TextKeys.C_PROCEED), null);
+    private File checkVersion(File javaHome) {
+        // handle target java version
+        JavaInfo javaInfo = verifyTargetJava(javaHome);
+        message(Installation.getText(TextKeys.C_JAVA_VERSION, javaInfo.getJavaVersionInfo().getVendor(), javaInfo
+                .getJavaVersionInfo().getVersion()));
+        if (Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
+            question(Installation.getText(TextKeys.C_PROCEED));
         } else {
             message(Installation.getText(TextKeys.C_UNSUPPORTED_JAVA));
-            question(Installation.getText(TextKeys.C_PROCEED_ANYWAY), null);
+            question(Installation.getText(TextKeys.C_PROCEED_ANYWAY));
         }
+        // handle OS
+        String osName = System.getProperty(Installation.OS_NAME);
+        String osVersion = System.getProperty(Installation.OS_VERSION);
+        message(Installation.getText(TextKeys.C_OS_VERSION, osName, osVersion));
+        if (Installation.isValidOs()) {
+            question(Installation.getText(TextKeys.C_PROCEED));
+        } else {
+            message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
+            question(Installation.getText(TextKeys.C_PROCEED_ANYWAY));
+        }
+        return javaInfo.getJavaHome();
     }
 
-    private void checkVersionSilent() {
+    private File checkVersionSilent(File javaHome) {
+        // check target java version
+        JavaInfo javaInfo = verifyTargetJava(javaHome);
+        if (!Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
+            message(Installation.getText(TextKeys.C_UNSUPPORTED_JAVA));
+        }
+        // check OS
         if (!Installation.isValidOs()) {
             message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
         }
-        if (!Installation.isValidJava()) {
-            message(Installation.getText(TextKeys.C_UNSUPPORTED_JAVA));
+        return javaInfo.getJavaHome();
+    }
+
+    private JavaInfo verifyTargetJava(File javaHome) {
+        JavaVersionInfo javaVersionInfo = new JavaVersionInfo();
+        if (javaHome != null) {
+            javaVersionInfo = Installation.getExternalJavaVersion(javaHome);
+            if (javaVersionInfo.getErrorCode() != Installation.NORMAL_RETURN) {
+                // switch back to current if an error occurred
+                message(Installation.getText(TextKeys.C_TO_CURRENT_JAVA, javaVersionInfo.getReason()));
+                javaHome = null;
+            }
         }
+        if (javaHome == null) {
+            Installation.fillJavaVersionInfo(javaVersionInfo, System.getProperties());
+            javaHome = new File(System.getProperty(JavaVersionTester.JAVA_HOME));
+        }
+        JavaInfo javaInfo = new JavaInfo();
+        javaInfo.setJavaHome(javaHome);
+        javaInfo.setJavaVersionInfo(javaVersionInfo);
+        return javaInfo;
     }
 
     private void acceptLicense() {
@@ -194,42 +238,63 @@ public class ConsoleInstaller implements ProgressListener {
         File targetDirectory = null;
         try {
             do {
-                targetDirectory = new File(question(Installation.getText(TextKeys.C_ENTER_TARGET_DIRECTORY), null));
-                if (targetDirectory.exists() && !targetDirectory.isDirectory()) {
-                    message(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, targetDirectory.getCanonicalPath()));
-                }
-            } while (targetDirectory.exists() && !targetDirectory.isDirectory());
-            if (!targetDirectory.exists()) {
-                String create = question(Installation.getText(TextKeys.C_CREATE_DIRECTORY, targetDirectory
-                        .getCanonicalPath()), getYNAnswers());
-                if (create.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
-                    if (!targetDirectory.mkdirs()) {
-                        throw new InstallerException(Installation.getText(TextKeys.C_UNABLE_CREATE_DIRECTORY,
-                                targetDirectory.getCanonicalPath()));
-                    }
-                } else {
-                    throw new InstallationCancelledException();
-                }
-            }
-            if (targetDirectory.list().length > 0) {
-                String overwrite = question(Installation.getText(TextKeys.C_OVERWRITE_DIRECTORY, targetDirectory
-                        .getCanonicalPath()), getYNAnswers());
-                if (!overwrite.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
-                    throw new InstallationCancelledException();
-                } else {
-                    String clear = question(Installation.getText(TextKeys.C_CLEAR_DIRECTORY, targetDirectory
-                            .getCanonicalPath()), getYNAnswers());
-                    if (clear.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
-                        clearDirectory(targetDirectory);
+                targetDirectory = new File(question(Installation.getText(TextKeys.C_ENTER_TARGET_DIRECTORY), true));
+                if (targetDirectory.exists()) {
+                    if (!targetDirectory.isDirectory()) {
+                        message(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, targetDirectory.getCanonicalPath()));
                     } else {
-                        throw new InstallationCancelledException();
+                        if (targetDirectory.list().length > 0) {
+                            String overwrite = question(Installation.getText(TextKeys.C_OVERWRITE_DIRECTORY,
+                                    targetDirectory.getCanonicalPath()), getYNAnswers());
+                            if (overwrite.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+                                String clear = question(Installation.getText(TextKeys.C_CLEAR_DIRECTORY,
+                                        targetDirectory.getCanonicalPath()), getYNAnswers());
+                                if (clear.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+                                    clearDirectory(targetDirectory);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    String create = question(Installation.getText(TextKeys.C_CREATE_DIRECTORY, targetDirectory
+                            .getCanonicalPath()), getYNAnswers());
+                    if (create.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+                        if (!targetDirectory.mkdirs()) {
+                            throw new InstallerException(Installation.getText(TextKeys.C_UNABLE_CREATE_DIRECTORY,
+                                    targetDirectory.getCanonicalPath()));
+                        }
                     }
                 }
-            }
+            } while (!targetDirectory.exists() || !targetDirectory.isDirectory() || targetDirectory.list().length > 0);
         } catch (IOException ioe) {
             throw new InstallerException(ioe);
         }
         return targetDirectory;
+    }
+
+    private File determineJavaHome() {
+        File javaHome = null;
+        File binDir = null;
+        try {
+            do {
+                javaHome = new File(question(Installation.getText(TextKeys.C_ENTER_JAVA_HOME), true));
+                if (!javaHome.exists()) {
+                    message(Installation.getText(TextKeys.C_NOT_FOUND, javaHome.getCanonicalPath()));
+                } else {
+                    if (!javaHome.isDirectory()) {
+                        message(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, javaHome.getCanonicalPath()));
+                    } else {
+                        binDir = new File(javaHome, "bin");
+                        if (!binDir.exists()) {
+                            message(Installation.getText(TextKeys.C_NO_BIN_DIRECTORY, javaHome.getCanonicalPath()));
+                        }
+                    }
+                }
+            } while (!javaHome.exists() || !javaHome.isDirectory() || !binDir.exists());
+        } catch (IOException ioe) {
+            throw new InstallerException(ioe);
+        }
+        return javaHome;
     }
 
     private void checkTargetDirectorySilent(File targetDirectory) {
@@ -262,7 +327,7 @@ public class ConsoleInstaller implements ProgressListener {
         if (read.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
             try {
                 message(Installation.getReadmeText(targetDirectory.getCanonicalPath()));
-                question(Installation.getText(TextKeys.C_PROCEED), null);
+                question(Installation.getText(TextKeys.C_PROCEED));
             } catch (IOException ioe) {
                 throw new InstallerException(ioe);
             }
@@ -314,6 +379,27 @@ public class ConsoleInstaller implements ProgressListener {
 
     private void progressMessage(int percentage) {
         message(" " + percentage + " %");
+    }
+
+    private static class JavaInfo {
+        private JavaVersionInfo _javaVersionInfo;
+        private File _javaHome;
+
+        void setJavaHome(File javaHome) {
+            _javaHome = javaHome;
+        }
+
+        File getJavaHome() {
+            return _javaHome;
+        }
+
+        void setJavaVersionInfo(JavaVersionInfo javaVersionInfo) {
+            _javaVersionInfo = javaVersionInfo;
+        }
+
+        JavaVersionInfo getJavaVersionInfo() {
+            return _javaVersionInfo;
+        }
     }
 
     //

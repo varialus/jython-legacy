@@ -71,7 +71,10 @@ public class ProgressPage extends AbstractWizardPage implements ProgressListener
         }
         JarInstaller jarInstaller = new JarInstaller(this, _jarInfo);
         File targetDirectory = new File(FrameInstaller.getTargetDirectory());
-        jarInstaller.inflate(targetDirectory, FrameInstaller.getInstallationType(), null); //TODO:oti FrameInstaller.getJavaHome()
+        // TODO:oti correct java home
+        File javaHome = new File(System.getProperty(JavaVersionTester.JAVA_HOME));
+        jarInstaller.inflate(targetDirectory, FrameInstaller.getInstallationType(), javaHome); // TODO:oti
+                                                                                                // FrameInstaller.getJavaHome()
     }
 
     protected void passivate() {

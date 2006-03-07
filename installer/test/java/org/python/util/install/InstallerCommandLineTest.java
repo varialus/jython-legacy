@@ -204,11 +204,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertTrue(commandLine.hasTypeOption());
         assertEquals(Installation.MINIMUM, commandLine.getInstallationType());
 
-        try {
-            commandLine.getJavaHome();
-            fail("should have thrown exception");
-        } catch (InstallerException ie) {
-        }
+        assertNull(commandLine.getJavaHome());
     }
 
     public void testJavaHome() {
@@ -229,23 +225,19 @@ public class InstallerCommandLineTest extends TestCase {
         assertNotNull(commandLine.getJavaHome());
         assertEquals("java", commandLine.getJavaHome().getName());
 
-        try {
-            commandLine.getTargetDirectory();
-            fail("should have thrown exception");
-        } catch (InstallerException ie) {
-        }
+        assertNull(commandLine.getTargetDirectory());
     }
-    
+
     public void testExamples() {
         String[] args;
         InstallerCommandLine commandLine;
 
-        args = new String[] { "-c"};
+        args = new String[] { "-c" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasConsoleOption());
 
-        args = new String[] { "-s", "-d", "dir"};
+        args = new String[] { "-s", "-d", "dir" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasSilentOption());
@@ -253,7 +245,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertNotNull(commandLine.getTargetDirectory());
         assertEquals("dir", commandLine.getTargetDirectory().getName());
 
-        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-j", "java"};
+        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-j", "java" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasSilentOption());

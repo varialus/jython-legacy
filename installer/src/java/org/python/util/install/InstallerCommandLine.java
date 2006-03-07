@@ -172,22 +172,31 @@ public class InstallerCommandLine {
         System.out.println(examples);
     }
 
+    /**
+     * @return the requested target directory, <code>null</code> if no directory specified
+     */
     public File getTargetDirectory() {
         if (hasDirectoryOption()) {
             return new File(_commandLine.getOptionValue(DIRECTORY_SHORT));
         } else {
-            throw new InstallerException("no target directory specified"); // should not happen
+            return null;
         }
     }
 
+    /**
+     * @return the requested java home directory, <code>null</code> if no java home specified
+     */
     public File getJavaHome() {
         if (hasJavaHomeOption()) {
             return new File(_commandLine.getOptionValue(JRE_SHORT));
         } else {
-            throw new InstallerException("no java home specified"); // should not happen
+            return null;
         }
     }
 
+    /**
+     * @return the installation type usable for the jar installer, defaults to <code>Installation.STANDARD</code>
+     */
     public String getInstallationType() {
         String type = Installation.STANDARD;
         String typeName = _commandLine.getOptionValue(TYPE_SHORT);
@@ -197,6 +206,8 @@ public class InstallerCommandLine {
             type = Installation.ALL;
         } else if (TYPE_MINIMUM.equals(typeName)) {
             type = Installation.MINIMUM;
+        } else {
+            typeName = TYPE_STANDARD; // for the message
         }
         message(Installation.getText(TextKeys.C_USING_TYPE, typeName));
         return type;

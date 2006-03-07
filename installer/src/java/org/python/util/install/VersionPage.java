@@ -10,6 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.python.util.install.Installation.JavaVersionInfo;
+
 public class VersionPage extends AbstractWizardPage {
     private JLabel _osLabel;
     private JCheckBox _osBox = new JCheckBox();
@@ -31,12 +33,17 @@ public class VersionPage extends AbstractWizardPage {
         _osBox.setSelected(Installation.isValidOs());
 
         _javaLabel = new JLabel();
-        JTextField javaVendor = new JTextField(System.getProperty(Installation.JAVA_VENDOR));
+        JTextField javaVendor = new JTextField(System.getProperty(JavaVersionTester.JAVA_VENDOR));
         javaVendor.setEditable(false);
-        JTextField javaVersion = new JTextField(System.getProperty(Installation.JAVA_VERSION));
+        JTextField javaVersion = new JTextField(System.getProperty(JavaVersionTester.JAVA_VERSION));
         javaVersion.setEditable(false);
         _javaBox.setEnabled(false);
-        _javaBox.setSelected(Installation.isValidJava());
+
+        // TODO:oti correct java version info
+        JavaVersionInfo javaVersionInfo = new JavaVersionInfo();
+        Installation.fillJavaVersionInfo(javaVersionInfo, System.getProperties());
+
+        _javaBox.setSelected(Installation.isValidJava(javaVersionInfo));
 
         JPanel panel = new JPanel();
         GridBagLayout gridBagLayout = new GridBagLayout();

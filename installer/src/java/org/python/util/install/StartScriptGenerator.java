@@ -15,10 +15,6 @@ public class StartScriptGenerator {
 
     public StartScriptGenerator(File targetDirectory, File javaHome) {
         _targetDirectory = targetDirectory;
-        if( javaHome == null) {
-            // use default java home if nothing specified
-            javaHome = new File(System.getProperty("java.home"));
-        }
         _javaHome = javaHome;
     }
 

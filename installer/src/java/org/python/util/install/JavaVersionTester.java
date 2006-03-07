@@ -8,9 +8,10 @@ import java.io.FileWriter;
  */
 public class JavaVersionTester {
 
-    private static final String JAVA_VERSION = "java.version";
-    private static final String JAVA_SPECIFICATION_VERSION = "java.specification.version";
-    private static final String JAVA_HOME = "java.home";
+    protected static final String JAVA_VERSION = "java.version";
+    protected static final String JAVA_SPECIFICATION_VERSION = "java.specification.version";
+    protected static final String JAVA_HOME = "java.home";
+    protected static final String JAVA_VENDOR = "java.vendor";
     private static final String NEWLINE = "\n";
 
     private static final String UNKNOWN = "<unknown>";
@@ -53,6 +54,7 @@ public class JavaVersionTester {
         sb.append(JAVA_HOME + "=" + java_home + NEWLINE);
         sb.append(JAVA_VERSION + "=" + System.getProperty(JAVA_VERSION, UNKNOWN) + NEWLINE);
         sb.append(JAVA_SPECIFICATION_VERSION + "=" + System.getProperty(JAVA_SPECIFICATION_VERSION, UNKNOWN) + NEWLINE);
+        sb.append(JAVA_VENDOR + "=" + System.getProperty(JAVA_VENDOR, UNKNOWN) + NEWLINE);
         return sb.toString();
     }
 

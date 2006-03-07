@@ -81,14 +81,17 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_CONGRATULATIONS, "Congratulations!" }, // congratulations
         { C_CREATE_DIRECTORY, "Unable to find directory {0}, create it ?" }, // console
         { C_ENTER_TARGET_DIRECTORY, "Please enter the target directory" }, // console
+        { C_ENTER_JAVA_HOME, "Please enter the target java home directory" }, // console
         { C_ENGLISH, "English" }, // language
         { C_GERMAN, "German" }, // language
         { C_INSTALL_TYPES, "The following installation types are available:" }, // installation type
-        { C_JAVA_VERSION, "Your java version is: {0} / {1}" }, // version
+        { C_JAVA_VERSION, "Your java version to start Jython is: {0} / {1}" }, // version
         { C_MINIMUM, "Minimum (core)" }, // installation type
         { C_NO, "n" }, // answer
+        { C_NO_BIN_DIRECTORY, "There is no /bin directory below {0}." }, //error
         { C_NON_EMPTY_TARGET_DIRECTORY, "Target directory {0} is not empty" }, // error
         { C_NOT_A_DIRECTORY, "{0} is not a directory. " }, // error
+        { C_NOT_FOUND, "{0} not found. " }, // error
         { C_OS_VERSION, "Your operation system version is: {0} / {1}" }, // version
         { C_OVERWRITE_DIRECTORY, "Directory {0} is not empty - ok to overwrite contents ?" }, // console
         { C_PROCEED, "Please press Enter to proceed" }, // console
@@ -100,6 +103,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_SILENT_INSTALLATION, "Performing silent installation" }, // installation mode
         { C_STANDARD, "Standard (core, library modules, demos and examples)" }, // installation type
         { C_SUCCESS, "You successfully installed Jython {0} to directory {1}." }, // success
+        { C_TO_CURRENT_JAVA, "Warning: switching back to current JDK due to error: {0}." }, // warning
         { C_UNABLE_CREATE_DIRECTORY, "Unable to create directory {0}." }, // error
         { C_UNABLE_TO_DELETE, "Unable to delete {0}" }, // error
         { C_UNSUPPORTED_JAVA, "This java version is not supported." }, // version

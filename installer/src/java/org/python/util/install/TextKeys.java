@@ -77,13 +77,16 @@ public interface TextKeys {
     public static final String C_CREATE_DIRECTORY = "C_CREATE_DIRECTORY";
     public static final String C_ENGLISH = "C_ENGLISH";
     public static final String C_ENTER_TARGET_DIRECTORY = "C_ENTER_TARGET_DIRECTORY";
+    public static final String C_ENTER_JAVA_HOME = "C_ENTER_JAVA_HOME";
     public static final String C_GERMAN = "C_GERMAN";
     public static final String C_INSTALL_TYPES = "C_INSTALL_TYPES";
     public static final String C_JAVA_VERSION = "C_JAVA_VERSION";
     public static final String C_MINIMUM = "C_MINIMUM";
     public static final String C_NO = "C_NO";
+    public static final String C_NO_BIN_DIRECTORY = "C_NO_BIN_DIRECTORY";
     public static final String C_NON_EMPTY_TARGET_DIRECTORY = "C_NON_EMPTY_TARGET_DIRECTORY";
     public static final String C_NOT_A_DIRECTORY = "C_NOT_A_DIRECTORY";
+    public static final String C_NOT_FOUND = "C_NOT_FOUND";
     public static final String C_OS_VERSION = "C_OS_VERSION";
     public static final String C_OVERWRITE_DIRECTORY = "C_OVERWRITE_DIRECTORY";
     public static final String C_PROCEED = "C_PROCEED";
@@ -95,6 +98,7 @@ public interface TextKeys {
     public static final String C_SILENT_INSTALLATION = "C_SILENT_INSTALLATION";
     public static final String C_STANDARD = "C_STANDARD";
     public static final String C_SUCCESS = "C_SUCCESS";
+    public static final String C_TO_CURRENT_JAVA = "C_TO_CURRENT_JAVA";
     public static final String C_UNABLE_CREATE_DIRECTORY = "C_UNABLE_CREATE_DIRECTORY";
     public static final String C_UNABLE_TO_DELETE = "C_UNABLE_TO_DELETE";
     public static final String C_UNSUPPORTED_JAVA = "C_UNSUPPORTED_JAVA";

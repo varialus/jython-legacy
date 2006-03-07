@@ -80,14 +80,17 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_CONGRATULATIONS, "Gratulation!" }, // congratulations
         { C_CREATE_DIRECTORY, "Das Verzeichnis {0} gibt es nicht - soll es erstellt werden ?" }, // console
         { C_ENTER_TARGET_DIRECTORY, "Bitte geben Sie das Zielverzeichnis ein" }, // console
+        { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte java home Verzeichnis ein" }, // console
         { C_ENGLISH, "Englisch" }, // language
         { C_GERMAN, "Deutsch" }, // language
         { C_INSTALL_TYPES, "Die folgenden Installationstypen sind verfuegbar:" }, // installation type
-        { C_JAVA_VERSION, "Ihre Java Version ist: {0} / {1}" }, // version
+        { C_JAVA_VERSION, "Ihre Java Version fuer den Start von Jython ist: {0} / {1}" }, // version
         { C_MINIMUM, "Minimum (Kern)" }, // installation type
         { C_NO, "n" }, // answer
+        { C_NO_BIN_DIRECTORY, "Es gibt kein /bin Verzeichnis unterhalb {0}." }, //error
         { C_NON_EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis {0} enthaelt bereits Daten" }, // error
         { C_NOT_A_DIRECTORY, "{0} ist kein Verzeichnis. " }, // error
+        { C_NOT_FOUND, "{0} nicht gefunden." }, // error
         { C_OS_VERSION, "Ihre Betriebssystem Version ist: {0} / {1}" }, // version
         { C_OVERWRITE_DIRECTORY, "Das Verzeichnis {0} enthaelt bereits Daten, und die Installation wuerde diese ueberschreiben - ok ?" }, // console
         { C_PROCEED, "Bitte druecken Sie Enter um weiterzufahren" }, // console
@@ -99,6 +102,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_SILENT_INSTALLATION, "Die Installation wird ohne Benutzerinteraktion ausgefuehrt" }, // installation mode
         { C_STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele)" }, // installation type
         { C_SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
+        { C_TO_CURRENT_JAVA, "Warnung: Wechsel zum aktuellen JDK wegen Fehler: {0}." }, // warning
         { C_UNABLE_CREATE_DIRECTORY, "Fehler beim Erstellen von Verzeichnis {0}." }, // error
         { C_UNABLE_TO_DELETE, "Fehler beim Loeschen von {0}" }, // console
         { C_UNSUPPORTED_JAVA, "Diese Java Version ist nicht unterstuetzt." }, // version
