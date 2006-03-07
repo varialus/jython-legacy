@@ -27,7 +27,7 @@ public class Wizard extends AbstractWizard {
         this.addPage(progressPage);
         this.addPage(readmePage);
         this.addPage(successPage);
-        setSize(600, 300); // TODO:oti was (600, 400)
+        setSize(600, 300);
         validate();
     }
 
