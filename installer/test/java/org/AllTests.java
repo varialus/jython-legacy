@@ -13,7 +13,7 @@ public class AllTests extends TestSuite {
     public static Test suite() throws Exception {
         String testPackageName = AllTests.class.getPackage().getName();
 
-        TestSuite suite = new TestSuite("Test " + testPackageName + " recursive.");
+        TestSuite suite = new TestSuite("All tests in package " + testPackageName + ", recursively");
 
         String testSuiteClassName = AllTests.class.getName();
 
