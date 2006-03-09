@@ -1,0 +1,143 @@
+<!-- Copyright 2001 Finn Bock -->
+<!-- Copyright 2003 Samuele Pedroni -->
+<!-- Copyright 2006 Frank Wierzbicki -->
+<!--
+ The "update" target requires that an bsf.jar file is available
+ in the ant/lib directory.
+-->
+
+<project name="website" default="all" basedir=".">
+    <target name="init">
+        <property name="website.tar" value="website.tar"/>
+        <property name="website.tgz" value="website.tgz"/>
+        
+        <property name="scp.destination"
+                  value="shell.sourceforge.net:/home/groups/j/jy/jython"/>
+
+
+        <!-- These properties should be assigned in one of the
+             the ant.properties files
+        <property name="python.home" value="d:\python\Python21\python"/>
+        <property name="python.exe" value="d:\python\Python21\python\python"/>
+        <property name="jython.home" value="d:\jython"/>
+        <property name="ht2html.dir" value="d:\jython\ht2html-1.1"/>
+
+        <property name="scp.command" value="scp"/>
+        <property name="scp.user" value="bckfnn"/>
+        -->
+
+        <property file="ant.properties" />
+        <property file="../ant.properties" />
+    </target>
+
+    <target name="update" depends="init">
+        <taskdef name="script"
+                 classname="org/apache/tools/ant/taskdefs/optional/Script"/>
+
+        <!-- Rename the property because "jython.home" is not a legal
+             python name -->
+        <property name="jython_home" value="${jython.home}"/>
+        <script language="jpython">
+            <![CDATA[
+if 1:
+            f = open("%s/NEWS.ht" % basedir, "w")
+            f.write("<pre>\n")
+            f.write(open("%s/NEWS" % jython_home).read())
+            f.write("</pre>\n")
+            f.close()
+
+            f = open("%s/license.ht" % basedir, "w")
+            f.write("<pre>\n")
+            f.write(open("%s/LICENSE.txt" % jython_home).read())
+            f.write("</pre>\n")
+            f.close()
+        ]]>
+        </script>
+
+    </target>
+
+    <target name="generate-top" depends="init">
+    <!-- Create .html files in website -->
+        <apply executable="${python.exe}">
+            <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
+            <arg line="${ht2html.dir}/ht2html.py"/>
+            <arg line="-s JyGenerator"/>
+            <fileset dir=".">
+                <include name="*.ht" />
+            </fileset>
+        </apply>
+    </target>
+
+    <target name="generate-applets" depends="init">
+    <!-- Create .html files in website/applets -->
+        <apply executable="${python.exe}" dir="applets">
+            <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
+            <arg line="${ht2html.dir}/ht2html.py"/>
+            <arg line="-s JyGenerator"/>
+            <arg line="-r .."/>
+            <fileset dir=".">
+                <include name="applets/*.ht" />
+            </fileset>
+        </apply>
+    </target>
+
+    <target name="inherit-docs" depends="init">
+        <copy todir="docs">
+            <fileset dir="${jython.home}/Doc" includes="*.ht"/>
+        </copy>
+    </target>
+
+    <target name="inherit-javadoc" depends="init">
+        <copy todir="docs/javadoc">
+            <fileset dir="${jython.home}/dist/Doc/javadoc"
+                     includes="**/*.html,*.css"/>
+        </copy>
+    </target>
+
+    <target name="generate-docs" depends="init">
+    <!-- Create .html files in website/docs -->
+        <apply executable="${python.exe}" dir="docs">
+            <env key="PYTHONPATH" path="${jython.home}/Misc/htgen"/>
+            <arg line="${ht2html.dir}/ht2html.py"/>
+            <arg line="-s JyGenerator"/>
+            <arg line="-r .."/>
+            <fileset dir=".">
+                <include name="docs/*.ht" />
+            </fileset>
+        </apply>
+    </target>
+
+    <target 
+       name="generate" 
+       depends="init, generate-top, generate-applets, 
+                inherit-docs, inherit-javadoc, generate-docs" />
+
+    <target name="collect" depends="generate">
+        <tar tarfile="${website.tar}" basedir="."
+             includes="*.html
+                       images/*.gif
+                       images/*.png
+                       docs/*.html
+                       docs/javadoc/**
+                       applets/*.html
+                       applets/*.class
+                       applets/*.java
+                       applets/*.jar
+                       applets/*.cab
+                       graphics/*.*
+                       mac/*.*"/>
+        <gzip zipfile="${website.tgz}" src="${website.tar}" />
+    </target>
+
+    <target name="all" depends="init, generate, collect"/>
+
+    <target name="newrelease" depends="init, update, generate, collect"/>
+
+    <target name="copy2sf" depends="init">
+        <exec executable="${scp.command}">
+            <arg line="${website.tgz}"/>
+            <arg line="${scp.user}@${scp.destination}"/>
+        </exec>
+    </target>
+
+</project>
