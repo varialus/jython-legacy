@@ -1,5 +1,7 @@
 package org.python.util.install;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -11,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class DirectorySelectionPage extends AbstractWizardPage {
@@ -28,15 +31,28 @@ public class DirectorySelectionPage extends AbstractWizardPage {
     private void initComponents() {
         // label
         _label = new JLabel();
-        add(_label);
         // directory
-        _directory = new JTextField(30);
+        _directory = new JTextField(40);
         _directory.addFocusListener(new DirectoryFocusListener());
-        add(_directory);
         // browse button
         _browse = new JButton();
         _browse.addActionListener(new BrowseButtonListener());
-        add(_browse);
+
+        JPanel panel = new JPanel();
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        panel.setLayout(gridBagLayout);
+        GridBagConstraints gridBagConstraints = newGridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        panel.add(_label, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panel.add(_directory, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        panel.add(_browse, gridBagConstraints);
+
+        add(panel);
     }
 
     JTextField getDirectory() {
