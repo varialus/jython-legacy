@@ -43,6 +43,16 @@ public class InstallerCommandLineTest extends TestCase {
         assertFalse(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
 
+        args = new String[] { "-v" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasArguments());
+
+        args = new String[] { "--verbose" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasArguments());
+
         args = new String[0];
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
@@ -245,7 +255,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertNotNull(commandLine.getTargetDirectory());
         assertEquals("dir", commandLine.getTargetDirectory().getName());
 
-        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-j", "java" };
+        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-j", "java", "-v" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasSilentOption());
@@ -256,6 +266,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertEquals(Installation.STANDARD, commandLine.getInstallationType());
         assertTrue(commandLine.hasJavaHomeOption());
         assertEquals("java", commandLine.getJavaHome().getName());
+        assertTrue(commandLine.hasVerboseOption());
     }
 
     public void testHelp() {

@@ -57,6 +57,10 @@ public class InstallerCommandLine {
     private static final String TYPE_DESC = "installation type: " + TYPE_ALL + ", " + TYPE_STANDARD + " or "
             + TYPE_MINIMUM + NEW_LINE + IGNORED_IF_NOT_SILENT + ".";
 
+    private static final String VERBOSE_SHORT = "v";
+    private static final String VERBOSE_LONG = "verbose";
+    private static final String VERBOSE_DESC = "print more output.";
+
     private static final String HEADER = "\nthe following options are available:";
     private static final String SYNTAX = "\n\tjava -jar jython_version.jar";
     private static final String SYNTAX_WITHOUT_JAR = "\n\tjava -jar ";
@@ -65,7 +69,7 @@ public class InstallerCommandLine {
             + "\n\nexample of a console installation:{0} -" + CONSOLE_SHORT
             + "\n\nexample of a silent installation:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT + " targetDirectory"
             + "\n\nexample of a silent installation with more options:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT
-            + " targetDirectory -" + TYPE_SHORT + " " + TYPE_MINIMUM + " -" + JRE_SHORT + " javaHome";
+            + " targetDirectory -" + TYPE_SHORT + " " + TYPE_MINIMUM + " -" + JRE_SHORT + " javaHome -" + VERBOSE_SHORT;
 
     private String[] _args;
     private Options _options;
@@ -155,6 +159,10 @@ public class InstallerCommandLine {
         return _commandLine.hasOption(JRE_SHORT) || _commandLine.hasOption(JRE_LONG);
     }
 
+    public boolean hasVerboseOption() {
+        return _commandLine.hasOption(VERBOSE_SHORT) || _commandLine.hasOption(VERBOSE_LONG);
+    }
+
     public void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.defaultWidth = 76;
@@ -239,6 +247,10 @@ public class InstallerCommandLine {
         // installation type
         _options.addOption(OptionBuilder.withArgName(TYPE_ARG).hasArg().withDescription(TYPE_DESC).withLongOpt(
                 TYPE_LONG).create(TYPE_SHORT));
+
+        // verbose
+        Option verboseOption = new Option(VERBOSE_SHORT, VERBOSE_LONG, false, VERBOSE_DESC);
+        _options.addOption(verboseOption);
 
         // different help options
         Option helpHOption = new Option(HELP_SHORT, HELP_LONG, false, HELP_DESC);

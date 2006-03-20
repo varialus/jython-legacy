@@ -28,6 +28,8 @@ public class Installation {
 
     private static ResourceBundle _textConstants = ResourceBundle.getBundle(RESOURCE_CLASS, Locale.getDefault());
 
+    private static boolean _verbose = false;
+
     public static void main(String args[]) {
         try {
             JarInfo jarInfo = new JarInfo();
@@ -36,6 +38,9 @@ public class Installation {
                 commandLine.printHelp();
                 System.exit(1);
             } else {
+                if (commandLine.hasVerboseOption()) {
+                    _verbose = true;
+                }
                 if (!useGUI(commandLine)) {
                     ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
                     consoleInstaller.install();
@@ -54,6 +59,10 @@ public class Installation {
             t.printStackTrace();
             System.exit(1);
         }
+    }
+
+    protected static boolean isVerbose() {
+        return _verbose;
     }
 
     protected static String getText(String key) {
@@ -80,29 +89,32 @@ public class Installation {
     protected static boolean isValidOs() {
         String osName = System.getProperty(OS_NAME, "");
         String lowerOs = osName.toLowerCase();
-        if (isWindows())
+        if (isWindows()) {
             return true;
-        if (lowerOs.indexOf("linux") >= 0)
+        }
+        if (lowerOs.indexOf("linux") >= 0) {
             return true;
-        if (lowerOs.indexOf("mac") >= 0)
+        }
+        if (lowerOs.indexOf("mac") >= 0) {
             return true;
-        if (lowerOs.indexOf("unix") >= 0)
+        }
+        if (lowerOs.indexOf("unix") >= 0) {
             return true;
+        }
         return false;
     }
 
     protected static boolean isValidJava(JavaVersionInfo javaVersionInfo) {
-        // TODO:oti verbose
         String specificationVersion = javaVersionInfo.getSpecificationVersion();
-        if (specificationVersion.equals("1.2"))
+        if (Installation.isVerbose()) {
+            ConsoleInstaller.message("specification version: '" + specificationVersion + "'");
+        }
+        if (specificationVersion.equals("1.2") || specificationVersion.equals("1.3")
+                || specificationVersion.equals("1.4") || specificationVersion.equals("1.5")) {
             return true;
-        if (specificationVersion.equals("1.3"))
-            return true;
-        if (specificationVersion.equals("1.4"))
-            return true;
-        if (specificationVersion.equals("1.5"))
-            return true;
-        return false;
+        } else {
+            return false;
+        }
     }
 
     protected static boolean isWindows() {
@@ -164,7 +176,6 @@ public class Installation {
      * @return The versionInfo
      */
     protected static JavaVersionInfo getExternalJavaVersion(File javaHome) {
-        // TODO:oti verbose
         JavaVersionInfo versionInfo = new JavaVersionInfo();
 
         File binDirectory = new File(javaHome, "bin");
@@ -182,6 +193,7 @@ public class Installation {
                         command[4] = tempFile.getAbsolutePath();
 
                         ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
+                        childProcess.setDebug(Installation.isVerbose());
                         int errorCode = childProcess.run();
                         if (errorCode != NORMAL_RETURN) {
                             versionInfo.setErrorCode(errorCode);
