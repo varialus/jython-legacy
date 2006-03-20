@@ -7,9 +7,15 @@ import java.util.Properties;
 
 import javax.swing.UIManager;
 
+import org.python.util.install.Installation.JavaVersionInfo;
+
 public class FrameInstaller {
     private static final String TRUE = "1";
     private static final String FALSE = "0";
+
+    private static final String VERSION = "FrameInstaller.Version";
+    private static final String VENDOR = "FrameInstaller.Vendor";
+    private static final String SPEC_VERSION = "FrameInstaller.SpecVersion";
 
     private static Properties _properties = new Properties();
 
@@ -48,6 +54,14 @@ public class FrameInstaller {
         return getProperty(TextKeys.TARGET_DIRECTORY_PROPERTY);
     }
 
+    protected static void setTargetJavaHome(String javaHome) {
+        setProperty(TextKeys.TARGET_JAVA_HOME_PROPERTY, javaHome.trim());
+    }
+
+    protected static String getTargetJavaHome() {
+        return getProperty(TextKeys.TARGET_JAVA_HOME_PROPERTY);
+    }
+
     protected static void setLanguage(Locale locale) {
         setProperty(TextKeys.LANGUAGE_PROPERTY, locale.toString());
         Installation.setLanguage(locale);
@@ -63,6 +77,20 @@ public class FrameInstaller {
 
     protected static void setInstallationType(String installationType) {
         setProperty(TextKeys.INSTALLATION_TYPE_PROPERTY, installationType);
+    }
+
+    protected static JavaVersionInfo getJavaVersionInfo() {
+        JavaVersionInfo javaVersionInfo = new JavaVersionInfo();
+        javaVersionInfo.setVersion(getProperty(VERSION));
+        javaVersionInfo.setVendor(getProperty(VENDOR));
+        javaVersionInfo.setSpecificationVersion(getProperty(SPEC_VERSION));
+        return javaVersionInfo;
+    }
+
+    protected static void setJavaVersionInfo(JavaVersionInfo javaVersionInfo) {
+        setProperty(VERSION, javaVersionInfo.getVersion());
+        setProperty(VENDOR, javaVersionInfo.getVendor());
+        setProperty(SPEC_VERSION, javaVersionInfo.getSpecificationVersion());
     }
 
     protected static void setAccept(boolean accept) {

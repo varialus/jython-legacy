@@ -1,0 +1,195 @@
+package org.python.util.install;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.io.File;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+public class JavaSelectionPage extends AbstractWizardPage {
+
+    private final static String CURRENT = "current"; // action command
+    private final static String OTHER = "other"; // action command
+
+    private JRadioButton _currentButton;
+    private JRadioButton _otherButton;
+
+    private JLabel _label;
+    private JTextField _javaHome;
+    private JButton _browse;
+
+    public JavaSelectionPage() {
+        super();
+        initComponents();
+    }
+
+    private void initComponents() {
+        // label for java home
+        _label = new JLabel();
+
+        // radio buttons
+        RadioButtonListener radioButtonListener = new RadioButtonListener();
+        _currentButton = new JRadioButton();
+        _currentButton.setActionCommand(CURRENT);
+        _currentButton.addActionListener(radioButtonListener);
+        _otherButton = new JRadioButton();
+        _otherButton.setActionCommand(OTHER);
+        _otherButton.addActionListener(radioButtonListener);
+        ButtonGroup radioButtonGroup = new ButtonGroup();
+        radioButtonGroup.add(_currentButton);
+        radioButtonGroup.add(_otherButton);
+        JPanel radioPanel = new JPanel(new GridLayout(0, 1));
+        radioPanel.add(_currentButton);
+        radioPanel.add(_otherButton);
+
+        // directory for java home
+        _javaHome = new JTextField(40);
+        _javaHome.addFocusListener(new JavaFocusListener());
+        // browse button
+        _browse = new JButton();
+        _browse.addActionListener(new BrowseButtonListener());
+
+        JPanel panel = new JPanel();
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        panel.setLayout(gridBagLayout);
+        GridBagConstraints gridBagConstraints = newGridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        panel.add(_label, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panel.add(radioPanel, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        panel.add(_javaHome, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        panel.add(_browse, gridBagConstraints);
+
+        add(panel);
+    }
+
+    JTextField getJavaHome() {
+        return _javaHome;
+    }
+
+    protected String getTitle() {
+        return Installation.getText(TextKeys.TARGET_JAVA_HOME_PROPERTY);
+    }
+
+    protected String getDescription() {
+        return Installation.getText(TextKeys.CHOOSE_JRE);
+    }
+
+    protected boolean isCancelVisible() {
+        return true;
+    }
+
+    protected boolean isPreviousVisible() {
+        return true;
+    }
+
+    protected boolean isNextVisible() {
+        return true;
+    }
+
+    protected JComponent getFocusField() {
+        return _currentButton;
+    }
+
+    protected void activate() {
+        _label.setText(Installation.getText(TextKeys.SELECT_JAVA_HOME) + ": ");
+        _currentButton.setText(Installation.getText(TextKeys.CURRENT));
+        _otherButton.setText(Installation.getText(TextKeys.OTHER));
+        _browse.setText(Installation.getText(TextKeys.BROWSE));
+        setValues();
+    }
+
+    protected void passivate() {
+    }
+
+    protected void beforeValidate() {
+    }
+
+    private String getDefaultJavaHome() {
+        return System.getProperty(JavaVersionTester.JAVA_HOME);
+    }
+
+    private void setValues() {
+        String javaHome = FrameInstaller.getTargetJavaHome();
+        boolean current = true;
+        if (javaHome != null && javaHome.length() > 0) {
+            if (!javaHome.equals(getDefaultJavaHome())) {
+                current = false;
+            }
+        }
+        setCurrent(current);
+    }
+
+    private void setCurrent(boolean current) {
+        if (current) {
+            FrameInstaller.setTargetJavaHome(getDefaultJavaHome());
+            _currentButton.setSelected(true);
+            _otherButton.setSelected(false);
+            _javaHome.setEnabled(false);
+            _browse.setEnabled(false);
+        } else {
+            _currentButton.setSelected(false);
+            _otherButton.setSelected(true);
+            _javaHome.setEnabled(true);
+            _browse.setEnabled(true);
+        }
+        _javaHome.setText(FrameInstaller.getTargetJavaHome());
+    }
+
+    private final class BrowseButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fileChooser = new JFileChooser(new File(_javaHome.getText()));
+            fileChooser.setDialogTitle(Installation.getText(TextKeys.SELECT_JAVA_HOME));
+            // the filter is at the moment only used for the title of the dialog:
+            fileChooser.setFileFilter(new DirectoryFilter());
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (fileChooser.isAcceptAllFileFilterUsed()) {
+                if (Installation.isMacintosh() && Installation.isJDK141()) {
+                    // work around ArrayIndexOutOfBoundsExceptio on Mac OS X, java version 1.4.1
+                } else {
+                    fileChooser.setAcceptAllFileFilterUsed(false);
+                }
+            }
+            int returnValue = fileChooser.showDialog(_browse, Installation.getText(TextKeys.SELECT));
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                FrameInstaller.setTargetJavaHome(fileChooser.getSelectedFile().getAbsolutePath());
+                setValues();
+            }
+        }
+    }
+
+    private final class RadioButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String actionCommand = e.getActionCommand();
+            setCurrent(CURRENT.equals(actionCommand));
+        }
+    }
+
+    private final class JavaFocusListener implements FocusListener {
+        public void focusGained(FocusEvent e) {
+        }
+
+        public void focusLost(FocusEvent e) {
+            FrameInstaller.setTargetJavaHome(_javaHome.getText());
+        }
+    }
+
+}

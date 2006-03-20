@@ -6,27 +6,32 @@ public class Wizard extends AbstractWizard {
 
     public Wizard(JarInfo jarInfo) {
         super();
+
         setTitle(Installation.getText(TextKeys.JYTHON_INSTALL));
+
         LanguagePage languagePage = new LanguagePage(jarInfo);
-        TypePage typePage = new TypePage();
-        VersionPage versionPage = new VersionPage();
         LicensePage licensePage = new LicensePage(jarInfo);
         licensePage.setValidator(new LicensePageValidator(licensePage));
+        TypePage typePage = new TypePage();
         DirectorySelectionPage directoryPage = new DirectorySelectionPage(jarInfo);
         directoryPage.setValidator(new DirectorySelectionPageValidator(directoryPage));
+        JavaSelectionPage javaPage = new JavaSelectionPage();
+        javaPage.setValidator(new JavaSelectionPageValidator(javaPage));
         OverviewPage overviewPage = new OverviewPage();
         ProgressPage progressPage = new ProgressPage(jarInfo);
         ReadmePage readmePage = new ReadmePage();
         SuccessPage successPage = new SuccessPage(jarInfo);
+
         this.addPage(languagePage);
-        this.addPage(typePage);
-        this.addPage(versionPage);
         this.addPage(licensePage);
+        this.addPage(typePage);
         this.addPage(directoryPage);
+        this.addPage(javaPage);
         this.addPage(overviewPage);
         this.addPage(progressPage);
         this.addPage(readmePage);
         this.addPage(successPage);
+
         setSize(600, 300);
         validate();
     }

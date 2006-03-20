@@ -7,9 +7,11 @@ public interface TextKeys {
     public static final String BROWSE = "BROWSE";
     public static final String CANCEL = "CANCEL";
     public static final String CHOOSE_LOCATION = "CHOOSE_LOCATION";
+    public static final String CHOOSE_JRE = "CHOOSE_JRE";
     public static final String CONFIRM_START = "CONFIRM_START";
     public static final String CONGRATULATIONS = "CONGRATULATIONS";
     public static final String CREATED_DIRECTORY = "CREATED_DIRECTORY";
+    public static final String CURRENT = "CURRENT";
     public static final String DIRECTORIES_ONLY = "DIRECTORIES_ONLY";
     public static final String DO_NOT_ACCEPT = "DO_NOT_ACCEPT";
     public static final String EMPTY_TARGET_DIRECTORY = "EMPTY_TARGET_DIRECTORY";
@@ -38,6 +40,7 @@ public interface TextKeys {
     public static final String NOT_OK = "NOT_OK";
     public static final String OK = "OK";
     public static final String OS_INFO = "OS_INFO";
+    public static final String OTHER = "OTHER";
     public static final String OVERVIEW_DESCRIPTION = "OVERVIEW_DESCRIPTION";
     public static final String OVERVIEW_TITLE = "OVERVIEW_TITLE";
     public static final String PLEASE_ACCEPT_LICENSE = "PLEASE_ACCEPT_LICENSE";
@@ -50,17 +53,17 @@ public interface TextKeys {
     public static final String README = "README";
     public static final String SELECT = "SELECT";
     public static final String SELECT_INSTALLATION_TYPE = "SELECT_INSTALLATION_TYPE";
+    public static final String SELECT_JAVA_HOME = "SELECT_JAVA_HOME";
     public static final String SELECT_LANGUAGE = "SELECT_LANGUAGE";
     public static final String SELECT_TARGET_DIRECTORY = "SELECT_TARGET_DIRECTORY";
     public static final String STANDARD = "STANDARD";
     public static final String SUCCESS = "SUCCESS";
     public static final String TARGET_DIRECTORY_PROPERTY = "TARGET_DIRECTORY_PROPERTY";
+    public static final String TARGET_JAVA_HOME_PROPERTY = "TARGET_JAVA_HOME_PROPERTY";
     public static final String UNABLE_CREATE_DIRECTORY = "UNABLE_CREATE_DIRECTORY";
     public static final String UNABLE_CREATE_FILE = "UNABLE_CREATE_FILE";
     public static final String UNABLE_TO_DELETE = "UNABLE_TO_DELETE";
     public static final String UNEXPECTED_URL = "UNEXPECTED_URL";
-    public static final String VERSION_CHECK = "VERSION_CHECK";
-    public static final String VERSION_CHECK_DESCRIPTION = "VERSION_CHECK_DESCRIPTION";
     public static final String VERSION_INFO = "VERSION_INFO";
     public static final String WELCOME_TO_JYTHON = "WELCOME_TO_JYTHON";
     public static final String ZIP_ENTRY_SIZE = "ZIP_ENTRY_SIZE";
@@ -84,6 +87,8 @@ public interface TextKeys {
     public static final String C_MINIMUM = "C_MINIMUM";
     public static final String C_NO = "C_NO";
     public static final String C_NO_BIN_DIRECTORY = "C_NO_BIN_DIRECTORY";
+    public static final String C_NO_JAVA_EXECUTABLE = "C_NO_JAVA_EXECUTABLE";
+    public static final String C_NO_VALID_JAVA = "C_NO_VALID_JAVA";
     public static final String C_NON_EMPTY_TARGET_DIRECTORY = "C_NON_EMPTY_TARGET_DIRECTORY";
     public static final String C_NOT_A_DIRECTORY = "C_NOT_A_DIRECTORY";
     public static final String C_NOT_FOUND = "C_NOT_FOUND";
@@ -98,6 +103,7 @@ public interface TextKeys {
     public static final String C_SILENT_INSTALLATION = "C_SILENT_INSTALLATION";
     public static final String C_STANDARD = "C_STANDARD";
     public static final String C_SUCCESS = "C_SUCCESS";
+    public static final String C_UNABLE_CREATE_TMPFILE = "C_UNABLE_CREATE_TMPFILE";
     public static final String C_TO_CURRENT_JAVA = "C_TO_CURRENT_JAVA";
     public static final String C_UNABLE_CREATE_DIRECTORY = "C_UNABLE_CREATE_DIRECTORY";
     public static final String C_UNABLE_TO_DELETE = "C_UNABLE_TO_DELETE";

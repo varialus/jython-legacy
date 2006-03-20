@@ -24,6 +24,32 @@ public class InstallationTest extends TestCase {
         File javaHome = new File(System.getProperty("user.home"), "non_existing");
         JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
         assertEquals(Installation.ERROR_RETURN, versionInfo.getErrorCode());
-        assertTrue(versionInfo.getReason().indexOf("existing directory") >= 0);
+        String reason = versionInfo.getReason();
+        assertTrue(reason.indexOf("directory") >= 0 || reason.indexOf("Verzeichnis") >= 0);
     }
+
+    public void testGetExternalJavaVersionNoBinDirectory() {
+        File javaHome = new File(System.getProperty("user.home"));
+        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+        assertEquals(Installation.ERROR_RETURN, versionInfo.getErrorCode());
+        String reason = versionInfo.getReason();
+        assertTrue(reason.indexOf("directory") >= 0 || reason.indexOf("Verzeichnis") >= 0);
+    }
+
+    public void testGetExternalJavaVersionNoJavaInBinDirectory() {
+        File javaHome = new File(System.getProperty("user.home"));
+        File binDir = new File(javaHome, "bin");
+        assertFalse(binDir.exists());
+        try {
+            assertTrue(binDir.mkdirs());
+            JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+            assertEquals(Installation.ERROR_RETURN, versionInfo.getErrorCode());
+            assertTrue(versionInfo.getReason().indexOf("java") >= 0);
+        } finally {
+            if (binDir.exists()) {
+                binDir.delete();
+            }
+        }
+    }
+
 }

@@ -1,5 +1,7 @@
 package org.python.util.install;
 
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -127,4 +129,15 @@ public abstract class AbstractWizardPage extends JPanel {
             return;
         _validator.start();
     }
+
+    /**
+     * @return default grid bag constraints
+     */
+    protected GridBagConstraints newGridBagConstraints() {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        return gridBagConstraints;
+    }
+
 }

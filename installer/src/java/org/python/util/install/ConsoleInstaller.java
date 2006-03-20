@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.python.util.install.Installation.JavaFilenameFilter;
 import org.python.util.install.Installation.JavaVersionInfo;
 
 public class ConsoleInstaller implements ProgressListener {
@@ -16,6 +17,7 @@ public class ConsoleInstaller implements ProgressListener {
     private static final String PROMPT = ">>>";
     private static final String BEGIN_ANSWERS = "[";
     private static final String END_ANSWERS = "]";
+    private static final String CURRENT = "==";
 
     private InstallerCommandLine _commandLine;
     private JarInstaller _jarInstaller;
@@ -276,8 +278,14 @@ public class ConsoleInstaller implements ProgressListener {
         File javaHome = null;
         File binDir = null;
         try {
+            boolean javaFound = false;
             do {
-                javaHome = new File(question(Installation.getText(TextKeys.C_ENTER_JAVA_HOME), true));
+                String javaHomeName = question(Installation.getText(TextKeys.C_ENTER_JAVA_HOME, CURRENT), true);
+                if (CURRENT.equals(javaHomeName)) {
+                    javaHome = new File(System.getProperty(JavaVersionTester.JAVA_HOME));
+                } else {
+                    javaHome = new File(javaHomeName);
+                }
                 if (!javaHome.exists()) {
                     message(Installation.getText(TextKeys.C_NOT_FOUND, javaHome.getCanonicalPath()));
                 } else {
@@ -287,10 +295,16 @@ public class ConsoleInstaller implements ProgressListener {
                         binDir = new File(javaHome, "bin");
                         if (!binDir.exists()) {
                             message(Installation.getText(TextKeys.C_NO_BIN_DIRECTORY, javaHome.getCanonicalPath()));
+                        } else {
+                            if (binDir.list(new JavaFilenameFilter()).length <= 0) {
+                                message(Installation.getText(TextKeys.C_NO_JAVA_EXECUTABLE, binDir.getCanonicalPath()));
+                            } else {
+                                javaFound = true;
+                            }
                         }
                     }
                 }
-            } while (!javaHome.exists() || !javaHome.isDirectory() || !binDir.exists());
+            } while (!javaHome.exists() || !javaHome.isDirectory() || !binDir.exists() || !javaFound);
         } catch (IOException ioe) {
             throw new InstallerException(ioe);
         }

@@ -11,9 +11,11 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { BROWSE, "Suchen..." }, // button (open the JFileChooser)
         { CANCEL, "Abbrechen" }, // button text
         { CHOOSE_LOCATION, "Wählen Sie das Verzeichnis, in das Jython installiert werden soll" }, // selection
+        { CHOOSE_JRE, "Bestimmen Sie die Java Version (JRE/JDK), mit welcher Jython gestartet werden soll" }, // selection
         { CONFIRM_START, "Bitte drücken Sie {0}, um die Installation zu starten" }, // overview
         { CONGRATULATIONS, "Gratulation!" }, // congratulations
         { CREATED_DIRECTORY, "Verzeichnis {0} wurde erstellt" }, // directory
+        { CURRENT, "Das aktuelle" }, // directory
         { DIRECTORIES_ONLY, "Nur Verzeichnisse" }, // file chooser
         { DO_NOT_ACCEPT, "Nein, ich akzeptiere nicht" }, // license
         { EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis darf nicht leer sein" }, // error
@@ -42,6 +44,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { NOT_OK, "Nicht ok !" }, // version
         { OK, "Ok" }, // version
         { OS_INFO, "Betriebssystem Name / Version" }, // version
+        { OTHER, "Ein abweichendes" }, // directory
         { OVERVIEW_DESCRIPTION, "Sie haben folgende Einstellungen für die Installation ausgewählt" }, // overview
         { OVERVIEW_TITLE, "Übersicht über die gewählten Einstellungen" }, // overview
         { PLEASE_ACCEPT_LICENSE, "Bitte lesen und akzeptieren Sie die Lizenzvereinbarung" }, // license
@@ -54,17 +57,17 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { README, "README" }, // readme
         { SELECT, "Auswählen" }, // button (approval in JFileChooser)
         { SELECT_INSTALLATION_TYPE, "Bitte wählen Sie den Installationstyp" }, // installation type
+        { SELECT_JAVA_HOME, "Bitte wählen Sie das Java Home Verzeichnis" }, // directory
         { SELECT_LANGUAGE, "Bitte wählen Sie Ihre Sprache" }, // language
         { SELECT_TARGET_DIRECTORY, "Bitte wählen Sie das Zielverzeichnis" }, // directory
         { STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele)" }, // installation type
         { SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
-        { TARGET_DIRECTORY_PROPERTY, "Zielverzeichnis" }, // property
+        { TARGET_DIRECTORY_PROPERTY, "Zielverzeichnis" }, // property als Titel
+        { TARGET_JAVA_HOME_PROPERTY, "Java Home Verzeichnis" }, // property als Titel
         { UNABLE_CREATE_DIRECTORY, "Fehler beim Erstellen von Verzeichnis {0}." }, // error
         { UNABLE_CREATE_FILE, "Fehler beim Erstellen von File {0}." }, // error
         { UNABLE_TO_DELETE, "Fehler beim Löschen von {0}" }, // console
         { UNEXPECTED_URL, "Das Jar File für die Installation weist eine unerwartete URL {0} auf." }, // error
-        { VERSION_CHECK, "Versionsprüfung" }, // version
-        { VERSION_CHECK_DESCRIPTION, "Die Installationsvoraussetzungen werden überprüft" }, // version
         { VERSION_INFO, "Sie sind im Begriff, Jython Version {0} zu installieren." }, // version
         { WELCOME_TO_JYTHON, "Willkommen bei Jython !" }, // welcome
         { ZIP_ENTRY_SIZE, "Der Zip Eintrag {0} hat eine unbekannte Grösse." }, // error
@@ -80,7 +83,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_CONGRATULATIONS, "Gratulation!" }, // congratulations
         { C_CREATE_DIRECTORY, "Das Verzeichnis {0} gibt es nicht - soll es erstellt werden ?" }, // console
         { C_ENTER_TARGET_DIRECTORY, "Bitte geben Sie das Zielverzeichnis ein" }, // console
-        { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte java home Verzeichnis ein" }, // console
+        { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte Java Home Verzeichnis ein ({0} fuer das aktuelle)" }, // console
         { C_ENGLISH, "Englisch" }, // language
         { C_GERMAN, "Deutsch" }, // language
         { C_INSTALL_TYPES, "Die folgenden Installationstypen sind verfuegbar:" }, // installation type
@@ -88,6 +91,8 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_MINIMUM, "Minimum (Kern)" }, // installation type
         { C_NO, "n" }, // answer
         { C_NO_BIN_DIRECTORY, "Es gibt kein /bin Verzeichnis unterhalb {0}." }, //error
+        { C_NO_JAVA_EXECUTABLE, "Es gibt kein ausfuehrbares java in {0}." }, // error
+        { C_NO_VALID_JAVA, "Keine gueltige Java Version gefunden in {0}." }, // error
         { C_NON_EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis {0} enthaelt bereits Daten" }, // error
         { C_NOT_A_DIRECTORY, "{0} ist kein Verzeichnis. " }, // error
         { C_NOT_FOUND, "{0} nicht gefunden." }, // error
@@ -104,6 +109,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
         { C_TO_CURRENT_JAVA, "Warnung: Wechsel zum aktuellen JDK wegen Fehler: {0}." }, // warning
         { C_UNABLE_CREATE_DIRECTORY, "Fehler beim Erstellen von Verzeichnis {0}." }, // error
+        { C_UNABLE_CREATE_TMPFILE, "Fehler beim Erstellen der temporaeren Datei {0}." }, // error
         { C_UNABLE_TO_DELETE, "Fehler beim Loeschen von {0}" }, // console
         { C_UNSUPPORTED_JAVA, "Diese Java Version ist nicht unterstuetzt." }, // version
         { C_UNSUPPORTED_OS, "Dieses Betriebssystem ist eventuell nicht vollstaendig unterstuetzt." }, // version

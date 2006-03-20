@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -44,7 +45,7 @@ public class Installation {
                 }
             }
         } catch (InstallationCancelledException ice) {
-            ConsoleInstaller.message((Installation.getText(TextKeys.INSTALLATION_CANCELLED)));
+            ConsoleInstaller.message((getText(TextKeys.INSTALLATION_CANCELLED)));
             System.exit(1);
         } catch (InstallerException ie) {
             ie.printStackTrace();
@@ -91,14 +92,15 @@ public class Installation {
     }
 
     protected static boolean isValidJava(JavaVersionInfo javaVersionInfo) {
-        String lowerJava = javaVersionInfo.getVersion().toLowerCase();
-        if (lowerJava.startsWith("1.2"))
+        // TODO:oti verbose
+        String specificationVersion = javaVersionInfo.getSpecificationVersion();
+        if (specificationVersion.equals("1.2"))
             return true;
-        if (lowerJava.startsWith("1.3"))
+        if (specificationVersion.equals("1.3"))
             return true;
-        if (lowerJava.startsWith("1.4"))
+        if (specificationVersion.equals("1.4"))
             return true;
-        if (lowerJava.startsWith("1.5"))
+        if (specificationVersion.equals("1.5"))
             return true;
         return false;
     }
@@ -162,42 +164,48 @@ public class Installation {
      * @return The versionInfo
      */
     protected static JavaVersionInfo getExternalJavaVersion(File javaHome) {
+        // TODO:oti verbose
         JavaVersionInfo versionInfo = new JavaVersionInfo();
 
         File binDirectory = new File(javaHome, "bin");
         if (binDirectory.exists() && binDirectory.isDirectory()) {
-            try {
-                // launch the java command - temporary file will be written by the child process
-                File tempFile = File.createTempFile("jython_installation", ".properties");
-                if (tempFile.exists() && tempFile.canWrite()) {
-                    String command[] = new String[5];
-                    command[0] = binDirectory.getAbsolutePath() + File.separator + "java";
-                    command[1] = "-cp";
-                    command[2] = System.getProperty("java.class.path"); // our own class path should be ok here
-                    command[3] = JavaVersionTester.class.getName();
-                    command[4] = tempFile.getAbsolutePath();
+            if (binDirectory.list(new JavaFilenameFilter()).length > 0) {
+                try {
+                    // launch the java command - temporary file will be written by the child process
+                    File tempFile = File.createTempFile("jython_installation", ".properties");
+                    if (tempFile.exists() && tempFile.canWrite()) {
+                        String command[] = new String[5];
+                        command[0] = binDirectory.getAbsolutePath() + File.separator + "java";
+                        command[1] = "-cp";
+                        command[2] = System.getProperty("java.class.path"); // our own class path should be ok here
+                        command[3] = JavaVersionTester.class.getName();
+                        command[4] = tempFile.getAbsolutePath();
 
-                    ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
-                    int errorCode = childProcess.run();
-                    if (errorCode != NORMAL_RETURN) {
-                        versionInfo.setErrorCode(errorCode);
-                        versionInfo.setReason("abnormal return of the JavaVersionTester");
+                        ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
+                        int errorCode = childProcess.run();
+                        if (errorCode != NORMAL_RETURN) {
+                            versionInfo.setErrorCode(errorCode);
+                            versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHome.getAbsolutePath()));
+                        } else {
+                            Properties tempProperties = new Properties();
+                            tempProperties.load(new FileInputStream(tempFile));
+                            fillJavaVersionInfo(versionInfo, tempProperties);
+                        }
                     } else {
-                        Properties tempProperties = new Properties();
-                        tempProperties.load(new FileInputStream(tempFile));
-                        fillJavaVersionInfo(versionInfo, tempProperties);
+                        versionInfo.setErrorCode(ERROR_RETURN);
+                        versionInfo.setReason(getText(TextKeys.C_UNABLE_CREATE_TMPFILE, tempFile.getAbsolutePath()));
                     }
-                } else {
+                } catch (IOException e) {
                     versionInfo.setErrorCode(ERROR_RETURN);
-                    versionInfo.setReason("problems creating temp file " + tempFile.getAbsolutePath());
+                    versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHome.getAbsolutePath()));
                 }
-            } catch (IOException e) {
+            } else {
                 versionInfo.setErrorCode(ERROR_RETURN);
-                versionInfo.setReason("IOException: " + e.getMessage());
+                versionInfo.setReason(getText(TextKeys.C_NO_JAVA_EXECUTABLE, binDirectory.getAbsolutePath()));
             }
         } else {
             versionInfo.setErrorCode(ERROR_RETURN);
-            versionInfo.setReason(binDirectory.getAbsolutePath() + " is not an existing directory");
+            versionInfo.setReason(getText(TextKeys.C_NOT_A_DIRECTORY, binDirectory.getAbsolutePath()));
         }
 
         return versionInfo;
@@ -261,6 +269,16 @@ public class Installation {
 
         protected String getReason() {
             return _reason;
+        }
+    }
+
+    protected static class JavaFilenameFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            if (name.toLowerCase().startsWith("java")) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
