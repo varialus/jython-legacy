@@ -93,15 +93,26 @@ public class Options {
     /** a map of the options with the long key */
     private Map  longOpts     = new HashMap();
 
-    /** a map of the required options */
+    /** a list of the required options */
     private List requiredOpts = new ArrayList();
     
     /** a map of the option groups */
     private Map optionGroups  = new HashMap();
+    
+    /** a list of all options, in sequence of addition, only in use when isSortAsAdded() */
+    private List _addedOpts = new ArrayList();
 
+    /** flag for the sort behaviour */
+    private boolean _sortAsAdded;
+    
     /** <p>Construct a new Options descriptor</p>
      */
-    public Options() {        
+    public Options() {
+        this(false);
+    }
+    
+    public Options(boolean sortAsAdded) {
+        _sortAsAdded = sortAsAdded;
     }
 
     /**
@@ -179,6 +190,10 @@ public class Options {
 
         shortOpts.put( shortOpt, opt );
         
+        if (isSortAsAdded()) {
+            _addedOpts.add(opt);
+        }
+        
         return this;
     }
     
@@ -187,20 +202,31 @@ public class Options {
      * @return read-only Collection of {@link Option} objects in this descriptor
      */
     public Collection getOptions() {
-        List opts = new ArrayList( shortOpts.values() );
-
-        // now look through the long opts to see if there are any Long-opt
-        // only options
-        Iterator iter = longOpts.values().iterator();
-        while (iter.hasNext())
-        {
-            Object item = iter.next();
-            if (!opts.contains(item))
+        if( isSortAsAdded()) {
+            return _addedOpts;
+        } else {
+            List opts = new ArrayList( shortOpts.values() );
+    
+            // now look through the long opts to see if there are any Long-opt
+            // only options
+            Iterator iter = longOpts.values().iterator();
+            while (iter.hasNext())
             {
-                opts.add(item);
+                Object item = iter.next();
+                if (!opts.contains(item))
+                {
+                    opts.add(item);
+                }
             }
+            return Collections.unmodifiableCollection( opts );
         }
-        return Collections.unmodifiableCollection( opts );
+    }
+    
+    /**
+     * @return true if options should be sorted in sequence of addition.
+     */
+    public boolean isSortAsAdded() {
+        return _sortAsAdded;
     }
 
     /**
@@ -209,7 +235,11 @@ public class Options {
      * @return the List of Options
      */
     List helpOptions() {
-        return new ArrayList( shortOpts.values() );
+        if( isSortAsAdded()) {
+            return _addedOpts;
+        } else {
+            return new ArrayList( shortOpts.values() );
+        }
     }
 
     /** <p>Returns the required options as a 

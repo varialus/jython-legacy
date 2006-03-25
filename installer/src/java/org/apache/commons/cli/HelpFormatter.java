@@ -344,7 +344,9 @@ public class HelpFormatter
       List prefixList = new ArrayList();
       Option option;
       List optList = options.helpOptions();
-      Collections.sort( optList, new StringBufferComparator() );
+      if( !options.isSortAsAdded()) {
+          Collections.sort( optList, new StringBufferComparator() );
+      }
       for ( Iterator i = optList.iterator(); i.hasNext(); )
       {
          option = (Option) i.next();
