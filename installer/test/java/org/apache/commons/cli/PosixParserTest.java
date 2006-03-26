@@ -106,6 +106,21 @@ public class PosixParserTest extends TestCase {
         assertEquals(expectedFlattened, _parser.flatten(_options, args, stopAtNonOption));
     }
 
+    /**
+     * test that a misspelled long option (-test instead of --test) is not interpreted as -t est
+     */
+    public void testMisspelledLongOption() {
+        boolean stopAtNonOption = false; // means every token should be added
+        String[] args;
+        String[] expectedFlattened;
+
+        // unknown single dash long option
+        String singleDashLongOption = "-" + TEST_LONG; 
+        args = new String[] { singleDashLongOption };
+        expectedFlattened = new String[] { singleDashLongOption };
+        assertEquals(expectedFlattened, _parser.flatten(_options, args, stopAtNonOption));
+    }
+    
     //
     // private stuff
     //
