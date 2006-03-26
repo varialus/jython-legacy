@@ -61,9 +61,10 @@
 
 package org.apache.commons.cli;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A group of mutually exclusive options.
@@ -71,9 +72,9 @@ import java.util.Iterator;
  * @version $Revision$
  */
 public class OptionGroup {
-
-    /** hold the options */
-    private HashMap optionMap = new HashMap();
+    
+    /** hold the options in added order */
+    private List optionList = new ArrayList();
 
     /** the name of the selected option */
     private String selected;
@@ -88,9 +89,7 @@ public class OptionGroup {
      * @return this option group with opt added
      */
     public OptionGroup addOption(Option opt) {
-        // key   - option name
-        // value - the option
-        optionMap.put( "-" + opt.getOpt(), opt );
+        optionList.add(opt);
         return this;
     }
 
@@ -99,16 +98,20 @@ public class OptionGroup {
      * <code>Collection</code>
      */
     public Collection getNames() {
-        // the key set is the collection of names
-        return optionMap.keySet();
+        List namesList = new ArrayList();
+        Iterator optionsIterator = optionList.iterator();
+        while (optionsIterator.hasNext()) {
+            Option option = (Option) optionsIterator.next();
+            namesList.add("-" + option.getOpt());
+        }
+        return namesList;
     }
 
     /**
      * @return the options in this group as a <code>Collection</code>
      */
     public Collection getOptions() {
-        // the values are the collection of options
-        return optionMap.values();
+        return optionList;
     }
 
     /**

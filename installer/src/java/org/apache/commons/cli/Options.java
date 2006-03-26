@@ -68,7 +68,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.*;
 
 /** <p>Main entry-point into the library.</p>
  *
@@ -202,23 +201,21 @@ public class Options {
      * @return read-only Collection of {@link Option} objects in this descriptor
      */
     public Collection getOptions() {
-        if( isSortAsAdded()) {
+        if (isSortAsAdded()) {
             return _addedOpts;
         } else {
-            List opts = new ArrayList( shortOpts.values() );
-    
+            List opts = new ArrayList(shortOpts.values());
+
             // now look through the long opts to see if there are any Long-opt
             // only options
             Iterator iter = longOpts.values().iterator();
-            while (iter.hasNext())
-            {
+            while (iter.hasNext()) {
                 Object item = iter.next();
-                if (!opts.contains(item))
-                {
+                if (!opts.contains(item)) {
                     opts.add(item);
                 }
             }
-            return Collections.unmodifiableCollection( opts );
+            return Collections.unmodifiableCollection(opts);
         }
     }
     
@@ -235,10 +232,10 @@ public class Options {
      * @return the List of Options
      */
     List helpOptions() {
-        if( isSortAsAdded()) {
+        if (isSortAsAdded()) {
             return _addedOpts;
         } else {
-            return new ArrayList( shortOpts.values() );
+            return new ArrayList(shortOpts.values());
         }
     }
 

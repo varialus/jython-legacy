@@ -20,11 +20,11 @@ public class HelpFormatterTest extends TestCase {
     }
 
     /**
-     * the setUp above used to print [-b | -a] [-a] [-b]
+     * the setUp above used to print [-a | -b] [-a] [-b]
      */
     public void testOptionGroupDuplication() {
         String help = getFormattedHelp();
-        String expectedHelp = new String("usage: syntax [-b | -a]\r\n-a,--Aa option A\r\n-b,--Bb option B\r\n");
+        String expectedHelp = new String("usage: syntax [-a | -b]\r\n-a,--Aa option A\r\n-b,--Bb option B\r\n");
         assertEquals("expected usage to be '" + expectedHelp + "' instead of '" + help + "'", expectedHelp, help);
     }
 
@@ -35,7 +35,7 @@ public class HelpFormatterTest extends TestCase {
         _options.addOption(new Option("o", "Option O"));
         String help = getFormattedHelp();
         assertTrue(help.indexOf("][") < 0);
-        assertTrue(help.indexOf("[-b | -a] [-o]") >= 0);
+        assertTrue(help.indexOf("[-a | -b] [-o]") >= 0);
     }
 
     //
