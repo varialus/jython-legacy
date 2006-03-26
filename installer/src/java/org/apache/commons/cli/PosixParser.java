@@ -134,54 +134,56 @@ public class PosixParser extends Parser {
      * when an non option is found.
      * @return The flattened <code>arguments</code> String array.
      */
-    protected String[] flatten( Options options, 
-                                String[] arguments, 
-                                boolean stopAtNonOption )
-    {
+    protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption) {
         init();
         this.options = options;
 
         // an iterator for the command line tokens
-        Iterator iter = Arrays.asList( arguments ).iterator();
+        Iterator iter = Arrays.asList(arguments).iterator();
         String token = null;
-        
+
         // process each command line token
-        while ( iter.hasNext() ) {
+        while (iter.hasNext()) {
 
             // get the next command line token
             token = (String) iter.next();
 
             // handle SPECIAL TOKEN
-            if( token.startsWith( "--" ) ) {
+            if (token.startsWith("--")) {
                 processLongOptionToken(token, stopAtNonOption);
-            }
-            // single hyphen
-            else if( "-".equals( token ) ) {
-                processSingleHyphen( token );
-            }
-            else if( token.startsWith( "-" ) ) {
+            } else if ("-".equals(token)) {
+                // single hyphen
+                processSingleHyphen(token);
+            } else if (token.startsWith("-")) {
                 int tokenLength = token.length();
-                if( tokenLength == 2 ) {
-                    processOptionToken( token, stopAtNonOption );
+                if (tokenLength == 2) {
+                    processOptionToken(token, stopAtNonOption);
+                } else {
+                    boolean burst = true;
+                    if (token.length() > 2) {
+                        // check for misspelled long option
+                        String longOptionCandidate = "-" + token;
+                        if (this.options.hasOption(longOptionCandidate)) {
+                            tokens.add(token);
+                            burst = false;
+                        }
+                    }
+                    if (burst) {
+                        burstToken(token, stopAtNonOption);
+                    }
                 }
-                // requires bursting
-                else {
-                    burstToken( token, stopAtNonOption );
-                }
-            }
-            else {
-                if( stopAtNonOption ) {
-                    process( token );
-                }
-                else {
-                    tokens.add( token );
+            } else {
+                if (stopAtNonOption) {
+                    process(token);
+                } else {
+                    tokens.add(token);
                 }
             }
 
-            gobble( iter );
+            gobble(iter);
         }
 
-        return (String[])tokens.toArray( new String[] {} );
+        return (String[]) tokens.toArray(new String[] {});
     }
 
     /**
