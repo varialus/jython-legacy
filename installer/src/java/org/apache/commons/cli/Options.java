@@ -104,13 +104,18 @@ public class Options {
     /** flag for the sort behaviour */
     private boolean _sortAsAdded;
     
-    /** <p>Construct a new Options descriptor</p>
+    /**
+     * Construct a new Options descriptor
      */
     public Options() {
-        this(false);
+        setSortAsAdded(false);
     }
-    
-    public Options(boolean sortAsAdded) {
+
+    /**
+     * Set the sort sequence: <code>true</code> means in sequence of addition, <code>false</code> will use the
+     * default (undefined) sorting
+     */
+    public void setSortAsAdded(boolean sortAsAdded) {
         _sortAsAdded = sortAsAdded;
     }
 
