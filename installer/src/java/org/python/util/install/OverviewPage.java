@@ -144,15 +144,15 @@ public class OverviewPage extends AbstractWizardPage {
         _directory.setText(FrameInstaller.getTargetDirectory());
 
         // type
-        _typeLabel.setText(Installation.getText(TextKeys.INSTALLATION_TYPE_PROPERTY) + ": ");
-        String installationType = FrameInstaller.getInstallationType();
-        if (installationType.equals(Installation.ALL)) {
+        _typeLabel.setText(Installation.getText(TextKeys.INSTALLATION_TYPE) + ": ");
+        InstallationType installationType = FrameInstaller.getInstallationType();
+        if (installationType.isAll()) {
             _type.setText(Installation.getText(TextKeys.ALL));
         }
-        if (installationType.equals(Installation.STANDARD)) {
+        if (installationType.isStandard()) {
             _type.setText(Installation.getText(TextKeys.STANDARD));
         }
-        if (installationType.equals(Installation.MINIMUM)) {
+        if (installationType.isMinimum()) {
             _type.setText(Installation.getText(TextKeys.MINIMUM));
         }
 

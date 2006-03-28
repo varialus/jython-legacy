@@ -30,7 +30,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { INSTALLATION_CANCELLED, "Sie haben die Installation abgebrochen." }, // final
         { INSTALLATION_IN_PROGRESS, "Die Installation läuft" }, // progress
         { INSTALLATION_TYPE_DESCRIPTION, "Die folgenden Installationstypen sind verfügbar" }, // installation type
-        { INSTALLATION_TYPE_PROPERTY, "Installationstyp" }, // installation type
+        { INSTALLATION_TYPE, "Installationstyp" }, // installation type
         { JAVA_INFO, "Java Hersteller / Version" }, // version
         { JAR_NOT_FOUND, "Jar File {0} nicht gefunden." }, // error
         { JYTHON_INSTALL, "Jython Installation" }, // title
@@ -78,6 +78,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_ALL, "Alles (volle Installation, inklusive Sourcen)" }, // installation type
         { C_AT_ANY_TIME_CANCEL, "(Sie koennen die Installation jederzeit durch Eingabe von {0} abbrechen)" }, // console
         { C_AVAILABLE_LANGUAGES, "Die folgenden Sprachen sind fuer den Installationsvorgang verfuegbar: {0}" }, // languages
+        { C_CHECK_JAVA_VERSION, "Ueberpruefung der Java Version ..." }, // progress
         { C_CLEAR_DIRECTORY, "Der Inhalt von Verzeichnis {0} wird anschliessend geloescht! Moechten Sie wirklich weiterfahren ?" }, //console
         { C_CONFIRM_TARGET, "Bitte bestaetigen Sie den Start des Kopiervorgangs ins Verzeichnis {0}" }, // console
         { C_CONGRATULATIONS, "Gratulation!" }, // congratulations
@@ -85,8 +86,12 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_ENTER_TARGET_DIRECTORY, "Bitte geben Sie das Zielverzeichnis ein" }, // console
         { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte Java Home Verzeichnis ein ({0} fuer das aktuelle)" }, // console
         { C_ENGLISH, "Englisch" }, // language
+        { C_EXCLUDE, "Moechten Sie Teile von der Installation ausschliessen ?" }, // installation type
         { C_GERMAN, "Deutsch" }, // language
+        { C_INCLUDE, "Moechten Sie weitere Teile installieren ?" }, // installation type
+        { C_INEXCLUDE_PARTS, "Folgende Teile stehen zur Auswahl ({0} = keine weiteren)" }, // installation type
         { C_INSTALL_TYPES, "Die folgenden Installationstypen sind verfuegbar:" }, // installation type
+        { C_INVALID_ANSWER, "Die Antwort {0} ist hier nicht gueltig" }, // error
         { C_JAVA_VERSION, "Ihre Java Version fuer den Start von Jython ist: {0} / {1}" }, // version
         { C_MINIMUM, "Minimum (Kern)" }, // installation type
         { C_NO, "n" }, // answer
@@ -102,15 +107,18 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_PROCEED_ANYWAY, "Bitte druecken Sie Enter um trotzdem weiterzufahren" }, // console
         { C_READ_LICENSE, "Moechten Sie die Lizenzvereinbarung jetzt lesen ?" }, // license
         { C_READ_README, "Moechten Sie den Inhalt von README jetzt lesen ?" }, // readme
+        { C_SCHEDULED, "{0} zur Installation vorgemerkt" }, // installation type
         { C_SELECT_INSTALL_TYPE, "Bitte waehlen Sie den Installationstyp" }, // installation type
         { C_SELECT_LANGUAGE, "Bitte waehlen Sie Ihre Sprache" }, // language
         { C_SILENT_INSTALLATION, "Die Installation wird ohne Benutzerinteraktion ausgefuehrt" }, // installation mode
-        { C_STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele)" }, // installation type
+        { C_STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele, Dokumentation)" }, // installation type
         { C_SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
+        { C_SUMMARY, "Zusammenfassung:" }, // summary
         { C_TO_CURRENT_JAVA, "Warnung: Wechsel zum aktuellen JDK wegen Fehler: {0}." }, // warning
         { C_UNABLE_CREATE_DIRECTORY, "Fehler beim Erstellen von Verzeichnis {0}." }, // error
         { C_UNABLE_CREATE_TMPFILE, "Fehler beim Erstellen der temporaeren Datei {0}." }, // error
         { C_UNABLE_TO_DELETE, "Fehler beim Loeschen von {0}" }, // console
+        { C_UNSCHEDULED, "{0} von der Installation ausgeschlossen" }, // installation type
         { C_UNSUPPORTED_JAVA, "Diese Java Version ist nicht unterstuetzt." }, // version
         { C_UNSUPPORTED_OS, "Dieses Betriebssystem ist eventuell nicht vollstaendig unterstuetzt." }, // version
         { C_USING_TYPE, "Installationstyp ist {0}" }, // installation type

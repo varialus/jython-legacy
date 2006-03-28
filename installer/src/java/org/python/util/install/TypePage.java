@@ -48,7 +48,7 @@ public class TypePage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.INSTALLATION_TYPE_PROPERTY);
+        return Installation.getText(TextKeys.INSTALLATION_TYPE);
     }
 
     protected String getDescription() {
@@ -76,14 +76,14 @@ public class TypePage extends AbstractWizardPage {
         _allButton.setText(Installation.getText(TextKeys.ALL));
         _standardButton.setText(Installation.getText(TextKeys.STANDARD));
         _minimumButton.setText(Installation.getText(TextKeys.MINIMUM));
-        String installationType = FrameInstaller.getInstallationType();
-        if (installationType.equals(Installation.ALL)) {
+        InstallationType installationType = FrameInstaller.getInstallationType();
+        if (installationType.isAll()) {
             _allButton.setSelected(true);
         }
-        if (installationType.equals(Installation.STANDARD)) {
+        if (installationType.isStandard()) {
             _standardButton.setSelected(true);
         }
-        if (installationType.equals(Installation.MINIMUM)) {
+        if (installationType.isMinimum()) {
             _minimumButton.setSelected(true);
         }
     }
@@ -96,7 +96,16 @@ public class TypePage extends AbstractWizardPage {
 
     private final static class RadioButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            FrameInstaller.setInstallationType(e.getActionCommand());
+            InstallationType installationType = new InstallationType();
+            String actionCommand = e.getActionCommand();
+            if (Installation.ALL.equals(actionCommand)) {
+                installationType.setAll();
+            } else if (Installation.STANDARD.equals(actionCommand)) {
+                installationType.setStandard();
+            } else if (Installation.MINIMUM.equals(actionCommand)) {
+                installationType.setMinimum();
+            }
+            FrameInstaller.setInstallationType(installationType);
         }
     }
 }

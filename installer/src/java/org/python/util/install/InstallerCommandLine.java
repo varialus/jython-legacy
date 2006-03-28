@@ -9,7 +9,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -17,59 +16,84 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.PosixParser;
 
 public class InstallerCommandLine {
-
-    private static final String IGNORED_IF_NOT_SILENT = "ignored if not in silent mode";
-    private static final String REQUIRED_IF_SILENT = "required if in silent mode";
-    private static final String NEW_LINE = ";\n";
-
-    private static final String HELP_SHORT = "h";
-    private static final String HELP2_SHORT = "?";
-    private static final String HELP_LONG = "help";
-    private static final String HELP_DESC = "print this help/usage.";
+    protected static final String INEXCLUDE_LIBRARY_MODULES = "mod";
+    protected static final String INEXCLUDE_DEMOS_AND_EXAMPLES = "demo";
+    protected static final String INEXCLUDE_DOCUMENTATION = "doc";
+    protected static final String INEXCLUDE_SOURCES = "src";
 
     private static final String CONSOLE_SHORT = "c";
     private static final String CONSOLE_LONG = "console";
-    private static final String CONSOLE_DESC = "do a console based installation (with user interaction).";
+    private static final String CONSOLE_DESC = "console based installation (user interaction),\n"
+            + "any other options will be ignored (except 'verbose')";
 
     private static final String SILENT_SHORT = "s";
     private static final String SILENT_LONG = "silent";
-    private static final String SILENT_DESC = "do a silent installation (without user interaction).";
+    private static final String SILENT_DESC = "silent installation (without user interaction)";
 
     private static final String DIRECTORY_SHORT = "d";
     private static final String DIRECTORY_LONG = "directory";
-    private static final String DIRECTORY_DESC = "target directory to install to" + NEW_LINE + REQUIRED_IF_SILENT
-            + NEW_LINE + IGNORED_IF_NOT_SILENT + ".";
-
-    private static final String JRE_SHORT = "j";
-    private static final String JRE_LONG = "jre";
-    private static final String JRE_DESC = "home directory of the runtime jre, or jdk" + NEW_LINE
-            + "executables are assumed in the /bin subdirectory" + NEW_LINE + IGNORED_IF_NOT_SILENT + ".";
+    private static final String DIRECTORY_DESC = "target directory to install to\n" + "(required in silent mode)";
 
     private static final String DIRECTORY_ARG = "dir";
 
     private static final String TYPE_STANDARD = "standard";
     private static final String TYPE_ALL = "all";
     private static final String TYPE_MINIMUM = "minimum";
+    private static final String TYPE_STANDALONE = "standalone";
+
+    private static final String INEXCLUDE_ARG = "part(s)";
+    private static final String INEXCLUDE_PARTS = "more than one of the following is possible:\n" + "- "
+            + INEXCLUDE_LIBRARY_MODULES + ": library modules\n" + "- " + INEXCLUDE_DEMOS_AND_EXAMPLES
+            + ": demos and examples\n" + "- " + INEXCLUDE_DOCUMENTATION + ": documentation\n" + "- "
+            + INEXCLUDE_SOURCES + ": java source code";
 
     private static final String TYPE_SHORT = "t";
     private static final String TYPE_LONG = "type";
     private static final String TYPE_ARG = TYPE_LONG;
-    private static final String TYPE_DESC = "installation type: " + TYPE_ALL + ", " + TYPE_STANDARD + " or "
-            + TYPE_MINIMUM + NEW_LINE + IGNORED_IF_NOT_SILENT + ".";
+    private static final String TYPE_DESC = "installation type\n" + "one of the following types is possible\n"
+            + "(see also include/exclude parts):\n" + "- " + TYPE_ALL + ": everything (including " + INEXCLUDE_SOURCES
+            + ")\n" + "- " + TYPE_STANDARD + ": core, " + INEXCLUDE_LIBRARY_MODULES + ", "
+            + INEXCLUDE_DEMOS_AND_EXAMPLES + ", " + INEXCLUDE_DOCUMENTATION + "\n" + "- " + TYPE_MINIMUM + ": core\n"
+            + "- " + TYPE_STANDALONE + ": (not yet implemented)"; // TODO:oti implement standalone
+
+    private static final String INCLUDE_SHORT = "i";
+    private static final String INCLUDE_LONG = "include";
+    private static final String INCLUDE_DESC = "finer control over parts to install\n" + INEXCLUDE_PARTS;
+
+    private static final String EXCLUDE_SHORT = "e";
+    private static final String EXCLUDE_LONG = "exclude";
+    private static final String EXCLUDE_DESC = "finer control over parts not to install\n" + INEXCLUDE_PARTS
+            + "\n(excludes override includes)";
+
+    private static final String JRE_SHORT = "j";
+    private static final String JRE_LONG = "jre";
+    private static final String JRE_DESC = "home directory of the runtime jre or jdk\n"
+            + "(executables are assumed in the /bin subdirectory)\n" + "select this if you want to run Jython with a\n"
+            + "different java version than the installation";
 
     private static final String VERBOSE_SHORT = "v";
     private static final String VERBOSE_LONG = "verbose";
-    private static final String VERBOSE_DESC = "print more output.";
+    private static final String VERBOSE_DESC = "print more output during the installation";
 
-    private static final String HEADER = "\nthe following options are available:";
+    private static final String HELP_SHORT = "h";
+    private static final String HELP2_SHORT = "?";
+    private static final String HELP_LONG = "help";
+    private static final String HELP_DESC = "print this help (overrides any other options)";
+
     private static final String SYNTAX = "\n\tjava -jar jython_version.jar";
+    private static final String HEADER = "\nno option at all (or 'verbose') will start the interactive GUI installer;\n"
+            + "in non gui mode the following options are available:";
     private static final String SYNTAX_WITHOUT_JAR = "\n\tjava -jar ";
-    private static final String FOOTER = "\nno option at all will start the interactive GUI installer.";
-    private static final String EXAMPLES = "\n\nexample of a GUI installation:{0}"
+    private static final String FOOTER = "";
+    private static final String EXAMPLES = "\nexample of a GUI installation:{0} -" + VERBOSE_SHORT
             + "\n\nexample of a console installation:{0} -" + CONSOLE_SHORT
             + "\n\nexample of a silent installation:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT + " targetDirectory"
-            + "\n\nexample of a silent installation with more options:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT
-            + " targetDirectory -" + TYPE_SHORT + " " + TYPE_MINIMUM + " -" + JRE_SHORT + " javaHome -" + VERBOSE_SHORT;
+            + "\n\nexamples of a silent installation with more options:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT
+            + " targetDirectory -" + TYPE_SHORT + " " + TYPE_MINIMUM + " -" + INCLUDE_SHORT + " " + INEXCLUDE_SOURCES
+            + " -" + JRE_SHORT + " javaHome" + "{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT + " targetDirectory -"
+            + TYPE_SHORT + " " + TYPE_STANDARD + " -" + EXCLUDE_SHORT + " " + INEXCLUDE_DEMOS_AND_EXAMPLES + " "
+            + INEXCLUDE_DOCUMENTATION + "\n\t\t -" + INCLUDE_SHORT + " " + INEXCLUDE_SOURCES + " -" + JRE_SHORT
+            + " javaHome -" + VERBOSE_SHORT;
 
     private String[] _args;
     private Options _options;
@@ -99,7 +123,7 @@ public class InstallerCommandLine {
     public boolean setArgs(String args[]) {
         _args = args;
         try {
-            _commandLine = _parser.parse(_options, _args, false); // throw for missing or unknown options / arguments
+            _commandLine = _parser.parse(_options, args, false); // throw for missing or unknown options / arguments
         } catch (MissingArgumentException mae) {
             System.err.println(mae.getMessage());
             return false;
@@ -112,9 +136,10 @@ public class InstallerCommandLine {
             System.err.println("unrecognized argument(s): " + unrecognized);
             return false;
         }
-        if (_commandLine.hasOption(TYPE_SHORT)) { // sufficient even if user chose long opt
+        if (hasTypeOption()) {
             String type = _commandLine.getOptionValue(TYPE_SHORT);
-            if (TYPE_ALL.equals(type) || TYPE_STANDARD.equals(type) || TYPE_MINIMUM.equals(type)) {
+            if (TYPE_ALL.equals(type) || TYPE_STANDARD.equals(type) || TYPE_MINIMUM.equals(type)
+                    || TYPE_STANDALONE.equals(type)) {
             } else {
                 System.err.println("unrecognized argument '" + type + "' to option: " + TYPE_SHORT + " / " + TYPE_LONG);
                 return false;
@@ -125,6 +150,24 @@ public class InstallerCommandLine {
                 System.err.println("option " + DIRECTORY_SHORT + " / " + DIRECTORY_LONG + " is required in "
                         + SILENT_LONG + " mode");
                 return false;
+            }
+        }
+        if (hasIncludeOption()) {
+            String[] includeParts = _commandLine.getOptionValues(INCLUDE_SHORT);
+            for (int i = 0; i < includeParts.length; i++) {
+                if (!isValidInExcludePart(includeParts[i])) {
+                    System.err.println("unrecognized include part '" + includeParts[i] + "'");
+                    return false;
+                }
+            }
+        }
+        if (hasExcludeOption()) {
+            String[] excludeParts = _commandLine.getOptionValues(EXCLUDE_SHORT);
+            for (int i = 0; i < excludeParts.length; i++) {
+                if (!isValidInExcludePart(excludeParts[i])) {
+                    System.err.println("unrecognized exclude part '" + excludeParts[i] + "'");
+                    return false;
+                }
             }
         }
         return true;
@@ -153,6 +196,14 @@ public class InstallerCommandLine {
 
     public boolean hasTypeOption() {
         return _commandLine.hasOption(TYPE_SHORT) || _commandLine.hasOption(TYPE_LONG);
+    }
+
+    public boolean hasIncludeOption() {
+        return _commandLine.hasOption(INCLUDE_SHORT) || _commandLine.hasOption(INCLUDE_LONG);
+    }
+
+    public boolean hasExcludeOption() {
+        return _commandLine.hasOption(EXCLUDE_SHORT) || _commandLine.hasOption(EXCLUDE_LONG);
     }
 
     public boolean hasJavaHomeOption() {
@@ -203,22 +254,60 @@ public class InstallerCommandLine {
     }
 
     /**
-     * @return the installation type usable for the jar installer, defaults to <code>Installation.STANDARD</code>
+     * The Installation type is built out of the type, include and exclude option
+     * 
+     * @return the installation type usable for the jar installer
      */
-    public String getInstallationType() {
-        String type = Installation.STANDARD;
-        String typeName = _commandLine.getOptionValue(TYPE_SHORT);
-        if (TYPE_STANDARD.equals(typeName)) {
-            type = Installation.STANDARD;
-        } else if (TYPE_ALL.equals(typeName)) {
-            type = Installation.ALL;
-        } else if (TYPE_MINIMUM.equals(typeName)) {
-            type = Installation.MINIMUM;
-        } else {
-            typeName = TYPE_STANDARD; // for the message
+    public InstallationType getInstallationType() {
+        InstallationType installationType = new InstallationType(); // defaults to standard
+        // build a priori values out of the type option
+        if (hasTypeOption()) {
+            String typeName = _commandLine.getOptionValue(TYPE_SHORT);
+            if (TYPE_ALL.equals(typeName)) {
+                installationType.setAll();
+            } else if (TYPE_MINIMUM.equals(typeName)) {
+                installationType.setMinimum();
+            } else if (TYPE_STANDALONE.equals(typeName)) {
+                installationType.setStandalone();
+            }
         }
-        message(Installation.getText(TextKeys.C_USING_TYPE, typeName));
-        return type;
+        // add parts to include
+        if (hasIncludeOption()) {
+            String[] includeParts = _commandLine.getOptionValues(INCLUDE_SHORT);
+            for (int i = 0; i < includeParts.length; i++) {
+                if (INEXCLUDE_DEMOS_AND_EXAMPLES.equals(includeParts[i])) {
+                    installationType.addDemosAndExamples();
+                }
+                if (INEXCLUDE_DOCUMENTATION.equals(includeParts[i])) {
+                    installationType.addDocumentation();
+                }
+                if (INEXCLUDE_LIBRARY_MODULES.equals(includeParts[i])) {
+                    installationType.addLibraryModules();
+                }
+                if (INEXCLUDE_SOURCES.equals(includeParts[i])) {
+                    installationType.addSources();
+                }
+            }
+        }
+        // remove parts to exclude
+        if (hasExcludeOption()) {
+            String[] excludeParts = _commandLine.getOptionValues(EXCLUDE_SHORT);
+            for (int i = 0; i < excludeParts.length; i++) {
+                if (INEXCLUDE_DEMOS_AND_EXAMPLES.equals(excludeParts[i])) {
+                    installationType.removeDemosAndExamples();
+                }
+                if (INEXCLUDE_DOCUMENTATION.equals(excludeParts[i])) {
+                    installationType.removeDocumentation();
+                }
+                if (INEXCLUDE_LIBRARY_MODULES.equals(excludeParts[i])) {
+                    installationType.removeLibraryModules();
+                }
+                if (INEXCLUDE_SOURCES.equals(excludeParts[i])) {
+                    installationType.removeSources();
+                }
+            }
+        }
+        return installationType;
     }
 
     //
@@ -227,6 +316,7 @@ public class InstallerCommandLine {
 
     private void createOptions() {
         _options = new Options();
+        _options.setSortAsAdded(true);
 
         // console or silent mode
         Option consoleOption = new Option(CONSOLE_SHORT, CONSOLE_LONG, false, CONSOLE_DESC);
@@ -237,16 +327,33 @@ public class InstallerCommandLine {
         _options.addOptionGroup(group1);
 
         // target directory
-        _options.addOption(OptionBuilder.withArgName(DIRECTORY_ARG).hasArg().withDescription(DIRECTORY_DESC)
-                .withLongOpt(DIRECTORY_LONG).create(DIRECTORY_SHORT));
-
-        // runtime jre
-        _options.addOption(OptionBuilder.withArgName(DIRECTORY_ARG).hasArg().withDescription(JRE_DESC).withLongOpt(
-                JRE_LONG).create(JRE_SHORT));
+        Option directoryOption = new Option(DIRECTORY_SHORT, DIRECTORY_LONG, true, DIRECTORY_DESC);
+        directoryOption.setArgName(DIRECTORY_ARG);
+        _options.addOption(directoryOption);
 
         // installation type
-        _options.addOption(OptionBuilder.withArgName(TYPE_ARG).hasArg().withDescription(TYPE_DESC).withLongOpt(
-                TYPE_LONG).create(TYPE_SHORT));
+        Option typeOption = new Option(TYPE_SHORT, TYPE_LONG, true, TYPE_DESC);
+        typeOption.setArgName(TYPE_ARG);
+        _options.addOption(typeOption);
+
+        // additional parts to include
+        Option includeOption = new Option(INCLUDE_SHORT, INCLUDE_DESC);
+        includeOption.setArgs(4);
+        includeOption.setArgName(INEXCLUDE_ARG);
+        includeOption.setLongOpt(INCLUDE_LONG);
+        _options.addOption(includeOption);
+
+        // parts to exclude
+        Option excludeOption = new Option(EXCLUDE_SHORT, EXCLUDE_DESC);
+        excludeOption.setArgs(4);
+        excludeOption.setArgName(INEXCLUDE_ARG);
+        excludeOption.setLongOpt(EXCLUDE_LONG);
+        _options.addOption(excludeOption);
+
+        // runtime jre
+        Option jreOption = new Option(JRE_SHORT, JRE_LONG, true, JRE_DESC);
+        jreOption.setArgName(DIRECTORY_ARG);
+        _options.addOption(jreOption);
 
         // verbose
         Option verboseOption = new Option(VERBOSE_SHORT, VERBOSE_LONG, false, VERBOSE_DESC);
@@ -261,8 +368,9 @@ public class InstallerCommandLine {
         _options.addOptionGroup(group2);
     }
 
-    private void message(String message) {
-        ConsoleInstaller.message(message);
+    private boolean isValidInExcludePart(String part) {
+        return INEXCLUDE_DEMOS_AND_EXAMPLES.equals(part) || INEXCLUDE_DOCUMENTATION.equals(part)
+                || INEXCLUDE_LIBRARY_MODULES.equals(part) || INEXCLUDE_SOURCES.equals(part);
     }
 
 }

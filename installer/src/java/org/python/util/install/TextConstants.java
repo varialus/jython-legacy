@@ -31,7 +31,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { INSTALLATION_CANCELLED, "Installation cancelled." }, // final
         { INSTALLATION_IN_PROGRESS, "The installation is now in progress" }, // progress
         { INSTALLATION_TYPE_DESCRIPTION, "The following installation types are available" }, // installation type
-        { INSTALLATION_TYPE_PROPERTY, "Installation type" }, // installation type
+        { INSTALLATION_TYPE, "Installation type" }, // installation type
         { JAR_NOT_FOUND, "Unable to find jar file {0}." }, // error
         { JAVA_INFO, "Java vendor / version" }, // version
         { JYTHON_INSTALL, "Jython Installation" }, // title
@@ -79,6 +79,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_ALL, "All (everything, including sources)" }, // installation type
         { C_AT_ANY_TIME_CANCEL, "(at any time, answer {0} to cancel the installation)" }, // console
         { C_AVAILABLE_LANGUAGES, "For the installation process, the following languages are available: {0}" }, // console
+        { C_CHECK_JAVA_VERSION, "Checking java version ..." }, // progress
         { C_CLEAR_DIRECTORY, "Contents of directory {0} will be deleted now! Are you sure to proceed ?" }, //console
         { C_CONFIRM_TARGET, "Please confirm copying of files to directory {0}" }, // console
         { C_CONGRATULATIONS, "Congratulations!" }, // congratulations
@@ -86,8 +87,12 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_ENTER_TARGET_DIRECTORY, "Please enter the target directory" }, // console
         { C_ENTER_JAVA_HOME, "Please enter the target java home directory ({0} for current)" }, // console
         { C_ENGLISH, "English" }, // language
+        { C_EXCLUDE, "Do you want to exclude parts from the installation ?" }, // installation type
         { C_GERMAN, "German" }, // language
+        { C_INCLUDE, "Do you want to install additional parts ?" }, // installation type
+        { C_INEXCLUDE_PARTS, "The following parts are selectable ({0} = no more)" }, // installation type
         { C_INSTALL_TYPES, "The following installation types are available:" }, // installation type
+        { C_INVALID_ANSWER, "Answer {0} is not valid here" }, // error
         { C_JAVA_VERSION, "Your java version to start Jython is: {0} / {1}" }, // version
         { C_MINIMUM, "Minimum (core)" }, // installation type
         { C_NO, "n" }, // answer
@@ -103,14 +108,17 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_PROCEED_ANYWAY, "Please press Enter to proceed anyway" }, // console
         { C_READ_LICENSE, "Do you want to read the license agreement now ?" }, // license
         { C_READ_README, "Do you want to show the contents of README ?" }, // readme
+        { C_SCHEDULED, "{0} scheduled for installation" }, // installation type
         { C_SELECT_INSTALL_TYPE, "Please select the installation type" }, // installation type
         { C_SELECT_LANGUAGE, "Please select your language" }, // language
         { C_SILENT_INSTALLATION, "Performing silent installation" }, // installation mode
-        { C_STANDARD, "Standard (core, library modules, demos and examples)" }, // installation type
+        { C_STANDARD, "Standard (core, library modules, demos and examples, documentation)" }, // installation type
         { C_SUCCESS, "You successfully installed Jython {0} to directory {1}." }, // success
+        { C_SUMMARY, "Summary:" }, // summary
         { C_TO_CURRENT_JAVA, "Warning: switching back to current JDK due to error: {0}." }, // warning
         { C_UNABLE_CREATE_DIRECTORY, "Unable to create directory {0}." }, // error
         { C_UNABLE_CREATE_TMPFILE, "Unable to create temp file {0}." }, // error
+        { C_UNSCHEDULED, "{0} excluded from installation" }, // installation type
         { C_UNABLE_TO_DELETE, "Unable to delete {0}" }, // error
         { C_UNSUPPORTED_JAVA, "This java version is not supported." }, // version
         { C_UNSUPPORTED_OS, "This operating system might not be fully supported." }, // version

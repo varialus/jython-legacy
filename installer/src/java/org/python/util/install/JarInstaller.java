@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -17,6 +18,8 @@ import java.util.zip.ZipInputStream;
  */
 public class JarInstaller {
     private static final String PATH_SEPARATOR = "/";
+    private static final String LIB_NAME_SEP = "Lib" + PATH_SEPARATOR;
+    private static final String LIB_PAWT_SEP = LIB_NAME_SEP + "pawt" + PATH_SEPARATOR;
     private static final int BUFFER_SIZE = 1024;
 
     private ProgressListener _progressListener;
@@ -37,19 +40,27 @@ public class JarInstaller {
      * @param targetDirectory
      * @param installationType
      */
-    public void inflate(final File targetDirectory, String installationType, File javaHome) {
+    public void inflate(final File targetDirectory, InstallationType installationType, File javaHome) {
         try {
+            // has to correspond with build.xml
+            // has to correspond with build.Lib.include.properties
             List excludeDirs = _jarInfo.getExcludeDirs();
-            if (!Installation.ALL.equals(installationType)) {
-                // has to correspond with build.xml
+            List coreLibFiles = new ArrayList();
+            if (!installationType.installSources()) {
                 excludeDirs.add("src");
             }
-            if (Installation.MINIMUM.equals(installationType)) {
-                // has to correspond with build.Lib.include.properties
+            if (!installationType.installDocumentation()) {
+                excludeDirs.add("Doc");
+            }
+            if (!installationType.installDemosAndExamples()) {
                 excludeDirs.add("Demo");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "email");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "encodings");
-                excludeDirs.add("Lib" + PATH_SEPARATOR + "test");
+            }
+            if (!installationType.installLibraryModules()) {
+                excludeDirs.add(LIB_NAME_SEP + "email");
+                excludeDirs.add(LIB_NAME_SEP + "encodings");
+                excludeDirs.add(LIB_NAME_SEP + "test");
+                excludeDirs.add(LIB_NAME_SEP + "jxxload_help");
+                coreLibFiles = getCoreLibFiles();
             }
 
             int count = 0;
@@ -65,12 +76,22 @@ public class JarInstaller {
             while (zipEntry != null) {
                 String zipEntryName = zipEntry.getName();
                 boolean exclude = false;
+                // handle exclusion of directories
                 Iterator excludeDirsAsIterator = excludeDirs.iterator();
                 while (excludeDirsAsIterator.hasNext()) {
-                    if (zipEntryName.startsWith((String) excludeDirsAsIterator.next() + PATH_SEPARATOR))
+                    if (zipEntryName.startsWith((String) excludeDirsAsIterator.next() + PATH_SEPARATOR)) {
                         exclude = true;
+                    }
                 }
+                // handle exclusion of core Lib files
                 if (!exclude) {
+                    exclude = shouldExcludeFile(installationType, coreLibFiles, zipEntry, zipEntryName);
+                }
+                if (exclude) {
+                    if (Installation.isVerbose()) {
+                        ConsoleInstaller.message("excluding " + zipEntryName);
+                    }
+                } else {
                     count++;
                     if (count % threshold == 0) {
                         percent = percent + _progressListener.getInterval();
@@ -119,12 +140,19 @@ public class JarInstaller {
         }
     }
 
-    private int approximateNumberOfEntries(String installationType) throws IOException {
-        int numberOfEntries = _jarInfo.getNumberOfEntries();
-        if (Installation.MINIMUM.equals(installationType)) {
-            numberOfEntries = numberOfEntries / 3;
-        } else if (Installation.STANDARD.equals(installationType)) {
-            numberOfEntries = (numberOfEntries * 3) / 4;
+    private int approximateNumberOfEntries(InstallationType installationType) {
+        int numberOfEntries = 65; // core (minimum)
+        if (installationType.installLibraryModules()) {
+            numberOfEntries += 664;
+        }
+        if (installationType.installDemosAndExamples()) {
+            numberOfEntries += 44;
+        }
+        if (installationType.installDocumentation()) {
+            numberOfEntries += 209;
+        }
+        if (installationType.installSources()) {
+            numberOfEntries += 401;
         }
         return numberOfEntries;
     }
@@ -163,6 +191,55 @@ public class JarInstaller {
             throw new InstallerException(Installation.getText(TextKeys.ZIP_ENTRY_SIZE, zipEntry.toString()));
         }
         return (int) size;
+    }
+
+    private List getCoreLibFiles() {
+        List coreLibFiles = new ArrayList();
+        coreLibFiles.add("__future__.py");
+        coreLibFiles.add("copy.py");
+        coreLibFiles.add("dbexts.py");
+        coreLibFiles.add("imaplib.py");
+        coreLibFiles.add("isql.py");
+        coreLibFiles.add("javaos.py");
+        coreLibFiles.add("javapath.py");
+        coreLibFiles.add("jreload.py");
+        coreLibFiles.add("marshal.py");
+        coreLibFiles.add("random.py");
+        coreLibFiles.add("re.py");
+        coreLibFiles.add("site.py");
+        coreLibFiles.add("socket.py");
+        coreLibFiles.add("sre.py");
+        coreLibFiles.add("sre_compile.py");
+        coreLibFiles.add("sre_constants.py");
+        coreLibFiles.add("sre_parse.py");
+        coreLibFiles.add("string.py");
+        coreLibFiles.add("zipfile.py");
+        coreLibFiles.add("zlib.py");
+        return coreLibFiles;
+    }
+
+    private boolean shouldExcludeFile(InstallationType installationType, List coreLibFiles, ZipEntry zipEntry,
+            String zipEntryName) {
+        boolean exclude = false;
+        if (!installationType.installLibraryModules()) {
+            // handle files in Lib
+            if (!zipEntry.isDirectory() && zipEntryName.startsWith(LIB_NAME_SEP)) {
+                // include all files in /pawt subdirectory
+                if (!zipEntryName.startsWith(LIB_PAWT_SEP)) {
+                    if (zipEntryName.endsWith(".py")) { // only compare *.py files
+                        exclude = true;
+                        Iterator coreLibFilesAsIterator = coreLibFiles.iterator();
+                        while (coreLibFilesAsIterator.hasNext()) {
+                            String coreFileName = (String) coreLibFilesAsIterator.next();
+                            if (zipEntryName.endsWith(PATH_SEPARATOR + coreFileName)) {
+                                exclude = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return exclude;
     }
 
 }
