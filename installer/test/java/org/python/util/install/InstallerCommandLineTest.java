@@ -38,7 +38,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
 
-        args = new String[] { "-type", "standard" }; // PosixParser bursts this into -t ype
+        args = new String[] { "-type", "standard" };
         commandLine = new InstallerCommandLine();
         assertFalse(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
@@ -83,7 +83,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertFalse(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
 
-        args = new String[] { "-type" }; // PosixParser bursts -type into -t ype
+        args = new String[] { "-type" };
         commandLine = new InstallerCommandLine();
         assertFalse(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
@@ -92,6 +92,10 @@ public class InstallerCommandLineTest extends TestCase {
         commandLine = new InstallerCommandLine();
         assertFalse(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
+
+        args = new String[] { "-" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
     }
 
     public void testMissingArgument() {
@@ -195,26 +199,157 @@ public class InstallerCommandLineTest extends TestCase {
     public void testType() {
         String[] args;
         InstallerCommandLine commandLine;
+        InstallationType type;
 
         args = new String[] { "-t", "all" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasTypeOption());
-        assertEquals(Installation.ALL, commandLine.getInstallationType());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertTrue(type.isAll());
 
         args = new String[] { "--type", "standard" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasTypeOption());
-        assertEquals(Installation.STANDARD, commandLine.getInstallationType());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertTrue(type.isStandard());
 
         args = new String[] { "--type", "minimum" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasTypeOption());
-        assertEquals(Installation.MINIMUM, commandLine.getInstallationType());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertTrue(type.isMinimum());
+
+        args = new String[] { "--type", "standalone" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasTypeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertTrue(type.isStandalone());
 
         assertNull(commandLine.getJavaHome());
+    }
+
+    public void testInclude() {
+        String[] args;
+        InstallerCommandLine commandLine;
+        InstallationType type;
+
+        args = new String[] { "-t", "minimum", "-i", "mod" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasIncludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertTrue(type.installLibraryModules());
+        assertFalse(type.installDemosAndExamples());
+        assertFalse(type.installDocumentation());
+        assertFalse(type.installSources());
+
+        args = new String[] { "-t", "minimum", "-i", "mod", "demo" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasIncludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertTrue(type.installLibraryModules());
+        assertTrue(type.installDemosAndExamples());
+        assertFalse(type.installDocumentation());
+        assertFalse(type.installSources());
+
+        args = new String[] { "-t", "minimum", "-i", "mod", "demo", "doc" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasIncludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertTrue(type.installLibraryModules());
+        assertTrue(type.installDemosAndExamples());
+        assertTrue(type.installDocumentation());
+        assertFalse(type.installSources());
+
+        args = new String[] { "-t", "minimum", "--include", "mod", "demo", "doc", "src" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasIncludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertTrue(type.installLibraryModules());
+        assertTrue(type.installDemosAndExamples());
+        assertTrue(type.installDocumentation());
+        assertTrue(type.installSources());
+
+        args = new String[] { "-i", "modulo" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
+    }
+
+    public void testExclude() {
+        String[] args;
+        InstallerCommandLine commandLine;
+        InstallationType type;
+
+        args = new String[] { "-t", "all", "-e", "mod" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasExcludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertFalse(type.installLibraryModules());
+        assertTrue(type.installDemosAndExamples());
+        assertTrue(type.installDocumentation());
+        assertTrue(type.installSources());
+
+        args = new String[] { "-t", "all", "-e", "mod", "demo" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasExcludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertFalse(type.installLibraryModules());
+        assertFalse(type.installDemosAndExamples());
+        assertTrue(type.installDocumentation());
+        assertTrue(type.installSources());
+
+        args = new String[] { "-t", "all", "-e", "mod", "demo", "doc" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasExcludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertFalse(type.installLibraryModules());
+        assertFalse(type.installDemosAndExamples());
+        assertFalse(type.installDocumentation());
+        assertTrue(type.installSources());
+
+        args = new String[] { "-t", "all", "--exclude", "mod", "demo", "doc", "src" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasExcludeOption());
+        type = commandLine.getInstallationType();
+        assertNotNull(type);
+        assertFalse(type.isStandalone());
+        assertFalse(type.installLibraryModules());
+        assertFalse(type.installDemosAndExamples());
+        assertFalse(type.installDocumentation());
+        assertFalse(type.installSources());
+
+        args = new String[] { "--exclude", "sources" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
     }
 
     public void testJavaHome() {
@@ -263,7 +398,28 @@ public class InstallerCommandLineTest extends TestCase {
         assertNotNull(commandLine.getTargetDirectory());
         assertEquals("dir", commandLine.getTargetDirectory().getName());
         assertTrue(commandLine.hasTypeOption());
-        assertEquals(Installation.STANDARD, commandLine.getInstallationType());
+        assertNotNull(commandLine.getInstallationType());
+        assertTrue(commandLine.getInstallationType().installDemosAndExamples());
+        assertTrue(commandLine.getInstallationType().installDocumentation());
+        assertTrue(commandLine.getInstallationType().installLibraryModules());
+        assertFalse(commandLine.getInstallationType().installSources());
+        assertTrue(commandLine.hasJavaHomeOption());
+        assertEquals("java", commandLine.getJavaHome().getName());
+        assertTrue(commandLine.hasVerboseOption());
+
+        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-e", "doc", "demo", "-i", "src", "-j", "java", "-v" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasSilentOption());
+        assertTrue(commandLine.hasDirectoryOption());
+        assertNotNull(commandLine.getTargetDirectory());
+        assertEquals("dir", commandLine.getTargetDirectory().getName());
+        assertTrue(commandLine.hasTypeOption());
+        assertNotNull(commandLine.getInstallationType());
+        assertFalse(commandLine.getInstallationType().installDemosAndExamples());
+        assertFalse(commandLine.getInstallationType().installDocumentation());
+        assertTrue(commandLine.getInstallationType().installLibraryModules());
+        assertTrue(commandLine.getInstallationType().installSources());
         assertTrue(commandLine.hasJavaHomeOption());
         assertEquals("java", commandLine.getJavaHome().getName());
         assertTrue(commandLine.hasVerboseOption());

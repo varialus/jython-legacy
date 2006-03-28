@@ -12,12 +12,12 @@ import java.util.Locale;
 import org.python.util.install.Installation.JavaFilenameFilter;
 import org.python.util.install.Installation.JavaVersionInfo;
 
-public class ConsoleInstaller implements ProgressListener {
-    private static final String CANCEL = "c";
-    private static final String PROMPT = ">>>";
-    private static final String BEGIN_ANSWERS = "[";
-    private static final String END_ANSWERS = "]";
-    private static final String CURRENT = "==";
+public class ConsoleInstaller implements ProgressListener, TextKeys {
+    private static final String _CANCEL = "c";
+    private static final String _PROMPT = ">>>";
+    private static final String _BEGIN_ANSWERS = "[";
+    private static final String _END_ANSWERS = "]";
+    private static final String _CURRENT = "==";
 
     private InstallerCommandLine _commandLine;
     private JarInstaller _jarInstaller;
@@ -36,15 +36,15 @@ public class ConsoleInstaller implements ProgressListener {
             welcome();
             selectLanguage();
             acceptLicense();
-            String installationType = selectInstallationType();
+            InstallationType installationType = selectInstallationType();
             targetDirectory = determineTargetDirectory();
             javaHome = checkVersion(determineJavaHome());
-            promptForCopying(targetDirectory);
+            promptForCopying(targetDirectory, installationType, javaHome);
             _jarInstaller.inflate(targetDirectory, installationType, javaHome);
             showReadme(targetDirectory);
             success(targetDirectory);
         } else {
-            message(Installation.getText(TextKeys.C_SILENT_INSTALLATION));
+            message(getText(C_SILENT_INSTALLATION));
             targetDirectory = _commandLine.getTargetDirectory();
             checkTargetDirectorySilent(targetDirectory);
             javaHome = checkVersionSilent(_commandLine.getJavaHome());
@@ -58,9 +58,9 @@ public class ConsoleInstaller implements ProgressListener {
     }
 
     private void welcome() {
-        message(Installation.getText(TextKeys.C_WELCOME_TO_JYTHON));
-        message(Installation.getText(TextKeys.C_VERSION_INFO, _jarInfo.getVersion()));
-        message(Installation.getText(TextKeys.C_AT_ANY_TIME_CANCEL, CANCEL));
+        message(getText(C_WELCOME_TO_JYTHON));
+        message(getText(C_VERSION_INFO, _jarInfo.getVersion()));
+        message(getText(C_AT_ANY_TIME_CANCEL, _CANCEL));
     }
 
     private String question(String question) {
@@ -83,19 +83,19 @@ public class ConsoleInstaller implements ProgressListener {
      */
     private String question(String question, List answers, boolean answerRequired) {
         if (answers != null && answers.size() > 0) {
-            question = question + " " + BEGIN_ANSWERS;
+            question = question + " " + _BEGIN_ANSWERS;
             Iterator answersAsIterator = answers.iterator();
             while (answersAsIterator.hasNext()) {
-                if (!question.endsWith(BEGIN_ANSWERS))
+                if (!question.endsWith(_BEGIN_ANSWERS))
                     question = question + "/";
                 question = question + (String) answersAsIterator.next();
             }
-            question = question + END_ANSWERS;
+            question = question + _END_ANSWERS;
         }
-        question = question + " " + PROMPT + " ";
+        question = question + " " + _PROMPT + " ";
         boolean match = false;
         String answer = "";
-        while (!match && !answer.equalsIgnoreCase(CANCEL)) {
+        while (!match && !_CANCEL.equalsIgnoreCase(answer)) {
             System.out.print(question); // this is print, not println (!)
             answer = readline();
             if (answers != null && answers.size() > 0) {
@@ -111,8 +111,11 @@ public class ConsoleInstaller implements ProgressListener {
                     match = false;
                 }
             }
+            if (!match && !_CANCEL.equalsIgnoreCase(answer)) {
+                message(getText(C_INVALID_ANSWER, answer));
+            }
         }
-        if (answer.equalsIgnoreCase(CANCEL)) {
+        if (_CANCEL.equalsIgnoreCase(answer)) {
             throw new InstallationCancelledException();
         }
         return answer;
@@ -131,8 +134,8 @@ public class ConsoleInstaller implements ProgressListener {
 
     private void selectLanguage() {
         List availableLanguages = new ArrayList(2);
-        availableLanguages.add(Installation.getText(TextKeys.C_ENGLISH));
-        availableLanguages.add(Installation.getText(TextKeys.C_GERMAN)); // 1 == German
+        availableLanguages.add(getText(C_ENGLISH));
+        availableLanguages.add(getText(C_GERMAN)); // 1 == German
         List answers = new ArrayList(availableLanguages.size());
         String languages = "";
         for (Iterator iterator = availableLanguages.iterator(); iterator.hasNext();) {
@@ -141,8 +144,8 @@ public class ConsoleInstaller implements ProgressListener {
             answers.add(language.substring(0, 1).toLowerCase());
         }
         languages = languages.substring(0, languages.length() - 2);
-        message(Installation.getText(TextKeys.C_AVAILABLE_LANGUAGES, languages));
-        String answer = question(Installation.getText(TextKeys.C_SELECT_LANGUAGE), answers);
+        message(getText(C_AVAILABLE_LANGUAGES, languages));
+        String answer = question(getText(C_SELECT_LANGUAGE), answers);
         if (answer.equalsIgnoreCase((String) answers.get(1))) {
             Installation.setLanguage(Locale.GERMAN);
         } else {
@@ -150,38 +153,101 @@ public class ConsoleInstaller implements ProgressListener {
         }
     }
 
-    private String selectInstallationType() {
-        message(Installation.getText(TextKeys.C_INSTALL_TYPES));
-        message("  " + Installation.ALL + ". " + Installation.getText(TextKeys.C_ALL));
-        message("  " + Installation.STANDARD + ". " + Installation.getText(TextKeys.C_STANDARD));
-        message("  " + Installation.MINIMUM + ". " + Installation.getText(TextKeys.C_MINIMUM));
+    private InstallationType selectInstallationType() {
+        InstallationType installationType = new InstallationType();
+        String no = getText(C_NO);
+        String yes = getText(C_YES);
+        message(getText(C_INSTALL_TYPES));
+        message("  " + Installation.ALL + ". " + getText(C_ALL));
+        message("  " + Installation.STANDARD + ". " + getText(C_STANDARD));
+        message("  " + Installation.MINIMUM + ". " + getText(C_MINIMUM));
         List answers = new ArrayList(3);
         answers.add(Installation.ALL);
         answers.add(Installation.STANDARD);
-        answers.add(Installation.MINIMUM);
-        return question(Installation.getText(TextKeys.C_SELECT_INSTALL_TYPE), answers);
+        answers.add(Installation.MINIMUM); // TODO:oti add standalone
+        String answer = question(getText(C_SELECT_INSTALL_TYPE), answers);
+        if (Installation.ALL.equals(answer)) {
+            installationType.setAll();
+        } else if (Installation.STANDARD.equals(answer)) {
+            installationType.setStandard();
+        } else if (Installation.MINIMUM.equals(answer)) {
+            installationType.setMinimum();
+        } else if (Installation.STANDALONE.equals(answer)) {
+            installationType.setStandalone();
+        }
+        if (!installationType.isStandalone()) {
+            // include parts ?
+            if (!installationType.isAll()) {
+                answer = question(getText(C_INCLUDE), getYNAnswers());
+                if (yes.equals(answer)) {
+                    answers = new ArrayList(5);
+                    answers.add(InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES);
+                    answers.add(InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES);
+                    answers.add(InstallerCommandLine.INEXCLUDE_DOCUMENTATION);
+                    answers.add(InstallerCommandLine.INEXCLUDE_SOURCES);
+                    answers.add(no);
+                    do {
+                        answer = question(getText(C_INEXCLUDE_PARTS, no), answers);
+                        if (InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES.equals(answer)) {
+                            installationType.addLibraryModules();
+                        } else if (InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES.equals(answer)) {
+                            installationType.addDemosAndExamples();
+                        } else if (InstallerCommandLine.INEXCLUDE_DOCUMENTATION.equals(answer)) {
+                            installationType.addDocumentation();
+                        } else if (InstallerCommandLine.INEXCLUDE_SOURCES.equals(answer)) {
+                            installationType.addSources();
+                        }
+                        if (!no.equals(answer)) {
+                            message(getText(C_SCHEDULED, answer));
+                        }
+                    } while (!no.equals(answer));
+                }
+            }
+            // exclude parts ?
+            if (!installationType.isMinimum()) {
+                answer = question(getText(C_EXCLUDE), getYNAnswers());
+                if (yes.equals(answer)) {
+                    do {
+                        answer = question(getText(C_INEXCLUDE_PARTS, no), answers);
+                        if (InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES.equals(answer)) {
+                            installationType.removeLibraryModules();
+                        } else if (InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES.equals(answer)) {
+                            installationType.removeDemosAndExamples();
+                        } else if (InstallerCommandLine.INEXCLUDE_DOCUMENTATION.equals(answer)) {
+                            installationType.removeDocumentation();
+                        } else if (InstallerCommandLine.INEXCLUDE_SOURCES.equals(answer)) {
+                            installationType.removeSources();
+                        }
+                        if (!no.equals(answer)) {
+                            message(getText(C_UNSCHEDULED, answer));
+                        }
+                    } while (!no.equals(answer));
+                }
+            }
+        }
+        return installationType;
     }
 
     private File checkVersion(File javaHome) {
         // handle target java version
         JavaInfo javaInfo = verifyTargetJava(javaHome);
-        message(Installation.getText(TextKeys.C_JAVA_VERSION, javaInfo.getJavaVersionInfo().getVendor(), javaInfo
+        message(getText(C_JAVA_VERSION, javaInfo.getJavaVersionInfo().getVendor(), javaInfo
                 .getJavaVersionInfo().getVersion()));
         if (Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
-            question(Installation.getText(TextKeys.C_PROCEED));
+            question(getText(C_PROCEED));
         } else {
-            message(Installation.getText(TextKeys.C_UNSUPPORTED_JAVA));
-            question(Installation.getText(TextKeys.C_PROCEED_ANYWAY));
+            message(getText(C_UNSUPPORTED_JAVA));
+            question(getText(C_PROCEED_ANYWAY));
         }
         // handle OS
         String osName = System.getProperty(Installation.OS_NAME);
         String osVersion = System.getProperty(Installation.OS_VERSION);
-        message(Installation.getText(TextKeys.C_OS_VERSION, osName, osVersion));
+        message(getText(C_OS_VERSION, osName, osVersion));
         if (Installation.isValidOs()) {
-            question(Installation.getText(TextKeys.C_PROCEED));
+            question(getText(C_PROCEED));
         } else {
-            message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
-            question(Installation.getText(TextKeys.C_PROCEED_ANYWAY));
+            message(getText(C_UNSUPPORTED_OS));
+            question(getText(C_PROCEED_ANYWAY));
         }
         return javaInfo.getJavaHome();
     }
@@ -190,28 +256,34 @@ public class ConsoleInstaller implements ProgressListener {
         // check target java version
         JavaInfo javaInfo = verifyTargetJava(javaHome);
         if (!Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
-            message(Installation.getText(TextKeys.C_UNSUPPORTED_JAVA));
+            message(getText(C_UNSUPPORTED_JAVA));
         }
         // check OS
         if (!Installation.isValidOs()) {
-            message(Installation.getText(TextKeys.C_UNSUPPORTED_OS));
+            message(getText(C_UNSUPPORTED_OS));
         }
         return javaInfo.getJavaHome();
     }
 
     private JavaInfo verifyTargetJava(File javaHome) {
         JavaVersionInfo javaVersionInfo = new JavaVersionInfo();
+        String currentJavaHomeName = System.getProperty(JavaVersionTester.JAVA_HOME);
         if (javaHome != null) {
-            javaVersionInfo = Installation.getExternalJavaVersion(javaHome);
-            if (javaVersionInfo.getErrorCode() != Installation.NORMAL_RETURN) {
-                // switch back to current if an error occurred
-                message(Installation.getText(TextKeys.C_TO_CURRENT_JAVA, javaVersionInfo.getReason()));
+            if (currentJavaHomeName.equals(javaHome.getAbsolutePath())) {
+                // no experiments if current java is selected
                 javaHome = null;
+            } else {
+                javaVersionInfo = Installation.getExternalJavaVersion(javaHome);
+                if (javaVersionInfo.getErrorCode() != Installation.NORMAL_RETURN) {
+                    // switch back to current if an error occurred
+                    message(getText(C_TO_CURRENT_JAVA, javaVersionInfo.getReason()));
+                    javaHome = null;
+                }
             }
         }
         if (javaHome == null) {
             Installation.fillJavaVersionInfo(javaVersionInfo, System.getProperties());
-            javaHome = new File(System.getProperty(JavaVersionTester.JAVA_HOME));
+            javaHome = new File(currentJavaHomeName);
         }
         JavaInfo javaInfo = new JavaInfo();
         javaInfo.setJavaHome(javaHome);
@@ -220,8 +292,8 @@ public class ConsoleInstaller implements ProgressListener {
     }
 
     private void acceptLicense() {
-        String read = question(Installation.getText(TextKeys.C_READ_LICENSE), getYNAnswers());
-        if (read.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+        String read = question(getText(C_READ_LICENSE), getYNAnswers());
+        if (read.equalsIgnoreCase(getText(C_YES))) {
             String licenseText = "n/a";
             try {
                 licenseText = _jarInfo.getLicenseText();
@@ -230,8 +302,8 @@ public class ConsoleInstaller implements ProgressListener {
                 throw new InstallerException(ioe);
             }
         }
-        String accept = question(Installation.getText(TextKeys.C_ACCEPT), getYNAnswers());
-        if (!accept.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+        String accept = question(getText(C_ACCEPT), getYNAnswers());
+        if (!accept.equalsIgnoreCase(getText(C_YES))) {
             throw new InstallationCancelledException();
         }
     }
@@ -240,29 +312,29 @@ public class ConsoleInstaller implements ProgressListener {
         File targetDirectory = null;
         try {
             do {
-                targetDirectory = new File(question(Installation.getText(TextKeys.C_ENTER_TARGET_DIRECTORY), true));
+                targetDirectory = new File(question(getText(C_ENTER_TARGET_DIRECTORY), true));
                 if (targetDirectory.exists()) {
                     if (!targetDirectory.isDirectory()) {
-                        message(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, targetDirectory.getCanonicalPath()));
+                        message(getText(C_NOT_A_DIRECTORY, targetDirectory.getCanonicalPath()));
                     } else {
                         if (targetDirectory.list().length > 0) {
-                            String overwrite = question(Installation.getText(TextKeys.C_OVERWRITE_DIRECTORY,
+                            String overwrite = question(getText(C_OVERWRITE_DIRECTORY,
                                     targetDirectory.getCanonicalPath()), getYNAnswers());
-                            if (overwrite.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
-                                String clear = question(Installation.getText(TextKeys.C_CLEAR_DIRECTORY,
+                            if (overwrite.equalsIgnoreCase(getText(C_YES))) {
+                                String clear = question(getText(C_CLEAR_DIRECTORY,
                                         targetDirectory.getCanonicalPath()), getYNAnswers());
-                                if (clear.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+                                if (clear.equalsIgnoreCase(getText(C_YES))) {
                                     clearDirectory(targetDirectory);
                                 }
                             }
                         }
                     }
                 } else {
-                    String create = question(Installation.getText(TextKeys.C_CREATE_DIRECTORY, targetDirectory
+                    String create = question(getText(C_CREATE_DIRECTORY, targetDirectory
                             .getCanonicalPath()), getYNAnswers());
-                    if (create.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+                    if (create.equalsIgnoreCase(getText(C_YES))) {
                         if (!targetDirectory.mkdirs()) {
-                            throw new InstallerException(Installation.getText(TextKeys.C_UNABLE_CREATE_DIRECTORY,
+                            throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY,
                                     targetDirectory.getCanonicalPath()));
                         }
                     }
@@ -280,24 +352,24 @@ public class ConsoleInstaller implements ProgressListener {
         try {
             boolean javaFound = false;
             do {
-                String javaHomeName = question(Installation.getText(TextKeys.C_ENTER_JAVA_HOME, CURRENT), true);
-                if (CURRENT.equals(javaHomeName)) {
+                String javaHomeName = question(getText(C_ENTER_JAVA_HOME, _CURRENT), true);
+                if (_CURRENT.equals(javaHomeName)) {
                     javaHome = new File(System.getProperty(JavaVersionTester.JAVA_HOME));
                 } else {
                     javaHome = new File(javaHomeName);
                 }
                 if (!javaHome.exists()) {
-                    message(Installation.getText(TextKeys.C_NOT_FOUND, javaHome.getCanonicalPath()));
+                    message(getText(C_NOT_FOUND, javaHome.getCanonicalPath()));
                 } else {
                     if (!javaHome.isDirectory()) {
-                        message(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, javaHome.getCanonicalPath()));
+                        message(getText(C_NOT_A_DIRECTORY, javaHome.getCanonicalPath()));
                     } else {
                         binDir = new File(javaHome, "bin");
                         if (!binDir.exists()) {
-                            message(Installation.getText(TextKeys.C_NO_BIN_DIRECTORY, javaHome.getCanonicalPath()));
+                            message(getText(C_NO_BIN_DIRECTORY, javaHome.getCanonicalPath()));
                         } else {
                             if (binDir.list(new JavaFilenameFilter()).length <= 0) {
-                                message(Installation.getText(TextKeys.C_NO_JAVA_EXECUTABLE, binDir.getCanonicalPath()));
+                                message(getText(C_NO_JAVA_EXECUTABLE, binDir.getCanonicalPath()));
                             } else {
                                 javaFound = true;
                             }
@@ -316,17 +388,17 @@ public class ConsoleInstaller implements ProgressListener {
             if (!targetDirectory.exists()) {
                 // create directory
                 if (!targetDirectory.mkdirs()) {
-                    throw new InstallerException(Installation.getText(TextKeys.C_UNABLE_CREATE_DIRECTORY,
+                    throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY,
                             targetDirectory.getCanonicalPath()));
                 }
             } else {
                 // assert it is an empty directory
                 if (!targetDirectory.isDirectory()) {
-                    throw new InstallerException(Installation.getText(TextKeys.C_NOT_A_DIRECTORY, targetDirectory
+                    throw new InstallerException(getText(C_NOT_A_DIRECTORY, targetDirectory
                             .getCanonicalPath()));
                 } else {
                     if (targetDirectory.list().length > 0) {
-                        throw new InstallerException(Installation.getText(TextKeys.C_NON_EMPTY_TARGET_DIRECTORY,
+                        throw new InstallerException(getText(C_NON_EMPTY_TARGET_DIRECTORY,
                                 targetDirectory.getCanonicalPath()));
                     }
                 }
@@ -337,11 +409,11 @@ public class ConsoleInstaller implements ProgressListener {
     }
 
     private void showReadme(final File targetDirectory) {
-        String read = question(Installation.getText(TextKeys.C_READ_README), getYNAnswers());
-        if (read.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+        String read = question(getText(C_READ_README), getYNAnswers());
+        if (read.equalsIgnoreCase(getText(C_YES))) {
             try {
                 message(Installation.getReadmeText(targetDirectory.getCanonicalPath()));
-                question(Installation.getText(TextKeys.C_PROCEED));
+                question(getText(C_PROCEED));
             } catch (IOException ioe) {
                 throw new InstallerException(ioe);
             }
@@ -355,17 +427,27 @@ public class ConsoleInstaller implements ProgressListener {
                 clearDirectory(files[i]);
             }
             if (!files[i].delete()) {
-                throw new InstallerException(Installation.getText(TextKeys.C_UNABLE_TO_DELETE, files[i]
+                throw new InstallerException(getText(C_UNABLE_TO_DELETE, files[i]
                         .getAbsolutePath()));
             }
         }
     }
 
-    private void promptForCopying(final File targetDirectory) {
+    private void promptForCopying(final File targetDirectory, final InstallationType installationType,
+            final File javaHome) {
         try {
-            String proceed = question(Installation.getText(TextKeys.C_CONFIRM_TARGET, targetDirectory
+            message(getText(C_SUMMARY));
+            message("  - " + InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES + ": "
+                    + installationType.installLibraryModules());
+            message("  - " + InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES + ": "
+                    + installationType.installDemosAndExamples());
+            message("  - " + InstallerCommandLine.INEXCLUDE_DOCUMENTATION + ": "
+                    + installationType.installDocumentation());
+            message("  - " + InstallerCommandLine.INEXCLUDE_SOURCES + ": " + installationType.installSources());
+            message("  - JRE: " + javaHome.getAbsolutePath());
+            String proceed = question(getText(C_CONFIRM_TARGET, targetDirectory
                     .getCanonicalPath()), getYNAnswers());
-            if (!proceed.equalsIgnoreCase(Installation.getText(TextKeys.C_YES))) {
+            if (!proceed.equalsIgnoreCase(getText(C_YES))) {
                 throw new InstallationCancelledException();
             }
         } catch (IOException ioe) {
@@ -375,9 +457,9 @@ public class ConsoleInstaller implements ProgressListener {
 
     private void success(final File targetDirectory) {
         try {
-            message(Installation.getText(TextKeys.C_CONGRATULATIONS)
+            message(getText(C_CONGRATULATIONS)
                     + " "
-                    + Installation.getText(TextKeys.C_SUCCESS, _jarInfo.getVersion(), targetDirectory
+                    + getText(C_SUCCESS, _jarInfo.getVersion(), targetDirectory
                             .getCanonicalPath()));
         } catch (IOException ioe) {
             throw new InstallerException(ioe); // catch for the compiler
@@ -386,8 +468,8 @@ public class ConsoleInstaller implements ProgressListener {
 
     private List getYNAnswers() {
         List answers = new ArrayList(2);
-        answers.add(Installation.getText(TextKeys.C_YES));
-        answers.add(Installation.getText(TextKeys.C_NO));
+        answers.add(getText(C_YES));
+        answers.add(getText(C_NO));
         return answers;
     }
 
@@ -395,6 +477,18 @@ public class ConsoleInstaller implements ProgressListener {
         message(" " + percentage + " %");
     }
 
+    private String getText(String textKey) {
+        return Installation.getText(textKey);
+    }
+    
+    private String getText(String textKey, String parameter0) {
+        return Installation.getText(textKey, parameter0);
+    }
+    
+    private String getText(String textKey, String parameter0, String parameter1) {
+        return Installation.getText(textKey, parameter0, parameter1);
+    }
+    
     private static class JavaInfo {
         private JavaVersionInfo _javaVersionInfo;
         private File _javaHome;
@@ -437,7 +531,7 @@ public class ConsoleInstaller implements ProgressListener {
     }
 
     public void progressStartScripts() {
-        message(Installation.getText(TextKeys.GENERATING_START_SCRIPTS));
+        message(getText(GENERATING_START_SCRIPTS));
     }
 
 }

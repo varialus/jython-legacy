@@ -13,9 +13,14 @@ public class FrameInstaller {
     private static final String TRUE = "1";
     private static final String FALSE = "0";
 
-    private static final String VERSION = "FrameInstaller.Version";
-    private static final String VENDOR = "FrameInstaller.Vendor";
-    private static final String SPEC_VERSION = "FrameInstaller.SpecVersion";
+    private static final String JAVA_VERSION_PROPERTY = "FrameInstaller.Version";
+    private static final String JAVA_VENDOR_PROPERTY = "FrameInstaller.Vendor";
+    private static final String JAVA_SPEC_VERSION_PROPERTY = "FrameInstaller.SpecVersion";
+
+    private static final String INEX_MOD_PROPERTY = "FrameInstaller.mod";
+    private static final String INEX_DEMO_PROPERTY = "FrameInstaller.demo";
+    private static final String INEX_DOC_PROPERTY = "FrameInstaller.doc";
+    private static final String INEX_SRC_PROPERTY = "FrameInstaller.src";
 
     private static Properties _properties = new Properties();
 
@@ -71,26 +76,50 @@ public class FrameInstaller {
         return new Locale(getProperty(TextKeys.LANGUAGE_PROPERTY));
     }
 
-    protected static String getInstallationType() {
-        return getProperty(TextKeys.INSTALLATION_TYPE_PROPERTY, Installation.ALL);
+    protected static InstallationType getInstallationType() {
+        InstallationType installationType = new InstallationType();
+        if (Boolean.valueOf(getProperty(INEX_MOD_PROPERTY)).booleanValue()) {
+            installationType.addLibraryModules();
+        } else {
+            installationType.removeLibraryModules();
+        }
+        if (Boolean.valueOf(getProperty(INEX_DEMO_PROPERTY)).booleanValue()) {
+            installationType.addDemosAndExamples();
+        } else {
+            installationType.removeDemosAndExamples();
+        }
+        if (Boolean.valueOf(getProperty(INEX_DOC_PROPERTY)).booleanValue()) {
+            installationType.addDocumentation();
+        } else {
+            installationType.removeDocumentation();
+        }
+        if (Boolean.valueOf(getProperty(INEX_SRC_PROPERTY)).booleanValue()) {
+            installationType.addSources();
+        } else {
+            installationType.removeSources();
+        }
+        return installationType;
     }
 
-    protected static void setInstallationType(String installationType) {
-        setProperty(TextKeys.INSTALLATION_TYPE_PROPERTY, installationType);
+    protected static void setInstallationType(InstallationType installationType) {
+        setProperty(INEX_MOD_PROPERTY, Boolean.toString(installationType.installLibraryModules()));
+        setProperty(INEX_DEMO_PROPERTY, Boolean.toString(installationType.installDemosAndExamples()));
+        setProperty(INEX_DOC_PROPERTY, Boolean.toString(installationType.installDocumentation()));
+        setProperty(INEX_SRC_PROPERTY, Boolean.toString(installationType.installSources()));
     }
 
     protected static JavaVersionInfo getJavaVersionInfo() {
         JavaVersionInfo javaVersionInfo = new JavaVersionInfo();
-        javaVersionInfo.setVersion(getProperty(VERSION));
-        javaVersionInfo.setVendor(getProperty(VENDOR));
-        javaVersionInfo.setSpecificationVersion(getProperty(SPEC_VERSION));
+        javaVersionInfo.setVersion(getProperty(JAVA_VERSION_PROPERTY));
+        javaVersionInfo.setVendor(getProperty(JAVA_VENDOR_PROPERTY));
+        javaVersionInfo.setSpecificationVersion(getProperty(JAVA_SPEC_VERSION_PROPERTY));
         return javaVersionInfo;
     }
 
     protected static void setJavaVersionInfo(JavaVersionInfo javaVersionInfo) {
-        setProperty(VERSION, javaVersionInfo.getVersion());
-        setProperty(VENDOR, javaVersionInfo.getVendor());
-        setProperty(SPEC_VERSION, javaVersionInfo.getSpecificationVersion());
+        setProperty(JAVA_VERSION_PROPERTY, javaVersionInfo.getVersion());
+        setProperty(JAVA_VENDOR_PROPERTY, javaVersionInfo.getVendor());
+        setProperty(JAVA_SPEC_VERSION_PROPERTY, javaVersionInfo.getSpecificationVersion());
     }
 
     protected static void setAccept(boolean accept) {

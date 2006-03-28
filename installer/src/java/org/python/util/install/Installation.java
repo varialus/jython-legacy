@@ -17,6 +17,8 @@ public class Installation {
     protected static final String ALL = "1";
     protected static final String STANDARD = "2";
     protected static final String MINIMUM = "3";
+    protected static final String STANDALONE = "9";
+
     protected static final String OS_NAME = "os.name";
     protected static final String OS_VERSION = "os.version";
     protected static final String EMPTY = "";
@@ -182,6 +184,7 @@ public class Installation {
         if (binDirectory.exists() && binDirectory.isDirectory()) {
             if (binDirectory.list(new JavaFilenameFilter()).length > 0) {
                 try {
+                    ConsoleInstaller.message(getText(TextKeys.C_CHECK_JAVA_VERSION));
                     // launch the java command - temporary file will be written by the child process
                     File tempFile = File.createTempFile("jython_installation", ".properties");
                     if (tempFile.exists() && tempFile.canWrite()) {
@@ -192,6 +195,10 @@ public class Installation {
                         command[3] = JavaVersionTester.class.getName();
                         command[4] = tempFile.getAbsolutePath();
 
+                        if (isVerbose()) {
+                            ConsoleInstaller.message("executing: " + command[0] + " " + command[1] + " " + command[2]
+                                    + " " + command[3] + " " + command[4]);
+                        }
                         ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
                         childProcess.setDebug(Installation.isVerbose());
                         int errorCode = childProcess.run();
