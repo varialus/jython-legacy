@@ -42,11 +42,11 @@ public class LanguagePage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.WELCOME_TO_JYTHON);
+        return getText(WELCOME_TO_JYTHON);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.VERSION_INFO, _jarInfo.getVersion());
+        return getText(VERSION_INFO, _jarInfo.getVersion());
     }
 
     protected boolean isCancelVisible() {
@@ -66,15 +66,15 @@ public class LanguagePage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _label.setText(Installation.getText(TextKeys.SELECT_LANGUAGE) + ": ");
+        _label.setText(getText(SELECT_LANGUAGE) + ": ");
         // replace combo box items (localization)
         int itemCount = _languageBox.getItemCount();
         _stopListening = true; // adding and removing fires an action event
         for (int i = 0; i < itemCount; i++) {
             _languageBox.removeItemAt(0);
         }
-        _languageBox.addItem(Installation.getText(TextKeys.ENGLISH)); // keep indexes here
-        _languageBox.addItem(Installation.getText(TextKeys.GERMAN));
+        _languageBox.addItem(getText(ENGLISH)); // keep indexes here
+        _languageBox.addItem(getText(GERMAN));
         _stopListening = false;
         if (!_activated) {
             // preselect German if default looks like German

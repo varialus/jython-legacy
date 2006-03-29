@@ -37,11 +37,11 @@ public class ProgressPage extends AbstractWizardPage implements ProgressListener
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.INSTALLATION_IN_PROGRESS);
+        return getText(INSTALLATION_IN_PROGRESS);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.PLEASE_WAIT);
+        return getText(PLEASE_WAIT);
     }
 
     protected boolean isCancelVisible() {
@@ -61,11 +61,11 @@ public class ProgressPage extends AbstractWizardPage implements ProgressListener
     }
 
     protected void activate() {
-        _label.setText(Installation.getText(TextKeys.PROGRESS) + ": ");
+        _label.setText(getText(PROGRESS) + ": ");
         _progressBar.setValue(0);
         _progressBar.setStringPainted(true);
         try {
-            _progressEntry.setText(Installation.getText(TextKeys.INFLATING, _jarInfo.getJarFile().getName()));
+            _progressEntry.setText(getText(INFLATING, _jarInfo.getJarFile().getName()));
         } catch (IOException e) {
             // should not happen
         }
@@ -99,10 +99,10 @@ public class ProgressPage extends AbstractWizardPage implements ProgressListener
     }
 
     public void progressEntry(String entry) {
-        _progressEntry.setText(Installation.getText(TextKeys.INFLATING, entry));
+        _progressEntry.setText(getText(INFLATING, entry));
     }
 
     public void progressStartScripts() {
-        _progressEntry.setText(Installation.getText(TextKeys.GENERATING_START_SCRIPTS));
+        _progressEntry.setText(getText(GENERATING_START_SCRIPTS));
     }
 }

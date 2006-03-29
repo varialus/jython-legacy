@@ -8,8 +8,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public abstract class AbstractWizardPage extends JPanel {
-    private static final String ICON_FILE_NAME = "jython_small_c.png";
+public abstract class AbstractWizardPage extends JPanel implements TextKeys {
+    private static final String _ICON_FILE_NAME = "jython_small_c.png";
 
     private static ImageIcon _imageIcon = null;
     private AbstractWizardValidator _validator = null;
@@ -57,8 +57,8 @@ public abstract class AbstractWizardPage extends JPanel {
             String className = getClass().getName();
             String packageName = className.substring(0, className.lastIndexOf("."));
             String packagePath = packageName.replace('.', '/');
-            URL iconURL = Thread.currentThread().getContextClassLoader()
-                    .getResource(packagePath + "/" + ICON_FILE_NAME);
+            URL iconURL = Thread.currentThread().getContextClassLoader().getResource(
+                    packagePath + "/" + _ICON_FILE_NAME);
             if (iconURL != null) {
                 _imageIcon = new ImageIcon(iconURL);
             }
@@ -138,6 +138,18 @@ public abstract class AbstractWizardPage extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         return gridBagConstraints;
+    }
+
+    final String getText(String textKey) {
+        return Installation.getText(textKey);
+    }
+
+    final String getText(String textKey, String parameter0) {
+        return Installation.getText(textKey, parameter0);
+    }
+
+    final String getText(String textKey, String parameter0, String parameter1) {
+        return Installation.getText(textKey, parameter0, parameter1);
     }
 
 }

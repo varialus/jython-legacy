@@ -60,11 +60,11 @@ public class DirectorySelectionPage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.TARGET_DIRECTORY_PROPERTY);
+        return getText(TARGET_DIRECTORY_PROPERTY);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.CHOOSE_LOCATION);
+        return getText(CHOOSE_LOCATION);
     }
 
     protected boolean isCancelVisible() {
@@ -84,8 +84,8 @@ public class DirectorySelectionPage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _label.setText(Installation.getText(TextKeys.SELECT_TARGET_DIRECTORY) + ": ");
-        _browse.setText(Installation.getText(TextKeys.BROWSE));
+        _label.setText(getText(SELECT_TARGET_DIRECTORY) + ": ");
+        _browse.setText(getText(BROWSE));
         String directory = FrameInstaller.getTargetDirectory();
         if (directory == null || directory.length() <= 0) {
             File defaultDirectory = getDefaultDirectory();
@@ -150,7 +150,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
                 }
             }
             JFileChooser fileChooser = new JFileChooser(directory);
-            fileChooser.setDialogTitle(Installation.getText(TextKeys.SELECT_TARGET_DIRECTORY));
+            fileChooser.setDialogTitle(getText(SELECT_TARGET_DIRECTORY));
             // the filter is at the moment only used for the title of the dialog:
             fileChooser.setFileFilter(new DirectoryFilter());
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -161,7 +161,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
                     fileChooser.setAcceptAllFileFilterUsed(false);
                 }
             }
-            int returnValue = fileChooser.showDialog(_browse, Installation.getText(TextKeys.SELECT));
+            int returnValue = fileChooser.showDialog(_browse, getText(SELECT));
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 _directory.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 FrameInstaller.setTargetDirectory(_directory.getText());

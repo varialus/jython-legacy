@@ -20,11 +20,11 @@ public class SuccessPage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.CONGRATULATIONS);
+        return getText(CONGRATULATIONS);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.SUCCESS, _jarInfo.getVersion(), FrameInstaller.getTargetDirectory());
+        return getText(SUCCESS, _jarInfo.getVersion(), FrameInstaller.getTargetDirectory());
     }
 
     protected boolean isCancelVisible() {
@@ -44,7 +44,7 @@ public class SuccessPage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _label.setText(Installation.getText(TextKeys.PRESS_FINISH, getWizard().getFinishString()));
+        _label.setText(getText(PRESS_FINISH, getWizard().getFinishString()));
     }
 
     protected void passivate() {

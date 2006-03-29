@@ -13,8 +13,8 @@ import org.python.util.install.Installation.JavaVersionInfo;
 
 public class OverviewPage extends AbstractWizardPage {
 
-    private final static int LONGER_LENGTH = 25;
-    private final static int SHORTER_LENGTH = 10;
+    private final static int _LONGER_LENGTH = 25;
+    private final static int _SHORTER_LENGTH = 10;
 
     private JLabel _directoryLabel;
     private JLabel _typeLabel;
@@ -36,17 +36,17 @@ public class OverviewPage extends AbstractWizardPage {
 
     private void initComponents() {
         _directoryLabel = new JLabel();
-        _directory = new JTextField(LONGER_LENGTH);
+        _directory = new JTextField(_LONGER_LENGTH);
         _directory.setEditable(false);
         _typeLabel = new JLabel();
-        _type = new JTextField(LONGER_LENGTH);
+        _type = new JTextField(_LONGER_LENGTH);
         _type.setEditable(false);
 
         _osLabel = new JLabel();
-        JTextField osName = new JTextField(LONGER_LENGTH);
+        JTextField osName = new JTextField(_LONGER_LENGTH);
         osName.setText(System.getProperty(Installation.OS_NAME));
         osName.setEditable(false);
-        JTextField osVersion = new JTextField(SHORTER_LENGTH);
+        JTextField osVersion = new JTextField(_SHORTER_LENGTH);
         osVersion.setText(System.getProperty(Installation.OS_VERSION));
         osVersion.setEditable(false);
         _osBox = new JCheckBox();
@@ -54,9 +54,9 @@ public class OverviewPage extends AbstractWizardPage {
         _osBox.setSelected(Installation.isValidOs());
 
         _javaLabel = new JLabel();
-        _javaVendor = new JTextField(LONGER_LENGTH);
+        _javaVendor = new JTextField(_LONGER_LENGTH);
         _javaVendor.setEditable(false);
-        _javaVersion = new JTextField(SHORTER_LENGTH);
+        _javaVersion = new JTextField(_SHORTER_LENGTH);
         _javaVersion.setEditable(false);
         _javaBox = new JCheckBox();
         _javaBox.setEnabled(false);
@@ -115,11 +115,11 @@ public class OverviewPage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.OVERVIEW_TITLE);
+        return getText(OVERVIEW_TITLE);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.OVERVIEW_DESCRIPTION);
+        return getText(OVERVIEW_DESCRIPTION);
     }
 
     protected boolean isCancelVisible() {
@@ -140,48 +140,48 @@ public class OverviewPage extends AbstractWizardPage {
 
     protected void activate() {
         // directory
-        _directoryLabel.setText(Installation.getText(TextKeys.TARGET_DIRECTORY_PROPERTY) + ": ");
+        _directoryLabel.setText(getText(TARGET_DIRECTORY_PROPERTY) + ": ");
         _directory.setText(FrameInstaller.getTargetDirectory());
 
         // type
-        _typeLabel.setText(Installation.getText(TextKeys.INSTALLATION_TYPE) + ": ");
+        _typeLabel.setText(getText(INSTALLATION_TYPE) + ": ");
         InstallationType installationType = FrameInstaller.getInstallationType();
         if (installationType.isAll()) {
-            _type.setText(Installation.getText(TextKeys.ALL));
+            _type.setText(getText(ALL));
         }
         if (installationType.isStandard()) {
-            _type.setText(Installation.getText(TextKeys.STANDARD));
+            _type.setText(getText(STANDARD));
         }
         if (installationType.isMinimum()) {
-            _type.setText(Installation.getText(TextKeys.MINIMUM));
+            _type.setText(getText(MINIMUM));
         }
 
         // os
-        _osLabel.setText(Installation.getText(TextKeys.OS_INFO) + ": ");
+        _osLabel.setText(getText(OS_INFO) + ": ");
         String osText;
         if (_osBox.isSelected()) {
-            osText = Installation.getText(TextKeys.OK);
+            osText = getText(OK);
         } else {
-            osText = Installation.getText(TextKeys.MAYBE_NOT_SUPPORTED);
+            osText = getText(MAYBE_NOT_SUPPORTED);
         }
         _osBox.setText(osText);
 
         // java
-        _javaLabel.setText(Installation.getText(TextKeys.JAVA_INFO) + ": ");
+        _javaLabel.setText(getText(JAVA_INFO) + ": ");
         JavaVersionInfo javaVersionInfo = FrameInstaller.getJavaVersionInfo();
         _javaVendor.setText(javaVersionInfo.getVendor());
         _javaVersion.setText(javaVersionInfo.getVersion());
         _javaBox.setSelected(Installation.isValidJava(javaVersionInfo));
         String javaText;
         if (_javaBox.isSelected()) {
-            javaText = Installation.getText(TextKeys.OK);
+            javaText = getText(OK);
         } else {
-            javaText = Installation.getText(TextKeys.NOT_OK);
+            javaText = getText(NOT_OK);
         }
         _javaBox.setText(javaText);
 
         // message
-        _message.setText(Installation.getText(TextKeys.CONFIRM_START, Installation.getText(TextKeys.NEXT)));
+        _message.setText(getText(CONFIRM_START, getText(NEXT)));
     }
 
     protected void passivate() {

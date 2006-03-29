@@ -3,7 +3,7 @@ package org.python.util.install;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public abstract class AbstractWizardValidator {
+public abstract class AbstractWizardValidator implements TextKeys {
 
     /**
      * The thread that performs the validation
@@ -120,5 +120,13 @@ public abstract class AbstractWizardValidator {
      * @throws ValidationInformationException when an information should be displayed
      */
     protected abstract void validate() throws ValidationException, ValidationInformationException;
+
+    final String getText(String textKey) {
+        return Installation.getText(textKey);
+    }
+
+    final String getText(String textKey, String parameter0) {
+        return Installation.getText(textKey, parameter0);
+    }
 
 }

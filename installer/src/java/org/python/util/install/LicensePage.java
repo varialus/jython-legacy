@@ -15,8 +15,8 @@ import javax.swing.JTextArea;
 
 public class LicensePage extends AbstractWizardPage {
 
-    private static final String ACCEPT = "1";
-    private static final String DO_NOT_ACCEPT = "0";
+    private static final String _ACCEPT_ACTION_COMMAND = "1";
+    private static final String _DO_NOT_ACCEPT_ACTION_COMMAND = "0";
 
     private JRadioButton _acceptButton;
     private JRadioButton _doNotAcceptButton;
@@ -46,10 +46,10 @@ public class LicensePage extends AbstractWizardPage {
         JPanel southPanel = new JPanel();
         RadioButtonListener radioButtonListener = new RadioButtonListener();
         _acceptButton = new JRadioButton();
-        _acceptButton.setActionCommand(ACCEPT);
+        _acceptButton.setActionCommand(_ACCEPT_ACTION_COMMAND);
         _acceptButton.addActionListener(radioButtonListener);
         _doNotAcceptButton = new JRadioButton();
-        _doNotAcceptButton.setActionCommand(DO_NOT_ACCEPT);
+        _doNotAcceptButton.setActionCommand(_DO_NOT_ACCEPT_ACTION_COMMAND);
         _doNotAcceptButton.addActionListener(radioButtonListener);
         ButtonGroup radioButtonGroup = new ButtonGroup();
         radioButtonGroup.add(_acceptButton);
@@ -65,11 +65,11 @@ public class LicensePage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.LICENSE);
+        return getText(LICENSE);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.PLEASE_READ_LICENSE);
+        return getText(PLEASE_READ_LICENSE);
     }
 
     protected boolean isCancelVisible() {
@@ -89,8 +89,8 @@ public class LicensePage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _acceptButton.setText(Installation.getText(TextKeys.ACCEPT));
-        _doNotAcceptButton.setText(Installation.getText(TextKeys.DO_NOT_ACCEPT));
+        _acceptButton.setText(getText(ACCEPT));
+        _doNotAcceptButton.setText(getText(DO_NOT_ACCEPT));
         boolean accept = FrameInstaller.isAccept();
         _acceptButton.setSelected(accept);
         _doNotAcceptButton.setSelected(!accept);
@@ -109,7 +109,7 @@ public class LicensePage extends AbstractWizardPage {
     private final static class RadioButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String actionCommand = e.getActionCommand();
-            if (actionCommand.equals(ACCEPT)) {
+            if (actionCommand.equals(_ACCEPT_ACTION_COMMAND)) {
                 FrameInstaller.setAccept(true);
             } else {
                 FrameInstaller.setAccept(false);

@@ -11,7 +11,7 @@ public class LicensePageValidator extends AbstractWizardValidator {
 
     protected void validate() throws ValidationException {
         if (!_page.isAccept()) {
-            throw new ValidationException(Installation.getText(TextKeys.PLEASE_ACCEPT_LICENSE));
+            throw new ValidationException(getText(PLEASE_ACCEPT_LICENSE));
         }
     }
 }

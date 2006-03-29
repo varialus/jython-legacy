@@ -32,11 +32,11 @@ public class ReadmePage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.README);
+        return getText(README);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.PLEASE_README);
+        return getText(PLEASE_README);
     }
 
     protected boolean isCancelVisible() {

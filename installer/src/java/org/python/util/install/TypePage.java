@@ -48,11 +48,11 @@ public class TypePage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.INSTALLATION_TYPE);
+        return getText(INSTALLATION_TYPE);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.INSTALLATION_TYPE_DESCRIPTION);
+        return getText(INSTALLATION_TYPE_DESCRIPTION);
     }
 
     protected boolean isCancelVisible() {
@@ -72,10 +72,10 @@ public class TypePage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _label.setText(Installation.getText(TextKeys.SELECT_INSTALLATION_TYPE) + ": ");
-        _allButton.setText(Installation.getText(TextKeys.ALL));
-        _standardButton.setText(Installation.getText(TextKeys.STANDARD));
-        _minimumButton.setText(Installation.getText(TextKeys.MINIMUM));
+        _label.setText(getText(SELECT_INSTALLATION_TYPE) + ": ");
+        _allButton.setText(getText(ALL));
+        _standardButton.setText(getText(STANDARD));
+        _minimumButton.setText(getText(MINIMUM));
         InstallationType installationType = FrameInstaller.getInstallationType();
         if (installationType.isAll()) {
             _allButton.setSelected(true);

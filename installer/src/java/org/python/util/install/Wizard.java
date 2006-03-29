@@ -2,12 +2,12 @@ package org.python.util.install;
 
 import javax.swing.JOptionPane;
 
-public class Wizard extends AbstractWizard {
+public class Wizard extends AbstractWizard implements TextKeys {
 
     public Wizard(JarInfo jarInfo) {
         super();
 
-        setTitle(Installation.getText(TextKeys.JYTHON_INSTALL));
+        setTitle(getText(JYTHON_INSTALL));
 
         LanguagePage languagePage = new LanguagePage(jarInfo);
         LicensePage licensePage = new LicensePage(jarInfo);
@@ -41,34 +41,38 @@ public class Wizard extends AbstractWizard {
     }
 
     protected String getCancelString() {
-        return Installation.getText(TextKeys.CANCEL);
+        return getText(CANCEL);
     }
 
     protected String getFinishString() {
-        return Installation.getText(TextKeys.FINISH);
+        return getText(FINISH);
     }
 
     protected String getNextString() {
-        return Installation.getText(TextKeys.NEXT);
+        return getText(NEXT);
     }
 
     protected String getPreviousString() {
-        return Installation.getText(TextKeys.PREVIOUS);
+        return getText(PREVIOUS);
     }
 
     public void validationStarted(ValidationEvent event) {
     }
 
     public void validationFailed(ValidationEvent event, ValidationException exception) {
-        JOptionPane.showMessageDialog(this, exception.getMessage(), Installation.getText(TextKeys.ERROR),
-                JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, exception.getMessage(), getText(TextKeys.ERROR), JOptionPane.ERROR_MESSAGE);
     }
 
     public void validationInformationRequired(ValidationEvent event, ValidationInformationException exception) {
-        JOptionPane.showMessageDialog(this, exception.getMessage(), Installation.getText(TextKeys.INFORMATION),
+        JOptionPane.showMessageDialog(this, exception.getMessage(), getText(INFORMATION),
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void validationSucceeded(ValidationEvent event) {
     }
+
+    private final String getText(String textKey) {
+        return Installation.getText(textKey);
+    }
+
 }

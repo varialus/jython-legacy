@@ -20,8 +20,8 @@ import javax.swing.JTextField;
 
 public class JavaSelectionPage extends AbstractWizardPage {
 
-    private final static String CURRENT = "current"; // action command
-    private final static String OTHER = "other"; // action command
+    private final static String _CURRENT_ACTION_COMMAND = "current";
+    private final static String _OTHER_ACTION_COMMAND = "other";
 
     private JRadioButton _currentButton;
     private JRadioButton _otherButton;
@@ -42,10 +42,10 @@ public class JavaSelectionPage extends AbstractWizardPage {
         // radio buttons
         RadioButtonListener radioButtonListener = new RadioButtonListener();
         _currentButton = new JRadioButton();
-        _currentButton.setActionCommand(CURRENT);
+        _currentButton.setActionCommand(_CURRENT_ACTION_COMMAND);
         _currentButton.addActionListener(radioButtonListener);
         _otherButton = new JRadioButton();
-        _otherButton.setActionCommand(OTHER);
+        _otherButton.setActionCommand(_OTHER_ACTION_COMMAND);
         _otherButton.addActionListener(radioButtonListener);
         ButtonGroup radioButtonGroup = new ButtonGroup();
         radioButtonGroup.add(_currentButton);
@@ -86,11 +86,11 @@ public class JavaSelectionPage extends AbstractWizardPage {
     }
 
     protected String getTitle() {
-        return Installation.getText(TextKeys.TARGET_JAVA_HOME_PROPERTY);
+        return getText(TARGET_JAVA_HOME_PROPERTY);
     }
 
     protected String getDescription() {
-        return Installation.getText(TextKeys.CHOOSE_JRE);
+        return getText(CHOOSE_JRE);
     }
 
     protected boolean isCancelVisible() {
@@ -110,10 +110,10 @@ public class JavaSelectionPage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _label.setText(Installation.getText(TextKeys.SELECT_JAVA_HOME) + ": ");
-        _currentButton.setText(Installation.getText(TextKeys.CURRENT));
-        _otherButton.setText(Installation.getText(TextKeys.OTHER));
-        _browse.setText(Installation.getText(TextKeys.BROWSE));
+        _label.setText(getText(SELECT_JAVA_HOME) + ": ");
+        _currentButton.setText(getText(CURRENT));
+        _otherButton.setText(getText(OTHER));
+        _browse.setText(getText(BROWSE));
         setValues();
     }
 
@@ -157,7 +157,7 @@ public class JavaSelectionPage extends AbstractWizardPage {
     private final class BrowseButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser(new File(_javaHome.getText()));
-            fileChooser.setDialogTitle(Installation.getText(TextKeys.SELECT_JAVA_HOME));
+            fileChooser.setDialogTitle(getText(SELECT_JAVA_HOME));
             // the filter is at the moment only used for the title of the dialog:
             fileChooser.setFileFilter(new DirectoryFilter());
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -168,7 +168,7 @@ public class JavaSelectionPage extends AbstractWizardPage {
                     fileChooser.setAcceptAllFileFilterUsed(false);
                 }
             }
-            int returnValue = fileChooser.showDialog(_browse, Installation.getText(TextKeys.SELECT));
+            int returnValue = fileChooser.showDialog(_browse, getText(SELECT));
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 FrameInstaller.setTargetJavaHome(fileChooser.getSelectedFile().getAbsolutePath());
                 setValues();
@@ -179,7 +179,7 @@ public class JavaSelectionPage extends AbstractWizardPage {
     private final class RadioButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String actionCommand = e.getActionCommand();
-            setCurrent(CURRENT.equals(actionCommand));
+            setCurrent(_CURRENT_ACTION_COMMAND.equals(actionCommand));
         }
     }
 
