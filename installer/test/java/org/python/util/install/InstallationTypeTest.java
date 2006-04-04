@@ -15,6 +15,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.isMinimum());
         assertFalse(_type.isAll());
         assertFalse(_type.isStandalone());
+        assertTrue(_type.isPredefined());
     }
 
     public void testStandard() {
@@ -25,6 +26,7 @@ public class InstallationTypeTest extends TestCase {
         assertTrue(_type.installDocumentation());
         assertFalse(_type.installSources());
         assertFalse(_type.isStandalone());
+        assertTrue(_type.isPredefined());
     }
 
     public void testMinimum() {
@@ -36,6 +38,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.installDocumentation());
         assertFalse(_type.installSources());
         assertFalse(_type.isStandalone());
+        assertTrue(_type.isPredefined());
     }
 
     public void testAll() {
@@ -47,6 +50,7 @@ public class InstallationTypeTest extends TestCase {
         assertTrue(_type.installDocumentation());
         assertTrue(_type.installSources());
         assertFalse(_type.isStandalone());
+        assertTrue(_type.isPredefined());
     }
 
     public void testStandalone() {
@@ -56,6 +60,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.isMinimum());
         assertFalse(_type.isStandard());
         assertFalse(_type.isAll());
+        assertTrue(_type.isPredefined());
 
         // sure to handle this as follows?
         assertTrue(_type.installLibraryModules());
@@ -74,6 +79,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.isStandard());
         assertFalse(_type.isAll());
         assertFalse(_type.isStandalone());
+        assertFalse(_type.isPredefined());
 
         _type.removeDemosAndExamples();
         assertTrue(_type.installLibraryModules());
@@ -84,6 +90,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.isStandard());
         assertFalse(_type.isAll());
         assertFalse(_type.isStandalone());
+        assertFalse(_type.isPredefined());
 
         _type.addSources();
         assertTrue(_type.installLibraryModules());
@@ -94,6 +101,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.isStandard());
         assertFalse(_type.isAll());
         assertFalse(_type.isStandalone());
+        assertFalse(_type.isPredefined());
 
         _type.addDocumentation();
         assertTrue(_type.installLibraryModules());
@@ -104,6 +112,7 @@ public class InstallationTypeTest extends TestCase {
         assertFalse(_type.isStandard());
         assertFalse(_type.isAll());
         assertFalse(_type.isStandalone());
+        assertFalse(_type.isPredefined());
     }
 
 }

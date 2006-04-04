@@ -1,6 +1,7 @@
 package org.python.util.install;
 
 public class InstallationType {
+
     private boolean _installLibraryModules = true;
     private boolean _installDemosAndExamples = true;
     private boolean _installDocumentation = true;
@@ -101,5 +102,19 @@ public class InstallationType {
 
     public boolean isMinimum() {
         return !installLibraryModules() && !installDemosAndExamples() && !installDocumentation() && !installSources();
+    }
+
+    /**
+     * @return <code>true</code> if current settings reflect one of the predefined settings
+     */
+    public boolean isPredefined() {
+        return isAll() || isStandard() || isMinimum() || isStandalone();
+    }
+
+    public String toString() {
+        StringBuffer buf = new StringBuffer(30);
+        buf.append("mod: " + installDemosAndExamples() + ", demo: " + installDemosAndExamples() + ", doc: "
+                + installDocumentation() + ", src: " + installSources());
+        return buf.toString();
     }
 }
