@@ -3,6 +3,7 @@ package org.python.util.install;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import java.util.Locale;
 
 import org.python.util.install.Installation.JavaFilenameFilter;
 import org.python.util.install.Installation.JavaVersionInfo;
+import org.python.util.install.driver.Tunnel;
 
 public class ConsoleInstaller implements ProgressListener, TextKeys {
     private static final String _CANCEL = "c";
@@ -22,6 +24,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     private InstallerCommandLine _commandLine;
     private JarInstaller _jarInstaller;
     private JarInfo _jarInfo;
+    private Tunnel _tunnel;
 
     public ConsoleInstaller(InstallerCommandLine commandLine, JarInfo jarInfo) {
         _commandLine = commandLine;
@@ -29,10 +32,14 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         _jarInstaller = new JarInstaller(this, jarInfo);
     }
 
+    public void setTunnel(Tunnel tunnel) {
+        _tunnel = tunnel;
+    }
+
     public void install() {
         File targetDirectory = null;
         File javaHome = null;
-        if (!_commandLine.hasSilentOption()) {
+        if (_commandLine.hasConsoleOption()) {
             welcome();
             selectLanguage();
             acceptLicense();
@@ -43,7 +50,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
             _jarInstaller.inflate(targetDirectory, installationType, javaHome);
             showReadme(targetDirectory);
             success(targetDirectory);
-        } else {
+        } else if (_commandLine.hasSilentOption()) {
             message(getText(C_SILENT_INSTALLATION));
             targetDirectory = _commandLine.getTargetDirectory();
             checkTargetDirectorySilent(targetDirectory);
@@ -82,53 +89,70 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
      * @return (chosen) answer
      */
     private String question(String question, List answers, boolean answerRequired) {
-        if (answers != null && answers.size() > 0) {
-            question = question + " " + _BEGIN_ANSWERS;
-            Iterator answersAsIterator = answers.iterator();
-            while (answersAsIterator.hasNext()) {
-                if (!question.endsWith(_BEGIN_ANSWERS))
-                    question = question + "/";
-                question = question + (String) answersAsIterator.next();
-            }
-            question = question + _END_ANSWERS;
-        }
-        question = question + " " + _PROMPT + " ";
-        boolean match = false;
-        String answer = "";
-        while (!match && !_CANCEL.equalsIgnoreCase(answer)) {
-            System.out.print(question); // this is print, not println (!)
-            answer = readline();
+        try {
             if (answers != null && answers.size() > 0) {
+                question = question + " " + _BEGIN_ANSWERS;
                 Iterator answersAsIterator = answers.iterator();
                 while (answersAsIterator.hasNext()) {
-                    if (answer.equalsIgnoreCase((String) answersAsIterator.next())) {
-                        match = true;
+                    if (!question.endsWith(_BEGIN_ANSWERS))
+                        question = question + "/";
+                    question = question + (String) answersAsIterator.next();
+                }
+                question = question + _END_ANSWERS;
+            }
+            question = question + " " + _PROMPT + " ";
+            boolean match = false;
+            String answer = "";
+            while (!match && !_CANCEL.equalsIgnoreCase(answer)) {
+                // output to normal System.out
+                System.out.print(question); // intended print, not println (!)
+                answer = readLine();
+                if (answers != null && answers.size() > 0) {
+                    Iterator answersAsIterator = answers.iterator();
+                    while (answersAsIterator.hasNext()) {
+                        if (answer.equalsIgnoreCase((String) answersAsIterator.next())) {
+                            match = true;
+                        }
+                    }
+                } else {
+                    match = true;
+                    if (answerRequired && "".equals(answer)) {
+                        match = false;
                     }
                 }
-            } else {
-                match = true;
-                if (answerRequired && "".equals(answer)) {
-                    match = false;
+                if (!match && !_CANCEL.equalsIgnoreCase(answer)) {
+                    message(getText(C_INVALID_ANSWER, answer));
                 }
             }
-            if (!match && !_CANCEL.equalsIgnoreCase(answer)) {
-                message(getText(C_INVALID_ANSWER, answer));
+            if (_CANCEL.equalsIgnoreCase(answer)) {
+                throw new InstallationCancelledException();
             }
+            return answer;
+        } catch (IOException ioe) {
+            throw new InstallerException(ioe);
         }
-        if (_CANCEL.equalsIgnoreCase(answer)) {
-            throw new InstallationCancelledException();
-        }
-        return answer;
     }
 
-    private String readline() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    /**
+     * Send a signal through the tunnel, and then wait for the answer from the other side.
+     * 
+     * <pre>
+     *         (2)  [Driver]   receives question  [Tunnel]   sends question   [Console]  (1)
+     *         (3)  [Driver]   sends answer       [Tunnel]   receives answer  [Console]  (4)
+     * </pre>
+     */
+    private String readLine() throws IOException {
+        InputStream inputStream;
         String line = "";
-        try {
-            line = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (_tunnel == null) {
+            inputStream = System.in;
+        } else {
+            inputStream = _tunnel.getAnswerReceiverStream();
+            _tunnel.getQuestionSenderStream().write(Tunnel.NEW_LINE.getBytes());
+            _tunnel.getQuestionSenderStream().flush();
         }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        line = reader.readLine();
         return line;
     }
 
@@ -231,8 +255,8 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     private File checkVersion(File javaHome) {
         // handle target java version
         JavaInfo javaInfo = verifyTargetJava(javaHome);
-        message(getText(C_JAVA_VERSION, javaInfo.getJavaVersionInfo().getVendor(), javaInfo
-                .getJavaVersionInfo().getVersion()));
+        message(getText(C_JAVA_VERSION, javaInfo.getJavaVersionInfo().getVendor(), javaInfo.getJavaVersionInfo()
+                .getVersion()));
         if (Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
             question(getText(C_PROCEED));
         } else {
@@ -318,11 +342,11 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                         message(getText(C_NOT_A_DIRECTORY, targetDirectory.getCanonicalPath()));
                     } else {
                         if (targetDirectory.list().length > 0) {
-                            String overwrite = question(getText(C_OVERWRITE_DIRECTORY,
-                                    targetDirectory.getCanonicalPath()), getYNAnswers());
+                            String overwrite = question(getText(C_OVERWRITE_DIRECTORY, targetDirectory
+                                    .getCanonicalPath()), getYNAnswers());
                             if (overwrite.equalsIgnoreCase(getText(C_YES))) {
-                                String clear = question(getText(C_CLEAR_DIRECTORY,
-                                        targetDirectory.getCanonicalPath()), getYNAnswers());
+                                String clear = question(getText(C_CLEAR_DIRECTORY, targetDirectory.getCanonicalPath()),
+                                        getYNAnswers());
                                 if (clear.equalsIgnoreCase(getText(C_YES))) {
                                     clearDirectory(targetDirectory);
                                 }
@@ -330,12 +354,12 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                         }
                     }
                 } else {
-                    String create = question(getText(C_CREATE_DIRECTORY, targetDirectory
-                            .getCanonicalPath()), getYNAnswers());
+                    String create = question(getText(C_CREATE_DIRECTORY, targetDirectory.getCanonicalPath()),
+                            getYNAnswers());
                     if (create.equalsIgnoreCase(getText(C_YES))) {
                         if (!targetDirectory.mkdirs()) {
-                            throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY,
-                                    targetDirectory.getCanonicalPath()));
+                            throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY, targetDirectory
+                                    .getCanonicalPath()));
                         }
                     }
                 }
@@ -388,18 +412,16 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
             if (!targetDirectory.exists()) {
                 // create directory
                 if (!targetDirectory.mkdirs()) {
-                    throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY,
-                            targetDirectory.getCanonicalPath()));
+                    throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY, targetDirectory.getCanonicalPath()));
                 }
             } else {
                 // assert it is an empty directory
                 if (!targetDirectory.isDirectory()) {
-                    throw new InstallerException(getText(C_NOT_A_DIRECTORY, targetDirectory
-                            .getCanonicalPath()));
+                    throw new InstallerException(getText(C_NOT_A_DIRECTORY, targetDirectory.getCanonicalPath()));
                 } else {
                     if (targetDirectory.list().length > 0) {
-                        throw new InstallerException(getText(C_NON_EMPTY_TARGET_DIRECTORY,
-                                targetDirectory.getCanonicalPath()));
+                        throw new InstallerException(getText(C_NON_EMPTY_TARGET_DIRECTORY, targetDirectory
+                                .getCanonicalPath()));
                     }
                 }
             }
@@ -427,8 +449,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 clearDirectory(files[i]);
             }
             if (!files[i].delete()) {
-                throw new InstallerException(getText(C_UNABLE_TO_DELETE, files[i]
-                        .getAbsolutePath()));
+                throw new InstallerException(getText(C_UNABLE_TO_DELETE, files[i].getAbsolutePath()));
             }
         }
     }
@@ -445,8 +466,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                     + installationType.installDocumentation());
             message("  - " + InstallerCommandLine.INEXCLUDE_SOURCES + ": " + installationType.installSources());
             message("  - JRE: " + javaHome.getAbsolutePath());
-            String proceed = question(getText(C_CONFIRM_TARGET, targetDirectory
-                    .getCanonicalPath()), getYNAnswers());
+            String proceed = question(getText(C_CONFIRM_TARGET, targetDirectory.getCanonicalPath()), getYNAnswers());
             if (!proceed.equalsIgnoreCase(getText(C_YES))) {
                 throw new InstallationCancelledException();
             }
@@ -457,10 +477,8 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
 
     private void success(final File targetDirectory) {
         try {
-            message(getText(C_CONGRATULATIONS)
-                    + " "
-                    + getText(C_SUCCESS, _jarInfo.getVersion(), targetDirectory
-                            .getCanonicalPath()));
+            message(getText(C_CONGRATULATIONS) + " "
+                    + getText(C_SUCCESS, _jarInfo.getVersion(), targetDirectory.getCanonicalPath()));
         } catch (IOException ioe) {
             throw new InstallerException(ioe); // catch for the compiler
         }
@@ -480,15 +498,15 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     private String getText(String textKey) {
         return Installation.getText(textKey);
     }
-    
+
     private String getText(String textKey, String parameter0) {
         return Installation.getText(textKey, parameter0);
     }
-    
+
     private String getText(String textKey, String parameter0, String parameter1) {
         return Installation.getText(textKey, parameter0, parameter1);
     }
-    
+
     private static class JavaInfo {
         private JavaVersionInfo _javaVersionInfo;
         private File _javaHome;

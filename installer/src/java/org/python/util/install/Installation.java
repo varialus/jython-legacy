@@ -13,6 +13,9 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import org.python.util.install.driver.InstallationDriver;
+import org.python.util.install.driver.Tunnel;
+
 public class Installation {
     protected static final String ALL = "1";
     protected static final String STANDARD = "2";
@@ -31,40 +34,22 @@ public class Installation {
     private static ResourceBundle _textConstants = ResourceBundle.getBundle(RESOURCE_CLASS, Locale.getDefault());
 
     private static boolean _verbose = false;
+    private static boolean _isAutotesting = false;
 
     public static void main(String args[]) {
-        try {
-            JarInfo jarInfo = new JarInfo();
-            InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
-            if (!commandLine.setArgs(args) || commandLine.hasHelpOption()) {
-                commandLine.printHelp();
-                System.exit(1);
-            } else {
-                if (commandLine.hasVerboseOption()) {
-                    _verbose = true;
-                }
-                if (!useGUI(commandLine)) {
-                    ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
-                    consoleInstaller.install();
-                    System.exit(0);
-                } else {
-                    new FrameInstaller(jarInfo);
-                }
-            }
-        } catch (InstallationCancelledException ice) {
-            ConsoleInstaller.message((getText(TextKeys.INSTALLATION_CANCELLED)));
-            System.exit(1);
-        } catch (InstallerException ie) {
-            ie.printStackTrace();
-            System.exit(1);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-        }
+        internalMain(args, null);
+    }
+
+    public static void driverMain(String args[], Tunnel tunnel) {
+        internalMain(args, tunnel);
     }
 
     protected static boolean isVerbose() {
         return _verbose;
+    }
+
+    protected static boolean isAutotesting() {
+        return _isAutotesting;
     }
 
     protected static String getText(String key) {
@@ -317,6 +302,44 @@ public class Installation {
             return true;
         } catch (Throwable t) {
             return false;
+        }
+    }
+
+    private static void internalMain(String[] args, Tunnel tunnel) {
+        try {
+            JarInfo jarInfo = new JarInfo();
+            InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
+            if (!commandLine.setArgs(args) || commandLine.hasHelpOption()) {
+                commandLine.printHelp();
+                System.exit(1);
+            } else {
+                if (commandLine.hasAutotestOption()) {
+                    _isAutotesting = true;
+                    InstallationDriver autotestDriver = new InstallationDriver(args);
+                    autotestDriver.drive(); // ! reentrant into internalMain()
+                    _isAutotesting = false;
+                    System.exit(0);
+                }
+                if (commandLine.hasVerboseOption()) {
+                    _verbose = true;
+                }
+                if (!useGUI(commandLine)) {
+                    ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
+                    consoleInstaller.setTunnel(tunnel);
+                    consoleInstaller.install();
+                    if (!isAutotesting()) {
+                        System.exit(0);
+                    }
+                } else {
+                    new FrameInstaller(jarInfo);
+                }
+            }
+        } catch (InstallationCancelledException ice) {
+            ConsoleInstaller.message((getText(TextKeys.INSTALLATION_CANCELLED)));
+            System.exit(1);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(1);
         }
     }
 
