@@ -152,6 +152,7 @@ public class JavaSelectionPage extends AbstractWizardPage {
             _browse.setEnabled(true);
         }
         _javaHome.setText(FrameInstaller.getTargetJavaHome());
+        _javaHome.setToolTipText(_javaHome.getText());
     }
 
     private final class BrowseButtonListener implements ActionListener {
@@ -189,6 +190,7 @@ public class JavaSelectionPage extends AbstractWizardPage {
 
         public void focusLost(FocusEvent e) {
             FrameInstaller.setTargetJavaHome(_javaHome.getText());
+            _javaHome.setToolTipText(_javaHome.getText());
         }
     }
 

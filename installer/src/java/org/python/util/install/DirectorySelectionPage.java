@@ -97,6 +97,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
             FrameInstaller.setTargetDirectory(directory);
         }
         _directory.setText(FrameInstaller.getTargetDirectory());
+        _directory.setToolTipText(_directory.getText());
     }
 
     protected void passivate() {
@@ -164,6 +165,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
             int returnValue = fileChooser.showDialog(_browse, getText(SELECT));
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 _directory.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                _directory.setToolTipText(_directory.getText());
                 FrameInstaller.setTargetDirectory(_directory.getText());
             }
         }
@@ -175,6 +177,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
 
         public void focusLost(FocusEvent e) {
             FrameInstaller.setTargetDirectory(_directory.getText());
+            _directory.setToolTipText(_directory.getText());
         }
     }
 
