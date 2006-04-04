@@ -45,9 +45,11 @@ public class OverviewPage extends AbstractWizardPage {
         _osLabel = new JLabel();
         JTextField osName = new JTextField(_LONGER_LENGTH);
         osName.setText(System.getProperty(Installation.OS_NAME));
+        osName.setToolTipText(System.getProperty(Installation.OS_NAME));
         osName.setEditable(false);
         JTextField osVersion = new JTextField(_SHORTER_LENGTH);
         osVersion.setText(System.getProperty(Installation.OS_VERSION));
+        osVersion.setToolTipText(System.getProperty(Installation.OS_VERSION));
         osVersion.setEditable(false);
         _osBox = new JCheckBox();
         _osBox.setEnabled(false);
@@ -142,19 +144,43 @@ public class OverviewPage extends AbstractWizardPage {
         // directory
         _directoryLabel.setText(getText(TARGET_DIRECTORY_PROPERTY) + ": ");
         _directory.setText(FrameInstaller.getTargetDirectory());
+        _directory.setToolTipText(FrameInstaller.getTargetDirectory());
 
         // type
         _typeLabel.setText(getText(INSTALLATION_TYPE) + ": ");
         InstallationType installationType = FrameInstaller.getInstallationType();
+        String typeText;
         if (installationType.isAll()) {
-            _type.setText(getText(ALL));
+            typeText = getText(ALL);
+        } else if (installationType.isStandard()) {
+            typeText = getText(STANDARD);
+        } else if (installationType.isMinimum()) {
+            typeText = getText(MINIMUM);
+        } else if (installationType.isStandalone()) {
+            typeText = getText(STANDALONE);
+        } else {
+            typeText = getText(CUSTOM);
+            typeText += " (";
+            if (installationType.installLibraryModules()) {
+                typeText += " ";
+                typeText += InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES;
+            }
+            if (installationType.installDemosAndExamples()) {
+                typeText += " ";
+                typeText += InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES;
+            }
+            if (installationType.installDocumentation()) {
+                typeText += " ";
+                typeText += InstallerCommandLine.INEXCLUDE_DOCUMENTATION;
+            }
+            if (installationType.installSources()) {
+                typeText += " ";
+                typeText += InstallerCommandLine.INEXCLUDE_SOURCES;
+            }
+            typeText += ")";
         }
-        if (installationType.isStandard()) {
-            _type.setText(getText(STANDARD));
-        }
-        if (installationType.isMinimum()) {
-            _type.setText(getText(MINIMUM));
-        }
+        _type.setText(typeText);
+        _type.setToolTipText(typeText);
 
         // os
         _osLabel.setText(getText(OS_INFO) + ": ");
@@ -170,7 +196,9 @@ public class OverviewPage extends AbstractWizardPage {
         _javaLabel.setText(getText(JAVA_INFO) + ": ");
         JavaVersionInfo javaVersionInfo = FrameInstaller.getJavaVersionInfo();
         _javaVendor.setText(javaVersionInfo.getVendor());
+        _javaVendor.setToolTipText(javaVersionInfo.getVendor());
         _javaVersion.setText(javaVersionInfo.getVersion());
+        _javaVersion.setToolTipText(javaVersionInfo.getVersion());
         _javaBox.setSelected(Installation.isValidJava(javaVersionInfo));
         String javaText;
         if (_javaBox.isSelected()) {

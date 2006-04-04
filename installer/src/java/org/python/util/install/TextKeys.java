@@ -10,9 +10,13 @@ public interface TextKeys {
     public static final String CHOOSE_JRE = "CHOOSE_JRE";
     public static final String CONFIRM_START = "CONFIRM_START";
     public static final String CONGRATULATIONS = "CONGRATULATIONS";
+    public static final String CORE = "CORE";
     public static final String CREATED_DIRECTORY = "CREATED_DIRECTORY";
     public static final String CURRENT = "CURRENT";
+    public static final String CUSTOM = "CUSTOM";
+    public static final String DEMOS_EXAMPLES = "DEMOS_EXAMPLES";
     public static final String DIRECTORIES_ONLY = "DIRECTORIES_ONLY";
+    public static final String DOCUMENTATION = "DOCUMENTATION";
     public static final String DO_NOT_ACCEPT = "DO_NOT_ACCEPT";
     public static final String EMPTY_TARGET_DIRECTORY = "EMPTY_TARGET_DIRECTORY";
     public static final String ENGLISH = "ENGLISH";
@@ -31,6 +35,7 @@ public interface TextKeys {
     public static final String JAVA_INFO = "JAVA_INFO";
     public static final String JYTHON_INSTALL = "JYTHON_INSTALL";
     public static final String LANGUAGE_PROPERTY = "LANGUAGE_PROPERTY";
+    public static final String LIBRARY_MODULES = "LIBRARY_MODULES";
     public static final String LICENSE = "LICENSE";
     public static final String MAYBE_NOT_SUPPORTED = "MAYBE_NOT_SUPPORTED";
     public static final String MINIMUM = "MINIMUM";
@@ -56,7 +61,9 @@ public interface TextKeys {
     public static final String SELECT_JAVA_HOME = "SELECT_JAVA_HOME";
     public static final String SELECT_LANGUAGE = "SELECT_LANGUAGE";
     public static final String SELECT_TARGET_DIRECTORY = "SELECT_TARGET_DIRECTORY";
+    public static final String SOURCES = "SOURCES";
     public static final String STANDARD = "STANDARD";
+    public static final String STANDALONE = "STANDALONE";
     public static final String SUCCESS = "SUCCESS";
     public static final String TARGET_DIRECTORY_PROPERTY = "TARGET_DIRECTORY_PROPERTY";
     public static final String TARGET_JAVA_HOME_PROPERTY = "TARGET_JAVA_HOME_PROPERTY";

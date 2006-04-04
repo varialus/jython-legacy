@@ -15,10 +15,14 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { CHOOSE_JRE, "Choose the java version (JRE/JDK) to run Jython with" }, // selection
         { CONFIRM_START, "Please press {0} to start the installation" }, // overview
         { CONGRATULATIONS, "Congratulations!" }, // congratulations
+        { CORE, "Core" }, // installation type
         { CREATED_DIRECTORY, "Created directory {0}" }, // directory
         { CURRENT, "Current" }, // directory
+        { CUSTOM, "Custom" }, // installation type
+        { DEMOS_EXAMPLES, "Demos and examples" }, // installation type
         { DO_NOT_ACCEPT, "I do not accept" }, // license
         { DIRECTORIES_ONLY, "Directories only" }, // file chooser
+        { DOCUMENTATION, "Documentation" }, // installation type
         { EMPTY_TARGET_DIRECTORY, "Target directory must not be empty" }, // error
         { ENGLISH, "English" }, // language
         { ERROR, "Error" }, // error
@@ -36,6 +40,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { JAVA_INFO, "Java vendor / version" }, // version
         { JYTHON_INSTALL, "Jython Installation" }, // title
         { LANGUAGE_PROPERTY, "Language" }, // language
+        { LIBRARY_MODULES, "Library modules" }, // installation type
         { LICENSE, "License agreement" }, // license
         { MAYBE_NOT_SUPPORTED, "Maybe not supported" }, // version
         { MINIMUM, "Minimum (core)" }, // installation type
@@ -44,7 +49,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { NO_MANIFEST, "No manifest found in jar file {0}." }, // error
         { NOT_OK, "Not ok !" }, // version
         { OK, "Ok" }, // version
-        { OS_INFO, "Operation system name / version" }, // version
+        { OS_INFO, "OS name / version" }, // version
         { OTHER, "Other" }, // directory
         { OVERVIEW_DESCRIPTION, "The installation will be done using the following options" }, // overview
         { OVERVIEW_TITLE, "Overview (summary of options)" }, // overview
@@ -61,7 +66,9 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { SELECT_JAVA_HOME, "Please select the java home directory" }, // directory
         { SELECT_LANGUAGE, "Please select your language" }, // language
         { SELECT_TARGET_DIRECTORY, "Please select the target directory" }, // directory
-        { STANDARD, "Standard (core, library modules, demos and examples)" }, // installation type
+        { SOURCES, "Sources" }, // installation type
+        { STANDARD, "Standard (core, library modules, demos, examples, documentation)" }, // installation type
+        { STANDALONE, "Standalone (a callable .jar file)" }, // installation type
         { SUCCESS, "You successfully installed Jython {0} to directory {1}." }, // success
         { TARGET_DIRECTORY_PROPERTY, "Target directory" }, // property as title
         { TARGET_JAVA_HOME_PROPERTY, "Target java home" }, // property as title

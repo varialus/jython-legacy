@@ -7,16 +7,20 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
     static final Object[][] contents = {
         // Die folgenden Texte dürfen Umlaute und Sonderzeichen enthalten:
         { ACCEPT, "Ja, ich akzeptiere" }, // license
-        { ALL, "Alles (volle Installation, inklusive Sourcen)" }, // installation type
+        { ALL, "Alles (volle Installation, inklusive Quellcode)" }, // installation type
         { BROWSE, "Suchen..." }, // button (open the JFileChooser)
         { CANCEL, "Abbrechen" }, // button text
         { CHOOSE_LOCATION, "Wählen Sie das Verzeichnis, in das Jython installiert werden soll" }, // selection
         { CHOOSE_JRE, "Bestimmen Sie die Java Version (JRE/JDK), mit welcher Jython gestartet werden soll" }, // selection
         { CONFIRM_START, "Bitte drücken Sie {0}, um die Installation zu starten" }, // overview
         { CONGRATULATIONS, "Gratulation!" }, // congratulations
+        { CORE, "Kern" }, // installation type
         { CREATED_DIRECTORY, "Verzeichnis {0} wurde erstellt" }, // directory
         { CURRENT, "Das aktuelle" }, // directory
+        { CUSTOM, "Benutzerdefiniert" }, // installation type
+        { DEMOS_EXAMPLES, "Demos und Beispiele" }, // installation type
         { DIRECTORIES_ONLY, "Nur Verzeichnisse" }, // file chooser
+        { DOCUMENTATION, "Dokumentation" }, // installation type
         { DO_NOT_ACCEPT, "Nein, ich akzeptiere nicht" }, // license
         { EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis darf nicht leer sein" }, // error
         { ENGLISH, "Englisch" }, // language
@@ -35,6 +39,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { JAR_NOT_FOUND, "Jar File {0} nicht gefunden." }, // error
         { JYTHON_INSTALL, "Jython Installation" }, // title
         { LANGUAGE_PROPERTY, "Sprache" }, // language
+        { LIBRARY_MODULES, "Bibliotheksmodule" }, // installation type
         { LICENSE, "Lizenzvereinbarung" }, // license
         { MAYBE_NOT_SUPPORTED, "Eventuell nicht unterstützt" }, // version
         { MINIMUM, "Minimum (Kern)" }, // installation type
@@ -43,7 +48,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { NO_MANIFEST, "Jar File {0} enthält kein Manifest." }, // error
         { NOT_OK, "Nicht ok !" }, // version
         { OK, "Ok" }, // version
-        { OS_INFO, "Betriebssystem Name / Version" }, // version
+        { OS_INFO, "Betriebssystem / Version" }, // version
         { OTHER, "Ein abweichendes" }, // directory
         { OVERVIEW_DESCRIPTION, "Sie haben folgende Einstellungen für die Installation ausgewählt" }, // overview
         { OVERVIEW_TITLE, "Übersicht über die gewählten Einstellungen" }, // overview
@@ -60,7 +65,9 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { SELECT_JAVA_HOME, "Bitte wählen Sie das Java Home Verzeichnis" }, // directory
         { SELECT_LANGUAGE, "Bitte wählen Sie Ihre Sprache" }, // language
         { SELECT_TARGET_DIRECTORY, "Bitte wählen Sie das Zielverzeichnis" }, // directory
-        { STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele)" }, // installation type
+        { SOURCES, "Quellcode" }, // installation type
+        { STANDARD, "Standard (Kern, Bibliotheksmodule, Demos, Beispiele, Dokumentation)" }, // installation type
+        { STANDALONE, "Standalone (ein ausführbares .jar File)" }, // installation type
         { SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
         { TARGET_DIRECTORY_PROPERTY, "Zielverzeichnis" }, // property als Titel
         { TARGET_JAVA_HOME_PROPERTY, "Java Home Verzeichnis" }, // property als Titel
@@ -75,7 +82,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
 
         // Konsole Texte (beginnend mit C_) sollten keine Umlaute und andere Sonderzeichen enthalten:
         { C_ACCEPT, "Akzeptieren Sie die Lizenzvereinbarung ?" }, // license
-        { C_ALL, "Alles (volle Installation, inklusive Sourcen)" }, // installation type
+        { C_ALL, "Alles (volle Installation, inklusive Quellcode)" }, // installation type
         { C_AT_ANY_TIME_CANCEL, "(Sie koennen die Installation jederzeit durch Eingabe von {0} abbrechen)" }, // console
         { C_AVAILABLE_LANGUAGES, "Die folgenden Sprachen sind fuer den Installationsvorgang verfuegbar: {0}" }, // languages
         { C_CHECK_JAVA_VERSION, "Ueberpruefung der Java Version ..." }, // progress
