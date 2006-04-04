@@ -53,6 +53,16 @@ public class InstallerCommandLineTest extends TestCase {
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasArguments());
 
+        args = new String[] { "-A" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasArguments());
+
+        args = new String[] { "--autotest" };
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertTrue(commandLine.hasArguments());
+
         args = new String[0];
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
@@ -140,7 +150,23 @@ public class InstallerCommandLineTest extends TestCase {
         commandLine = new InstallerCommandLine();
         assertFalse(commandLine.setArgs(args));
 
+        args = new String[] { "-s", "-A" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
+
+        args = new String[] { "-c", "-A" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
+
         args = new String[] { "--silent", "--console" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
+
+        args = new String[] { "--silent", "--autotest" };
+        commandLine = new InstallerCommandLine();
+        assertFalse(commandLine.setArgs(args));
+
+        args = new String[] { "--console", "--autotest" };
         commandLine = new InstallerCommandLine();
         assertFalse(commandLine.setArgs(args));
 

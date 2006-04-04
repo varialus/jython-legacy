@@ -30,6 +30,11 @@ public class InstallerCommandLine {
     private static final String SILENT_LONG = "silent";
     private static final String SILENT_DESC = "silent installation (without user interaction)";
 
+    private static final String AUTOTEST_SHORT = "A";
+    private static final String AUTOTEST_LONG = "autotest";
+    private static final String AUTOTEST_DESC = "automatic stress tests for the installer\n"
+            + "most of the other options are ignored"; // TODO:oti specify as soon as applicable
+
     private static final String DIRECTORY_SHORT = "d";
     private static final String DIRECTORY_LONG = "directory";
     private static final String DIRECTORY_DESC = "target directory to install to\n" + "(required in silent mode)";
@@ -190,6 +195,10 @@ public class InstallerCommandLine {
         return _commandLine.hasOption(CONSOLE_SHORT) || _commandLine.hasOption(CONSOLE_LONG);
     }
 
+    public boolean hasAutotestOption() {
+        return _commandLine.hasOption(AUTOTEST_SHORT) || _commandLine.hasOption(AUTOTEST_LONG);
+    }
+
     public boolean hasDirectoryOption() {
         return _commandLine.hasOption(DIRECTORY_SHORT) || _commandLine.hasOption(DIRECTORY_LONG);
     }
@@ -321,9 +330,11 @@ public class InstallerCommandLine {
         // console or silent mode
         Option consoleOption = new Option(CONSOLE_SHORT, CONSOLE_LONG, false, CONSOLE_DESC);
         Option silentOption = new Option(SILENT_SHORT, SILENT_LONG, false, SILENT_DESC);
+        Option autotestOption = new Option(AUTOTEST_SHORT, AUTOTEST_LONG, false, AUTOTEST_DESC);
         OptionGroup group1 = new OptionGroup();
         group1.addOption(consoleOption);
         group1.addOption(silentOption);
+        group1.addOption(autotestOption);
         _options.addOptionGroup(group1);
 
         // target directory
