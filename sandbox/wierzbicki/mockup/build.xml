@@ -6,6 +6,7 @@
  in the ant/lib directory.
 -->
 
+<-- ant file to build the jython website -->
 <project name="website" default="all" basedir=".">
     <target name="init">
         <property name="website.tar" value="website.tar"/>
