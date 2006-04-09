@@ -6,7 +6,7 @@
  in the ant/lib directory.
 -->
 
-<-- ant file to build the jython website -->
+<!-- ant file to build the jython website -->
 <project name="website" default="all" basedir=".">
     <target name="init">
         <property name="website.tar" value="website.tar"/>
@@ -56,18 +56,7 @@
 
     <target name="collect" depends="generate">
         <tar tarfile="${website.tar}" basedir="."
-             includes="*.html
-                       images/*.gif
-                       images/*.png
-                       docs/*.html
-                       docs/javadoc/**
-                       applets/*.html
-                       applets/*.class
-                       applets/*.java
-                       applets/*.jar
-                       applets/*.cab
-                       graphics/*.*
-                       mac/*.*"/>
+             includes="dist/**" />
         <gzip zipfile="${website.tgz}" src="${website.tar}" />
     </target>
 
