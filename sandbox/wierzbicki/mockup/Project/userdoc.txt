@@ -17,8 +17,7 @@ General Python Documentation
 ============================
 
 Since Jython is an implementation of Python for the JVM, most of
-the standard Python documentation applies.  A few very handy places
-to look are:
+the standard Python documentation applies.  Look in the following places for general information:
 
 * The `Python Tutorial`_ (start here)
 * The `Python Library Reference`_. Although many of these modules are not
@@ -34,67 +33,61 @@ Other Useful Links
   same language. There are naturally some differences between the
   two implementations, sometimes reflecting undefined aspects of
   the Python language, sometimes reflecting quirks of the independent
-  implementations. Here is a more detailed discussion and
-  `comparision of Jython and CPython`_.
-* The `Jython FAQ`_ may already contain the answer to your question...
-* if it doesn't, then the `Jython-users mailing list archives`_
-  might help.
-* And if it still doesn't: you can ask the `Jython-users mailing list`_
+  implementations.
+* The `Jython FAQ`_ may already contain the answer to your question.
+* If it doesn't, then check  `Jython-users mailing list archives`_.
+* If you are still stuck you can post a question to the `Jython-users mailing list`_
 
 -------------------------------
 Invoking the Jython Interpreter
 -------------------------------
-
-Jython can be invoked from the shell using the following command:
+Jython is invoked using the "jython" script, a short script that invokes your local JVM, sets the Java
+property install.path to an appropriate value, and then runs the Java
+classfile org.python.util.jython.  
 
 jython [options] [-jar jar | -c cmd | file | -] [args]
 
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-| Option      | Description                                                                                                                |
-+=============+============================================================================================================================+
-|-i           | inspect interactively after running script, and force prompts, even if stdin does not appear to be a terminal              |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|-S           | don't imply import site on initialization                                                                                  |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|-Dprop=value | Set the jython property prop to value                                                                                      |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|-jar jar     | program to run is read from the __run__.py file in the specified jar file                                                  |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|-c cmd       | program to run is passed in as the cmd string. This option terminates the options list file run file as the program script |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-| \-          | program is read from standard-in (default; interactive mode is used if on a tty).                                          |
-|             | This flag allows you to pipe a file into Jython and                                                                        |
-|             | have it be treated correctly. This would be useful in a case like: filter file | jython -                                  |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|--help       | print a usage message and exit                                                                                             |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|--version    | print Jython version number and exit                                                                                       |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
-|args         | arguments passed to the program in sys.argv[1:]                                                                            |
-+-------------+----------------------------------------------------------------------------------------------------------------------------+
+options
+	-i: Inspect interactively after running script; force prompts even if stdin is not a terminal.
+	-S: Do not imply import site on initialization
+	-Dprop=[value]: Set the jython property prop to value.
+
+-jar jar
+	the program to run is read from the __run__.py file in the specified jar file   
+
+-c cmd
+	program to run is passed in as the cmd string. This option terminates the options list file run file as the program script file
+
+-
+	program is read from standard-in (default; interactive mode is 	used if on a tty).  This flag allows you to pipe a file into Jython and have it be treated correctly. For example:
+		filter file | jython - 
+
+args
+	arguments passed to the program in sys.argv[1:] 
+
+--help
+	print a usage message and exit                                                                                             
+
+--version
+	print Jython version number and exit                                                                                      
+  
+                                               
 
 
-Details
-=======
-
-jython is a short script that invokes your local JVM, sets the Java
-property install.path to an appropriate value, and then runs the Java
-classfile org.python.util.jython.
 
 Making Jython Scripts Executable
 ================================
 
-To make a jython ".py" file executable on a Unix system you can add the
-following line to the top of the file:
+To make a jython ".py" file executable on a Unix system:
+
+* Make sure that jython is on your standard PATH.
+* Make the ".py" file executable.  Typically, this is done with the command chmod +x foo.py
+* Add the following line to the top of the file:
 
 #! /usr/bin/env jython
 
-For this magic to work, you must have jython somewhere on your standard
-PATH. You also must also make the ".py" file executable. Typically this
-is done with the command: chmod +x foo.py.
-
-.. Note:: "#! <...>/jython" will probably not work to make your script
-  executable. This is because "jython" is itself a script, and the #! magic
+.. Note:: "#! <...>/jython" will generally not work to make your script
+  executable. This is because "jython" is itself a script, and  #! 
   requires that the file to execute is a binary executable on most Unix
   variants. Using "/usr/bin/env" will get around this problem - and make
   your scripts more portable in the bargain.
@@ -103,18 +96,18 @@ is done with the command: chmod +x foo.py.
 The Jython Registry
 -------------------
 
-Because there is no good platform independent equivalent of the Windows
-Registry (or Unix envrionment variables) Java has it's own environment
-variable namespace. Jython aquires it's namespace from the following
-three sources (later sources override defaults found in earlier places).
+Because there is no good platform-independent equivalent of the Windows
+Registry or Unix environment variables, Java has its own environment
+variable namespace. Jython aquires its namespace from the following
+sources (later sources override defaults found in earlier places):
 
-* The Java system properties: typically passed in on the command line
+* The Java system properties, typically passed in on the command line
   as options to the java interpreter.
-* The Jython "registry" file, which contains prop=value pairs. See below
+* The Jython "registry" file, containing prop=value pairs. See below
   for the algorithm Jython uses to find the registry file.
-* The user's personal registry file, which contains similarly formated
-  prop/value pairs. The user's registry file is at "user.home"+"/.jython"
-* Jython properties: Specified on the command line as options to the
+* The user's personal registry file, containing similarly formated
+  prop/value pairs. The user's registry file can be found at  "user.home"+"/.jython"
+* Jython properties specified on the command line as options to the
   jython class. See the -D option to the interpreter.
 
 Registry Properties
@@ -162,172 +155,22 @@ python.console.readlinelib
 Finding the Registry File
 =========================
 
-The following steps are used to find the Jython registry file, and
-also to set the Python values for sys.prefix. First a root directory
-is calculated:
+To find the Jython registry file and
+set the Python values for sys.prefix, you must first locate a root directory.
 
-* If there is a property called python.home, this is used as the root
-  directory.
-* Otherwise, the property install.root is used if it exists.
-* If neither of those properties exist, then Jython searches for the
+* If a "python.home" exists, it is used as the root directory by default.
+* If "python.home" does not exist, "install.root" is used.
+* If neither of these exist, then Jython searches for the
   file "jython.jar" on the Java classpath, as defined in the system
-  property java.class.path. The actual file system isn't searched, only
-  the paths defined on the classpath (one of them must literally include
+  property java.class.path. (The actual file system isn't searched, only
+  the paths defined on the classpath and one of them must literally include
   "jython.jar").
 
 Once the root directory is found, sys.prefix and sys.exec_prefix are set
 to this, and sys.path has rootdir/Lib appended to it. The registry file
 used is then rootdir/registry.
 
-----------------
-Embedding Jython
-----------------
 
-There are several options for embedding Jython in a Java
-application. Sometimes the nicest approach is to make a real Java
-class out of a Python class and then just use that Python class from
-Java code. The simplest approach to embedding Jython is to use the
-PythonInterpreter object.
-
-JavaDoc documentation for `org.python.util.PythonInterpreter`_
-
-The following example is distributed under Demo/embed/SimpleEmbedded.java
-::
-
-    import org.python.util.PythonInterpreter;
-    import org.python.core.*;
-
-    public class SimpleEmbedded {
-        public static void main(String []args)
-            throws PyException
-        {
-            PythonInterpreter interp =
-                new PythonInterpreter();
-
-            System.out.println("Hello, brave new world");
-            interp.exec("import sys");
-            interp.exec("print sys");
-
-            interp.set("a", new PyInteger(42));
-            interp.exec("print a");
-            interp.exec("x = 2+2");
-            PyObject x = interp.get("x");
-
-            System.out.println("x: "+x);
-            System.out.println("Goodbye, cruel world");
-        }
-    }
-
-----------------
-Compiling Jython
-----------------
-
-Most users of Jython will never be required to look at the contents
-of the source directories, or try and recompile any of the files in
-the org.python package. All of these files have been precompiled in
-jython.jar.
-
-For those people who do want to rebuild Jython from the source, for
-whatever reason, the following offers a few tips to keep in mind.
-
-* The source directories from CVS or the nightly buils contain both
-  makefiles and a build.xml file. Only the build.xml is updated at this
-  time. We are using ant to compile the sources and create the .jar file.
-
-The build.xml file will search for a properties file called ant.properties
-which can contain values to control paths and local options. My
-ant.properties file look like this: ::
-
-          # javaccHome is needed when making modification to the grammar.
-          javaccHome = d:\\box\\javacc-3.0
-
-          # PyXmlHome is needed when running the installXML ant task to
-          # copy PyXML files to jython.
-          PyXmlHome = d:\\python\\PyXML-0.6.6
-
-          #build.compiler = classic
-          build.compiler = jikes
-          debug=on
-
-          # python.home is needed when building the documentation and
-          installing
-          # PyXML sources.
-          python.home=d:\\python\\python211
-
-          # Needed when building documentation.
-          ht2html.dir=d:\\jython\\ht2html-1.1
-          jython.home=d:\\jython\\CVS
-
-          # Needed when installing documentation.
-          scp.command=scp
-          scp.user=bckfnn
-
-          # Needed for building PyServlet support.
-          servlet.jar=d:/java/servlet/servlet.jar
-
-          # Needed for building Readline support.
-          readline.jar=d:/java/java_readline-0.6/java_readline.jar
-
-          # Needed for building zxJDBC DataHandlers
-          # If missing, the appropriate DataHandler will not be built
-          oracle.jar=d:/java/lib/classes12.zip
-          mysql.jar=d:/java/lib/mm.mysql-2.0.6.jar
-          informix.jar=d:/java/lib/ifxjdbc.jar;d:/java/lib/ifxjdbcx.jar
-          postgresql.jar=d:/java/lib/postgresql.jar
-          jdbc.jar=d:/java/lib/jdbc2_0-stdext.jar
-
-Some of the sources in the org.python.parser package are generated
-from python.jtt file by the JavaCC parser generator. If you need to make
-changes to the grammar file you will need to download this JavaCC. The
-generated files are also in the distribution, so usually this is not
-necessary.
-
-To regenerate the parser from the grammar, run jjtree on python.jjt, and
-then run javacc on the resulting python.jj. This should produce all of
-the required source files to build the org.python.parser package. The
-build.xml file already contain the needed entries to run the JavaCC
-program when the python.jjt is modified.
-
-The source directories contain several files that require Java2. These
-files are normally easily recoqnizable because they have the number "2"
-in their name.
-
-When compiling jython with Java1 compiler (like the JDK1.1), these java2
-files can be safely ignored. Jython will work even when these classes
-files are missing. The build.xml file have a conditional check and will
-not try to compile the Java2 sources when using a Java1 compiler.
-
-One of the sources depends on the servlet classes and can only compile
-when servlet.jar is included on the classpath. Again, the build.xml
-have a conditional check and will not compile the PyServlet class if
-the servlet classes isn't available during compilation.
-
-The CVS only contain a few of the standard python modules. The rest
-most come from a CPython installation. Setting this up can be performed
-by creating a file ".jython" in your home directory and including a line
-like this:
-
-          python.path=d:\\python\\Python-2.1\\Lib
-
-The PyXML sources (the content of ./Lib/xml) is not included in the
-CVS repository. This is mainly because PyXML is developed and released
-in its own time cycle. To install PyXML support in a CVS version, the
-ant properties PyXmlHome and python.home must be configured and the ant
-task installXML must be executed.
-
-If you have further interest in the Jython source and Jython's continued
-development, you can read the `Jython-users mailing list archives`_
-or join the `Jython-users mailing list`_
-
-Suggested tools and support software:
-
-* JavaCC
-* Ant
-* Servlet classes
-* MySQL JDBC Driver
-* Informix JDBC Driver
-* Postgresql JDBC Driver
-* Oracle JDBC Driver
 
 ------------------------------
 Interaction with Java Packages
@@ -934,7 +777,56 @@ application exists:
 Examples
 ========
 
-XXX
+
+----------------
+Embedding Jython
+----------------
+
+There are two options for embedding Jython in a Java
+application.  You can make a real Java class out of a Python class, and then call it from your Java code, as previously described, or you can use the PythonInterpreter object 
+
+Information on the PythonInterpreter can be found in the JavaDoc documentation for `org.python.util.PythonInterpreter`_.
+
+The following example demonstrates how to use the PythonInterpreter to execute a simple Python program.
+
+The python program:
+::
+
+	import sys
+	print sys
+	a=42
+	print a
+	x=2+2
+	print "x:",x
+
+
+
+The java code required to execute the python program:
+::
+
+    import org.python.util.PythonInterpreter;
+    import org.python.core.*;
+
+    public class SimpleEmbedded {
+        public static void main(String []args)
+            throws PyException
+        {
+            PythonInterpreter interp =
+                new PythonInterpreter();
+
+            System.out.println("Hello, brave new world");
+            interp.exec("import sys");
+            interp.exec("print sys");
+
+            interp.set("a", new PyInteger(42));
+            interp.exec("print a");
+            interp.exec("x = 2+2");
+            PyObject x = interp.get("x");
+
+            System.out.println("x: "+x);
+            System.out.println("Goodbye, cruel world");
+        }
+    }
 
 
 ---------------------------------------------------
@@ -1679,4 +1571,3 @@ Example session
 .. _Jython-users mailing list archives: http://sourceforge.net/mailarchive/forum.php?forum_id=5586
 .. _Jython-users mailing list: http://lists.sourceforge.net/lists/listinfo/jython-users
 .. _org.python.util.PythonInterpreter: http://www.jython.org/docs/javadoc/org/python/util/PythonInterpreter.html
-
