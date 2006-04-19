@@ -1,6 +1,6 @@
 package org.python.util.install;
 
-public interface ProgressListener {
+public interface ProgressListener extends InstallationListener {
 
     public int getInterval();
 
@@ -9,6 +9,4 @@ public interface ProgressListener {
     public void progressEntry(String entry);
 
     public void progressStartScripts();
-
-    public void progressFinished();
 }

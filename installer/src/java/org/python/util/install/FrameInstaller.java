@@ -8,6 +8,7 @@ import java.util.Properties;
 import javax.swing.UIManager;
 
 import org.python.util.install.Installation.JavaVersionInfo;
+import org.python.util.install.driver.Autotest;
 
 public class FrameInstaller {
     private static final String TRUE = "1";
@@ -24,15 +25,26 @@ public class FrameInstaller {
 
     private static Properties _properties = new Properties();
 
-    protected FrameInstaller(JarInfo jarInfo) {
+    protected FrameInstaller(InstallerCommandLine commandLine, JarInfo jarInfo, Autotest autotest) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
         }
-        Wizard wizard = new Wizard(jarInfo);
+        // clear all properties
+        _properties.clear();
+        // set the default for the target directory
+        if (commandLine.hasDirectoryOption()) {
+            setTargetDirectory(commandLine.getTargetDirectory().getAbsolutePath());
+        }
+        if (commandLine.hasJavaHomeOption()) {
+            setTargetJavaHome(commandLine.getJavaHome().getAbsolutePath());
+        }
+        Wizard wizard = new Wizard(jarInfo, autotest);
         wizard.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
-                System.exit(0);
+                if (!Installation.isAutotesting()) {
+                    System.exit(0);
+                }
             }
         });
         wizard.addWizardListener(new SimpleWizardListener());
@@ -139,7 +151,9 @@ public class FrameInstaller {
         }
 
         public void wizardFinished(WizardEvent event) {
-            System.exit(0);
+            if (!Installation.isAutotesting()) {
+                System.exit(0);
+            }
         }
 
         public void wizardCancelled(WizardEvent event) {

@@ -1,36 +1,25 @@
 package org.python.util.install.driver;
 
-import java.io.File;
+import java.io.IOException;
 
-public class SilentAutotest {
+import org.python.util.install.InstallerCommandLine;
 
-    private File _targetDir;
-    private String[] _commandLineArgs;
+public class SilentAutotest extends Autotest {
 
-    protected SilentAutotest(File targetDir) {
-        _targetDir = targetDir;
+    protected SilentAutotest(InstallerCommandLine commandLine) throws IOException, DriverException {
+        super(commandLine);
     }
 
-    protected File getTargetDir() {
-        return _targetDir;
+    protected String getNameSuffix() {
+        return "silentTest";
     }
 
-    protected String[] getCommandLineArgs() {
-        return _commandLineArgs;
+    //
+    // interface InstallationListener
+    //
+
+    public void progressFinished() {
+        // ignored
     }
 
-    protected void setCommandLineArgs(String[] commandLineArgs) {
-        _commandLineArgs = commandLineArgs;
-    }
-
-    protected void assertTargetDirNotEmpty() throws DriverException {
-        if (_targetDir != null) {
-            if (_targetDir.exists() && _targetDir.isDirectory()) {
-                if (_targetDir.listFiles().length > 0) {
-                    return;
-                }
-            }
-        }
-        throw new DriverException("installation failed for " + getTargetDir().getAbsolutePath());
-    }
 }

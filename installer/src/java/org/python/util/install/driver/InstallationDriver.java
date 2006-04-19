@@ -1,34 +1,35 @@
 package org.python.util.install.driver;
 
-import java.io.File;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.python.util.install.Installation;
+import org.python.util.install.InstallerCommandLine;
 
 public class InstallationDriver {
 
-    private static final String _DIR_SUFFIX = "_dir";
-
-    private File _tempRootDirectory;
     private SilentAutotest[] _silentTests;
     private ConsoleAutotest[] _consoleTests;
+    private GuiAutotest[] _guiTests;
+    private InstallerCommandLine _commandLine;
 
     /**
      * construct the driver
      * 
-     * @param args console arguments
+     * @param commandLine the console arguments
      * 
      * @throws IOException
      * @throws DriverException
      */
-    public InstallationDriver(String[] args) throws DriverException {
+    public InstallationDriver(InstallerCommandLine commandLine) throws DriverException {
+        _commandLine = commandLine;
         try {
-            createTempRootDirectory();
             buildSilentTests();
             buildConsoleTests();
+            buildGuiTests();
         } catch (IOException ioe) {
             throw new DriverException(ioe);
         }
@@ -40,69 +41,21 @@ public class InstallationDriver {
      * @throws DriverException
      */
     public void drive() throws DriverException {
-        // silent tests
-        for (int i = 0; i < _silentTests.length; i++) {
-            driveSilentTest(_silentTests[i]);
-        }
-        // console tests
-        for (int i = 0; i < _consoleTests.length; i++) {
-            driveConsoleTest(_consoleTests[i]);
-        }
-
-        // TODO:oti gui tests
-    }
-
-    /**
-     * create the root directory for all automatic installations
-     * <p>
-     * assumed to be a subdirectory of java.io.tmpdir
-     * 
-     * @throws IOException
-     * @throws DriverException
-     */
-    private void createTempRootDirectory() throws IOException, DriverException {
-        File tmpFile = File.createTempFile("jython.autoinstall.root_", _DIR_SUFFIX);
-        if (createTempDirectory(tmpFile)) {
-            _tempRootDirectory = tmpFile;
-        } else {
-            throw new DriverException("unable to create root temporary directory");
-        }
-    }
-
-    /**
-     * create an empty temporary target directory
-     * 
-     * @param parentDirectory
-     * @param prefix
-     * 
-     * @return the target directory
-     * 
-     * @throws IOException
-     * @throws DriverException
-     */
-    private File createTempTargetDirectory(String prefix) throws IOException, DriverException {
-        File tmpFile = File.createTempFile(prefix, _DIR_SUFFIX, _tempRootDirectory);
-        if (createTempDirectory(tmpFile)) {
-            return tmpFile;
-        } else {
-            throw new DriverException("unable to create temporary target directory");
-        }
-    }
-
-    /**
-     * create a temporary directory with the same name as the passed in File (which may exist as file, not directory)
-     * 
-     * @param tempDirectory
-     * @return <code>true</code> only if the the directory was successfully created (or already existed)
-     */
-    private boolean createTempDirectory(File tempDirectory) {
-        if (!tempDirectory.isDirectory()) {
-            if (tempDirectory.exists()) {
-                tempDirectory.delete();
+        try {
+            // silent tests
+            for (int i = 0; i < _silentTests.length; i++) {
+                driveSilentTest(_silentTests[i]);
             }
-            return tempDirectory.mkdir();
-        } else {
-            return true;
+            // console tests
+            for (int i = 0; i < _consoleTests.length; i++) {
+                driveConsoleTest(_consoleTests[i]);
+            }
+            // gui tests
+            for (int i = 0; i < _guiTests.length; i++) {
+                driveGuiTest(_guiTests[i]);
+            }
+        } catch (IOException ioe) {
+            throw new DriverException(ioe);
         }
     }
 
@@ -112,21 +65,18 @@ public class InstallationDriver {
      * @param consoleTest
      * @throws DriverException
      * @throws IOException
+     * @throws IOException
      */
-    private void driveConsoleTest(ConsoleAutotest consoleTest) throws DriverException {
+    private void driveConsoleTest(ConsoleAutotest consoleTest) throws DriverException, IOException {
         Tunnel _tunnel;
-        try {
-            _tunnel = new Tunnel();
-            // have to fork off the driver thread first
-            ConsoleDriver driver = new ConsoleDriver(_tunnel, consoleTest.getAnswers());
-            driver.start();
-            // now do the installation
-            Installation.driverMain(consoleTest.getCommandLineArgs(), _tunnel);
-            consoleTest.assertTargetDirNotEmpty();
-            _tunnel.close();
-        } catch (IOException ioe) {
-            throw new DriverException(ioe);
-        }
+        _tunnel = new Tunnel();
+        // have to fork off the driver thread first
+        ConsoleDriver driver = new ConsoleDriver(_tunnel, consoleTest.getAnswers());
+        driver.start();
+        // now do the installation
+        Installation.driverMain(consoleTest.getCommandLineArgs(), consoleTest, _tunnel);
+        _tunnel.close();
+        consoleTest.assertTargetDirNotEmpty();
     }
 
     /**
@@ -136,8 +86,27 @@ public class InstallationDriver {
      * @throws DriverException
      */
     private void driveSilentTest(SilentAutotest silentTest) throws DriverException {
-        Installation.driverMain(silentTest.getCommandLineArgs(), null); // only a thin wrapper
+        Installation.driverMain(silentTest.getCommandLineArgs(), silentTest, null); // only a thin wrapper
         silentTest.assertTargetDirNotEmpty();
+    }
+
+    /**
+     * execute a single gui test
+     * 
+     * @param guiTest
+     * @throws DriverException
+     */
+    private void driveGuiTest(GuiAutotest guiTest) throws DriverException {
+        Installation.driverMain(guiTest.getCommandLineArgs(), guiTest, null); // only a thin wrapper
+        guiTest.execute();
+        guiTest.assertTargetDirNotEmpty();
+    }
+
+    /**
+     * @return the command line the autotest session was started with
+     */
+    private InstallerCommandLine getOriginalCommandLine() {
+        return _commandLine;
     }
 
     /**
@@ -148,18 +117,17 @@ public class InstallationDriver {
      */
     private void buildSilentTests() throws IOException, DriverException {
         List silentTests = new ArrayList(50);
-        final String prefix = "silentTest_";
 
-        File targetDir = createTempTargetDirectory(prefix + "01_");
-        SilentAutotest test1 = new SilentAutotest(targetDir);
-        String[] arguments = new String[] { "-s", "-d", targetDir.getAbsolutePath() };
+        SilentAutotest test1 = new SilentAutotest(getOriginalCommandLine());
+        String[] arguments = new String[] { "-s" };
         test1.setCommandLineArgs(arguments);
+        test1.addAdditionalArguments(); // this also adds target directory
         silentTests.add(test1);
 
-        targetDir = createTempTargetDirectory(prefix + "02_");
-        SilentAutotest test2 = new SilentAutotest(targetDir);
-        arguments = new String[] { "-s", "-d", targetDir.getAbsolutePath(), "-t", "minimum" };
+        SilentAutotest test2 = new SilentAutotest(getOriginalCommandLine());
+        arguments = new String[] { "-s", "-t", "minimum" };
         test2.setCommandLineArgs(arguments);
+        test2.addAdditionalArguments();
         silentTests.add(test2);
 
         // build array
@@ -179,11 +147,15 @@ public class InstallationDriver {
      */
     private void buildConsoleTests() throws IOException, DriverException {
         List consoleTests = new ArrayList(50);
-        final String prefix = "consoleTest_";
-        final String[] arguments = new String[] { "-c" };
+        final String[] arguments;
+        if (getOriginalCommandLine().hasVerboseOption()) {
+            arguments = new String[] { "-c", "-v" };
+        } else {
+            arguments = new String[] { "-c" };
+        }
+        // do NOT call addAdditionalArguments()
 
-        File targetDir = createTempTargetDirectory(prefix + "01_");
-        ConsoleAutotest test1 = new ConsoleAutotest(targetDir);
+        ConsoleAutotest test1 = new ConsoleAutotest(getOriginalCommandLine());
         test1.setCommandLineArgs(arguments);
         test1.addAnswer("e"); // language
         test1.addAnswer("n"); // no read of license
@@ -191,15 +163,18 @@ public class InstallationDriver {
         test1.addAnswer("3"); // type: minimum
         test1.addAnswer("n"); // include: nothing
         test1.addAnswer(test1.getTargetDir().getAbsolutePath()); // target directory
-        test1.addAnswer("=="); // current jre
+        if (test1.hasJavaHomeDeviation()) {
+            test1.addAnswer(test1.getJavaHome().getAbsolutePath()); // different jre
+        } else {
+            test1.addAnswer("=="); // current jre
+        }
         test1.addAnswer(""); // simple enter for java version
         test1.addAnswer(""); // simple enter for os version
         test1.addAnswer("y"); // confirm copying
         test1.addAnswer("n"); // no readme
         consoleTests.add(test1);
 
-        targetDir = createTempTargetDirectory(prefix + "02_");
-        ConsoleAutotest test2 = new ConsoleAutotest(targetDir);
+        ConsoleAutotest test2 = new ConsoleAutotest(getOriginalCommandLine());
         test2.setCommandLineArgs(arguments);
         test2.addAnswer("e"); // language
         test2.addAnswer("n"); // no read of license
@@ -215,7 +190,11 @@ public class InstallationDriver {
         test2.addAnswer("wrongAnswer"); // wrong answer
         test2.addAnswer("n"); // no further excludes
         test2.addAnswer(test2.getTargetDir().getAbsolutePath()); // target directory
-        test2.addAnswer("=="); // current jre
+        if (test2.hasJavaHomeDeviation()) {
+            test2.addAnswer(test2.getJavaHome().getAbsolutePath()); // different jre
+        } else {
+            test2.addAnswer("=="); // current jre
+        }
         test2.addAnswer(""); // simple enter for java version
         test2.addAnswer(""); // simple enter for os version
         test2.addAnswer("y"); // confirm copying
@@ -229,6 +208,118 @@ public class InstallationDriver {
         for (int i = 0; i < size; i++) {
             _consoleTests[i] = (ConsoleAutotest) consoleIterator.next();
         }
+    }
+
+    /**
+     * build all the gui tests
+     * 
+     * @throws IOException
+     * @throws DriverException
+     */
+    private void buildGuiTests() throws IOException, DriverException {
+        List guiTests = new ArrayList(50);
+
+        if (Installation.isGuiAllowed()) {
+            GuiAutotest guiTest1 = new GuiAutotest(getOriginalCommandLine());
+            buildLanguageAndLicensePage(guiTest1);
+            // type page - use 'Standard'
+            guiTest1.addKeyAction(KeyEvent.VK_ENTER);
+            buildRestOfGuiPages(guiTest1);
+            guiTests.add(guiTest1);
+
+            GuiAutotest guiTest2 = new GuiAutotest(getOriginalCommandLine());
+            buildLanguageAndLicensePage(guiTest2);
+            // type page - use 'All'
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_SPACE); // select 'All'
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_ENTER);
+            buildRestOfGuiPages(guiTest2);
+            guiTests.add(guiTest2);
+
+            GuiAutotest guiTest3 = new GuiAutotest(getOriginalCommandLine());
+            buildLanguageAndLicensePage(guiTest3);
+            // type page - use 'Custom'
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_SPACE); // select 'Custom'
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_SPACE); // deselect 'Demos and Examples'
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_SPACE); // deselect 'Documentation'
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_SPACE); // select 'Sources'
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
+            guiTest3.addKeyAction(KeyEvent.VK_ENTER);
+            buildRestOfGuiPages(guiTest3);
+            guiTests.add(guiTest3);
+        }
+
+        // build array
+        int size = guiTests.size();
+        _guiTests = new GuiAutotest[size];
+        Iterator guiIterator = guiTests.iterator();
+        for (int i = 0; i < size; i++) {
+            _guiTests[i] = (GuiAutotest) guiIterator.next();
+        }
+    }
+
+    private void buildLanguageAndLicensePage(GuiAutotest guiTest) {
+        // language page
+        guiTest.addKeyAction(KeyEvent.VK_E);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        // license page
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE); // select "i accept"
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+    }
+
+    private void buildRestOfGuiPages(GuiAutotest guiTest) {
+        // directory page
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        // java selection page
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        if (guiTest.hasJavaHomeDeviation()) { // need 2 more tabs
+            guiTest.addKeyAction(KeyEvent.VK_TAB);
+            guiTest.addKeyAction(KeyEvent.VK_TAB);
+        }
+        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        // summary page
+        if (guiTest.hasJavaHomeDeviation()) {
+            guiTest.addKeyAction(KeyEvent.VK_ENTER, 3000); // enough time to check the java version
+        } else {
+            guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        }
+        // installation page (skipped)
+        // readme page
+        guiTest.addWaitingKeyAction(KeyEvent.VK_TAB); // wait for the installation to finish
+        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        // success page
+        guiTest.addKeyAction(KeyEvent.VK_ENTER);
     }
 
 }

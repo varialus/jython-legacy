@@ -2,9 +2,11 @@ package org.python.util.install;
 
 import javax.swing.JOptionPane;
 
+import org.python.util.install.driver.Autotest;
+
 public class Wizard extends AbstractWizard implements TextKeys {
 
-    public Wizard(JarInfo jarInfo) {
+    public Wizard(JarInfo jarInfo, Autotest autotest) {
         super();
 
         setTitle(getText(JYTHON_INSTALL));
@@ -18,7 +20,7 @@ public class Wizard extends AbstractWizard implements TextKeys {
         JavaSelectionPage javaPage = new JavaSelectionPage();
         javaPage.setValidator(new JavaSelectionPageValidator(javaPage));
         OverviewPage overviewPage = new OverviewPage();
-        ProgressPage progressPage = new ProgressPage(jarInfo);
+        ProgressPage progressPage = new ProgressPage(jarInfo, autotest);
         ReadmePage readmePage = new ReadmePage();
         SuccessPage successPage = new SuccessPage(jarInfo);
 

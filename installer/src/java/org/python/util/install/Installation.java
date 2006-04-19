@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import org.python.util.install.driver.Autotest;
 import org.python.util.install.driver.InstallationDriver;
 import org.python.util.install.driver.Tunnel;
 
@@ -37,11 +38,11 @@ public class Installation {
     private static boolean _isAutotesting = false;
 
     public static void main(String args[]) {
-        internalMain(args, null);
+        internalMain(args, null, null);
     }
 
-    public static void driverMain(String args[], Tunnel tunnel) {
-        internalMain(args, tunnel);
+    public static void driverMain(String args[], Autotest autotest, Tunnel tunnel) {
+        internalMain(args, autotest, tunnel);
     }
 
     protected static boolean isVerbose() {
@@ -286,14 +287,7 @@ public class Installation {
         }
     }
 
-    //
-    // private methods
-    //
-
-    private static boolean useGUI(InstallerCommandLine commandLine) {
-        if (commandLine.hasConsoleOption() || commandLine.hasSilentOption()) {
-            return false;
-        }
+    public static boolean isGuiAllowed() {
         if (Boolean.getBoolean("java.awt.headless")) {
             return false;
         }
@@ -305,7 +299,27 @@ public class Installation {
         }
     }
 
-    private static void internalMain(String[] args, Tunnel tunnel) {
+    //
+    // private methods
+    //
+
+    private static boolean useGui(InstallerCommandLine commandLine) {
+        if (commandLine.hasConsoleOption() || commandLine.hasSilentOption()) {
+            return false;
+        }
+        return isGuiAllowed();
+    }
+
+    /**
+     * In the normal case, this method is called with <code>(args, null, null)</code>, see <code>main(args)</code>.
+     * <p>
+     * However, in autotesting mode (<code>commandLine.hasAutotestOption()</code>), we pass in Autotest and Tunnel,
+     * see <code>driverMain(args, autotest, tunnel)</code>.
+     * <p>
+     * This means that in autotesting mode this method will call itself (via <code>InstallationDriver.drive()</code>),
+     * but with different arguments.
+     */
+    private static void internalMain(String[] args, Autotest autotest, Tunnel tunnel) {
         try {
             JarInfo jarInfo = new JarInfo();
             InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
@@ -315,15 +329,16 @@ public class Installation {
             } else {
                 if (commandLine.hasAutotestOption()) {
                     _isAutotesting = true;
-                    InstallationDriver autotestDriver = new InstallationDriver(args);
+                    InstallationDriver autotestDriver = new InstallationDriver(commandLine);
                     autotestDriver.drive(); // ! reentrant into internalMain()
                     _isAutotesting = false;
+                    ConsoleInstaller.message("\ncongratulations - autotests complete !");
                     System.exit(0);
                 }
                 if (commandLine.hasVerboseOption()) {
                     _verbose = true;
                 }
-                if (!useGUI(commandLine)) {
+                if (!useGui(commandLine)) {
                     ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
                     consoleInstaller.setTunnel(tunnel);
                     consoleInstaller.install();
@@ -331,7 +346,7 @@ public class Installation {
                         System.exit(0);
                     }
                 } else {
-                    new FrameInstaller(jarInfo);
+                    new FrameInstaller(commandLine, jarInfo, autotest);
                 }
             }
         } catch (InstallationCancelledException ice) {

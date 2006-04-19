@@ -9,16 +9,20 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import org.python.util.install.driver.Autotest;
+
 public class ProgressPage extends AbstractWizardPage implements ProgressListener {
 
     private JarInfo _jarInfo;
     private JLabel _label;
     private JProgressBar _progressBar;
     private JLabel _progressEntry;
+    private Autotest _autotest;
 
-    public ProgressPage(JarInfo jarInfo) {
+    public ProgressPage(JarInfo jarInfo, Autotest autotest) {
         super();
         _jarInfo = jarInfo;
+        _autotest = autotest;
         initComponents();
     }
 
@@ -70,6 +74,7 @@ public class ProgressPage extends AbstractWizardPage implements ProgressListener
             // should not happen
         }
         JarInstaller jarInstaller = new JarInstaller(this, _jarInfo);
+        jarInstaller.addInstallationListener(_autotest);
         File targetDirectory = new File(FrameInstaller.getTargetDirectory());
         File javaHome = new File(FrameInstaller.getTargetJavaHome());
         jarInstaller.inflate(targetDirectory, FrameInstaller.getInstallationType(), javaHome);

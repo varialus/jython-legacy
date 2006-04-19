@@ -23,21 +23,34 @@ public class InstallerCommandLine {
 
     private static final String CONSOLE_SHORT = "c";
     private static final String CONSOLE_LONG = "console";
-    private static final String CONSOLE_DESC = "console based installation (user interaction),\n"
+    private static final String CONSOLE_DESC = "console based installation (user interaction)\n"
             + "any other options will be ignored (except 'verbose')";
 
     private static final String SILENT_SHORT = "s";
     private static final String SILENT_LONG = "silent";
     private static final String SILENT_DESC = "silent installation (without user interaction)";
 
+    private static final String VERBOSE_SHORT = "v";
+    private static final String VERBOSE_LONG = "verbose";
+    private static final String VERBOSE_DESC = "print more output during the installation\n"
+            + "(also valid in gui and autotest mode)";
+
+    private static final String JRE_SHORT = "j";
+    private static final String JRE_LONG = "jre";
+    private static final String JRE_DESC = "home directory of the runtime jre or jdk\n"
+            + "(executables are assumed in the /bin subdirectory)\n" + "select this if you want to run Jython with a\n"
+            + "different java version than the installation";
+
     private static final String AUTOTEST_SHORT = "A";
     private static final String AUTOTEST_LONG = "autotest";
     private static final String AUTOTEST_DESC = "automatic stress tests for the installer\n"
-            + "most of the other options are ignored"; // TODO:oti specify as soon as applicable
+            + "most of the other options are ignored\n" + "allowed additional options: '" + VERBOSE_LONG + "', '"
+            + JRE_LONG + "'";
 
     private static final String DIRECTORY_SHORT = "d";
     private static final String DIRECTORY_LONG = "directory";
-    private static final String DIRECTORY_DESC = "target directory to install to\n" + "(required in silent mode)";
+    private static final String DIRECTORY_DESC = "target directory to install to\n"
+            + "(required in silent mode,\nused as default in gui mode)";
 
     private static final String DIRECTORY_ARG = "dir";
 
@@ -70,24 +83,16 @@ public class InstallerCommandLine {
     private static final String EXCLUDE_DESC = "finer control over parts not to install\n" + INEXCLUDE_PARTS
             + "\n(excludes override includes)";
 
-    private static final String JRE_SHORT = "j";
-    private static final String JRE_LONG = "jre";
-    private static final String JRE_DESC = "home directory of the runtime jre or jdk\n"
-            + "(executables are assumed in the /bin subdirectory)\n" + "select this if you want to run Jython with a\n"
-            + "different java version than the installation";
-
-    private static final String VERBOSE_SHORT = "v";
-    private static final String VERBOSE_LONG = "verbose";
-    private static final String VERBOSE_DESC = "print more output during the installation";
-
     private static final String HELP_SHORT = "h";
     private static final String HELP2_SHORT = "?";
     private static final String HELP_LONG = "help";
     private static final String HELP_DESC = "print this help (overrides any other options)";
 
     private static final String SYNTAX = "\n\tjava -jar jython_version.jar";
-    private static final String HEADER = "\nno option at all (or 'verbose') will start the interactive GUI installer;\n"
-            + "in non gui mode the following options are available:";
+    private static final String HEADER = "\nno option at all will start the interactive GUI installer, except:\n"
+            + "options respected in gui mode are '" + VERBOSE_LONG + "', '" + DIRECTORY_LONG + "', '" + JRE_LONG
+            + "';\n" + "in non gui mode the following options are available:";
+    // TODO:oti better description of gui mode (directory and jre are defaults)
     private static final String SYNTAX_WITHOUT_JAR = "\n\tjava -jar ";
     private static final String FOOTER = "";
     private static final String EXAMPLES = "\nexample of a GUI installation:{0} -" + VERBOSE_SHORT
@@ -98,7 +103,10 @@ public class InstallerCommandLine {
             + " -" + JRE_SHORT + " javaHome" + "{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT + " targetDirectory -"
             + TYPE_SHORT + " " + TYPE_STANDARD + " -" + EXCLUDE_SHORT + " " + INEXCLUDE_DEMOS_AND_EXAMPLES + " "
             + INEXCLUDE_DOCUMENTATION + "\n\t\t -" + INCLUDE_SHORT + " " + INEXCLUDE_SOURCES + " -" + JRE_SHORT
-            + " javaHome -" + VERBOSE_SHORT;
+            + " javaHome -" + VERBOSE_SHORT
+            + "\n\nexample of an autotest installation into temporary directories:{0} -" + AUTOTEST_SHORT;
+
+    // TODO:oti full example of autotest
 
     private String[] _args;
     private Options _options;
@@ -114,7 +122,7 @@ public class InstallerCommandLine {
     /**
      * constructor intended for JUnit tests only.
      */
-    InstallerCommandLine() {
+    public InstallerCommandLine() {
         this(null);
     }
 

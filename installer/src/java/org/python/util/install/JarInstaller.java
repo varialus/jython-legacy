@@ -24,10 +24,12 @@ public class JarInstaller {
 
     private ProgressListener _progressListener;
     private JarInfo _jarInfo;
+    private List _installationListeners;
 
     public JarInstaller(ProgressListener progressListener, JarInfo jarInfo) {
         _progressListener = progressListener;
         _jarInfo = jarInfo;
+        _installationListeners = new ArrayList();
     }
 
     /**
@@ -68,6 +70,7 @@ public class JarInstaller {
             int numberOfIntervals = 100 / _progressListener.getInterval();
             int numberOfEntries = approximateNumberOfEntries(installationType);
             int threshold = numberOfEntries / numberOfIntervals + 1; // +1 = pessimistic
+            boolean coreExclusionReported = false;
 
             // unzip
             ZipInputStream zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(_jarInfo
@@ -86,10 +89,14 @@ public class JarInstaller {
                 // handle exclusion of core Lib files
                 if (!exclude) {
                     exclude = shouldExcludeFile(installationType, coreLibFiles, zipEntry, zipEntryName);
+                    if (Installation.isVerbose() && !coreExclusionReported && exclude) {
+                        ConsoleInstaller.message("excluding some .py files, like " + zipEntryName);
+                        coreExclusionReported = true;
+                    }
                 }
                 if (exclude) {
-                    if (Installation.isVerbose()) {
-                        ConsoleInstaller.message("excluding " + zipEntryName);
+                    if (Installation.isVerbose() && zipEntry.isDirectory()) {
+                        ConsoleInstaller.message("excluding directory " + zipEntryName);
                     }
                 } else {
                     count++;
@@ -135,9 +142,17 @@ public class JarInstaller {
             }
             // end
             _progressListener.progressFinished();
+            Iterator installationListenersIterator = _installationListeners.iterator();
+            while (installationListenersIterator.hasNext()) {
+                ((InstallationListener) installationListenersIterator.next()).progressFinished();
+            }
         } catch (IOException ioe) {
             throw new InstallerException(Installation.getText(TextKeys.ERROR_ACCESS_JARFILE), ioe);
         }
+    }
+
+    public void addInstallationListener(InstallationListener installationListener) {
+        _installationListeners.add(installationListener);
     }
 
     private int approximateNumberOfEntries(InstallationType installationType) {
