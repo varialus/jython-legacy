@@ -2,6 +2,7 @@ package org.python.util.install;
 
 import junit.framework.TestCase;
 
+// test checkin
 public class InstallationTypeTest extends TestCase {
 
     private InstallationType _type;
