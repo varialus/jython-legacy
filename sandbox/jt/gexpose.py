@@ -498,17 +498,24 @@ class Gen:
             
             typeinfo = typeinfo.tfree() + typeinfo1.tfree()
 
-        print typeinfo.tnaked().texpand({'basic': basic.tbind(bindings),
+        return typeinfo.tnaked().texpand({'basic': basic.tbind(bindings),
                                          'setup': setup},nindent=1)
 
-
-def process(fn):
+def process(fn, outfile=sys.stdout):
     gen = Gen()
     directives.execute(directives.load(fn),gen)
-    gen.generate()
+    result = gen.generate()
+    print >> outfile, result
     #gen.debug()
     
-if __name__ == '__main__':
-    process(sys.argv[1])
+def usage():
+    print "Usage: python %s infile [outfile]" % sys.argv[0]
 
-  
+if __name__ == '__main__':
+    if (len(sys.argv) < 2 or len(sys.argv) > 3):
+        usage()
+    elif (len(sys.argv) == 2):
+        process(sys.argv[1])
+    elif (len(sys.argv) == 3):
+        process(sys.argv[1], file(sys.argv[2], 'w'))
+ 
