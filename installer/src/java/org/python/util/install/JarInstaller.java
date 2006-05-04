@@ -152,7 +152,9 @@ public class JarInstaller {
     }
 
     public void addInstallationListener(InstallationListener installationListener) {
-        _installationListeners.add(installationListener);
+        if (installationListener != null) {
+            _installationListeners.add(installationListener);
+        }
     }
 
     private int approximateNumberOfEntries(InstallationType installationType) {
