@@ -223,7 +223,7 @@ public class InstallationDriver {
             GuiAutotest guiTest1 = new GuiAutotest(getOriginalCommandLine());
             buildLanguageAndLicensePage(guiTest1);
             // type page - use 'Standard'
-            guiTest1.addKeyAction(KeyEvent.VK_ENTER);
+            guiTest1.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest1);
             guiTests.add(guiTest1);
 
@@ -238,7 +238,7 @@ public class InstallationDriver {
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
-            guiTest2.addKeyAction(KeyEvent.VK_ENTER);
+            guiTest2.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest2);
             guiTests.add(guiTest2);
 
@@ -260,7 +260,7 @@ public class InstallationDriver {
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
-            guiTest3.addKeyAction(KeyEvent.VK_ENTER);
+            guiTest3.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest3);
             guiTests.add(guiTest3);
         }
@@ -279,7 +279,7 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_E);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
-        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // license page
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
@@ -288,7 +288,7 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
-        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE);
     }
 
     private void buildRestOfGuiPages(GuiAutotest guiTest) {
@@ -297,7 +297,7 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
-        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // java selection page
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
@@ -307,19 +307,19 @@ public class InstallationDriver {
             guiTest.addKeyAction(KeyEvent.VK_TAB);
             guiTest.addKeyAction(KeyEvent.VK_TAB);
         }
-        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // summary page
         if (guiTest.hasJavaHomeDeviation()) {
-            guiTest.addKeyAction(KeyEvent.VK_ENTER, 3000); // enough time to check the java version
+            guiTest.addKeyAction(KeyEvent.VK_SPACE, 3000); // enough time to check the java version
         } else {
-            guiTest.addKeyAction(KeyEvent.VK_ENTER);
+            guiTest.addKeyAction(KeyEvent.VK_SPACE);
         }
         // installation page (skipped)
         // readme page
         guiTest.addWaitingKeyAction(KeyEvent.VK_TAB); // wait for the installation to finish
-        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // success page
-        guiTest.addKeyAction(KeyEvent.VK_ENTER);
+        guiTest.addKeyAction(KeyEvent.VK_SPACE);
     }
 
 }
