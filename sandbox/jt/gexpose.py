@@ -501,15 +501,47 @@ class Gen:
         return typeinfo.tnaked().texpand({'basic': basic.tbind(bindings),
                                          'setup': setup},nindent=1)
 
-def process(fn, outfile=sys.stdout):
+def process(fn, mergefile=None):
     gen = Gen()
     directives.execute(directives.load(fn),gen)
     result = gen.generate()
-    print >> outfile, result
+    if mergefile is None:
+        print result
+    else:
+        result = merge(mergefile, result)
     #gen.debug()
     
 def usage():
-    print "Usage: python %s infile [outfile]" % sys.argv[0]
+    print "Usage: python %s infile [mergefile]" % sys.argv[0]
+
+def merge(filename, generated):
+    in_generated = False
+    start_found = False
+    end_found = False
+    start_pattern = '    //~ BEGIN GENERATED REGION -- DO NOT EDIT SEE gexpose.py'
+    end_pattern =   '    //~ END GENERATED REGION -- DO NOT EDIT SEE gexpose.py'
+    output = []
+    f = file(filename, 'r')
+    for line in f:
+        if line.startswith(start_pattern):
+            in_generated = True
+            start_found = True
+        elif line.startswith(end_pattern):
+            in_generated = False
+            end_found = True
+            output.append('%s\n%s\n%s\n' % (start_pattern, generated, end_pattern))
+        elif in_generated:
+            continue
+        else:
+            output.append(line)
+    f.close()
+    if not start_found:
+        raise 'pattern [%s] not found in %s' % (start_pattern, filename)
+    if not end_found:
+        raise 'pattern [%s] not found in %s' % (end_pattern, filename)
+    f = file(filename, 'w')
+    f.write("".join(output))
+    mergefile.close()
 
 if __name__ == '__main__':
     if (len(sys.argv) < 2 or len(sys.argv) > 3):
@@ -517,5 +549,4 @@ if __name__ == '__main__':
     elif (len(sys.argv) == 2):
         process(sys.argv[1])
     elif (len(sys.argv) == 3):
-        process(sys.argv[1], file(sys.argv[2], 'w'))
- 
+        process(sys.argv[1], sys.argv[2])

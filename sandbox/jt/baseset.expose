@@ -13,6 +13,7 @@ expose_meth: baseset_> :o intersection o
 expose_meth: baseset_> :o issubset o
 expose_meth: baseset_> :o issuperset o
 expose_meth: baseset_> :i __len__
+expose_meth: baseset_> :o __reduce__
 expose_meth: __hash__
  `ideleg`(hashCode);
 expose_meth: baseset_> __repr__
