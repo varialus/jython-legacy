@@ -541,7 +541,7 @@ def merge(filename, generated):
         raise 'pattern [%s] not found in %s' % (end_pattern, filename)
     f = file(filename, 'w')
     f.write("".join(output))
-    mergefile.close()
+    f.close()
 
 if __name__ == '__main__':
     if (len(sys.argv) < 2 or len(sys.argv) > 3):
