@@ -2,5 +2,9 @@
 Reporting Bugs
 ===============
 
+-------------------------------
+Guidelines for submitting a bug
+-------------------------------
+
 Bug Tracker   http://sourceforge.net/tracker/?group_id=12867&atid=112867 
 
