@@ -20,47 +20,26 @@ Mailing Lists
 =============
 Mailing Lists http://sourceforge.net/mail/?group_id=12867
 
-CVS
-===
+Subversion
+==========
 
-* Wiki:ConcurrentVersionControl
-* available on most \*nix systems or with cygwin on Windows
-* GUI clients are available on most platforms
-* Eclipse users, see [wiki:Self:/JythonDeveloperGuide/EclipseNotes#CVS Eclipse CVS notes]
-
-Login
------
-
-::
-
-  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython login
-    
-Checkout
+checkout
 --------
 
-* NewStyleClasses: you'll want to checkout the newstyle classes branch:
-
+This checks out all of the jython subprojects (bugtests, jython -- the main codebase, sandbox etc.)
 ::
-       
-       cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P -d jython.newstyle-branch -r newstyle-branch jython
+       svn co https://svn.sourceforge.net/svnroot/jython/trunk/
 
 * 2.1 Stable:
 
 ::
+       svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_1
 
-    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P -d jython.Release_2_1 -r Release_2_1 jython 
-
-* 2.2 Alpha 0:
-
-::
-
-    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P -d jython.Release_2_2alpha0 -r Release_2_2alpha0 jython 
-
-* The tip:
+* 2.2 Alpha 1:
 
 ::
 
-    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython co -P jython 
+       svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_2alpha0
 
 * Preparing a Patch on Unix command line: (note multiple changes can be concatencated into one patch file using >> as shown.
 
