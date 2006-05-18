@@ -47,10 +47,12 @@ public class OverviewPage extends AbstractWizardPage {
         osName.setText(System.getProperty(Installation.OS_NAME));
         osName.setToolTipText(System.getProperty(Installation.OS_NAME));
         osName.setEditable(false);
+        osName.setFocusable(false);
         JTextField osVersion = new JTextField(_SHORTER_LENGTH);
         osVersion.setText(System.getProperty(Installation.OS_VERSION));
         osVersion.setToolTipText(System.getProperty(Installation.OS_VERSION));
         osVersion.setEditable(false);
+        osVersion.setFocusable(false);
         _osBox = new JCheckBox();
         _osBox.setEnabled(false);
         _osBox.setSelected(Installation.isValidOs());
@@ -145,6 +147,7 @@ public class OverviewPage extends AbstractWizardPage {
         _directoryLabel.setText(getText(TARGET_DIRECTORY_PROPERTY) + ": ");
         _directory.setText(FrameInstaller.getTargetDirectory());
         _directory.setToolTipText(FrameInstaller.getTargetDirectory());
+        _directory.setFocusable(false);
 
         // type
         _typeLabel.setText(getText(INSTALLATION_TYPE) + ": ");
@@ -181,6 +184,7 @@ public class OverviewPage extends AbstractWizardPage {
         }
         _type.setText(typeText);
         _type.setToolTipText(typeText);
+        _type.setFocusable(false);
 
         // os
         _osLabel.setText(getText(OS_INFO) + ": ");
@@ -191,14 +195,18 @@ public class OverviewPage extends AbstractWizardPage {
             osText = getText(MAYBE_NOT_SUPPORTED);
         }
         _osBox.setText(osText);
+        _osBox.setFocusable(false);
 
         // java
         _javaLabel.setText(getText(JAVA_INFO) + ": ");
+        _javaLabel.setFocusable(false);
         JavaVersionInfo javaVersionInfo = FrameInstaller.getJavaVersionInfo();
         _javaVendor.setText(javaVersionInfo.getVendor());
         _javaVendor.setToolTipText(javaVersionInfo.getVendor());
+        _javaVendor.setFocusable(false);
         _javaVersion.setText(javaVersionInfo.getVersion());
         _javaVersion.setToolTipText(javaVersionInfo.getVersion());
+        _javaVersion.setFocusable(false);
         _javaBox.setSelected(Installation.isValidJava(javaVersionInfo));
         String javaText;
         if (_javaBox.isSelected()) {
@@ -207,6 +215,7 @@ public class OverviewPage extends AbstractWizardPage {
             javaText = getText(NOT_OK);
         }
         _javaBox.setText(javaText);
+        _javaBox.setFocusable(false);
 
         // message
         _message.setText(getText(CONFIRM_START, getText(NEXT)));

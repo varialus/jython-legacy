@@ -223,6 +223,11 @@ public class InstallationDriver {
             GuiAutotest guiTest1 = new GuiAutotest(getOriginalCommandLine());
             buildLanguageAndLicensePage(guiTest1);
             // type page - use 'Standard'
+            guiTest1.addKeyAction(KeyEvent.VK_TAB);
+            guiTest1.addKeyAction(KeyEvent.VK_TAB);
+            guiTest1.addKeyAction(KeyEvent.VK_TAB);
+            guiTest1.addKeyAction(KeyEvent.VK_TAB);
+            guiTest1.addKeyAction(KeyEvent.VK_TAB);
             guiTest1.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest1);
             guiTests.add(guiTest1);
@@ -230,6 +235,11 @@ public class InstallationDriver {
             GuiAutotest guiTest2 = new GuiAutotest(getOriginalCommandLine());
             buildLanguageAndLicensePage(guiTest2);
             // type page - use 'All'
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_SPACE); // select 'All'
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
@@ -245,8 +255,6 @@ public class InstallationDriver {
             GuiAutotest guiTest3 = new GuiAutotest(getOriginalCommandLine());
             buildLanguageAndLicensePage(guiTest3);
             // type page - use 'Custom'
-            guiTest3.addKeyAction(KeyEvent.VK_TAB);
-            guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_SPACE); // select 'Custom'
@@ -281,6 +289,9 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // license page
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
+        guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_SPACE); // select "i accept"

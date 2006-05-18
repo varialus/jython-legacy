@@ -141,7 +141,18 @@ public class TypePage extends AbstractWizardPage {
     }
 
     protected JComponent getFocusField() {
-        return null;
+        InstallationType installationType = getInstallationType();
+        if (installationType.isAll()) {
+            return _allButton;
+        } else if (installationType.isMinimum()) {
+            return _minimumButton;
+        } else if (installationType.isStandalone()) {
+            return _standaloneButton;
+        } else if (installationType.isStandard()) {
+            return _standardButton;
+        } else {
+            return _customButton;
+        }
     }
 
     protected void activate() {
@@ -151,14 +162,7 @@ public class TypePage extends AbstractWizardPage {
         _minimumButton.setText(getText(MINIMUM));
         _standaloneButton.setText(getText(STANDALONE));
         _customButton.setText(getText(CUSTOM));
-        InstallationType installationType;
-        if (_firstTime) {
-            _firstTime = false;
-            installationType = new InstallationType();
-            installationType.setStandard();
-            FrameInstaller.setInstallationType(installationType);
-        }
-        installationType = FrameInstaller.getInstallationType();
+        InstallationType installationType = getInstallationType();
         if (installationType.isAll()) {
             _allButton.setSelected(true);
         } else if (installationType.isMinimum()) {
@@ -182,6 +186,18 @@ public class TypePage extends AbstractWizardPage {
     }
 
     protected void beforeValidate() {
+    }
+
+    private InstallationType getInstallationType() {
+        InstallationType installationType;
+        if (_firstTime) {
+            _firstTime = false;
+            installationType = new InstallationType();
+            installationType.setStandard();
+            FrameInstaller.setInstallationType(installationType);
+        }
+        installationType = FrameInstaller.getInstallationType();
+        return installationType;
     }
 
     private final class TypeChangeListener implements ActionListener {

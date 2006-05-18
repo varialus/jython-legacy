@@ -377,15 +377,15 @@ public abstract class AbstractWizard extends JDialog implements ValidationListen
         if (_activePage == null)
             return;
         int number = _pages.indexOf(_activePage);
-        //show the active page
+        // show the active page
         _cards.show(_content, "page" + number);
-        //update the wizard header
+        // update the wizard header
         if (_header != null) {
             _header.setTitle(_activePage.getTitle());
             _header.setDescription(_activePage.getDescription());
             _header.setIcon(_activePage.getIcon());
         }
-        //set visibility and localized text of buttons
+        // set visibility and localized text of buttons
         if (number == 0) {
             _previousButton.setVisible(false);
         } else {
@@ -400,6 +400,9 @@ public abstract class AbstractWizard extends JDialog implements ValidationListen
             _nextAction.putValue(Action.NAME, getFinishString());
         } else {
             _nextAction.putValue(Action.NAME, getNextString());
+        }
+        if (_nextButton.isVisible()) {
+            getRootPane().setDefaultButton(_nextButton);
         }
         _activePage.doActivate();
     }

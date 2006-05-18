@@ -85,7 +85,7 @@ public class LicensePage extends AbstractWizardPage {
     }
 
     protected JComponent getFocusField() {
-        return null;
+        return _doNotAcceptButton;
     }
 
     protected void activate() {
