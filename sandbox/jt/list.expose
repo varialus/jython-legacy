@@ -15,6 +15,7 @@ expose_meth: :- reverse
 expose_meth: :- sort o?
 expose_meth: :i __len__
 expose_meth: __add__ o
+expose_meth: __radd__ o
 expose_meth: __iadd__ o
 expose_meth: __imul__ o
 #expose_meth: __reduce__
