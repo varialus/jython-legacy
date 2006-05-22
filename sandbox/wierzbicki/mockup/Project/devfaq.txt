@@ -19,15 +19,14 @@ Where can I find Jython on SourceForge?
 
 The Jython project page can be found at http://sourceforge.net/projects/jython.
 
-Who is who? What is a nowonder?
-===============================
+Who is who?
+===========
 
 To get the real name, click on "View members" in the "Developer Info" box on the SourceForge project page. This presents a list of developers, giving their names and SourceForge IDs. A separate list of committers lists people with commit privileges to the Subversion repository.
 
 How can I become a developer?
 =============================
-
-There's only one way to become a developer, and that's through the School of Hard Knocks.
+Submit patches that fix bugs or implement features, especially features that exist in CPython but are not yet implemented in Jython.  Once we accept a large enough patch from you (or many small patches) we will offer you commit access.
 
 ----------------
 Subversion (svn)
@@ -47,8 +46,8 @@ This will give you the needed information to use the tool. The man page for svn 
 What do I need to use Subversion?
 =================================
 
-UNIX
-----
+UNIX Command line
+-----------------
 
 First, you need to download Subversion. Most UNIX-based operating systems have binary packages available for Subversion. Also, most package systems also have Subversion available.
 
@@ -58,21 +57,6 @@ Windows
 -------
 
 You have several options on Windows. One is to download Subversion itself which will give you a command-line version. Another option is to download TortoiseSVN which integrates with Windows Explorer.
-
-If you have checkin rights, you will also need an SSH client. Download PuTTY and friends (PuTTYgen, Pageant, and Plink) for this. All other questions in this FAQ will assume you are using these tools.
-
-Once you have both Subversion and PuTTY installed you must tell Subversion where to find an SSH client. Do this by editing %APPDATA%\Subversion\config (on Win9x, this might be c:\windows\Application Data\Subversionconfig) to have the following section:
-
-[tunnels]
-ssh="c:/path/to/putty/plink.exe" -T
-
-Obviously change the path to be the proper one for your system. The -T option prevents a pseudo-terminal from being created.
-
-You can use Pageant to prevent from having to type in your password for your SSH 2 key constantly (for how to do this, see XXX). If you prefer not to have another program running, you need to create a profile in PuTTY.
-
-Go to Session:Saved Sessions and create a new profile named svn.python.org. In Session:Hose Name, enter svn.python.org. In SSH/Auth:Private key file select your private key. In Connection:Auto-login username enter pythondev.
-
-With this set up, paths are slightly different than most other settings in that the username is not required. Do take notice of this when choosing to check out a project!
 
 How do I get a checkout of the repository?
 ==========================================
@@ -89,29 +73,20 @@ https://svn.sourceforge.net/svnroot/jython/<path>
 
 with <path> representing the path to the project. A list of projects can be viewed at http://svn.python.org/view/ . Do note that any subdirectory may also be checked out individually.
 
-For a read-write checkout (with a caveat for Windows users using PuTTY without Pageant), the format for <URL> is:
-
-svn+ssh://pythondev@svn.python.org/<path>
-
-There are three critical differences between a read-only URL and a read-write URL. One is the protocol being specified as svn+ssh and not http. Next, notice the addition of the username pythondev (note that for Windows users using PuTTY without Pageant should leave off pythondev@ if PuTTY was set up following the instructions in this FAQ). Lastly, note that projects was removed from the path entirely for a read-write checkout.
-
-The Subversion repository has many projects under it. Most people are probably interested in one of these three projects:
+The Subversion repository has many projects under it. Most people are probably interested in one of these four projects:
 
     * the trunk or HEAD (the current version under development)
-    * the latest release (plus bug fixes) of Jython 
+    * the latest release (plus bug fixes) of Jython (e.g. Jython 2.1)
     * the JEPs (Jython Enhancement Proposals)
+    * the website source
 
 A read-only checkout of the three projects above can be checked out using the following <URL> paths, respectively:
+
+.. FIXME
 
     * http://svn.python.org/projects/python/trunk
     * http://svn.python.org/projects/python/branches/release24-maint
     * http://svn.python.org/projects/peps/trunk
-
-For read-write checkouts (which require that you have commit privileges), the URLs for the same projects are:
-
-    * svn+ssh://pythondev@svn.python.org/python/trunk
-    * svn+ssh://pythondev@svn.python.org/python/branches/release24-maint
-    * svn+ssh://pythondev@svn.python.org/peps/trunk
 
 How do I update my working copy to be in sync with the repository?
 ==================================================================
@@ -463,7 +438,7 @@ If you're an expert in some area and know that a patch in that area is both need
 You should add a comment to every patch assigned to you at least once a week, if only to say that you realize it's still on your plate. This rule is meant to force your attention periodically: patches get harder & harder to deal with the longer they sit.
 
 Status Open, Resolution None
-----------------------------
+============================
 
 The initial state of all patches. The patch is under consideration, but has not been reviewed yet, or s under review but not yet Accepted or Rejected.
 
@@ -476,7 +451,7 @@ Discussion of major patches is carried out on the Jython-Dev mailing list. For s
 If you have specific complaints that would cause you to change your mind, explain them clearly in a comment, leave the status Open, and reassign back to the submitter. If you're uncertain, leave the status Open, explain your uncertainties in a comment, and reassign the patch to someone you believe can address your remaining questions; or leave the status Open and bring it up on Jython-Dev.
 
 Status Open, Resolution Accepted
---------------------------------
+================================
 
 The powers that be accepted the patch, but it hasn't been applied yet. [xxx flesh out -- Guido Bottleneck avoidable here?]
 
@@ -485,14 +460,14 @@ The Status will normally change to Closed next.
 The person changing the Resolution to Accepted should, at the same time, assign the patch to whoever they believe is most likely to be able & willing to apply it (the submitter if possible).
 
 Status Closed, Resolution Accepted
-----------------------------------
+==================================
 
 The patch has been accepted and applied.
 
 The previous Resolution was Accepted, or possibly None if the submitter was Guido (or moral equivalent in some particular area of expertise).
 
 Status Closed, Resolution Rejected
-----------------------------------
+==================================
 
 The patch has been reviewed and rejected.
 
@@ -501,7 +476,7 @@ There are generally no transitions out of this state: the patch is dead.
 The person setting this state should also assign the patch to None.
 
 Status Open, Resolution Out of date
------------------------------------
+===================================
 
 Previous Resolution was Accepted or Postponed, but the patch no longer works.
 
@@ -510,7 +485,7 @@ Please enter a comment when changing the Resolution to "Out of date", to record 
 Also assign it back to the submitter, as they need to upload a new version.
 
 Status Open, Resolution Postponed
----------------------------------
+=================================
 
 The previous Resolution was None or Accepted, but for some reason (e.g., pending release) the patch should not be reviewed or applied until further notice.
 
@@ -519,7 +494,7 @@ The Resolution will normally change to None or Accepted next.
 Please enter a comment when changing the Resolution to Postponed, to record the reason, the previous Resolution, and the conditions under which the patch should revert to Resolution None or Accepted. Also assign the patch to whoever is most likely able and willing to decide when the state should change again.
 
 Status Deleted
---------------
+==============
 
 Bit bucket.
 

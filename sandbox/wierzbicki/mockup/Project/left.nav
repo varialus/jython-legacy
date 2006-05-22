@@ -1,6 +1,7 @@
 section  | About
 menupageitem     | Welcome            | index.html
 menupageitem     | License            | license.html
+menupageitem     | Old Website        | ../old.html
 menupageitem     | FAQ                | faq.html
 menupageitem     | News               | news.html
 menupageitem     | History            | history.html

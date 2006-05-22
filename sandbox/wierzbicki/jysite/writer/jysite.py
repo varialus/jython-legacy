@@ -51,9 +51,9 @@ class HTMLTranslator(html4css1.HTMLTranslator):
             buffer.append('</form>')
             buffer.append('</div>')
 
-            buffer.append('<ul id="tabs">')
             if os.path.exists(navtop):
 
+                buffer.append('<ul id="tabs">')
                 f = open(navtop, 'rt')
                 lines = f.readlines()
                 f.close()
@@ -67,8 +67,8 @@ class HTMLTranslator(html4css1.HTMLTranslator):
                         buffer.append('<li class="%s"><a href="%s" >%s</a></li>' \
                                       % (val[0], val[2], val[1]))
                 buffer.append('</ul>')
-                buffer.append('</div>')
-                buffer.append('</div>')
+            buffer.append('</div>')
+            buffer.append('</div>')
             f = open(navleft, 'rt')
             lines = f.readlines()
             f.close()
