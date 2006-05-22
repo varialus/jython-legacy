@@ -1566,7 +1566,6 @@ Example session
 .. _`Python Tutorial`: http://www.python.org/doc/tut/tut.html
 .. _Python Library Reference: http://www.python.org/doc/lib/lib.html
 .. _Python Language Reference: http://www.python.org/doc/current/ref/ref.html
-.. _comparision of Jython and CPython: http://www.jython.org/Project/differences.html
 .. _Jython FAQ: http://www.jython.org/Project/faq.html
 .. _Jython-users mailing list archives: http://sourceforge.net/mailarchive/forum.php?forum_id=5586
 .. _Jython-users mailing list: http://lists.sourceforge.net/lists/listinfo/jython-users

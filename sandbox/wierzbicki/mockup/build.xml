@@ -69,4 +69,7 @@
         </exec>
     </target>
 
+    <target name="clean" depends="init">
+        <delete dir="dist" />
+    </target>
 </project>

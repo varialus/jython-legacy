@@ -1,18 +1,20 @@
 section  | About
-menupageitem     | Welcome  | index.html
-menupageitem     | License  | license.html
-menupageitem     | FAQ      | faq.html
-menupageitem     | News     | news.html
-menupageitem     | History  | history.html
-menupageitem     | Download | download.html
-menupageitem     | User Guide | userdoc.html
-#menupageitem     | Books and Articles | books_articles.html
-#menupageitem     | CPython comparison | differences.html
-section  | Join Us
-menupageitem     | Reporting Bugs    | bugs.html
-menupageitem     | Hacking           | hacking.html
-#menupageitem     | To Do List        | todo.html
-menupageitem     | Contributors      | contributors.html
+menupageitem     | Welcome            | index.html
+menupageitem     | License            | license.html
+menupageitem     | FAQ                | faq.html
+menupageitem     | News               | news.html
+menupageitem     | History            | history.html
+menupageitem     | Download           | download.html
+menupageitem     | User Guide         | userdoc.html
+#menupageitem    | Books and Articles | books_articles.html
+#menupageitem    | CPython comparison | differences.html
+menupageitem     | Related Projects   | related.html
+section  | Community
+menupageitem     | Reporting Bugs     | bugs.html
+menupageitem     | Developer FAQ      | devfaq.html
+menupageitem     | Developer Guide    | devguide.html
+#menupageitem    | To Do List         | todo.html
+menupageitem     | Contributors       | contributors.html
 section  | 
 raw      | <div style="height:1em"></div>
 image    | ../css/PythonPoweredSmall.gif | http://www.python.org
