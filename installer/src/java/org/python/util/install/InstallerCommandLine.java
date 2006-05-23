@@ -33,7 +33,7 @@ public class InstallerCommandLine {
     private static final String VERBOSE_SHORT = "v";
     private static final String VERBOSE_LONG = "verbose";
     private static final String VERBOSE_DESC = "print more output during the installation\n"
-            + "(also valid in gui and autotest mode)";
+            + "(also valid in GUI and autotest mode)";
 
     private static final String JRE_SHORT = "j";
     private static final String JRE_LONG = "jre";
@@ -50,7 +50,7 @@ public class InstallerCommandLine {
     private static final String DIRECTORY_SHORT = "d";
     private static final String DIRECTORY_LONG = "directory";
     private static final String DIRECTORY_DESC = "target directory to install to\n"
-            + "(required in silent mode,\nused as default in gui mode)";
+            + "(required in silent mode,\nused as default in GUI mode)";
 
     private static final String DIRECTORY_ARG = "dir";
 
@@ -90,12 +90,12 @@ public class InstallerCommandLine {
 
     private static final String SYNTAX = "\n\tjava -jar jython_version.jar";
     private static final String HEADER = "\nno option at all will start the interactive GUI installer, except:\n"
-            + "options respected in gui mode are '" + VERBOSE_LONG + "', '" + DIRECTORY_LONG + "', '" + JRE_LONG
-            + "';\n" + "in non gui mode the following options are available:";
-    // TODO:oti better description of gui mode (directory and jre are defaults)
+            + "options respected in GUI mode are '" + DIRECTORY_LONG + "' and '" + JRE_LONG
+            + "': the values provided for these serve as defaults;\n"
+            + "in non GUI mode the following options are available:\n.";
     private static final String SYNTAX_WITHOUT_JAR = "\n\tjava -jar ";
     private static final String FOOTER = "";
-    private static final String EXAMPLES = "\nexample of a GUI installation:{0} -" + VERBOSE_SHORT
+    private static final String EXAMPLES = "\nexample of a GUI installation:{0}"
             + "\n\nexample of a console installation:{0} -" + CONSOLE_SHORT
             + "\n\nexample of a silent installation:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT + " targetDirectory"
             + "\n\nexamples of a silent installation with more options:{0} -" + SILENT_SHORT + " -" + DIRECTORY_SHORT
@@ -104,7 +104,8 @@ public class InstallerCommandLine {
             + TYPE_SHORT + " " + TYPE_STANDARD + " -" + EXCLUDE_SHORT + " " + INEXCLUDE_DEMOS_AND_EXAMPLES + " "
             + INEXCLUDE_DOCUMENTATION + "\n\t\t -" + INCLUDE_SHORT + " " + INEXCLUDE_SOURCES + " -" + JRE_SHORT
             + " javaHome -" + VERBOSE_SHORT
-            + "\n\nexample of an autotest installation into temporary directories:{0} -" + AUTOTEST_SHORT;
+            + "\n\nexample of an autotest installation into temporary directories:{0} -" + AUTOTEST_SHORT
+            + "\n\t(make sure you do NOT touch mouse NOR keyboard after hitting enter/return!)";
 
     // TODO:oti full example of autotest
 
