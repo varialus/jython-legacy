@@ -165,6 +165,35 @@ rest:
     super.__setitem__(key,value);
   }
 
+  public PyObject __getitem__(PyObject key) { // ???
+    PyType self_type=getType();
+    PyObject impl=self_type.lookup("__getitem__");
+    if (impl!=null) {
+       try {
+         return impl.__get__(this,self_type).__call__(key);
+       } catch (PyException exc) {
+         if (Py.matchException(exc,Py.LookupError))
+            return null;
+         throw exc;
+       }
+    }
+    return super.__getitem__(key);
+  }
+
+  public PyObject __getslice__(PyObject start, PyObject stop, PyObject step) { // ???
+     PyType self_type=getType();
+     PyObject impl=self_type.lookup("__getslice__");
+     if (impl!=null)
+        try {
+           return impl.__get__(this,self_type).__call__(start, stop);
+        } catch (PyException exc) {
+           if (Py.matchException(exc,Py.LookupError))
+               return null;
+           throw exc;
+        }
+     return super.__getslice__(start, stop, step);
+  }
+
   public void __delitem__(PyObject key) { // ???
     PyType self_type = getType();
     PyObject impl = self_type.lookup("__delitem__");
@@ -196,19 +225,19 @@ rest:
     PyString py_name = null;
     try {
        if (getattribute != null) {
-	  return getattribute.__get__(this,self_type).__call__(py_name = new PyString(name));
+         return getattribute.__get__(this,self_type).__call__(py_name = new PyString(name));
        } else {
-	  return super.__findattr__(name);
+          return super.__findattr__(name);
        }
     } catch(PyException e) {
       if (Py.matchException(e,Py.AttributeError)) {
-	  PyObject getattr = self_type.lookup("__getattr__");
-	  if (getattr != null)
-	     try {
-	       return getattr.__get__(this,self_type).__call__(py_name!=null?py_name:new PyString(name));
-	     } catch(PyException e1) {
-	       if (!Py.matchException(e1,Py.AttributeError)) throw e1;
-	     }
+          PyObject getattr = self_type.lookup("__getattr__");
+          if (getattr != null)
+             try {
+               return getattr.__get__(this,self_type).__call__(py_name!=null?py_name:new PyString(name));
+             } catch(PyException e1) {
+               if (!Py.matchException(e1,Py.AttributeError)) throw e1;
+             }
           return null;
       }
       throw e;

@@ -7,6 +7,6 @@ expose_meth: seq_> :- __delitem__ o
 expose_meth: seq_> :- __setitem__ oo
 expose_index_getitem: seq_>
 expose_meth: seq_> :b __nonzero__
-expose_meth: seq_> __getslice__ ooo
+expose_meth: seq_> __getslice__ ooo?
 expose_meth: seq_> :- __delslice__ ooo
-expose_meth: seq_> :- __setslice__ oooo
+expose_meth: seq_> :- __setslice__ oooo?
