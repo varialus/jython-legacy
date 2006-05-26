@@ -26,6 +26,8 @@ public class Installation {
     protected static final String OS_NAME = "os.name";
     protected static final String OS_VERSION = "os.version";
     protected static final String EMPTY = "";
+    
+    protected static final String HEADLESS_PROPERTY_NAME = "java.awt.headless";
 
     protected final static int NORMAL_RETURN = 0;
     protected final static int ERROR_RETURN = 1;
@@ -288,7 +290,7 @@ public class Installation {
     }
 
     public static boolean isGuiAllowed() {
-        if (Boolean.getBoolean("java.awt.headless")) {
+        if (Boolean.getBoolean(HEADLESS_PROPERTY_NAME)) {
             return false;
         }
         try {

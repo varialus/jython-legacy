@@ -202,6 +202,38 @@ public class InstallerCommandLineTest extends TestCase {
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasConsoleOption());
     }
+    
+    public void testHeadless() {
+        String[] args;
+        InstallerCommandLine commandLine;
+        
+        // normal gui startup without any arguments
+        assertTrue(Installation.isGuiAllowed());
+        args = new String[0];
+        commandLine = new InstallerCommandLine();
+        assertTrue(commandLine.setArgs(args));
+        assertFalse(commandLine.hasConsoleOption());
+        assertFalse(commandLine.hasSilentOption());
+        
+        // simulate startup without any arguments on a headless system
+        boolean originalHeadless = Boolean.getBoolean(Installation.HEADLESS_PROPERTY_NAME);
+        try {
+            if(!originalHeadless) {
+                System.setProperty(Installation.HEADLESS_PROPERTY_NAME, "true");
+                assertFalse(Installation.isGuiAllowed());
+                args = new String[0];
+                commandLine = new InstallerCommandLine();
+                assertTrue(commandLine.setArgs(args));
+                assertTrue(commandLine.hasConsoleOption());
+                assertFalse(commandLine.hasSilentOption());
+            }
+        } finally {
+            if(!originalHeadless) {
+                System.setProperty(Installation.HEADLESS_PROPERTY_NAME, "false");
+            }
+            assertTrue(Installation.isGuiAllowed());
+        }
+    }
 
     public void testDirectory() {
         String[] args;

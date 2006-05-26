@@ -136,8 +136,14 @@ public class InstallerCommandLine {
      */
     public boolean setArgs(String args[]) {
         _args = args;
+        if( args.length == 0) {
+            // switch to console mode if gui is not allowed
+            if(!Installation.isGuiAllowed()) {
+                _args = new String[] { "-" + CONSOLE_SHORT };
+            }
+        }
         try {
-            _commandLine = _parser.parse(_options, args, false); // throw for missing or unknown options / arguments
+            _commandLine = _parser.parse(_options, _args, false); // throw for missing or unknown options / arguments
         } catch (MissingArgumentException mae) {
             System.err.println(mae.getMessage());
             return false;
