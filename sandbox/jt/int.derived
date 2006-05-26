@@ -1,4 +1,4 @@
 base_class: PyInteger
 want_dict: true
-ctr:
+ctr: int v
 incl: object
