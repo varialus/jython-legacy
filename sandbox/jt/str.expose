@@ -7,6 +7,7 @@ expose_meth: :b __contains__ o
 expose_meth: :i __len__
 expose_meth: __add__ o
 expose_meth: __mul__ o
+expose_meth: __reduce__
 expose_meth: __rmul__ o
 expose_meth: __hash__
  `ideleg`(hashCode);
@@ -31,7 +32,14 @@ expose_meth: :b isspace
 expose_meth: :b istitle
 expose_meth: :b isunicode
 expose_meth: :b isupper
-expose_meth: :s join o
+expose_meth: join o
+    String result = self.str_join(arg0);
+    //XXX: do we really need to check self?
+    if (self instanceof PyUnicode || arg0 instanceof PyUnicode) {
+        return new PyUnicode(result);
+    } else {
+        return new PyString(result);
+    }
 expose_meth: :s ljust i
 expose_meth: :s lower
 expose_meth: :s lstrip S?
@@ -53,4 +61,3 @@ expose_new_immutable:
 #TODO
 #expose_index_getitem:
 #expose_meth: :b __nonzero__
-#expose_meth: __reduce__

@@ -3,7 +3,6 @@ want_dict: true
 ctr:
 unary1: __str__ string
 unary1: __repr__ string
-unary1: __unicode__ unicode PyUnicode
 unary1: __hex__ string
 unary1: __oct__ string
 unary1: __int__ int PyObject
@@ -69,6 +68,20 @@ rest:
         self_type.lookup("__cmp__")!=null)
       throw Py.TypeError("unhashable type");
     return super.hashCode();
+  }
+
+  public PyUnicode __unicode__() {
+      PyType self_type=getType();
+      PyObject impl=self_type.lookup("__unicode__");
+      if (impl!=null) {
+          PyObject res=impl.__get__(this,self_type).__call__();
+          if (res instanceof PyUnicode)
+              return(PyUnicode)res;
+          if (res instanceof PyString)
+              return new PyUnicode((PyString)res);                                                                   
+          throw Py.TypeError("__unicode__"+" should return a "+"unicode");
+      }
+      return super.__unicode__();
   }
 
   public int __cmp__(PyObject other) {

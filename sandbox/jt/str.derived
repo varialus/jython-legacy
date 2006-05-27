@@ -1,4 +1,4 @@
 base_class: PyString
 want_dict: true
-ctr:
+ctr: String v
 incl: object
