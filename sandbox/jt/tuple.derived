@@ -1,4 +1,4 @@
 base_class: PyTuple
 want_dict: true
-ctr:
+ctr: PyObject[] elements
 incl: object
