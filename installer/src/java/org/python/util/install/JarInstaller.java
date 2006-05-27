@@ -132,14 +132,7 @@ public class JarInstaller {
             // generate start scripts
             _progressListener.progressStartScripts();
             StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
-            if (Installation.isWindows()) {
-                generator.generateJythonForWindows();
-                generator.generateJythoncForWindows();
-            } else {
-                // everything else defaults to unix at the moment
-                generator.generateJythonForUnix();
-                generator.generateJythoncForUnix();
-            }
+            generator.generateStartScripts();
             // end
             _progressListener.progressFinished();
             Iterator installationListenersIterator = _installationListeners.iterator();
