@@ -1,0 +1,84 @@
+JEP: 0
+Title: Index of Jython Enhancement Proposals (JEPs)
+Version: $Revision: 1 $
+Last-Modified: $Date: 2006-05-11 03:50:27 -0400 (Thu, 11 May 2006) $
+Author: Frank J. Wierzbicki <fwierzbicki@sourceforge.net>
+Status: Active
+Type: Informational
+Created: 27-May-2006
+Post-History:
+
+
+Introduction
+
+    The JEP contains the index of all Jython Enhancement Proposals,
+    known as JEPs.  JEP numbers are assigned by the JEP Editor, and
+    once assigned are never changed.  The SVN history[1] of the JEP
+    texts represent their historical record.
+
+    JEPs are based on the concept of PEPs from CPython -- see 
+    http://www.python.org/dev/peps/ for the PEP on which this index
+    was based.
+
+Index by Category
+
+     num  title                                        owner
+     ---  -----                                        -----
+
+ Meta-JEPs (JEPs about JEPs or Process)
+
+ I     0  Index of Jython Enhancement Proposals        Wierzbicki
+ P     1  JEP Purpose and Guidelines                   Wierzbicki
+..TODO I     3  Guidelines for Handling Bug Reports          Wierzbicki
+..TODO I     7  Style Guide for Java Code                    Wierzbicki
+..TODO P  3000  Jython 3000                                  Wierzbicki
+
+ Other Informational JEPs
+
+ I   100  Python PEPs observed by Jython               Wierzbicki
+..TODO I   101  Doing Jython Releases 101                    Wierzbicki
+..TODO I   102  Doing Jython Micro Releases                  Wierzbicki
+
+Numerical Index
+
+     num  title                                        owner
+     ---  -----                                        -----
+ I     0  Index of Jython Enhancement Proposals        Wierzbicki
+..TODO P     1  JEP Purpose and Guidelines                   Wierzbicki
+..TODO I     3  Guidelines for Handling Bug Reports          Wierzbicki
+..TODO I     7  Style Guide for Java Code                    Wierzbicki
+
+I   100  Python PEPs observed by Jython               Wierzbicki
+..TODO I   101  Doing Jython Releases 101                    Wierzbicki
+..TODO I   102  Doing Jython Micro Releases                  Wierzbicki
+
+..TODO I  200  Jython 2.2 Release Schedule                   Wierzbicki
+..TODO P  3000  Jython 3000                                  Wierzbicki
+
+Key
+
+    S - Standards Track JEP
+    I - Informational JEP
+    P - Process JEP
+
+    A - Accepted proposal
+    R - Rejected proposal
+    W - Withdrawn proposal
+    D - Deferred proposal
+    F - Final proposal
+
+
+Owners
+
+    name                     email address
+    -----------------        -------------
+    Wierzbicki, Frank        fwierzbicki@sourceforge.net
+
+
+Local Variables:
+mode: indented-text
+indent-tabs-mode: nil
+sentence-end-double-space: t
+fill-column: 70
+coding: utf-8
+End:
