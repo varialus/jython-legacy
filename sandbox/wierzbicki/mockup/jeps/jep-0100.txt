@@ -66,9 +66,16 @@ I     8  Style Guide for Python Code                  GvR, Warsaw
 ..TODO I   356  Python 2.5 Release Schedule                  Norwitz, et al
 ..TODO I  3100  Python 3.0 Plans                             Kuchling, Cannon
 
- Accepted PEPs (accepted; may not be implemented yet) observed by Jython
+ PEPs accepted by Python observed by Jython
 
 ..TODO SA  328  Imports: Multi-Line and Absolute/Relative    Aahz
+
+ PEPs accepted by Python but ignored by Jython
+
+..TODO none
+
+..TODO -- should we care about these at all, or wait for them to get
+..        accepted/rejected?
 
 ..TODO Open PEPs (under consideration)
 
@@ -98,7 +105,7 @@ I     8  Style Guide for Python Code                  GvR, Warsaw
 ..TODO S  3101  Advanced String Formatting                   Talin
 ..TODO S  3102  Keyword-Only Arguments                       Talin
 
- Finished PEPs (done, implemented in Jython's Subversion)
+ PEPs finished by Jython (done, implemented in Jython's Subversion)
 
 ..TODO SF  100  Python Unicode Integration                   Lemburg
 ..TODO IF  160  Python 1.6 Release Schedule                  Drake
@@ -154,14 +161,18 @@ I     8  Style Guide for Python Code                  GvR, Warsaw
 ..TODO IF  320  Python 2.4 Release Schedule                  Warsaw, et al
 ..TODO SF  322  Reverse Iteration                            Hettinger
 ..TODO SF  324  subprocess - New process module              Astrand
-..TODO SF  327  Decimal Data Type                            Batista
 ..TODO SF  338  Executing Modules as Scripts                 Coghlan
 ..TODO SF  341  Unifying try-except and try-finally          Brandl
 ..TODO SF  342  Coroutines via Enhanced Generators           GvR, Eby
-..TODO SF  343  The "with" Statement                         GvR, Coghlan
-..TODO SF  352  Required Superclass for Exceptions           GvR, Cannon
-..TODO SF  353  Using ssize_t as the index type              von Loewis
-..TODO SF  357  Allowing Any Object to be Used for Slicing   Oliphant
+
+PEPs finished by Python and accepted (not implemented yet) by Jython
+ SF  327  Decimal Data Type                            Batista
+ SF  343  The "with" Statement                         GvR, Coghlan
+ SF  352  Required Superclass for Exceptions           GvR, Cannon
+ SF  357  Allowing Any Object to be Used for Slicing   Oliphant
+
+PEPs finished by Python but ignored by Jython
+ SF  353  Using ssize_t as the index type              von Loewis
 
 Key
 
