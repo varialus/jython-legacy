@@ -51,8 +51,6 @@ UNIX Command line
 
 First, you need to download Subversion. Most UNIX-based operating systems have binary packages available for Subversion. Also, most package systems also have Subversion available.
 
-If you have checkin rights, you need OpenSSH. This is needed to verify your identity when performing commits.
-
 Windows
 -------
 
@@ -80,7 +78,7 @@ The Subversion repository has many projects under it. Most people are probably i
     * the JEPs (Jython Enhancement Proposals)
     * the website source
 
-A read-only checkout of the three projects above can be checked out using the following <URL> paths, respectively:
+The four projects above can be checked out using the following <URL> paths, respectively:
 
 .. FIXME
 
@@ -102,55 +100,11 @@ How do I browse the source code through a web browser?
 
 Visit http://svn.python.org/view/ to browse the Subversion repository.
 
-Where can I find a downloadable snapshot of the source code?
-============================================================
-
-Visit http://svn.python.org/snapshots/ to download a tarball containing a daily snapshot of the repository.
-
 Who has commit privileges on the Subversion repository?
 =======================================================
 
+.. FIXME
 See http://www.python.org/dev/committers for a list of committers.
-
-How do I get commit privileges on the svn repository if I had the same privileges on the CVS repository?
-========================================================================================================
-
-If you have established commit privileges as listed at http://sourceforge.net/project/memberlist.php?group_id=5470 but do not have them yet for the Subversion repository, then there are a few steps you must take:
-
-XXX add links to Q for each point
-
-#. Generate an SSH 2 public key #. Email key and name (first and last required, middle optional) #. Wait for verification email that the key has been installed #. Verify access
-
-How do I verify that my commit privileges are working?
-======================================================
-
-UNIX
-----
-
-If you are listed as a committer at http://www.python.org/dev/committers , then you should be able to execute:
-
-ssh pythondev@svn.python.org
-
-and have the following print out to your terminal:
-
-( success ( 1 2 ( ANONYMOUS EXTERNAL ) ( edit-pipeline ) ) )
-
-If something else is printed, then there is a problem with your SSH 2 public key and you should contact pydotorg@python.org .
-
-Windows
--------
-
-If you are using Pageant (discussed in XXX), you can verify that your SSH 2 key is set up properly by running:
-
-c:\path\to\putty\plink.exe pythondev@svn.python.org
-
-Using the proper path to your PuTTY installation, you should get a response from the server that says:
-
-( success ( 1 2 ( ANONYMOUS EXTERNAL ) ( edit-pipeline ) ) )
-
-If there is a failure, run plink with -v to analyse the problem.
-
-If you are using a profile in PuTTY, the best way to test is to try to log in through Open.
 
 What configuration settings should I use?
 =========================================

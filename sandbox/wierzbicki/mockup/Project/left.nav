@@ -2,11 +2,11 @@ section  | About
 menupageitem     | Welcome            | index.html
 menupageitem     | License            | license.html
 menupageitem     | Old Website        | ../old.html
-menupageitem     | FAQ                | faq.html
+menupageitem     | User FAQ           | userfaq.html
 menupageitem     | News               | news.html
 menupageitem     | History            | history.html
 menupageitem     | Download           | download.html
-menupageitem     | User Guide         | userdoc.html
+menupageitem     | User Guide         | userguide.html
 #menupageitem    | Books and Articles | books_articles.html
 #menupageitem    | CPython comparison | differences.html
 menupageitem     | Related Projects   | related.html

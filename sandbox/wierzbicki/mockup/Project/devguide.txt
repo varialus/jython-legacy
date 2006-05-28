@@ -155,14 +155,15 @@ Now your ready to run tests...
 Directory layout
 ================
 
-  * com       : zxJDBC related sources"
-  * Demo      : demo sources for the website and such"
-  * Doc       : the website documentation"
-  * installer : the current installer which apparently no longer works"
+  * src
+      * com       : zxJDBC related sources
+      * org       : top level package for python and apache (used for regex)
+  * Demo      : demo sources for the website and such
+  * Doc       : the website documentation
+  * installer : the current installer.
   * Lib       : the python source files for Jython standard library implementations
   * Lib/test  : test cases
   * Misc      : random scripts which are not all used; some generate source
-  * org       : top level package for python and apache (used for regex)
   * Tools     : JythonC and Freeze
 
 Coding Guidance
