@@ -1,4 +1,4 @@
 base_class: PyComplex
 want_dict: true
-ctr:
+ctr: double real, double imaginary
 incl: object
