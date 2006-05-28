@@ -105,9 +105,10 @@ public class InstallerCommandLine {
             + INEXCLUDE_DOCUMENTATION + "\n\t\t -" + INCLUDE_SHORT + " " + INEXCLUDE_SOURCES + " -" + JRE_SHORT
             + " javaHome -" + VERBOSE_SHORT
             + "\n\nexample of an autotest installation into temporary directories:{0} -" + AUTOTEST_SHORT
+            + "\n\t(make sure you do NOT touch mouse NOR keyboard after hitting enter/return!)"
+            + "\n\nexample of an autotest installation, using a different jre for the start scripts:{0} -"
+            + AUTOTEST_SHORT + " -" + JRE_SHORT + " javaHome" + " -" + VERBOSE_SHORT
             + "\n\t(make sure you do NOT touch mouse NOR keyboard after hitting enter/return!)";
-
-    // TODO:oti full example of autotest
 
     private String[] _args;
     private Options _options;
@@ -136,9 +137,9 @@ public class InstallerCommandLine {
      */
     public boolean setArgs(String args[]) {
         _args = args;
-        if( args.length == 0) {
+        if (args.length == 0) {
             // switch to console mode if gui is not allowed
-            if(!Installation.isGuiAllowed()) {
+            if (!Installation.isGuiAllowed()) {
                 _args = new String[] { "-" + CONSOLE_SHORT };
             }
         }
