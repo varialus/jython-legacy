@@ -1,0 +1,41 @@
+16th March 2005
+
+# Jython support in NetBeans has been announced as part of a more general dynamic languages support initiative for NetBeans called Coyote. See blog entries by Tim Bray and Simon Phipps of Sun Microsystems.
+
+14th February 2005
+
+# The Jython WIKI is up and running. Thanks to Bill de hOra who did much of the running to get this set up.
+
+24th January 2005
+
+# Brian Zimmer has started a Jython development blog : http://www.ziclix.com/bzimmer/
+
+14 January 2005
+
+The PSF recently published its list of projects to recieve grant funding. Brian Zimmer will manage the project Moving Jython Forward.
+
+19 December 2004
+
+Samuele Pedroni, Guido van Rossum and Sean McGrath represent the Python community at a dynamic languages summit. Hosted by Tim Bray of Sun.
+
+Random Jython Spotlight: Jython3D combining Jython and Java3D.
+
+25 October 2004: Progress on new-style classes implementation
+
+Samuele Pedroni is making strong progress in the end-to-end modifications required to the Jython code-base in order to support new-style classes. The implementation of new style classes in Jython is a key moment on the road to compatibility with CPython 2.3 and beyond. Samuele plans to make an initial check-in of the branch on or around 15 November 2004. Stay tuned for further updates. For more details about the state of play, see the jython-dev archive here and here
+
+25 October 2004: Jython tutorial
+
+Barry Feigenbaum has written a substantial two part Jython tutorial on using Jython. The tutorial consists of two PDF files: Part 1 (82 pages) and Part 2 (100 pages). First published by IBM developerWorks at http://www.ibm.com/developerWorks/.
+
+April 2004: Newstyle branch work.
+    Work is undergoing since the beginning of the year to implement new-style classes features (the biggest quantum-leap post 2.1 missing feature for a new release) on the newstyle-branch in the CVS (see e.g. this check-in). There will be a new alpha release when this branch will be merged to the trunk. We expect then a new release for the summer, with 2.2 and some 2.3 features. Leading up to the release this site will be revamped.
+
+31 July 2003 : Jython 2.2 alpha 0 available
+    Experimental, unstable release of Jython now available. This is an alpha release, in that it is not feature complete for a Jython 2.2 release, and there are significant known issues.
+
+    This is a snapshot that contains a mixture of Python 2.1 and 2.2 features. Use this release at your own risk.
+
+    There has been no validation of which parts of the Python library are functional with this relase. Expect pickle and related modules to be broken, probably others as well.
+
+.. FIXME: more remains in the old news.ht doc.

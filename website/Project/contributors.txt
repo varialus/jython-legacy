@@ -1,0 +1,73 @@
+============
+Contributors
+============
+
+----------------
+Active Commiters
+----------------
+
+* Otmar Humbel
+* Sean McGrath
+* Samuele Pedroni
+* Clark Updike
+* Frank Wierzbicki
+* Brian Zimmer
+
+-------------------
+Emeritus Committers
+-------------------
+
+* Finn Bock
+* Kevin J. Butler
+* Jim Hugunin
+* Barry A. Warsaw
+
+------------------
+Other Contributors
+------------------
+
+* Jim Althoff
+* Bernhard Bablok
+* Michael Becke
+* Robert W. Bill
+* Randolph Brown
+* Ben Burton
+* Ian Castleden
+* Steve Cohen
+* Matt Conway
+* Charles Duffy
+* dsyer
+* Nathan Franzen
+* Tim Hochberg
+* Kent Johnson
+* Bryn Keller
+* Ype Kingma
+* Ivan Kougaenko
+* Noel (Nick) Lockwood
+* Harry Mantakos
+* Drew Morrissey
+* Cyrille Morvan
+* John Mudd
+* Rodrigo B. de Oliveira
+* Tony Plate
+* Josselin PUJO
+* Steffen Ries
+* Durant Schoon
+* Aleks Totic
+* Alexey N. Solofnenko
+* Phil Surette
+* Dj Walker-Morgan
+* Greg Ward
+* Randy Jay Yarger
+
+----------------------
+Corporate Contributors
+----------------------
+
+* Corporation for National Research Initiatives
+* cryptix
+
+----
+Logo
+----
+Logo Design by Jesse Ross http://www.jesseross.com/ 

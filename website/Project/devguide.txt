@@ -1,0 +1,268 @@
+==========================
+ Jython Developer's Guide
+==========================
+
+.. contents:: Table of Contents
+
+Introduction
+============
+You might be interested in reading `Jim Hugunin's JPython paper`_,
+which appeared in the proceedings of the 6th International Python
+Conference.
+
+This is an introduction to developing Jython, just to get someone started. It doesn't cover in any depth the source code or the design behind Jython. It's purely aimed at getting a development environment setup. It's definitely not complete so feel free to make it better!
+
+The Wiki
+========
+Wiki          http://wiki.python.org/jython/
+
+Mailing Lists
+=============
+Mailing Lists http://sourceforge.net/mail/?group_id=12867
+
+Subversion
+==========
+
+checkout
+--------
+
+This checks out all of the jython subprojects (bugtests, jython -- the main codebase, sandbox etc.)
+
+::
+
+    svn co https://svn.sourceforge.net/svnroot/jython/trunk/
+
+* 2.1 Stable:
+
+::
+
+    svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_1
+
+* 2.2 Alpha 1:
+
+::
+
+    svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_2alpha0
+
+* Preparing a Patch on Unix command line: (note multiple changes can be concatencated into one patch file using >> as shown.
+
+::
+
+    cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jython diff -u PyFloat.java >> patchfile.txt 
+
+Python
+======
+
+  * http://www.python.org/2.2.3/
+  * Jython uses Python's standard library where possible. This means you will need a working copy of Python source files for the stdlib. We currently use Python 2.2 so you can grab the files from here if you don't already have 2.2 installed.
+
+
+JavaCC
+======
+
+  * https://javacc.dev.java.net/
+  * Parser generator for Java. Generally needed only for working on parser.
+  * It's not really required that you install this so I'd skip it.
+  * The latest version is JDK 1.5 compatible (uses 'e' rather than 'enum' as variable name).
+
+Ant
+===
+
+  * http://ant.apache.org/ A Java-based build tool.
+  * Eclipse users, see [wiki:Self:/JythonDeveloperGuide/EclipseNotes#ANT Eclipse ANT notes]
+  * The Makefiles in the repository are old and will be removed.
+  * Download the latest version and install so the bin/ is somewhere in your path.
+  * The build.xml is the file containing the compiler directives
+  * It uses a file called ant.properties to override default paths; here's mine:
+
+    build.compiler=modern
+    debug=on
+    optimize=off
+
+    javaccHome=/Users/bzimmer/Library/Java/Extras/javacc-3.2
+
+    ht2html.dir=
+    #python.home=
+    python.lib=/sw/lib/python2.2
+    python.exe=/sw/bin/python2.2
+
+    ### zxJDBC ###
+    oracle.jar=
+    mysql.jar=/Users/bzimmer/Library/Java/Extras/mysql-connector-java-3.1.6-bin.jar
+    informix.jar=
+    postgresql.jar=/Users/bzimmer/Library/Java/Extras/pg74.215.jdbc2.jar
+    jdbc.jar=
+    servlet.jar=
+
+
+Jars
+====
+
+  * Jython uses many optional jars
+  * These are not required for building locally but are for deployment with the installer
+  * The ant script takes care of conditional compilation
+
+IDEs
+====
+
+  * Any Java IDE will work
+    * IntelliJ
+    * Eclipse see /EclipseNotes
+    * Vim
+    * ...
+
+Tests
+=====
+
+After you've built the project, you may want to set up an excutable file on your path to make it easy to launch your build of jython. This file will need to:
+
+* Set the python home property to the `dist` directory of your build (otherwise, you'll get import errors on the standard lib stuff).
+* Execute the `jython.jar` in the `dist` produced by the build.      
+
+Here's a batch file that runs the built jython.jar (for windows): [[Anchor(sampleBatch)]]
+
+jytip.bat
+=========
+
+::
+
+  @echo off
+  set ARGS=
+
+  :: concatenate all the command line args into one
+  :loop
+  if [%1] == [] goto end
+          set ARGS=%ARGS% %1
+          shift
+          goto loop
+  :end
+
+  :: this is mine...
+  :: java -Dpython.home=C:\\workspace\\JythonTip\\jython\\dist -jar 
+  ::<cont> c:\workspace\JythonTip\jython\dist\jython.jar %ARGS%
+  :: fill in <placeholders> below:
+  java -Dpython.home=<path to dist directory>\\dist -jar <path to dist directory>\dist\jython.jar %ARGS%
+
+
+Now your ready to run tests...
+
+  * There are a couple different places to find test cases
+    * Jython's Lib/test
+    * Jython's bugtests repository
+    * Python2.2's Lib/test
+  * Run the particular test or you can run the whole suite by running `regrtest.py` with the `-a` option
+
+Directory layout
+================
+
+  * src
+      * com       : zxJDBC related sources
+      * org       : top level package for python and apache (used for regex)
+  * Demo      : demo sources for the website and such
+  * Doc       : the website documentation
+  * installer : the current installer.
+  * Lib       : the python source files for Jython standard library implementations
+  * Lib/test  : test cases
+  * Misc      : random scripts which are not all used; some generate source
+  * Tools     : JythonC and Freeze
+
+Coding Guidance
+===============
+
+  * CodingStandards_     : The standards for writing Java code for Jython
+  * JythonModulesInJava_ : How to write a Jython module in Java
+  * JythonClassesInJava_ : How to write a Jython class in Java
+
+
+New Style Classes
+=================
+`Unifying types and classes in Python`_
+
+svn co jython/trunk/sandbox
+
+cd sandbox/jt
+
+There are two primary objectives:
+
+   1.  expose the necessary methods for making an existing class 'new-style'
+   2.  generating a wrapper class for subclasses in python to implement
+
+To do this there are two scripts:
+
+    * gexpose.py (for exposing)
+    * gderived.py (for deriving or subclassing)
+
+They each have a simple input language for determing exactly what to implement. Note that these .expose and .derived files are hand generated.
+
+For example, looking at a partial listing of list.expose:
+
+type_name: list
+type_class: PyList
+# exposed methods
+expose_meth: :- append o
+expose_meth: :i count o
+expose_meth: pop i?
+expose_meth: :b __nonzero__
+
+So the type_name is 'list'.
+
+>>> type([])
+<type 'list'>
+
+It is intended to expose methods for PyList.
+
+    * It exposes the method 'append' which takes a PyObject and returns void.
+    * It exposes the method 'count' which takes a PyObject and returns an int.
+    * It exposes the method 'pop' which takes an optional int and returns a PyObject.
+    * It exposes the method '__nonzero__' which takes no arguments and returns a boolean.
+
+Running gexpose.py produces some Java code.
+
+$ python gexpose.py list.expose > list.txt
+
+Opening the file list.txt in your favorite editor you'll see the Java code. This code should then be pasted into the class PyList at the top of the file. This will result in a slew of compiler problems.
+
+The problem is PyList doesn't have any of the methods. The generated code expected 'list_append' but PyList has only 'append' so the compiler complains. This is intended. Now for the boring part. For each method exposed, we need to create a new method. For example:
+
+public void append(PyObject o) {
+    list_append(o);
+}
+
+final void list_append(PyObject o) {
+    resize(length+1);
+    list[length-1] = o;
+}
+
+Notice the new method is final and package protected. So follow the pattern for each method that needs to be exposed.
+
+The special method __init__ should delegate to 'list_init' which needs to handle the constructor arguments of a list. If there is no argument, create a new list. If an argument, copy it's contents to a new list.
+
+Make sure the class has a constructor which takes a PyType.
+
+Finally, make sure the type is registered with __builtin__.
+
+    * It should also be noted an existing 'list' was registered which provided the construction of a new list under the old scheme. I moved this code to PyList and deleted it from __builtin__. This is much better since all list construction now happens in one spot.
+
+Run some quick tests:
+
+>>> list()
+[]
+>>> list([1,2,3])
+[1, 2, 3]
+>>> type([])
+<type 'list'>
+>>> list
+<type 'list'>
+>>>
+
+After that was done, run the regrtest and the bugtests. The bugtests caught a bug in my original effort. I had forgotten to make the constructor with PyType argument so any list(arg) call failed quickly as the PyType instance was the argument to the PyList(PyObject) constuctor and since PyType is not iterable, the call failed. The tests were great in tracking this down.
+
+Next steps:
+
+    * automate this process a bit more if possible
+    * [].index.__self__ does not work correctly
+    * mutable __bases__ and __class__
+    * support for __del__
+    * support for __slots__
+
+.. _Jim Hugunin's JPython paper: http://www.python.org/workshops/1997-10/proceedings/hugunin.html

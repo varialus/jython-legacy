@@ -1,0 +1,29 @@
+JEP: 1
+Title: JEP Purpose and Guidelines
+Version: $Revision: 1 $
+Last-Modified: $Date: 2006-04-18 16:52:06 -0400 (Tue, 18 Apr 2006) $
+Author: Frank Wierzbicki
+Status: Active
+Type: Process
+Content-Type: text/x-rst
+Created: 27-May-2006
+Post-History:
+
+What is a JEP?
+==============
+
+
+JEP stands for Jython Enhancement Proposal.  A JEP is a design
+document providing information to the Python community, or describing
+a new feature for Jython or its processes or environment.  The JEP
+should provide a concise technical specification of the feature and a
+rationale for the feature.
+
+For the most part JEPs will follow the purposes and guidelines followed
+by PEPs (Python Enhancement Proposals) see 'PEP 1'_
+_PEP 1: http://www.python.org/dev/peps/pep-0001/
+
+PEP 1 allows eicher plaintext (see 'PEP 9'_) or reStructuredText (see
+'PEP 12'_) but please use only 'PEP 12'_ for JEPs.
+
+

@@ -1,0 +1,38 @@
+===============================
+Books and Articles about Jython
+===============================
+
+.. contents:: Table of Contents
+
+Articles
+========
+
+2005
+----
+Write Eclipse JUnit Tests in Jython: http://www.devx.com/Java/Article/26602
+
+2004
+----
+Barry Feigenbaum has written a substantial two part Jython tutorial on using Jython. The tutorial consists of two PDF files: Part 1 (82 pages) and Part 2 (100 pages). First published by IBM developerWorks at http://www.ibm.com/developerWorks/.
+
+2003
+----
+Scripting with Jython Instead of XML, Jonathan Simon on java.net http://today.java.net/pub/a/today/2003/06/10/jython.html
+
+Uche Ogbuij in IBM developerWorks Charming Jython http://www-128.ibm.com/developerworks/java/library/j-jython.html
+
+2002
+----
+Noel Rappin has written an article on how to script java with Jython. http://www.onjava.com/pub/a/onjava/2002/03/27/jython.html
+
+2001
+----
+Weiqi Gao shows  scripting examples using Jython and Rhino (javascript). http://www.ociweb.com/jnb/archive/jnbMar2001.html
+
+2000
+----
+Jon Udell talks  about using the JVM to implement other languages, among them JPython. http://www.byte.com/documents/s=505/BYT20001214S0006/
+David Mertz has written an interview with some of the jython developers http://gnosis.cx/publish/programming/charming_python_10.txt
+
+Books
+=====

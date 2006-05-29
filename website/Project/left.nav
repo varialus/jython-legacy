@@ -1,0 +1,23 @@
+section  | About
+menupageitem     | Welcome            | index.html
+menupageitem     | License            | license.html
+menupageitem     | Old Website        | ../old.html
+menupageitem     | User FAQ           | userfaq.html
+menupageitem     | News               | news.html
+menupageitem     | History            | history.html
+menupageitem     | Download           | download.html
+menupageitem     | User Guide         | userguide.html
+#menupageitem    | Books and Articles | books_articles.html
+#menupageitem    | CPython comparison | differences.html
+menupageitem     | Related Projects   | related.html
+section  | Community
+menupageitem     | Reporting Bugs     | bugs.html
+menupageitem     | Developer FAQ      | devfaq.html
+menupageitem     | Developer Guide    | devguide.html
+#menupageitem    | To Do List         | todo.html
+menupageitem     | Contributors       | contributors.html
+section  | 
+raw      | <div style="height:1em"></div>
+image    | ../css/PythonPoweredSmall.gif | http://www.python.org
+raw      | <div style="height:1em"></div>
+image    | http://sourceforge.net/sflogo.php?group_id=12867    | http://sourceforge.net

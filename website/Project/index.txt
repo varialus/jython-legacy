@@ -1,0 +1,29 @@
+Welcome to the Jython Project
+=============================
+
+Jython is an implementation of the high-level, dynamic, object-oriented language Python written in 100% Pure Java, and seamlessly integrated with the Java platform. It thus allows you to run Python on any Java platform.
+
+.. contents:: Table of Contents
+
+What is Jython?
+===============
+
+    *Jython, lest you do not know of it, is the most compelling weapon the Java platform has for its survival into the 21st century:-)* 
+
+    -- `Sean McGrath, CTO, Propylon`_
+
+Jython is an implementation of the high-level, dynamic, object-oriented language Python seamlessly integrated with the Java platform. The predecessor to Jython, JPython, is certified as 100% Pure Java. Jython is freely available for both commercial and non-commercial use and is distributed with source code. Jython is complementary to Java and is especially suited for the following tasks:
+
+* Embedded scripting - Java programmers can add the Jython libraries to their system to allow end users to write simple or complicated scripts that add functionality to the application.
+* Interactive experimentation - Jython provides an interactive interpreter that can be used to interact with Java packages or with running Java applications. This allows programmers to experiment and debug any Java system using Jython.
+* Rapid application development - Python programs are typically 2-10X shorter than the equivalent Java program. This translates directly to increased programmer productivity. The seamless interaction between Python and Java allows developers to freely mix the two languages both during development and in shipping products. 
+
+There are numerous alternative languages implemented for the Java VM. The following features help to separate Jython from the rest:
+
+* Dynamic compilation to Java bytecodes - leads to highest possible performance without sacrificing interactivity.
+* Ability to extend existing Java classes in Jython - allows effective use of abstract classes.
+* Optional static compilation - allows creation of applets, servlets, beans, ...
+* Bean Properties - make use of Java packages much easier.
+* Python Language - combines remarkable power with very clear syntax. It also supports a full object-oriented programming model which makes it a natural fit for Java's OO design. 
+
+.. _Sean McGrath, CTO, Propylon: http://seanmcgrath.blogspot.com/2003_07_27_seanmcgrath_archive.html#105971971904416520

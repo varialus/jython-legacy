@@ -1,0 +1,645 @@
+==========
+Jython FAQ
+==========
+
+.. contents:: Table of Contents
+.. sectnum::
+
+General information and availability
+====================================
+
+What is Jython?
+---------------
+Jython is the successor to JPython. The Jython project was created in
+accordance with the CNRI JPython 1.1.x license, in order to ensure the
+continued existence and development of this important piece of Python
+software. The intent is to manage this project with the same open policies
+that are serving CPython so well.
+
+Mailing lists, CVS and all current information on the Jython project is
+available at SourceForge, at http://sourceforge.net/projects/jython
+
+The name had to be changed to something other than JPython, because of
+paragraph 4 in the JPython-1.1 license: ::
+
+ 4. Licensee may not use CNRI trademarks or trade name, including
+    JPython [...] to endorse or promote products [...]
+
+Is Jython the same language as Python?
+--------------------------------------
+We will always strive to ensure that Jython remains as compatible with
+CPython as possible. Nevertheless, there are a number of differences
+between the two implementations that are unlikely to go away. These range
+from the trivial - Jython's code objects don't have a co_code attribute
+because they don't have any Python bytecodes; to the significant -
+Jython uses Java's true garbage collection rather than Python's reference
+counting scheme.
+
+  http://jython.sourceforge.net/docs/differences.html
+
+Python has never really had much of a language definition beyond it's
+C-based implementation. The existence of Jython changed that for the first
+time and will hopefully lead to a much clearer sense of what Python the
+language is; independent of any specific implementation.
+
+.. FIXME: move/edit this paragraph.
+
+We will be preparing a version of Python's regression test that would
+be appropriate for new implementations of the language. This is a good
+first step towards defining what parts of Python are essential and which
+are incidental
+
+What is the current status of Jython?
+--------------------------------------
+The Jython project was announced on 19-oct-2000. The first alpha release
+occured on 26-nov-2000.
+
+The final release of Jython-2.0 occured on 17-jan-2001. The final release
+of Jython-2.1 occured on 31-dec-2001.
+
+Current work include improvements to java integration and implementing
+the lastest features from CPython 2.2/3.
+
+How fast is Jython?
+-------------------
+The startup time and runtime performance for Jython are largely determined
+by the JVM.
+
+Current status is that CPython 2.3 on Windows2000 is about twice as
+fast as Jython 2.1 on JDK1.4 on Windows2000. However, because of Java's
+slow startup time, Jython starts much more slowly (2.4 s) than CPython
+(80 ms). This means you don't want to do standard CGI in Jython, but
+long-running processes are fine.
+
+The following notes are retained for historical interest.
+
+At IPC-6 JimH reported speeds equal to CPython 1.4 on the pystone
+benchmark. When Guido released CPython 1.5 he succeeded in making it
+about 2x faster than the 1.4 release. The current release of CPython
+is 1.5.2 which might be only slightly faster than 1.5. JimH re-ran his
+benchmark tests against CPython 1.5 and his then current release of
+Jython, finding that Jython was about 2.5x slower than CPython 1.5. I
+have recently run a few informal benchmarks and found some interesting
+numbers: using Sun's JDK 1.2.1 with JIT on a Solaris 2.6 Sparc Ultra 2,
+I found Jython 1.1beta3 to produce pystone numbers equal to (or very
+slightly better than) CPython 1.5.2+.
+
+The problem, of course, is that JITs are still not reliable enough for
+Jython. Turning off the JIT on the above platform, can slow Jython down
+by a factor of 10.
+
+The speed of Jython is tied very tightly to the speed of the underlying
+JVM. The benchmark results that JimH reported were all using Microsoft's
+JVM from Internet Explorer 4.0. The next fastest JVM that he used was
+almost a factor of 2 slower than this. Since the performance of JVMs
+changes nearly every day, at some point I'll need to collect a set of
+scores comparing pystone performance on a wider variety of JVM's.
+
+Finally, pystone is not the last word in benchmarking. At the moment
+I'm more concerned with making Jython complete and correct than with
+performance. We will continually be revisiting performance issues both to
+examine better benchmark's for comparing Jython and CPython (as well as
+other scripting languages for the JVM) and work at optimizing Jython's
+performance.
+
+Installing Jython
+=================
+
+Why do I get NoClassDefFoundError when running the installer
+------------------------------------------------------------
+Make sure that the class name on the command line doesn't end in
+.class. Also make sure that the installer actually exists in your current
+working directory.
+
+Why can't I use "from java import ..." on Windows?"
+---------------------------------------------------
+This problem can occur if you are using Microsoft's VM (i.e. jview.exe)
+which provides the standard classes in a different format. You need to
+run the following command in a console window before using Jython: ::
+
+    clspack -auto
+
+What is "python.path" and "python.prepath" mean in the Jython registry
+----------------------------------------------------------------------
+
+.. FIXME: do we need to even talk about pre-2.0 anymore?
+
+The key "python.path" in the Jython registry changed in the 2.0 version.  This
+FAQ entry is intended to clarify registry keys related to sys.path
+settings.
+
+Before Fri, December 15, 2000- the "python.path" key in the registry file
+appended the given value to the sys.path list before the (sys.prefix)/lib
+directory is added. This means for Jython-2.0a1 and before, the above
+behavior is expected.
+
+Changes committed on December 15, 2000 change the behavior so that
+the registry's "python.path" key is appended to sys.path after
+(sys.prefix)/lib directory. This applies to CVS versions and any
+subsequently released versions of Jython.
+
+This mimics the behavior of the appending that takes place in the
+autoloaded site.py. Traditionally JPython users have appended the CPython
+path in this registry key; however, this was unsafe as it then preceded
+the Jython lib directory. This change eliminates errors associated with
+appending the CPython lib path in this key.
+
+For those instances where you do intend to add something to the
+sys.path before (sys.prefix)/lib, there is a new registry key called
+"python.prepath". This exists only after the 20001215 change date.
+
+Here is the summary of changing sys.path:
+
+Before 20001215:
+
+        1. python.path key appends given path before (sys.prefix)/lib.
+        Do not put the CPython Lib dir in the python.path key unless
+        you precede it with the Jython lib path.  (using site.py may be
+        a better choice).
+        2. Jython-2.0a1 autoloads site.py (as does Python20) and appends
+        path changes after (sys.prefix)/lib- a better alternative to
+        appending to sys.path.
+
+After 20001215:
+
+        1. python.path key appends given path after (sys.prefix)/lib.
+        Same as autoloaded site.py file.
+        2. A new key, "python.prepath", was added to append path's before
+        (sys.prefix)/lib if needed.
+
+If there is confusion about site.py:
+
+        site.py is automatically loaded on normal startup in Python 2.0
+        and Jython-2.0a1.  This used to be user-loaded in Python 1.5.2
+        and JPython11.
+
+Edit this entry / Log info
+
+Why no command-line history in Jython?
+--------------------------------------
+The shells and other tools commonly associated with having a command-line
+history get this functionality from the C 'readline' package. There is
+experimental 'readline' classes in Java, and is likely to be in Jython's
+future. For the current release, there is console.py in the demo directory
+that adds a simple up/down.
+
+It is not commonly the case that programs look to the shell for this
+functionality, it is more common that readline is compiled in to the shell
+(or CPython) you are using which provides this functionality. However,
+some shells wrap the stdin/out of other programs (Jython). Shell mode in
+emacs is an excellent example. "rlterm", a shell that comes with the Unix
+version of Yorick, also does this (i.e. "rlterm jython"). There may be
+many others do the same so you can supplant the functionality of readline.
+
+Why do I get the error, "can't create package cache dir, '/cachedir/packages'"
+------------------------------------------------------------------------------
+An essential optimization in Jython is the caching of Java package
+information. The caching requires '/cachedir/packages/' in the python.home
+directory. It is often the case on `*nix` that users lack sufficient
+priveledges to create or write to this directory.
+
+Because the problem is merely permissions, something similar to "mkdir
+cachedir; chmod a+rw cachedir" within Jython's directory should eliminate
+this error message.
+
+Where's the registry file
+-------------------------
+Jython's installation includes a file called "registry" that you will find
+in the root directory of the Jython installation (e.g. /usr/local/jython
+or c:\jython).
+
+At initialization, Jython searches for the "registry" file in the
+directory specified by the "python.home" property, or the ".jython"
+file in the user's home directory.
+
+The "python.home" property is often set in the startup with Java's -D
+switch. The shell script that starts Jython (jython.bat or jython)
+demonstrates the use of the -D switch to set the "python.home"
+property. When embedding Jython, it is often still best to use the -D
+switch because the -D properties appear in System.getProperties(),
+which is usually the "preProperties" (first arg) in the static
+PythonInterpreter.initialize method. With python.home in the
+preProperties, the interpreter successfully loads preProperties,
+registry properties, and postProperties (the second arg to initialize)
+in the correct order.
+
+If you wish to use your home directory, and do not know where your home
+directory is, don't worry- Jython knows:
+
+ >>> print java.lang.System.getProperty("user.home")
+
+If you run into complaints about create ".jython", don't worry-
+Jython can:
+
+ >>> import java, os
+ >>> filename = os.path.join(java.lang.System.getProperty("user.home"),
+ ".jython")
+ >>> open(filename, "w")
+
+GUI-less installer?
+-------------------
+If you do not have a GUI, then add -o dir_to_install_to to the
+command. Jython will install to the specified directory without bringing
+up the graphical installer. E.g. to install all modules to a Jython-2.1
+subdirectory in the current directory do: ::
+
+    <java interpreter> jython-21 -o Jython-2.1 demo lib source
+
+Programming in Jython
+=====================
+
+Why can't I multiply inherit from two Java classes?
+---------------------------------------------------
+In earlier versions of JPython, you actually could. This was deliberately
+disabled in 1.1 for a variety of good reasons. For a detailed discussion
+on this issue see the following archive messages: ::
+
+  http://www.python.org/pipermail/jpython-interest/1998-April/000213.html
+  http://www.python.org/pipermail/jpython-interest/1999-June/001874.html
+
+Note that you can still multiply inherit from any number of Python
+classes.
+
+Why does dir(someJavaObject) return the empty list?
+---------------------------------------------------
+Because the built-in dir() function returns a list of names called
+from the object's __dict__, __methods__, and __members__ attributes. In
+Python, an instance's methods live in the instance's class's dictionary,
+so dir(someJavaObject.__class__) would return a list of the method names
+(although only for the direct class, not for any base classes).
+
+I'm trying to execute a 'protected' or 'private' Java Instance Method or attribute in a Java package. How can I get access?
+---------------------------------------------------------------------------------------------------------------------------
+By default, as in Java, these methods are protected from external access,
+but there may be reasons, such as test scaffolding scripts, that this
+feature is not wanted. In the [jython home]/registry file:
+
+  # Setting this to false will allow Jython to provide access to
+  # non-public fields, methods, and constructors of Java objects.
+  python.security.respectJavaAccessibility = false
+
+Can I reload a java class as is possible for python modules?
+------------------------------------------------------------
+The support for reloading java classes through reload(java-class),
+is disabled. The reload(java-class) only worked when the java class
+was a standalone class without any dependencies on other java classes
+(except the system class). When there was more than one class involved,
+the simple reload(java-class) no longer worked.
+
+Now on the other hand Jython 2.0 comes with some alternative
+(experimental) user-level support for java classes reloading ("jreload"
+module).
+
+See: http://www.jython.org/docs/jreload.html
+
+Further Jython 2.0 internal changes enable the expert user to play with
+reloading and class-loaders as he would from native java.
+
+How can I access Java protected (static) members from a Jython subclass?
+------------------------------------------------------------------------
+The short answer: you can't. At least not without setting the registry
+option python.security.respectJavaAccessibility to false.
+
+It is difficult to add in a nice manner. The problem is a bit like this:
+
+A normal (public) static method is from jython called on the parent
+java class:
+
+   javaclass.method()
+
+Such a call does not originate from the subclass, but from internal
+reflection code in jython. If we want to add support for calling protected
+static methods from a jython subclass, the call will have to originate
+from the subclass (ie. the proxy class), so we will have to generate a
+referring method in subclass proxy like::
+
+  public static void method() {
+     javaclass.method()
+  }
+
+(with the right return type and throws clauses) and the jython subclass
+will have to call the method on its own class, not the java class.
+
+
+How can I use a Java null value in Jython?
+------------------------------------------
+A java null is turned into a Python None value.
+
+import java
+>>> h = java.util.Hashtable()
+>>> print h.get("abc")
+None
+>>> if h.get("abc") is None:
+...   print "null returned"
+...
+null returned
+>>>
+
+
+Where's the -O switch
+---------------------
+Jython 2.0 does not have a -O command-line switch.
+
+Assigning __debug__=0 has been used to get -O behavior from things like
+"assert", but such assignments to __debug__ are considered an error,
+and in the future, will raise an exception. __debug__ is supposed to be
+a read-only variable.
+
+When I write to a file, it's empty. Why?
+----------------------------------------
+The addition of buffering to the org.python.core.PyFile class in the 2.1
+development cycle changed the autoflushing of Jython file objects. In
+Jython 2.1x, you must explicitly flush() and/or close() a file object
+opened for writing or appending before any data will actually be saved.
+
+This reflects the current status and is not meant to imply this will
+always be the case for Jython (but it may be for certain java versions).
+
+Currently, For example:
+
+    f = open("myFile", "w")
+    # if the program terminates here, the file is empty
+    f.flush() # or f.close()
+    # If the program terminates here ,the file has data
+
+Another example:
+
+    open("myFile", "w").write("some data")
+
+This will create an empty file, but note that the standard lib does not
+use write on anonymouse file objects as it is considered poor practice
+anyway.
+
+
+The Jython's os module is missing some functions, why?
+------------------------------------------------------
+Python's and Jython's os modules differ necessarily because of differences
+Java imposes on natvie system access. For example, Java does not have
+a chdir equivalent, so it does not exist in Jython's os.
+
+There is an alternative os module that does provide additional
+functionality, and it is the jnios module found at:
+
+    http://sourceforge.net/projects/jnios
+
+The jnios module replaces the default os module with a Java/JNI
+implementation of Python's os and posix modules.
+
+Jython CVS also has more functions in the os module (like system
+and the popen* functions). See FAQ 3.10 for more information:
+http://www.jython.org/cgi-bin/faqw.py?req=show&file=faq03.010.htp
+
+or:
+
+Use the os.system or os.popen* functions from Jython CVS.
+
+To use these functions, you'll need javaos.py, javashell.py, and
+popen2.py:
+
+    http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/jython/jython/Lib/
+
+You'll need to delete the 'from __future__ import division' line from
+javaos.py (this is a Python 2.2 feature not supported in Jython 2.1)
+
+Alternatively, you could use java.lang.Runtime.exec() directly, but the
+os functions handle a lot of complexity for you.
+
+
+Jython modules
+==============
+
+What parts of the Python library are supported?
+-----------------------------------------------
+The good news is that Jython now supports a large majority of the
+standard Python library. The bad news is that this has moved so rapidly,
+it's hard to keep the documentation up to date.
+
+Built-in modules (e.g. those that are written in C for CPython) are a
+different story. These would have to be ported to Java, or implemented
+with a JNI bridge in order to be used by Jython. Some built-in modules
+have been ported to JPython, most notably cStringIO, cPickle, struct,
+and binascii. It is unlikely that JNI modules will be included in Jython
+proper though.
+
+If you want to use a standard Python module, just try importing it. If
+that works, you're probably all set. You can also do a dir() on the
+modules to check the list of functions it implements.
+
+If there is some standard Python module that you have a real need for
+that doesn't work with JPython yet, please send us mail.
+
+Can I use the python DB API from Jython?
+----------------------------------------
+Take a look at zxJDBC which gives data database connectivity from Jython
+using the Python DB API 2.0 interface.  zxJDBC comes with Jython 2.1 or
+later.
+
+Can I use the Numeric package from Jython?
+------------------------------------------
+Take a look at at Tim Hochberg's Java implementation of Numeric, JNumeric.
+
+- http://members.home.net/tim.hochberg/
+
+Extending Jython
+================
+
+Java classes that emulate Jython Dictionaries and Sequences
+-----------------------------------------------------------
+
+.. FIXME: document new support in Jython 2.2/3.
+
+In order to emulate Dictionaries and Sequences, first your Java class must
+"extend" the org.python.core.PyObject class. The following methods can
+then be defined on your class in order to emulate these basic Jython
+types:
+
+public PyObject __finditem__(PyObject key);
+
+public void __setitem__(PyObject key, PyObject value);
+
+public void __delitem__(PyObject key);
+
+Additionally, you might want to throw the org.python.core.Py.KeyError
+object if you have any exceptions (Note, you need not declare the Java
+method as throwing anything.)
+
+Emulating Jython object attribute access with a Java class
+----------------------------------------------------------
+You can develop your own Java class that emulates Jython objects by
+first extending the org.python.core.PyObject class. Then, implement the
+following methods on your Java class:
+
+public PyObject __findattr__(String name);
+
+public void __setattr__(String name, PyObject value);
+
+public void __delattr__(String name);
+
+You may also want to raise exceptions using the
+org.python.core.Py.AttributeError error class. (Note, you do not need
+to declare that the method throws this class.)
+
+As in CPython, "a = foo.bar" calls the __findattr__ method on foo,
+"foo.bar = 'baz'" calls the __setattr__ method on foo, and "delattr(foo,
+'bar')" calls the __delattr__ method on foo.
+
+If you plan on storing functions as attributes of your Java object (so
+that you could say "foo.bar('baz', 'fizzle')", be forwarned that Jython
+*may or may not* call the __findattr__ method to find the function object
+depending on the number/types of parameters. You should, additionally,
+implement the following methods:
+
+public PyObject invoke(String name);
+
+public PyObject invoke(String name, PyObject arg1);
+
+public PyObject invoke(String name, PyObject arg1, PyObject arg2);
+
+public PyObject invoke(String name, PyObject[] args);
+
+public PyObject invoke(String name, PyObject[] args, String[] keywords);
+
+.. Note: Writing new-style classes (only possible in versions > 2.1)
+   is a bit more complicated.  This needs more documentation.
+
+Supporting `*args` and `**kw` in Java methods
+---------------------------------------------
+
+Embedding Jython
+================
+(thanks to Finn Bock for the information)
+
+In Jython (note, this does not work in JPython), you can support keyword
+arguments on Java methods by defining the method like so (the parameters
+are the important point):
+
+public PyObject foo(PyObject[] args, String[] keywords);
+
+The keywords array contains all of the keywords for the keyword-defined
+arguments. For example, if you called foo with:
+
+foo(1,2,3,four=4,five=5)
+
+args would be: [1, 2, 3, 4, 5] and keywords would be: ['four', 'five']
+(an array of 2 elements.)
+
+Additionally, you can use the experimental argument parser
+org.python.core.ArgParser to deal mapping these two arrays. Consult the
+Javadocs (or source) for further details on org.python.core.ArgParser.
+
+How can I use jython classes from my java application?
+------------------------------------------------------
+There are several ways to do that. The best way depends on the needs of
+your application. One possible way is to compile the python class into
+a real java class using the jythonc command. This real java can be used
+and instances can be created from your application.
+
+(See FAQ X.Y for other ways to access python classes from java)
+
+Create a python module (say Foo.py) and make a class with the same
+name as the python module. The class must inherit from a java class
+or interface. If you don't need a particular java superclass, just use
+java.lang.Object.::
+
+  import java
+  class Foo(java.util.Date):
+      def toString(self):
+          return "Foo[" + java.util.Date.toString(self) + "]"
+
+The python class can overwrite all existing methods on the java superclass
+or interface and these overridden methods can be called from the java
+application. New methods can by default not be accessed from java. If
+we add a "bar" method, the method can be used from python, but not from
+java. ::
+
+  import java
+  class Foo(java.util.Date):
+      def __init__(self):
+          self.count = 0
+      def bar(self, incr=1):
+          self.count += incr
+          return self.count
+      def toString(self):
+          cnt = self.bar()
+          return "Foo[" + java.util.Date.toString(self) + " " + `cnt` +
+          "]"
+
+The jythonc compiler can also create java methods for the python methods,
+but it need some additional help. This help is specified as a @sig line
+in the doc-string for the method. A doc-string is added to the example
+above. ::
+
+  import java
+  class Foo(java.util.Date):
+      def __init__(self):
+          self.count = 0
+      def bar(self, incr=1):
+          """@sig void bar(int incr)"""
+          self.count += incr
+          return self.count
+      def toString(self):
+          cnt = self.bar()
+          return "Foo[" + java.util.Date.toString(self) + " " + `cnt` +
+          "]"
+
+When this class is compiled with jythonc, A java class Foo.java and
+Foo.class is created with the java methods toString(), bar() and bar(int
+incr).
+
+When compiling the Foo.py class, make sure that the Foo actually extends
+the desired java class. You can check the output from the compilation. It
+should contain lines like: ::
+
+  Required packages:
+    java.util
+
+  Creating adapters:
+
+  Creating .java files:
+    Foo module
+      Foo extends java.util.Date
+
+If jython fails to recognize the superclass as a java class, it will
+silently assume that it is a python class and will not generate the
+desired java methods.
+
+The new Foo class can be used from java java class like this: ::
+
+   public class FooTest {
+       public static void main(String[] args) {
+	   Foo foo = new Foo();
+	   System.out.println(foo);
+	   foo.bar();
+	   foo.bar(43);
+	   System.out.println(foo);
+       }
+   }
+
+When compiling the FooTest.java class, the "jpywork" directory should
+be appended to your classpath.
+
+When running this little application, the jython.jar runtime must be
+available on the CLASSPATH or specified on the java command line.
+
+My modules can not be found when imported from an embedded application
+----------------------------------------------------------------------
+The default value for sys.path in an embedded application depend on
+several things:
+
+1) A python.path property, if found in the registry file or in the
+$HOME/.jython file will be used.
+
+2) The <python.home>/Lib directory is added.
+
+An application can override the python.path property by calling
+PythonInterpreter.initialize(..) before any other python code is
+called: ::
+
+    Properties props = new Properties();
+    props.setProperty("python.path", "/home/modules:scripts");
+    PythonInterpreter.initialize(System.getProperties(), props,
+				 new String[] {""});
+
+The value for python.path must follow the operating system conventions
+for the PATH environment var (':' separator for unix, ';' for windows)
+

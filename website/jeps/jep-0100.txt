@@ -1,0 +1,196 @@
+JEP: 100
+Title: Python PEPs observed by Jython
+Version: $Revision: 1 $
+Last-Modified: $Date: 2006-05-11 03:50:27 -0400 (Thu, 11 May 2006) $
+Author: Frank Wierzbicki
+        
+Status: Active
+Type: Informational
+Created: 28-May-2006
+Post-History:
+
+
+Introduction
+
+    The PEP contains the index of all Python Enhancement Proposals,
+    known as PEPs, that are being observed by Jython.  This includes
+    PEPs that have been implemented in Jython, PEPs that are to be
+    included in future releases, PEPs that are incompatible with 
+    Jython (for example C formatting).  This is a work in progress.
+
+
+Index by Category
+
+     num  title                                        owner
+     ---  -----                                        -----
+
+ Meta-PEPs Observed by Jython
+
+..TODO I     0  Index of Python Enhancement Proposals        Goodger, Warsaw
+..TODO P     1  PEP Purpose and Guidelines                   Warsaw, Hylton, Goodger
+..TODO I     2  Procedure for Adding New Modules             Faassen
+..TODO I     3  Guidelines for Handling Bug Reports          Hylton
+..TODO I     4  Deprecation of Standard Modules              von Loewis
+..TODO I     5  Guidelines for Language Evolution            Prescod
+..TODO P     6  Bug Fix Releases                             Aahz
+I     8  Style Guide for Python Code                  GvR, Warsaw
+..TODO I     9  Sample Plaintext PEP Template                Warsaw
+..TODO I    10  Voting Guidelines                            Warsaw
+..TODO I    11  Removing support for little used platforms   von Loewis
+ I    12  Sample reStructuredText PEP Template         Goodger, Warsaw
+..TODO P   347  Migrating the Python CVS to Subversion       von Löwis
+ P  3000  Python 3000                                  GvR
+ P  3001  Reviewing and improving stdlib modules       Brandl
+..TODO P  3002  Procedure for Backwards-Incompatible Changes Bethard
+ I  3099  Things that will Not Change in Python 3000   Brandl
+
+ Meta-PEPs Ignored by Jython
+ I     7  Style Guide for C Code                       GvR
+
+ Other Informational PEPs observed by Jython
+
+ I    20  The Zen of Python                            Peters
+ I    42  Feature Requests                             Hylton
+..TODO I   101  Doing Python Releases 101                    Warsaw, GvR
+..TODO I   102  Doing Python Micro Releases                  Baxter, Warsaw, GvR
+..TODO IF  247  API for Cryptographic Hash Functions         Kuchling
+..TODO IF  248  Python Database API Specification v1.0       Lemburg
+..TODO IF  249  Python Database API Specification v2.0       Lemburg
+ I   257  Docstring Conventions                        Goodger, GvR
+..TODO IF  272  API for Block Encryption Algorithms v1.0     Kuchling
+..TODO I   290  Code Migration and Modernization             Hettinger
+..TODO I   291  Backward Compatibility for Standard Library  Norwitz
+..TODO I   306  How to Change Python's Grammar               Hudson
+..TODO I   333  Python Web Server Gateway Interface v1.0     Eby
+..TODO I   339  Design of the CPython Compiler               Cannon
+..TODO I   356  Python 2.5 Release Schedule                  Norwitz, et al
+..TODO I  3100  Python 3.0 Plans                             Kuchling, Cannon
+
+ PEPs accepted by Python observed by Jython
+
+..TODO SA  328  Imports: Multi-Line and Absolute/Relative    Aahz
+
+ PEPs accepted by Python but ignored by Jython
+
+..TODO none
+
+..TODO -- should we care about these at all, or wait for them to get
+..        accepted/rejected?
+
+..TODO Open PEPs (under consideration)
+
+..TODO S   228  Reworking Python's Numeric Model             Zadka, GvR
+..TODO S   237  Unifying Long Integers and Integers          Zadka, GvR
+..TODO S   256  Docstring Processing System Framework        Goodger
+..TODO S   258  Docutils Design Specification                Goodger
+..TODO S   267  Optimized Access to Module Namespaces        Hylton
+..TODO S   268  Extended HTTP functionality and WebDAV       Stein
+..TODO S   275  Switching on Multiple Values                 Lemburg
+..TODO S   280  Optimizing access to globals                 GvR
+..TODO S   286  Enhanced Argument Tuples                     von Loewis
+..TODO I   287  reStructuredText Docstring Format            Goodger
+..TODO S   297  Support for System Upgrades                  Lemburg
+..TODO S   302  New Import Hooks                             JvR, Moore
+..TODO S   323  Copyable Iterators                           Martelli
+..TODO S   331  Locale-Independent Float/String Conversions  Reis
+..TODO S   335  Overloadable Boolean Operators               Ewing
+..TODO S   337  Logging Usage in the Standard Library        Dubner
+..TODO S   344  Exception Chaining and Embedded Tracebacks   Yee
+..TODO S   345  Metadata for Python Software Packages 1.2    Jones
+..TODO I   350  Codetags                                     Elliott
+..TODO S   354  Enumerations in Python                       Finney
+..TODO S   355  Path - Object oriented filesystem paths      Lindqvist
+..TODO S   358  The "bytes" Object                           Schemenauer
+..TODO S   754  IEEE 754 Floating Point Special Values       Warnes
+..TODO S  3101  Advanced String Formatting                   Talin
+..TODO S  3102  Keyword-Only Arguments                       Talin
+
+ PEPs finished by Jython (done, implemented in Jython's Subversion)
+
+..TODO SF  100  Python Unicode Integration                   Lemburg
+..TODO IF  160  Python 1.6 Release Schedule                  Drake
+..TODO IF  200  Python 2.0 Release Schedule                  Hylton
+..TODO SF  201  Lockstep Iteration                           Warsaw
+ SF  202  List Comprehensions                          Warsaw
+..TODO SF  203  Augmented Assignments                        Wouters
+..TODO S   205  Weak References                              Drake
+..TODO SF  207  Rich Comparisons                             GvR, Ascher
+..TODO SF  208  Reworking the Coercion Model                 Schemenauer, Lemburg
+..TODO SF  214  Extended Print Statement                     Warsaw
+..TODO SF  217  Display Hook for Interactive Use             Zadka
+..TODO SF  218  Adding a Built-In Set Object Type            Wilson, Hettinger
+..TODO SF  221  Import As                                    Wouters
+..TODO SF  223  Change the Meaning of \x Escapes             Peters
+..TODO I   226  Python 2.1 Release Schedule                  Hylton
+..TODO S   227  Statically Nested Scopes                     Hylton
+..TODO SF  229  Using Distutils to Build Python              Kuchling
+..TODO SF  230  Warning Framework                            GvR
+..TODO SF  232  Function Attributes                          Warsaw
+..TODO SF  234  Iterators                                    Yee, GvR
+..TODO SF  235  Import on Case-Insensitive Platforms         Peters
+..TODO SF  236  Back to the __future__                       Peters
+..TODO SF  238  Changing the Division Operator               Zadka, GvR
+..TODO SF  241  Metadata for Python Software Packages        Kuchling
+..TODO SF  250  Using site-packages on Windows               Moore
+..TODO IF  251  Python 2.2 Release Schedule                  Warsaw, GvR
+..TODO SF  252  Making Types Look More Like Classes          GvR
+..TODO SF  253  Subtyping Built-in Types                     GvR
+..TODO SF  255  Simple Generators                            Schemenauer, et al
+..TODO SF  260  Simplify xrange()                            GvR
+..TODO SF  261  Support for "wide" Unicode characters        Prescod
+..TODO SF  263  Defining Python Source Code Encodings        Lemburg
+..TODO SF  264  Future statements in simulated shells        Hudson
+..TODO SF  273  Import Modules from Zip Archives             Ahlstrom
+..TODO SF  277  Unicode file name support for Windows NT     Hodgson
+..TODO SF  278  Universal Newline Support                    Jansen
+..TODO SF  279  The enumerate() built-in function            Hettinger
+..TODO SF  282  A Logging System                             Sajip, Mick
+..TODO IF  283  Python 2.3 Release Schedule                  GvR
+..TODO SF  285  Adding a bool type                           GvR
+..TODO SF  289  Generator Expressions                        Hettinger
+..TODO SF  292  Simpler String Substitutions                 Warsaw
+..TODO SF  293  Codec Error Handling Callbacks               Dörwald
+..TODO SF  301  Package Index and Metadata for Distutils     Jones
+..TODO SF  305  CSV File API                                 Montanaro, et al
+..TODO SF  307  Extensions to the pickle protocol            GvR, Peters
+..TODO SF  308  Conditional Expressions                      GvR, Hettinger
+..TODO SF  309  Partial Function Application                 Harris
+..TODO SF  311  Simplified GIL Acquisition for Extensions    Hammond
+..TODO SF  314  Metadata for Python Software Packages v1.1   Kuchling, Jones
+..TODO SF  318  Decorators for Functions and Methods         Smith, et al
+..TODO IF  320  Python 2.4 Release Schedule                  Warsaw, et al
+..TODO SF  322  Reverse Iteration                            Hettinger
+..TODO SF  324  subprocess - New process module              Astrand
+..TODO SF  338  Executing Modules as Scripts                 Coghlan
+..TODO SF  341  Unifying try-except and try-finally          Brandl
+..TODO SF  342  Coroutines via Enhanced Generators           GvR, Eby
+
+PEPs finished by Python and accepted (not implemented yet) by Jython
+ SF  327  Decimal Data Type                            Batista
+ SF  343  The "with" Statement                         GvR, Coghlan
+ SF  352  Required Superclass for Exceptions           GvR, Cannon
+ SF  357  Allowing Any Object to be Used for Slicing   Oliphant
+
+PEPs finished by Python but ignored by Jython
+ SF  353  Using ssize_t as the index type              von Loewis
+
+Key
+
+    S - Standards Track PEP
+    I - Informational PEP
+    P - Process PEP
+
+    A - Accepted proposal
+    R - Rejected proposal
+    W - Withdrawn proposal
+    D - Deferred proposal
+    F - Final proposal
+
+
+Local Variables:
+mode: indented-text
+indent-tabs-mode: nil
+sentence-end-double-space: t
+fill-column: 70
+coding: utf-8
+End:

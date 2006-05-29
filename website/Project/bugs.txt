@@ -1,0 +1,16 @@
+===============
+Reporting Bugs
+===============
+
+-----------------------------
+Viewing and submitting a bugs
+-----------------------------
+
+The Jython project uses SourceForge's bug tracking facility. Go to http://sourceforge.net/bugs/?group_id=12867 for all bug management needs.
+
+Using the sourceforge bug manager
+=================================
+
+By default, you will see the list of all Open bugs. You can change which bugs you're viewing by selecting the assigned_to/status/area/type select boxes.
+To submit a bug, use the "Submit a Bug" link, near the top of the page.
+

@@ -1,0 +1,79 @@
+========================
+Patch Manager Guidelines
+========================
+
+Intended use of SourceForge patch Resolution, Status & "Assigned To" fields Revision 4 16-Mar-2001
+
+In general, the Resolution and Status fields should be close to self-explanatory, and the "Assigned to:" field should be the person responsible for taking the next step in the patch process. Both fields are expected to change value over the life of a patch; the normal workflow is detailed below.
+
+When you've got the time and the ability, feel free to move any patch that catches your eye along, whether or not it's been assigned to you. And if you're assigned to a patch but aren't going to take reasonably quick action (for whatever reason), please assign it to someone else ASAP: at those times you can't actively help, actively get out of the way.
+
+If you're an expert in some area and know that a patch in that area is both needed and non-controversial, just commit your changes directly -- no need then to get the patch mechanism involved in it.
+
+You should add a comment to every patch assigned to you at least once a week, if only to say that you realize it's still on your plate. This rule is meant to force your attention periodically: patches get harder & harder to deal with the longer they sit.
+
+Status Open, Resolution None
+============================
+
+The initial state of all patches. The patch is under consideration, but has not been reviewed yet, or s under review but not yet Accepted or Rejected.
+
+The Resolution will normally change to Accepted or Rejected next. The person submitting the patch should (if they can) assign it to the person they most want to review it.
+
+Else the patch will be assigned via [xxx a list of expertise areas should be developed] [xxx but since this hasn't happened and volunteers are too few, andom assignment is better than nothing: if you're a Jython developer, expect to get assigned out of the blue!]
+
+Discussion of major patches is carried out on the Jython-Dev mailing list. For simple patches, the SourceForge comment mechanism should be sufficient. [xxx an email gateway would be great, ditto Ping's Roundup] For the reviewer: If you're certain the patch should be applied, change the Resolution to Accepted and assign it back to the submitter (if possible) for checkin. If you're certain the patch should never be accepted, change the Resolution to Rejected, Status to Closed, and assign it to None.
+
+If you have specific complaints that would cause you to change your mind, explain them clearly in a comment, leave the status Open, and reassign back to the submitter. If you're uncertain, leave the status Open, explain your uncertainties in a comment, and reassign the patch to someone you believe can address your remaining questions; or leave the status Open and bring it up on Jython-Dev.
+
+Status Open, Resolution Accepted
+================================
+
+The powers that be accepted the patch, but it hasn't been applied yet. [xxx flesh out -- Guido Bottleneck avoidable here?]
+
+The Status will normally change to Closed next.
+
+The person changing the Resolution to Accepted should, at the same time, assign the patch to whoever they believe is most likely to be able & willing to apply it (the submitter if possible).
+
+Status Closed, Resolution Accepted
+==================================
+
+The patch has been accepted and applied.
+
+The previous Resolution was Accepted, or possibly None if the submitter was Guido (or moral equivalent in some particular area of expertise).
+
+Status Closed, Resolution Rejected
+==================================
+
+The patch has been reviewed and rejected.
+
+There are generally no transitions out of this state: the patch is dead.
+
+The person setting this state should also assign the patch to None.
+
+Status Open, Resolution Out of date
+===================================
+
+Previous Resolution was Accepted or Postponed, but the patch no longer works.
+
+Please enter a comment when changing the Resolution to "Out of date", to record the nature of the problem and the previous state.
+
+Also assign it back to the submitter, as they need to upload a new version.
+
+Status Open, Resolution Postponed
+=================================
+
+The previous Resolution was None or Accepted, but for some reason (e.g., pending release) the patch should not be reviewed or applied until further notice.
+
+The Resolution will normally change to None or Accepted next.
+
+Please enter a comment when changing the Resolution to Postponed, to record the reason, the previous Resolution, and the conditions under which the patch should revert to Resolution None or Accepted. Also assign the patch to whoever is most likely able and willing to decide when the state should change again.
+
+Status Deleted
+==============
+
+Bit bucket.
+
+Use only if it's OK for the patch and its SourceForge history to disappear. As of 09-July-2000, SF does not actually throw away Deleted patches, but that may change.
+
+..Note: This FAQ was adapted from Python developers FAQ at http://www.python.org/dev/faq/
+
