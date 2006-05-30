@@ -29,31 +29,31 @@ Index by Category
 
  I     0  Index of Jython Enhancement Proposals        Wierzbicki
  P     1  JEP Purpose and Guidelines                   Wierzbicki
-..TODO I     3  Guidelines for Handling Bug Reports          Wierzbicki
-..TODO I     7  Style Guide for Java Code                    Wierzbicki
-..TODO P  3000  Jython 3000                                  Wierzbicki
+.. I     3  Guidelines for Handling Bug Reports          Wierzbicki
+.. I     7  Style Guide for Java Code                    Wierzbicki
+.. P  3000  Jython 3000                                  Wierzbicki
 
  Other Informational JEPs
 
  I   100  Python PEPs observed by Jython               Wierzbicki
-..TODO I   101  Doing Jython Releases 101                    Wierzbicki
-..TODO I   102  Doing Jython Micro Releases                  Wierzbicki
+.. I   101  Doing Jython Releases 101                    Wierzbicki
+.. I   102  Doing Jython Micro Releases                  Wierzbicki
 
 Numerical Index
 
      num  title                                        owner
      ---  -----                                        -----
  I     0  Index of Jython Enhancement Proposals        Wierzbicki
-..TODO P     1  JEP Purpose and Guidelines                   Wierzbicki
-..TODO I     3  Guidelines for Handling Bug Reports          Wierzbicki
-..TODO I     7  Style Guide for Java Code                    Wierzbicki
+.. P     1  JEP Purpose and Guidelines                   Wierzbicki
+.. I     3  Guidelines for Handling Bug Reports          Wierzbicki
+.. I     7  Style Guide for Java Code                    Wierzbicki
 
 I   100  Python PEPs observed by Jython               Wierzbicki
-..TODO I   101  Doing Jython Releases 101                    Wierzbicki
-..TODO I   102  Doing Jython Micro Releases                  Wierzbicki
+.. I   101  Doing Jython Releases 101                    Wierzbicki
+.. I   102  Doing Jython Micro Releases                  Wierzbicki
 
-..TODO I  200  Jython 2.2 Release Schedule                   Wierzbicki
-..TODO P  3000  Jython 3000                                  Wierzbicki
+.. I  200  Jython 2.2 Release Schedule                   Wierzbicki
+.. P  3000  Jython 3000                                  Wierzbicki
 
 Key
 
