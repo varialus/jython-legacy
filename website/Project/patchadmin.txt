@@ -75,5 +75,3 @@ Bit bucket.
 
 Use only if it's OK for the patch and its SourceForge history to disappear. As of 09-July-2000, SF does not actually throw away Deleted patches, but that may change.
 
-..Note: This FAQ was adapted from Python developers FAQ at http://www.python.org/dev/faq/
-

@@ -77,16 +77,15 @@ The Subversion repository has many projects under it. Most people are probably i
 
     * the trunk or HEAD (the current version under development)
     * the latest release (plus bug fixes) of Jython (e.g. Jython 2.1)
-    * the JEPs (Jython Enhancement Proposals)
     * the website source
+    * the JEPs (Jython Enhancement Proposals)
 
 The four projects above can be checked out using the following <URL> paths, respectively:
 
-.. FIXME
-
-    * http://svn.python.org/projects/python/trunk
-    * http://svn.python.org/projects/python/branches/release24-maint
-    * http://svn.python.org/projects/peps/trunk
+    * https://svn.sourceforge.net/svnroot/jython/trunk/
+    * https://svn.sourceforge.net/svnroot/jython/tags/Release_2_1
+    * https://svn.sourceforge.net/svnroot/jython/website/
+    * https://svn.sourceforge.net/svnroot/jython/website/jeps
 
 How do I update my working copy to be in sync with the repository?
 ==================================================================
@@ -101,12 +100,6 @@ How do I browse the source code through a web browser?
 ======================================================
 
 Visit http://svn.python.org/view/ to browse the Subversion repository.
-
-Who has commit privileges on the Subversion repository?
-=======================================================
-
-.. FIXME
-See http://www.python.org/dev/committers for a list of committers.
 
 What configuration settings should I use?
 =========================================
@@ -362,3 +355,5 @@ Click on the patch itself. In the screen that comes up, there is a drop-box for 
 Note: If you are sure that you have the right permissions and a drop-box does not appear, check that you are actually logged in to SourceForge!
 
 ..FIXME: For more information about the use of the "Status:" and "Assigned To:" fields consult the Patch Manager Guidelines.
+
+..Note: This FAQ was adapted from Python developers FAQ at http://www.python.org/dev/faq/

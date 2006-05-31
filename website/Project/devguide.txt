@@ -224,14 +224,16 @@ Opening the file list.txt in your favorite editor you'll see the Java code. This
 
 The problem is PyList doesn't have any of the methods. The generated code expected 'list_append' but PyList has only 'append' so the compiler complains. This is intended. Now for the boring part. For each method exposed, we need to create a new method. For example:
 
-public void append(PyObject o) {
-    list_append(o);
-}
+::
 
-final void list_append(PyObject o) {
-    resize(length+1);
-    list[length-1] = o;
-}
+    public void append(PyObject o) {
+        list_append(o);
+    }
+
+    final void list_append(PyObject o) {
+        resize(length+1);
+        list[length-1] = o;
+    }
 
 Notice the new method is final and package protected. So follow the pattern for each method that needs to be exposed.
 
