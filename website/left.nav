@@ -2,7 +2,7 @@ section  | About
 menupageitem     | Welcome            | ../Project/index.html
 menupageitem     | License            | ../Project/license.html
 menupageitem     | Installation       | ../Project/installation.html
-menupageitem     | Old Website        | ../old.html
+menupageitem     | Old Website        | ../Jython21.html
 menupageitem     | User FAQ           | ../Project/userfaq.html
 menupageitem     | News               | ../Project/news.html
 menupageitem     | History            | ../Project/history.html
@@ -15,7 +15,7 @@ section  | Community
 menupageitem     | Reporting Bugs     | ../Project/bugs.html
 menupageitem     | Developer FAQ      | ../Project/devfaq.html
 menupageitem     | Developer Guide    | ../Project/devguide.html
-menupageitem     | JEP Index          | ../jeps/jep-0000.html
+#menupageitem     | JEP Index          | ../jeps/jep-0000.html
 #menupageitem    | To Do List         | ../Project/todo.html
 menupageitem     | Contributors       | ../Project/contributors.html
 section  | 

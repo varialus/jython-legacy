@@ -42,7 +42,7 @@ This checks out all of the jython subprojects (bugtests, jython -- the main code
 
 ::
 
-    svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_2alpha0
+    svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_2alpha1
 
 * Preparing a Patch on Unix command line: (note multiple changes can be concatencated into one patch file using >> as shown.
 
@@ -259,12 +259,116 @@ Run some quick tests:
 
 After that was done, run the regrtest and the bugtests. The bugtests caught a bug in my original effort. I had forgotten to make the constructor with PyType argument so any list(arg) call failed quickly as the PyType instance was the argument to the PyList(PyObject) constuctor and since PyType is not iterable, the call failed. The tests were great in tracking this down.
 
-Next steps:
+Another Newstyle Class Example: Implementing the _random module
+===============================================================
 
-    * automate this process a bit more if possible
-    * [].index.__self__ does not work correctly
-    * mutable __bases__ and __class__
-    * support for __del__
-    * support for __slots__
+Module
+------
+
+Start by writing a class to represent the module, I'll call it RandomModule.
+::
+
+    package org.python.modules.random;
+    
+    import org.python.core.ClassDictInit;
+    import org.python.core.Py;
+    import org.python.core.PyObject;
+    
+    public class RandomModule implements ClassDictInit {
+    
+        private RandomModule() {}
+    
+        public static void classDictInit(PyObject dict) {
+            dict.__setitem__("Random", Py.java2py(PyRandom.class));
+        }
+    }
+
+.. Note: ClassDictInit is the old style way for initializing the class dictionary -- need to see if there is 
+    a newstyle way to create a module.
+
+put module into builtin
+-----------------------
+
+Next add this line to the builtinModules method of org.python.modules.Setup, to put _random into the builtin namespace:
+
+        "_random:org.python.module.random.RandomModule"
+
+Next we create a stub for the "Random" object.  I'm going to call it PyRandom since it will depend on
+java.util.Random and I don't want to have to qualify the "Random" name throughout the code.
+
+::
+    
+    package org.python.modules.random;
+    
+    import org.python.core.PyObject;
+    import org.python.core.PyType;
+    import java.util.Random;
+    
+    public class PyRandom extends PyObject {
+        //~ BEGIN GENERATED REGION -- DO NOT EDIT SEE gexpose.py
+        //~ END GENERATED REGION -- DO NOT EDIT SEE gexpose.py
+    
+        private static final PyType RANDOMTYPE = PyType.fromClass(PyRandom.class);
+    
+        public PyRandom() {
+            this(RANDOMTYPE);
+        }
+    
+        public PyRandom(PyType subType) {
+            super(subType);
+        }
+     
+    }
+
+Create a random.expose file
+---------------------------
+Found the methods of _random.Random from CPython's _randommodule.c
+
+>>> import _random
+>>> dir(_random)
+['Random', '__doc__', '__file__', '__name__']
+>>> dir(_random.Random)
+['__class__', '__delattr__', '__doc__', '__getattribute__', '__hash__', '__init__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__str__', 'getrandbits', 'getstate', 'jumpahead', 'random', 'seed', 'setstate']
+
+::
+    
+    # setup
+    type_name: random
+    type_class: PyRandom
+    # exposed methods
+    expose_meth: random
+    expose_meth: seed o?
+    expose_meth: :o getstate
+    expose_meth: setstate o
+    expose_meth: jumpahead
+    expose_meth: getrandbits
+    expose_meth: __reduce__
+    #expose_meth: __reduce_ex__
+    expose_meth: __repr__
+    expose_meth: __str__
+    expose_new_mutable:
+    expose_wide_meth: __init__ -1 -1
+      `vdeleg`(init);
+      `void;
+
+Then execute:
+::
+
+    gexpose.py random.expose /path/to/file/PyRandom.java
+
+which will modify PyRandom.java in place and produce `this version of PyRandom`_
+
+Then we need to fill out all of those methods.  for each of the methods that
+start with `random_`, we also need to implement a bare version for Java
+subclassing.  See org.python.modules.random.PyRandom for the final result.
+
+Create a random.derived file
+----------------------------
 
 .. _Jim Hugunin's JPython paper: http://www.python.org/workshops/1997-10/proceedings/hugunin.html
+.. _CodingStandards: http://wiki.python.org/jython/CodingStandards 
+.. _JythonModulesInJava: http://wiki.python.org/jython/JythonModulesInJava
+.. _JythonClassesInJava: http://wiki.python.org/jython/JythonClassesInJava
+.. _Unifying types and classes in Python:
+.. _this version of PyRandom: randexposed.html
+

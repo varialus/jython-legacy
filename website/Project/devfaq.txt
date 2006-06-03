@@ -2,6 +2,8 @@
 Developer's FAQ
 ===============
 
+.. Note: This FAQ was adapted from Python developers FAQ at http://www.python.org/dev/faq/
+
 .. contents:: Table of Contents
 .. sectnum::
 
@@ -73,19 +75,17 @@ https://svn.sourceforge.net/svnroot/jython/<path>
 
 with <path> representing the path to the project. A list of projects can be viewed at http://svn.python.org/view/ . Do note that any subdirectory may also be checked out individually.
 
-The Subversion repository has many projects under it. Most people are probably interested in one of these four projects:
+The Subversion repository has many projects under it. Most people are probably interested in one of these three projects:
 
     * the trunk or HEAD (the current version under development)
     * the latest release (plus bug fixes) of Jython (e.g. Jython 2.1)
     * the website source
-    * the JEPs (Jython Enhancement Proposals)
 
-The four projects above can be checked out using the following <URL> paths, respectively:
+The three projects above can be checked out using the following <URL> paths, respectively:
 
     * https://svn.sourceforge.net/svnroot/jython/trunk/
     * https://svn.sourceforge.net/svnroot/jython/tags/Release_2_1
     * https://svn.sourceforge.net/svnroot/jython/website/
-    * https://svn.sourceforge.net/svnroot/jython/website/jeps
 
 How do I update my working copy to be in sync with the repository?
 ==================================================================
@@ -99,27 +99,12 @@ from the directory you wish to update (and all subdirectories).
 How do I browse the source code through a web browser?
 ======================================================
 
-Visit http://svn.python.org/view/ to browse the Subversion repository.
+Visit https://svn.sourceforge.net/svnroot/jython/ to browse the Subversion repository.
 
 What configuration settings should I use?
 =========================================
 
-Make sure the following settings are in your Subversion config file (~/.subversion/config under UNIX):
-
-[miscellany]
-enable-auto-props = yes
-
-[auto-props] ::
-
-  * = svn:eol-style=native
-  *.c = svn:keywords=Id
-  *.h = svn:keywords=Id
-  *.py = svn:keywords=Id
-  *.txt = svn:keywords=Author Date Id Revision
-
-The [auto-props] line specifies the beginning of the section in the config file. The svn:eol-style setting tells Subversion to check out files using the native line endings on your OS. It will also automatically convert line endings upon committal so that they are consistent across all platforms. The svn:keywords settings are to automatically substitute $keyword$ arguments in files that match the pattern. \*.txt has more options so as to cover all needed keywords for PEPs.
-
-The [miscellany] section and its one option make Subversion apply the various rules in the [auto-props] section automatically to all added or imported files into the respository.
+TODO
 
 How do I add a file or directory to the repository?
 ===================================================
@@ -130,7 +115,7 @@ svn add PATH
 
 Subversion will skip any directories it already knows about. But if you want new files that exist in any directories specified in PATH, specify --force and Subversion will check all directories for new files.
 
-You will then need to run svn commit (as discussed in XXX) to commit the file to the repository.
+You will then need to run svn commit.  See the next section.
 
 How do I commit a change to a file?
 ===================================
@@ -163,29 +148,10 @@ svn status [PATH]
 
 will list any differences between your working copy and the repository. Some key indicators that can appear in the first column of output are:
 
-        *
-
-          A
-
-              Scheduled to be added
-
-        *
-
-          D
-
-              Scheduled to be deleted
-
-        *
-
-          M
-
-              Modified locally
-
-        *
-
-          ?
-
-              Not under version control
+        * A Scheduled to be added
+        * D Scheduled to be deleted
+        * M Modified locally
+        * ?  Not under version control
 
 How do I find out what Subversions properties are set for a file or directory?
 ==============================================================================
@@ -231,15 +197,6 @@ svn log --verbose -r REV
 
 With REV substituted with the revision number. The --verbose flag should be used to get a listing of all files modified in that revision.
 
-How can I edit the log message of a committed revision?
-=======================================================
-
-Use:
-
-svn propedit -r <revision> --revprop svn:log
-
-Replace <revision> with the revision number of the commit whose log message you wish to change.
-
 How do I get a diff between the repository and my working copy for a file?
 ==========================================================================
 
@@ -267,40 +224,6 @@ svn merge -r NEW:OLD PATH
 This will revert all files back to their state in revision OLD. The reason that OLD is just NEW - 1 is you do not want files to be accidentally reverted to a state older than your changes, just to the point prior.
 
 Note: PATH here refers to the top of the checked out repository, not the full pathname to a file. PATH can refer to a different branch when merging from the head, but it must still be the top and not an individual file or subdirectory.
-
----
-SSH
----
-
-How do I generate an SSH 2 public key?
-======================================
-
-UNIX
-----
-
-Run:
-
-ssh-keygen -t dsa
-
-This will generate a two files; your public key and your private key. Your public key is the file ending in .pub.
-
-Windows
--------
-
-Use PuTTYgen to generate your public key. Choose the "SSH2 DSA" radio button, have it create an OpenSSH formatted key, choose a password, and save the private key to a file. Copy the section with the public key (using Alt-P) to a file; that file now has your public key.
-
-Is there a way to prevent from having to enter my password for my SSH 2 public key constantly?
-==============================================================================================
-
-UNIX
-----
-
-Use ssh-agent and ssh-add to register your private key with SSH for your current session. The simplest solution, though, is to use KeyChain, which is a shell script that will handle ssh-agent and ssh-add for you once per login instead of per session.
-
-Windows
--------
-
-Running Pageant will prevent you from having to type your password constantly. If you add a shortcut to Pageant to your Autostart group and edit the shortcut so that the command line includes an argument to your private key then Pageant will load the key every time you log in.
 
 -------
 Patches
@@ -341,19 +264,11 @@ Please consult the patch submission guidelines at http://www.python.org/patches/
 How to test a patch?
 ====================
 
-Start by testing on your own system. Jython comes with an extensive regression test suite by running the Lib/test/regrtest.py script. For more thorough documentation, read the documentation for the test package at http://www.python.org/doc/lib/module-test.html.
+Start by testing on your own system. Jython comes with an extensive regression test suite by running the Lib/test/regrtest.py script.
 
-If you suspect the patch may impact other operating systems, test as many as you have easy access to. You can get help on alternate platforms by contacting the people listed on http://www.python.org/moin/JythonTesters, who have volunteered to support a particular operating system.
+Also run the tests in trunk/bugtests/ directions are in a README file there.
 
-How to change the status of a patch?
-====================================
+.. TODO: For more thorough documentation, read the documentation for the test package at http://www.python.org/doc/lib/module-test.html.
 
-To change the status of a patch or assign it to somebody else you have to be a) a SourceForge-recognized Jython developer and b) a patch administrator. Unfortunately the SourceForge default for developers is not to be patch administrators. Contact one of the project administrators if the following does not work for you.
+.. TODO: For more information about the use of the "Status:" and "Assigned To:" fields consult the Patch Manager Guidelines.
 
-Click on the patch itself. In the screen that comes up, there is a drop-box for "Assigned To:" and a drop-box for "Status:" where you can select a new responsible developer or a new status respectively. After selecting the appropriate victim and status, hit the "Submit Changes" button at the bottom of the page.
-
-Note: If you are sure that you have the right permissions and a drop-box does not appear, check that you are actually logged in to SourceForge!
-
-..FIXME: For more information about the use of the "Status:" and "Assigned To:" fields consult the Patch Manager Guidelines.
-
-..Note: This FAQ was adapted from Python developers FAQ at http://www.python.org/dev/faq/

@@ -73,5 +73,7 @@
 
     <target name="clean" depends="init">
         <delete dir="dist" />
+        <delete file="${website.tar}" />
+        <delete file="${website.tgz}" />
     </target>
 </project>
