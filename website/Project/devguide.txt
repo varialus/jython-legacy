@@ -360,7 +360,10 @@ which will modify PyRandom.java in place and produce `this version of PyRandom`_
 
 Then we need to fill out all of those methods.  for each of the methods that
 start with `random_`, we also need to implement a bare version for Java
-subclassing.  See org.python.modules.random.PyRandom for the final result.
+subclassing.  
+
+org.python.modules.random.PyRandom is in the 2.3 branch, but is a stub implementation.
+If you are interested in implementing it please say so on the jython-dev list.
 
 Create a random.derived file
 ----------------------------

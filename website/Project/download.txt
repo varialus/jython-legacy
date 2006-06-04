@@ -1,2 +1,12 @@
-Download 2.1 (Production) http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=67726
-Download 2.2a1 (Development Release) http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=342904
+=========
+Downloads
+=========
+
+* `Latest Production`_
+* `Latest Development`_
+* `List of Releases`_
+
+.. _Latest Production: http://prdownloads.sourceforge.net/jython/jython_21.class?download 
+.. _Latest Development: http://prdownloads.sourceforge.net/jython/jython_Release_2_2alpha1.jar?download
+.. _List of Releases: http://sourceforge.net/project/showfiles.php?group_id=12867
+
