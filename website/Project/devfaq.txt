@@ -2,8 +2,6 @@
 Developer's FAQ
 ===============
 
-.. Note: This FAQ was adapted from Python developers FAQ at http://www.python.org/dev/faq/
-
 .. contents:: Table of Contents
 .. sectnum::
 
@@ -271,4 +269,6 @@ Also run the tests in trunk/bugtests/ directions are in a README file there.
 .. TODO: For more thorough documentation, read the documentation for the test package at http://www.python.org/doc/lib/module-test.html.
 
 .. TODO: For more information about the use of the "Status:" and "Assigned To:" fields consult the Patch Manager Guidelines.
+
+.. Note:: This FAQ was adapted from the Python developers FAQ at http://www.python.org/dev/faq/
 

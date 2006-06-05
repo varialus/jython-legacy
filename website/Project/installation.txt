@@ -51,38 +51,29 @@ Platform Specific notes
 
 Mac OSX
 -------
-INSTRUCTIONS FOR OS X
 
-1. OSX comes with Java already installed. If you wish to download the
-latest version, it can be obtained from http://developer.apple.com/
-java/download/
-2. Download the Jython Installer from http://www.jython.org/
-download.html.  The download is a jar file which once downloaded can be double- clicked.  This will install Jython in a location of your choice.  The default is
+OSX comes with Java already installed. If you wish to download the latest version, it can be obtained from http://developer.apple.com/java/download/
+Download the Jython Installer from the Latest Development link on http://www.jython.org/Project/download.html.  The download is a jar file which once downloaded can be double-clicked.  This will install Jython in a location of your choice.  The default is
 ::
 
     /Users/<current_user>/jythonRelease_2_2alpha1
 
-(depending on the version/release).
-3. Once it has been installed, open a terminal window and issue this
-command:
+Once it has been installed, open a terminal window and issue these two commands:
 ::
 
     echo 'export PATH=<path_to_jython_folder>:$PATH' >> ~/.bash_profile
+    source ~/.bash_profile
 
-where  <path_to_jython folder> is replaced by the appropriate text
-e.g. /Users/kiffer/jythonRelease_2_2alpha1
-Close the terminal window. This is important.
+where  <path_to_jython folder> is replaced by the appropriate text e.g. /Users/kiffer/jythonRelease_2_2alpha1. 
 
-4. Then open a terminal window again.
-Navigate to the Jython folder and issue this command:
+Then navigate to the Jython folder and issue this command:
 
-chmod 500 jython
+::
 
-This will make the script 'jython' executable.
+    chmod 500 jython
 
-This step should become unneccessary with the upcoming beta release.
-
-5. Run the jython interpreter from any terminal in any folder.
+This will make the script 'jython' executable.  This step should become unneccessary with the upcoming beta release.
+Run the jython interpreter from any terminal in any folder.
 
 -----------------
 What Can Go Wrong
