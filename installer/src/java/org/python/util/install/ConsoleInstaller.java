@@ -137,8 +137,8 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
      * Send a signal through the tunnel, and then wait for the answer from the other side.
      * 
      * <pre>
-     *         (2)  [Driver]   receives question  [Tunnel]   sends question   [Console]  (1)
-     *         (3)  [Driver]   sends answer       [Tunnel]   receives answer  [Console]  (4)
+     *            (2)  [Driver]   receives question  [Tunnel]   sends question   [Console]  (1)
+     *            (3)  [Driver]   sends answer       [Tunnel]   receives answer  [Console]  (4)
      * </pre>
      */
     private String readLine() throws IOException {
@@ -185,10 +185,12 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         message("  " + Installation.ALL + ". " + getText(C_ALL));
         message("  " + Installation.STANDARD + ". " + getText(C_STANDARD));
         message("  " + Installation.MINIMUM + ". " + getText(C_MINIMUM));
-        List answers = new ArrayList(3);
+        message("  " + Installation.STANDALONE + ". " + getText(C_STANDALONE));
+        List answers = new ArrayList(4);
         answers.add(Installation.ALL);
         answers.add(Installation.STANDARD);
-        answers.add(Installation.MINIMUM); // TODO:oti add standalone
+        answers.add(Installation.MINIMUM);
+        answers.add(Installation.STANDALONE);
         String answer = question(getText(C_SELECT_INSTALL_TYPE), answers);
         if (Installation.ALL.equals(answer)) {
             installationType.setAll();
@@ -434,7 +436,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         String read = question(getText(C_READ_README), getYNAnswers());
         if (read.equalsIgnoreCase(getText(C_YES))) {
             try {
-                message(Installation.getReadmeText(targetDirectory.getCanonicalPath()));
+                message(_jarInfo.getReadmeText());
                 question(getText(C_PROCEED));
             } catch (IOException ioe) {
                 throw new InstallerException(ioe);
@@ -458,14 +460,18 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
             final File javaHome) {
         try {
             message(getText(C_SUMMARY));
-            message("  - " + InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES + ": "
-                    + installationType.installLibraryModules());
-            message("  - " + InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES + ": "
-                    + installationType.installDemosAndExamples());
-            message("  - " + InstallerCommandLine.INEXCLUDE_DOCUMENTATION + ": "
-                    + installationType.installDocumentation());
-            message("  - " + InstallerCommandLine.INEXCLUDE_SOURCES + ": " + installationType.installSources());
-            message("  - JRE: " + javaHome.getAbsolutePath());
+            if (installationType.isStandalone()) {
+                message(" - " + InstallerCommandLine.TYPE_STANDALONE);
+            } else {
+                message("  - " + InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES + ": "
+                        + installationType.installLibraryModules());
+                message("  - " + InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES + ": "
+                        + installationType.installDemosAndExamples());
+                message("  - " + InstallerCommandLine.INEXCLUDE_DOCUMENTATION + ": "
+                        + installationType.installDocumentation());
+                message("  - " + InstallerCommandLine.INEXCLUDE_SOURCES + ": " + installationType.installSources());
+                message("  - JRE: " + javaHome.getAbsolutePath());
+            }
             String proceed = question(getText(C_CONFIRM_TARGET, targetDirectory.getCanonicalPath()), getYNAnswers());
             if (!proceed.equalsIgnoreCase(getText(C_YES))) {
                 throw new InstallationCancelledException();
@@ -549,7 +555,11 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     }
 
     public void progressStartScripts() {
-        message(getText(GENERATING_START_SCRIPTS));
+        message(getText(C_GENERATING_START_SCRIPTS));
+    }
+
+    public void progressStandalone() {
+        message(getText(C_PACKING_STANDALONE_JAR));
     }
 
 }

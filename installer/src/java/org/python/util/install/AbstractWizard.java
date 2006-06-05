@@ -403,6 +403,10 @@ public abstract class AbstractWizard extends JDialog implements ValidationListen
         }
         if (_nextButton.isVisible()) {
             getRootPane().setDefaultButton(_nextButton);
+            // workaround wrong default button (e.g. on OverviewPage)
+            if (_activePage.getFocusField() == null) {
+                _nextButton.grabFocus();
+            }
         }
         _activePage.doActivate();
     }

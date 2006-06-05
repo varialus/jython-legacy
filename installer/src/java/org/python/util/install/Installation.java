@@ -26,7 +26,7 @@ public class Installation {
     protected static final String OS_NAME = "os.name";
     protected static final String OS_VERSION = "os.version";
     protected static final String EMPTY = "";
-    
+
     protected static final String HEADLESS_PROPERTY_NAME = "java.awt.headless";
 
     protected final static int NORMAL_RETURN = 0;
@@ -132,31 +132,6 @@ public class Installation {
             isJDK141 = true;
         }
         return isJDK141;
-    }
-
-    protected static String getReadmeText(String targetDirectory) {
-        File readmeFile = new File(targetDirectory, "README.txt");
-        BufferedReader reader = null;
-        StringBuffer buffer = new StringBuffer();
-        try {
-            reader = new BufferedReader(new FileReader(readmeFile));
-            for (String s; (s = reader.readLine()) != null;) {
-                buffer.append(s);
-                buffer.append("\n");
-            }
-        } catch (FileNotFoundException fnfe) {
-            fnfe.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-        return buffer.toString();
     }
 
     /**

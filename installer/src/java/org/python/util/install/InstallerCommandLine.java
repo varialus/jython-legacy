@@ -57,7 +57,8 @@ public class InstallerCommandLine {
     private static final String TYPE_STANDARD = "standard";
     private static final String TYPE_ALL = "all";
     private static final String TYPE_MINIMUM = "minimum";
-    private static final String TYPE_STANDALONE = "standalone";
+    protected static final String TYPE_STANDALONE = "standalone";
+    private static final String STANDALONE_DOCUMENTATION = "install a single, executable .jar,\n(containing all the modules)";
 
     private static final String INEXCLUDE_ARG = "part(s)";
     private static final String INEXCLUDE_PARTS = "more than one of the following is possible:\n" + "- "
@@ -72,7 +73,7 @@ public class InstallerCommandLine {
             + "(see also include/exclude parts):\n" + "- " + TYPE_ALL + ": everything (including " + INEXCLUDE_SOURCES
             + ")\n" + "- " + TYPE_STANDARD + ": core, " + INEXCLUDE_LIBRARY_MODULES + ", "
             + INEXCLUDE_DEMOS_AND_EXAMPLES + ", " + INEXCLUDE_DOCUMENTATION + "\n" + "- " + TYPE_MINIMUM + ": core\n"
-            + "- " + TYPE_STANDALONE + ": (not yet implemented)"; // TODO:oti implement standalone
+            + "- " + TYPE_STANDALONE + ": " + STANDALONE_DOCUMENTATION;
 
     private static final String INCLUDE_SHORT = "i";
     private static final String INCLUDE_LONG = "include";

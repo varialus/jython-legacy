@@ -55,7 +55,6 @@ public class TypePage extends AbstractWizardPage {
         _standaloneButton = new JRadioButton();
         _standaloneButton.setActionCommand(Installation.STANDALONE);
         _standaloneButton.addActionListener(typeChangeListener);
-        _standaloneButton.setEnabled(false); // TODO:oti enable standalone
         _customButton = new JRadioButton();
         _customButton.setActionCommand(_CUSTOM_ACTION_COMMAND);
         _customButton.addActionListener(typeChangeListener);

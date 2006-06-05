@@ -17,6 +17,7 @@ public class StartScriptGenerator {
     private final static String JYTHON_BAT = "jython.bat";
     private final static String JYTHONC = "jythonc";
     private final static String JYTHONC_BAT = "jythonc.bat";
+    private final static String JYTHON_JAR = JarInstaller.JYTHON_JAR;
 
     private File _targetDirectory;
     private File _javaHome;
@@ -108,7 +109,7 @@ public class StartScriptGenerator {
      */
     private String getWindowsJythonTemplate() {
         StringBuffer buffer = getWindowsHeaderTemplate();
-        buffer.append("\"{2}\\bin\\java.exe\" -Dpython.home=\"{3}\" -classpath \"{3}\\jython.jar;%CLASSPATH%\" org.python.util.jython %ARGS%\n");
+        buffer.append("\"{2}\\bin\\java.exe\" -Dpython.home=\"{3}\" -classpath \"{3}\\" + JYTHON_JAR + ";%CLASSPATH%\" org.python.util.jython %ARGS%\n");
         return buffer.toString();
     }
 
@@ -153,7 +154,7 @@ public class StartScriptGenerator {
      */
     private String getUnixJythonTemplate() {
         StringBuffer buffer = getUnixHeaderTemplate();
-        buffer.append("CP={3}/jython.jar\n");
+        buffer.append("CP={3}/" + JYTHON_JAR + "\n");
         buffer.append("if [ ! -z \"$CLASSPATH\" ]\nthen\n  CP=$CP:$CLASSPATH\nfi\n");
         buffer.append("\"{2}/bin/java\" -Dpython.home=\"{3}\" -classpath \"$CP\" org.python.util.jython \"$@\"\n");
         return buffer.toString();

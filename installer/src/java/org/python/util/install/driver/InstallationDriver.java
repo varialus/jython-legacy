@@ -1,16 +1,22 @@
 package org.python.util.install.driver;
 
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.python.util.install.Installation;
 import org.python.util.install.InstallerCommandLine;
+import org.python.util.install.JarInstaller;
 
 public class InstallationDriver {
-
+    private static final String JYTHON_JAR = JarInstaller.JYTHON_JAR;
+    
     private SilentAutotest[] _silentTests;
     private ConsoleAutotest[] _consoleTests;
     private GuiAutotest[] _guiTests;
@@ -76,7 +82,7 @@ public class InstallationDriver {
         // now do the installation
         Installation.driverMain(consoleTest.getCommandLineArgs(), consoleTest, _tunnel);
         _tunnel.close();
-        consoleTest.assertTargetDirNotEmpty();
+        validate(consoleTest);
     }
 
     /**
@@ -87,7 +93,7 @@ public class InstallationDriver {
      */
     private void driveSilentTest(SilentAutotest silentTest) throws DriverException {
         Installation.driverMain(silentTest.getCommandLineArgs(), silentTest, null); // only a thin wrapper
-        silentTest.assertTargetDirNotEmpty();
+        validate(silentTest);
     }
 
     /**
@@ -99,7 +105,20 @@ public class InstallationDriver {
     private void driveGuiTest(GuiAutotest guiTest) throws DriverException {
         Installation.driverMain(guiTest.getCommandLineArgs(), guiTest, null); // only a thin wrapper
         guiTest.execute();
-        guiTest.assertTargetDirNotEmpty();
+        validate(guiTest);
+    }
+
+    /**
+     * perform validations after the test was run
+     * 
+     * @param autoTest
+     * @throws DriverException
+     */
+    private void validate(Autotest autoTest) throws DriverException {
+        autoTest.assertTargetDirNotEmpty();
+        if (autoTest.getVerifier() != null) {
+            autoTest.getVerifier().verify();
+        }
     }
 
     /**
@@ -110,7 +129,7 @@ public class InstallationDriver {
     }
 
     /**
-     * build all the silent tests // TODO:oti more tests
+     * build all the silent tests
      * 
      * @throws IOException
      * @throws DriverException
@@ -130,6 +149,13 @@ public class InstallationDriver {
         test2.addAdditionalArguments();
         silentTests.add(test2);
 
+        SilentAutotest test3 = new SilentAutotest(getOriginalCommandLine());
+        arguments = new String[] { "-s", "-t", "standalone" };
+        test3.setCommandLineArgs(arguments);
+        test3.addAdditionalArguments();
+        test3.setVerifier(new StandaloneVerifier());
+        silentTests.add(test3);
+
         // build array
         int size = silentTests.size();
         _silentTests = new SilentAutotest[size];
@@ -140,7 +166,7 @@ public class InstallationDriver {
     }
 
     /**
-     * build all the console tests // TODO:oti more tests
+     * build all the console tests
      * 
      * @throws IOException
      * @throws DriverException
@@ -201,6 +227,25 @@ public class InstallationDriver {
         test2.addAnswer("n"); // no readme
         consoleTests.add(test2);
 
+        ConsoleAutotest test3 = new ConsoleAutotest(getOriginalCommandLine());
+        test3.setCommandLineArgs(arguments);
+        test3.addAnswer("e"); // language
+        test3.addAnswer("n"); // no read of license
+        test3.addAnswer("y"); // accept license
+        test3.addAnswer("9"); // type: standalone
+        test3.addAnswer(test3.getTargetDir().getAbsolutePath()); // target directory
+        if (test3.hasJavaHomeDeviation()) {
+            test3.addAnswer(test3.getJavaHome().getAbsolutePath()); // different jre
+        } else {
+            test3.addAnswer("=="); // current jre
+        }
+        test3.addAnswer(""); // simple enter for java version
+        test3.addAnswer(""); // simple enter for os version
+        test3.addAnswer("y"); // confirm copying
+        test3.addAnswer("n"); // no readme
+        test3.setVerifier(new StandaloneVerifier());
+        consoleTests.add(test3);
+
         // build array
         int size = consoleTests.size();
         _consoleTests = new ConsoleAutotest[size];
@@ -228,6 +273,7 @@ public class InstallationDriver {
             guiTest1.addKeyAction(KeyEvent.VK_TAB);
             guiTest1.addKeyAction(KeyEvent.VK_TAB);
             guiTest1.addKeyAction(KeyEvent.VK_TAB);
+            guiTest1.addKeyAction(KeyEvent.VK_TAB);
             guiTest1.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest1);
             guiTests.add(guiTest1);
@@ -241,7 +287,9 @@ public class InstallationDriver {
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_SPACE); // select 'All'
+            guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
@@ -255,6 +303,7 @@ public class InstallationDriver {
             GuiAutotest guiTest3 = new GuiAutotest(getOriginalCommandLine());
             buildLanguageAndLicensePage(guiTest3);
             // type page - use 'Custom'
+            guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_SPACE); // select 'Custom'
@@ -271,6 +320,21 @@ public class InstallationDriver {
             guiTest3.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest3);
             guiTests.add(guiTest3);
+
+            GuiAutotest guiTest4 = new GuiAutotest(getOriginalCommandLine());
+            buildLanguageAndLicensePage(guiTest4);
+            // type page - use 'Standalone'
+            guiTest4.addKeyAction(KeyEvent.VK_TAB);
+            guiTest4.addKeyAction(KeyEvent.VK_TAB);
+            guiTest4.addKeyAction(KeyEvent.VK_SPACE); // select 'Standalone'
+            guiTest4.addKeyAction(KeyEvent.VK_TAB);
+            guiTest4.addKeyAction(KeyEvent.VK_TAB);
+            guiTest4.addKeyAction(KeyEvent.VK_TAB);
+            guiTest4.addKeyAction(KeyEvent.VK_TAB);
+            guiTest4.addKeyAction(KeyEvent.VK_SPACE);
+            buildRestOfGuiPages(guiTest4);
+            guiTest4.setVerifier(new StandaloneVerifier());
+            guiTests.add(guiTest4);
         }
 
         // build array
@@ -319,7 +383,7 @@ public class InstallationDriver {
             guiTest.addKeyAction(KeyEvent.VK_TAB);
         }
         guiTest.addKeyAction(KeyEvent.VK_SPACE);
-        // summary page
+        // overview page
         if (guiTest.hasJavaHomeDeviation()) {
             guiTest.addKeyAction(KeyEvent.VK_SPACE, 3000); // enough time to check the java version
         } else {
@@ -333,4 +397,41 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_SPACE);
     }
 
+    private static class StandaloneVerifier extends AbstractVerifier {
+        public void verify() throws DriverException {
+            // make sure only JYTHON_JAR is in the target directory
+            if (getTargetDir().listFiles().length != 1) {
+                throw new DriverException("more than " + JYTHON_JAR + " installed");
+            }
+            // make sure JYTHON_JAR contains a MANIFEST and a /Lib directory
+            File jythonJar = getTargetDir().listFiles()[0];
+            JarFile jar = null;
+            try {
+                jar = new JarFile(jythonJar);
+                if (jar.getManifest() == null) {
+                    throw new DriverException(JYTHON_JAR + " contains no MANIFEST");
+                }
+                boolean hasLibDir = false;
+                Enumeration entries = jar.entries();
+                while (!hasLibDir && entries.hasMoreElements()) {
+                    JarEntry entry = (JarEntry) entries.nextElement();
+                    if (entry.getName().startsWith("Lib/")) {
+                        hasLibDir = true;
+                    }
+                }
+                if (!hasLibDir) {
+                    throw new DriverException(JYTHON_JAR + " contains no /Lib directory");
+                }
+            } catch (IOException e) {
+                throw new DriverException(e);
+            } finally {
+                if (jar != null) {
+                    try {
+                        jar.close();
+                    } catch (IOException ioe) {
+                    }
+                }
+            }
+        }
+    }
 }

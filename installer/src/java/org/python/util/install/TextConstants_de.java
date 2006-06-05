@@ -52,6 +52,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { OTHER, "Ein abweichendes" }, // directory
         { OVERVIEW_DESCRIPTION, "Sie haben folgende Einstellungen für die Installation ausgewählt" }, // overview
         { OVERVIEW_TITLE, "Übersicht über die gewählten Einstellungen" }, // overview
+        { PACKING_STANDALONE_JAR, "Das standalone " + JarInstaller.JYTHON_JAR + " File wird erstellt ..." }, // progress
         { PLEASE_ACCEPT_LICENSE, "Bitte lesen und akzeptieren Sie die Lizenzvereinbarung" }, // license
         { PLEASE_README, "Bitte lesen Sie die folgenden Informationen" }, // readme
         { PLEASE_READ_LICENSE, "Bitte lesen Sie die Lizenzvereinbarung sorfältig durch" }, // license
@@ -94,6 +95,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte Java Home Verzeichnis ein ({0} fuer das aktuelle)" }, // console
         { C_ENGLISH, "Englisch" }, // language
         { C_EXCLUDE, "Moechten Sie Teile von der Installation ausschliessen ?" }, // installation type
+        { C_GENERATING_START_SCRIPTS, "Start Scripts werden generiert ..." }, // progress
         { C_GERMAN, "Deutsch" }, // language
         { C_INCLUDE, "Moechten Sie weitere Teile installieren ?" }, // installation type
         { C_INEXCLUDE_PARTS, "Folgende Teile stehen zur Auswahl ({0} = keine weiteren)" }, // installation type
@@ -110,6 +112,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_NOT_FOUND, "{0} nicht gefunden." }, // error
         { C_OS_VERSION, "Ihre Betriebssystem Version ist: {0} / {1}" }, // version
         { C_OVERWRITE_DIRECTORY, "Das Verzeichnis {0} enthaelt bereits Daten, und die Installation wuerde diese ueberschreiben - ok ?" }, // console
+        { C_PACKING_STANDALONE_JAR, "Das standalone " + JarInstaller.JYTHON_JAR + " File wird erstellt ..." }, // progress
         { C_PROCEED, "Bitte druecken Sie Enter um weiterzufahren" }, // console
         { C_PROCEED_ANYWAY, "Bitte druecken Sie Enter um trotzdem weiterzufahren" }, // console
         { C_READ_LICENSE, "Moechten Sie die Lizenzvereinbarung jetzt lesen ?" }, // license
@@ -118,6 +121,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { C_SELECT_INSTALL_TYPE, "Bitte waehlen Sie den Installationstyp" }, // installation type
         { C_SELECT_LANGUAGE, "Bitte waehlen Sie Ihre Sprache" }, // language
         { C_SILENT_INSTALLATION, "Die Installation wird ohne Benutzerinteraktion ausgefuehrt" }, // installation mode
+        { C_STANDALONE, "Standalone (ein ausfuehrbares .jar File)" }, //installation mode
         { C_STANDARD, "Standard (Kern, Bibliotheksmodule, Demos und Beispiele, Dokumentation)" }, // installation type
         { C_SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
         { C_SUMMARY, "Zusammenfassung:" }, // summary

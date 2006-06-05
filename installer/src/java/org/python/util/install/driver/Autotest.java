@@ -18,6 +18,7 @@ public abstract class Autotest implements InstallationListener {
     private File _javaHome;
     private boolean _verbose;
     private String[] _commandLineArgs;
+    private Verifier _verifier;
 
     /**
      * constructor
@@ -148,6 +149,18 @@ public abstract class Autotest implements InstallationListener {
         setCommandLineArgs(addArgument(newArgument, getCommandLineArgs()));
     }
 
+    /**
+     * set the verifier
+     */
+    protected void setVerifier(Verifier verifier) {
+        _verifier = verifier;
+        _verifier.setTargetDir(getTargetDir());
+    }
+
+    protected Verifier getVerifier() {
+        return _verifier;
+    }
+
     //
     // private stuff
     //
@@ -191,7 +204,7 @@ public abstract class Autotest implements InstallationListener {
      */
     private void createRootDirectory() throws IOException, DriverException {
         File tmpFile = File.createTempFile("jython.autoinstall.root_", _DIR_SUFFIX);
-        if (createTempDirectory(tmpFile)) {
+        if (FileHelper.createTempDirectory(tmpFile)) {
             _rootDirectory = tmpFile;
         } else {
             throw new DriverException("unable to create root temporary directory");
@@ -206,27 +219,10 @@ public abstract class Autotest implements InstallationListener {
      */
     private void createTargetDirectory() throws IOException, DriverException {
         File tmpFile = File.createTempFile(getName(), _DIR_SUFFIX, _rootDirectory);
-        if (createTempDirectory(tmpFile)) {
+        if (FileHelper.createTempDirectory(tmpFile)) {
             _targetDir = tmpFile;
         } else {
             throw new DriverException("unable to create temporary target directory");
-        }
-    }
-
-    /**
-     * create a temporary directory with the same name as the passed in File (which may exist as file, not directory)
-     * 
-     * @param tempDirectory
-     * @return <code>true</code> only if the the directory was successfully created (or already existed)
-     */
-    private boolean createTempDirectory(File tempDirectory) {
-        if (!tempDirectory.isDirectory()) {
-            if (tempDirectory.exists()) {
-                tempDirectory.delete();
-            }
-            return tempDirectory.mkdir();
-        } else {
-            return true;
         }
     }
 

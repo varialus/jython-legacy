@@ -53,6 +53,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { OTHER, "Other" }, // directory
         { OVERVIEW_DESCRIPTION, "The installation will be done using the following options" }, // overview
         { OVERVIEW_TITLE, "Overview (summary of options)" }, // overview
+        { PACKING_STANDALONE_JAR, "Packing standalone " + JarInstaller.JYTHON_JAR + " ..." }, // progress
         { PLEASE_ACCEPT_LICENSE, "Please read and accept the license agreement" }, // license
         { PLEASE_README, "Please read the following information" }, // readme
         { PLEASE_READ_LICENSE, "Please read the license agreement carefully" }, // license
@@ -95,6 +96,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_ENTER_JAVA_HOME, "Please enter the target java home directory ({0} for current)" }, // console
         { C_ENGLISH, "English" }, // language
         { C_EXCLUDE, "Do you want to exclude parts from the installation ?" }, // installation type
+        { C_GENERATING_START_SCRIPTS, "Generating start scripts ..." }, // progress
         { C_GERMAN, "German" }, // language
         { C_INCLUDE, "Do you want to install additional parts ?" }, // installation type
         { C_INEXCLUDE_PARTS, "The following parts are selectable ({0} = no more)" }, // installation type
@@ -111,6 +113,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_NOT_FOUND, "{0} not found. " }, // error
         { C_OS_VERSION, "Your operation system version is: {0} / {1}" }, // version
         { C_OVERWRITE_DIRECTORY, "Directory {0} is not empty - ok to overwrite contents ?" }, // console
+        { C_PACKING_STANDALONE_JAR, "Packing standalone " + JarInstaller.JYTHON_JAR + " ..." }, // progress
         { C_PROCEED, "Please press Enter to proceed" }, // console
         { C_PROCEED_ANYWAY, "Please press Enter to proceed anyway" }, // console
         { C_READ_LICENSE, "Do you want to read the license agreement now ?" }, // license
@@ -119,6 +122,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_SELECT_INSTALL_TYPE, "Please select the installation type" }, // installation type
         { C_SELECT_LANGUAGE, "Please select your language" }, // language
         { C_SILENT_INSTALLATION, "Performing silent installation" }, // installation mode
+        { C_STANDALONE, "Standalone (a single, executable .jar)" }, //installation mode
         { C_STANDARD, "Standard (core, library modules, demos and examples, documentation)" }, // installation type
         { C_SUCCESS, "You successfully installed Jython {0} to directory {1}." }, // success
         { C_SUMMARY, "Summary:" }, // summary

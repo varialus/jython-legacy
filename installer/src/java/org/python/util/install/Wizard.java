@@ -21,7 +21,7 @@ public class Wizard extends AbstractWizard implements TextKeys {
         javaPage.setValidator(new JavaSelectionPageValidator(javaPage));
         OverviewPage overviewPage = new OverviewPage();
         ProgressPage progressPage = new ProgressPage(jarInfo, autotest);
-        ReadmePage readmePage = new ReadmePage();
+        ReadmePage readmePage = new ReadmePage(jarInfo);
         SuccessPage successPage = new SuccessPage(jarInfo);
 
         this.addPage(languagePage);

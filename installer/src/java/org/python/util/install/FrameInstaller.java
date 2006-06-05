@@ -22,6 +22,7 @@ public class FrameInstaller {
     private static final String INEX_DEMO_PROPERTY = "FrameInstaller.demo";
     private static final String INEX_DOC_PROPERTY = "FrameInstaller.doc";
     private static final String INEX_SRC_PROPERTY = "FrameInstaller.src";
+    private static final String STANDALONE_PROPERTY = "FrameInstaller.standalone";
 
     private static Properties _properties = new Properties();
 
@@ -90,6 +91,9 @@ public class FrameInstaller {
 
     protected static InstallationType getInstallationType() {
         InstallationType installationType = new InstallationType();
+        if (Boolean.valueOf(getProperty(STANDALONE_PROPERTY)).booleanValue()) {
+            installationType.setStandalone();
+        }
         if (Boolean.valueOf(getProperty(INEX_MOD_PROPERTY)).booleanValue()) {
             installationType.addLibraryModules();
         } else {
@@ -114,6 +118,7 @@ public class FrameInstaller {
     }
 
     protected static void setInstallationType(InstallationType installationType) {
+        setProperty(STANDALONE_PROPERTY, Boolean.toString(installationType.isStandalone()));
         setProperty(INEX_MOD_PROPERTY, Boolean.toString(installationType.installLibraryModules()));
         setProperty(INEX_DEMO_PROPERTY, Boolean.toString(installationType.installDemosAndExamples()));
         setProperty(INEX_DOC_PROPERTY, Boolean.toString(installationType.installDocumentation()));

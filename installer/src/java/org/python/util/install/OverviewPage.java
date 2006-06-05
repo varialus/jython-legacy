@@ -38,9 +38,11 @@ public class OverviewPage extends AbstractWizardPage {
         _directoryLabel = new JLabel();
         _directory = new JTextField(_LONGER_LENGTH);
         _directory.setEditable(false);
+        _directory.setFocusable(false);
         _typeLabel = new JLabel();
         _type = new JTextField(_LONGER_LENGTH);
         _type.setEditable(false);
+        _type.setFocusable(false);
 
         _osLabel = new JLabel();
         JTextField osName = new JTextField(_LONGER_LENGTH);
@@ -56,14 +58,19 @@ public class OverviewPage extends AbstractWizardPage {
         _osBox = new JCheckBox();
         _osBox.setEnabled(false);
         _osBox.setSelected(Installation.isValidOs());
+        _osBox.setFocusable(false);
 
         _javaLabel = new JLabel();
+        _javaLabel.setFocusable(false);
         _javaVendor = new JTextField(_LONGER_LENGTH);
         _javaVendor.setEditable(false);
+        _javaVendor.setFocusable(false);
         _javaVersion = new JTextField(_SHORTER_LENGTH);
         _javaVersion.setEditable(false);
+        _javaVersion.setFocusable(false);
         _javaBox = new JCheckBox();
         _javaBox.setEnabled(false);
+        _javaBox.setFocusable(false);
 
         _message = new JLabel();
 
@@ -147,7 +154,6 @@ public class OverviewPage extends AbstractWizardPage {
         _directoryLabel.setText(getText(TARGET_DIRECTORY_PROPERTY) + ": ");
         _directory.setText(FrameInstaller.getTargetDirectory());
         _directory.setToolTipText(FrameInstaller.getTargetDirectory());
-        _directory.setFocusable(false);
 
         // type
         _typeLabel.setText(getText(INSTALLATION_TYPE) + ": ");
@@ -164,27 +170,39 @@ public class OverviewPage extends AbstractWizardPage {
         } else {
             typeText = getText(CUSTOM);
             typeText += " (";
+            boolean predecessor = false;
             if (installationType.installLibraryModules()) {
-                typeText += " ";
+                if (predecessor) {
+                    typeText += " ";
+                }
                 typeText += InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES;
+                predecessor = true;
             }
             if (installationType.installDemosAndExamples()) {
-                typeText += " ";
+                if (predecessor) {
+                    typeText += " ";
+                }
                 typeText += InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES;
+                predecessor = true;
             }
             if (installationType.installDocumentation()) {
-                typeText += " ";
+                if (predecessor) {
+                    typeText += " ";
+                }
                 typeText += InstallerCommandLine.INEXCLUDE_DOCUMENTATION;
+                predecessor = true;
             }
             if (installationType.installSources()) {
-                typeText += " ";
+                if (predecessor) {
+                    typeText += " ";
+                }
                 typeText += InstallerCommandLine.INEXCLUDE_SOURCES;
+                predecessor = true;
             }
             typeText += ")";
         }
         _type.setText(typeText);
         _type.setToolTipText(typeText);
-        _type.setFocusable(false);
 
         // os
         _osLabel.setText(getText(OS_INFO) + ": ");
@@ -195,18 +213,14 @@ public class OverviewPage extends AbstractWizardPage {
             osText = getText(MAYBE_NOT_SUPPORTED);
         }
         _osBox.setText(osText);
-        _osBox.setFocusable(false);
 
         // java
         _javaLabel.setText(getText(JAVA_INFO) + ": ");
-        _javaLabel.setFocusable(false);
         JavaVersionInfo javaVersionInfo = FrameInstaller.getJavaVersionInfo();
         _javaVendor.setText(javaVersionInfo.getVendor());
         _javaVendor.setToolTipText(javaVersionInfo.getVendor());
-        _javaVendor.setFocusable(false);
         _javaVersion.setText(javaVersionInfo.getVersion());
         _javaVersion.setToolTipText(javaVersionInfo.getVersion());
-        _javaVersion.setFocusable(false);
         _javaBox.setSelected(Installation.isValidJava(javaVersionInfo));
         String javaText;
         if (_javaBox.isSelected()) {
@@ -215,7 +229,6 @@ public class OverviewPage extends AbstractWizardPage {
             javaText = getText(NOT_OK);
         }
         _javaBox.setText(javaText);
-        _javaBox.setFocusable(false);
 
         // message
         _message.setText(getText(CONFIRM_START, getText(NEXT)));

@@ -17,6 +17,8 @@ import java.util.zip.ZipInputStream;
  * moment).
  */
 public class JarInstaller {
+    public static final String JYTHON_JAR = "jython.jar";
+    
     private static final String PATH_SEPARATOR = "/";
     private static final String LIB_NAME_SEP = "Lib" + PATH_SEPARATOR;
     private static final String LIB_PAWT_SEP = LIB_NAME_SEP + "pawt" + PATH_SEPARATOR;
@@ -63,6 +65,11 @@ public class JarInstaller {
                 excludeDirs.add(LIB_NAME_SEP + "test");
                 excludeDirs.add(LIB_NAME_SEP + "jxxload_help");
                 coreLibFiles = getCoreLibFiles();
+            }
+            if (installationType.isStandalone()) {
+                excludeDirs.add("Tools");
+                excludeDirs.add(LIB_NAME_SEP + "email/test");
+                excludeDirs.add(LIB_NAME_SEP + "test");
             }
 
             int count = 0;
@@ -129,10 +136,24 @@ public class JarInstaller {
                 zipInput.closeEntry();
                 zipEntry = zipInput.getNextEntry();
             }
-            // generate start scripts
-            _progressListener.progressStartScripts();
-            StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
-            generator.generateStartScripts();
+            if (!installationType.isStandalone()) {
+                // generate start scripts
+                _progressListener.progressStartScripts();
+                StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
+                generator.generateStartScripts();
+            } else {
+                _progressListener.progressStandalone();
+                File jythonJar = new File(targetDirectory, JYTHON_JAR);
+                File jythonPlainJar = new File(targetDirectory, "plain_" + JYTHON_JAR);
+                jythonJar.renameTo(jythonPlainJar);
+                File libDir = new File(targetDirectory, "Lib");
+                StandalonePackager packager = new StandalonePackager(jythonJar);
+                packager.addJarFile(jythonPlainJar);
+                _progressListener.progressChanged(90); // approx
+                packager.addFullDirectory(libDir);
+                packager.close();
+                StandalonePackager.emptyDirectory(targetDirectory, jythonJar);
+            }
             // end
             _progressListener.progressFinished();
             Iterator installationListenersIterator = _installationListeners.iterator();
@@ -153,7 +174,11 @@ public class JarInstaller {
     private int approximateNumberOfEntries(InstallationType installationType) {
         int numberOfEntries = 65; // core (minimum)
         if (installationType.installLibraryModules()) {
-            numberOfEntries += 664;
+            if (installationType.isStandalone()) {
+                numberOfEntries += 240;
+            } else {
+                numberOfEntries += 664;
+            }
         }
         if (installationType.installDemosAndExamples()) {
             numberOfEntries += 44;

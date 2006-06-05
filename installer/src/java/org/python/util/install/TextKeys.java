@@ -48,6 +48,7 @@ public interface TextKeys {
     public static final String OTHER = "OTHER";
     public static final String OVERVIEW_DESCRIPTION = "OVERVIEW_DESCRIPTION";
     public static final String OVERVIEW_TITLE = "OVERVIEW_TITLE";
+    public static final String PACKING_STANDALONE_JAR = "PACKING_STANDALONE_JAR";
     public static final String PLEASE_ACCEPT_LICENSE = "PLEASE_ACCEPT_LICENSE";
     public static final String PLEASE_README = "PLEASE_README";
     public static final String PLEASE_READ_LICENSE = "PLEASE_READ_LICENSE";
@@ -90,6 +91,7 @@ public interface TextKeys {
     public static final String C_ENTER_TARGET_DIRECTORY = "C_ENTER_TARGET_DIRECTORY";
     public static final String C_ENTER_JAVA_HOME = "C_ENTER_JAVA_HOME";
     public static final String C_EXCLUDE = "C_EXCLUDE";
+    public static final String C_GENERATING_START_SCRIPTS = "C_GENERATE_START_SCRIPTS";
     public static final String C_GERMAN = "C_GERMAN";
     public static final String C_INCLUDE = "C_INCLUDE";
     public static final String C_INEXCLUDE_PARTS = "C_INEXCLUDE_PARTS";
@@ -106,6 +108,7 @@ public interface TextKeys {
     public static final String C_NOT_FOUND = "C_NOT_FOUND";
     public static final String C_OS_VERSION = "C_OS_VERSION";
     public static final String C_OVERWRITE_DIRECTORY = "C_OVERWRITE_DIRECTORY";
+    public static final String C_PACKING_STANDALONE_JAR = "C_PACKING_STANDALONE_JAR";
     public static final String C_PROCEED = "C_PROCEED";
     public static final String C_PROCEED_ANYWAY = "C_PROCEED_ANYWAY";
     public static final String C_READ_LICENSE = "C_READ_LICENSE";
@@ -114,6 +117,7 @@ public interface TextKeys {
     public static final String C_SELECT_INSTALL_TYPE = "C_SELECT_INSTALL_TYPE";
     public static final String C_SELECT_LANGUAGE = "C_SELECT_LANGUAGE";
     public static final String C_SILENT_INSTALLATION = "C_SILENT_INSTALLATION";
+    public static final String C_STANDALONE = "C_STANDALONE";
     public static final String C_STANDARD = "C_STANDARD";
     public static final String C_SUCCESS = "C_SUCCESS";
     public static final String C_SUMMARY = "C_SUMMARY";

@@ -2,6 +2,7 @@ package org.python.util.install;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -11,9 +12,11 @@ import javax.swing.JTextArea;
 public class ReadmePage extends AbstractWizardPage {
 
     private JTextArea _textArea;
+    private JarInfo _jarInfo;
 
-    public ReadmePage() {
+    public ReadmePage(JarInfo jarInfo) {
         super();
+        _jarInfo = jarInfo;
         initComponents();
     }
 
@@ -56,7 +59,11 @@ public class ReadmePage extends AbstractWizardPage {
     }
 
     protected void activate() {
-        _textArea.setText(Installation.getReadmeText(FrameInstaller.getTargetDirectory()));
+        try {
+            _textArea.setText(_jarInfo.getReadmeText());
+        } catch (IOException ioe) {
+            throw new InstallerException(ioe);
+        }
     }
 
     protected void passivate() {

@@ -27,6 +27,7 @@ public class JarInfo {
     private int _numberOfEntries;
     private Manifest _manifest;
     private String _licenseText;
+    private String _readmeText;
 
     public JarInfo() {
         _jarFile = null;
@@ -96,12 +97,19 @@ public class JarInfo {
         return _licenseText;
     }
 
+    public String getReadmeText() throws IOException {
+        if (_readmeText == null) {
+            readJarInfo();
+        }
+        return _readmeText;
+    }
+
     private void readJarInfo() throws IOException {
         String fullClassName = getClass().getName();
         String className = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
         URL url = getClass().getResource(className + ".class");
         // we expect an URL like:
-        //   jar:file:/C:/stuff/jython21i.jar!/org/python/util/install/JarInfo.class
+        // jar:file:/C:/stuff/jython21i.jar!/org/python/util/install/JarInfo.class
         String urlString = url.toString();
         int jarSeparatorIndex = urlString.indexOf(JAR_SEPARATOR);
         if (!urlString.startsWith(JAR_URL_PREFIX) || jarSeparatorIndex <= 0) {
@@ -122,7 +130,10 @@ public class JarInfo {
         while (entries.hasMoreElements()) {
             JarEntry entry = (JarEntry) entries.nextElement();
             if ("LICENSE.txt".equals(entry.getName())) {
-                _licenseText = readLicense(entry, jarFile);
+                _licenseText = readTextFile(entry, jarFile);
+            }
+            if ("README.txt".equals(entry.getName())) {
+                _readmeText = readTextFile(entry, jarFile);
             }
             _numberOfEntries++;
         }
@@ -133,7 +144,7 @@ public class JarInfo {
         jarFile.close();
     }
 
-    private String readLicense(JarEntry entry, JarFile jarFile) throws IOException {
+    private String readTextFile(JarEntry entry, JarFile jarFile) throws IOException {
         StringBuffer buffer = new StringBuffer(10000);
         BufferedReader reader = null;
         try {

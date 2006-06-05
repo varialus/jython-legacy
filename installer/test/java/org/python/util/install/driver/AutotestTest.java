@@ -47,11 +47,31 @@ public class AutotestTest extends TestCase {
         assertEquals("-u", _autotest.getCommandLineArgs()[args.length]);
     }
 
+    public void testVerify() throws Exception {
+        TestVerifier testVerifier = new TestVerifier();
+        _autotest.setVerifier(testVerifier);
+        assertNotNull(_autotest.getVerifier());
+        assertNotNull(_autotest.getVerifier().getTargetDir());
+        assertEquals(_autotest.getTargetDir(), testVerifier.getTargetDir());
+        try {
+            _autotest.getVerifier().verify();
+            fail("should have thrown");
+        } catch (DriverException de) {
+        }
+
+    }
+
     private void verifyDir(File dir, boolean ensureEmpty) {
         assertTrue(dir.exists());
         assertTrue(dir.isDirectory());
         if (ensureEmpty) {
             assertTrue(dir.listFiles().length <= 0);
+        }
+    }
+
+    private static class TestVerifier extends AbstractVerifier {
+        public void verify() throws DriverException {
+            throw new DriverException("test verification failure");
         }
     }
 

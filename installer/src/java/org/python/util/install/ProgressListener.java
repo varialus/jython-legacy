@@ -9,4 +9,7 @@ public interface ProgressListener extends InstallationListener {
     public void progressEntry(String entry);
 
     public void progressStartScripts();
+
+    public void progressStandalone();
+
 }

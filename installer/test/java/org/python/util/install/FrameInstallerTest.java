@@ -41,4 +41,23 @@ public class FrameInstallerTest extends TestCase {
         assertFalse(returnedType.installDocumentation());
         assertTrue(returnedType.installSources());
     }
+
+    public void testStandalone() {
+        InstallationType installationType = new InstallationType();
+        installationType.setStandalone();
+        assertTrue(installationType.installLibraryModules());
+        assertFalse(installationType.installDemosAndExamples());
+        assertFalse(installationType.installDocumentation());
+        assertFalse(installationType.installSources());
+
+        FrameInstaller.setInstallationType(installationType);
+        InstallationType returnedType = FrameInstaller.getInstallationType();
+
+        assertNotNull(returnedType);
+        assertTrue(returnedType.isStandalone());
+        assertTrue(returnedType.installLibraryModules());
+        assertFalse(returnedType.installDemosAndExamples());
+        assertFalse(returnedType.installDocumentation());
+        assertFalse(returnedType.installSources());
+    }
 }
