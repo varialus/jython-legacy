@@ -2,14 +2,14 @@
 type_name: property
 type_class: PyProperty
 # getsets
-expose_getset: fget getFget
-expose_getset: fset getFset
-expose_getset: fdel getFdel
-expose_getset: __doc__ getDoc
+expose_getset: fget getFget setFget
+expose_getset: fset getFset setFset
+expose_getset: fdel getFdel setFdel
+expose_getset: __doc__ getDoc setDoc
 # exposed methods
 expose_meth: __get__ oo?(null)
-  PyObject obj = (`arg0==Py.None)?null:`arg1;
-  PyObject type = (`arg1==Py.None)?null:`arg0;
+  PyObject obj = (`arg0==Py.None)?null:`arg0;
+  PyObject type = (`arg1==null)?obj:`arg1;
   return self.property___get__(obj, type);
 expose_meth: :- __set__ oo
 expose_meth: :- __delete__ o
