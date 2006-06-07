@@ -16,6 +16,7 @@ expose_meth: imeth3
   `ideleg`(imeth3,parent_);
 expose_meth: > imeth4
   `ideleg`(imeth4);
+expose_cmeth: cmeth
 expose_binary: prnt_> __add__ __sub__
 expose_unary: prnt_> __hex__
 

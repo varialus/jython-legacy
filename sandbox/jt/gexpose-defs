@@ -96,6 +96,38 @@ define: expose_narrow_meth typ name minargs maxargs call_meths
                 `minargs,
                 `maxargs,
                 new `concat`(exposed_,`name)(null, null)));    
+
+define: expose_narrow_cmeth typ name minargs maxargs call_meths
+        class `concat`(exposed_,`name) extends PyBuiltinFunctionNarrow {
+            private `typ self;
+
+            public PyObject getSelf() {
+                return self;
+            }
+
+            `concat`(exposed_,`name)(`typ self, PyBuiltinFunction.Info info) {
+                super(info);
+                this.self = self;
+            }
+
+            public PyBuiltinFunction makeBound(PyObject self) {
+                return new `concat`(exposed_,`name)((`typ)self, info);
+            }
+
+            `call_meths;
+
+        }
+
+        dict.__setitem__(
+            `strfy`(`name),
+            new PyClassMethod(
+            new PyMethodDescr(
+                `strfy`(`name),
+                `typ.class,
+                `minargs,
+                `maxargs,
+                new `concat`(exposed_,`name)(null, null))));    
+
 define: conv_error_handling unsafe_body
      try {
          `unsafe_body;

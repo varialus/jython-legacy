@@ -28,6 +28,7 @@ class Gen:
                       'expose_vanilla_cmp','expose_vanilla_pow',
                       'expose_key_getitem',
                       'expose_index_getitem',
+                      'expose_cmeth',
                       'expose_meth',
                       'expose_wide_meth',
                       'expose_new_mutable',
@@ -305,6 +306,41 @@ class Gen:
     def dire_expose_meth(self,name,parm,body): # !!!
         parm, prefix, body = self.expose_meth_body(name, parm, body)
         expose = self.get_aux('expose_narrow_meth')
+
+        type_class = getattr(self,'type_class',None)
+        type_name = getattr(self,'type_name',None)
+        if type_class is None or type_name is None:
+            raise Exception,"type_class or type_name not defined"
+        parms = parm.strip().split(None,1)
+        if len(parms) not in (1,2):
+            self.invalid(name,parm)
+        if len(parms) == 1:
+            parms.append('')
+        expose_bindings = {}
+        expose_bindings['typ'] = type_class
+        expose_bindings['name'] = JavaTemplate(parms[0])
+        expose_bindings['deleg_prefix'] = make_name(prefix)
+
+        # !!!
+        call_meths_bindings = expose_bindings.copy()
+
+        body_bindings = self.global_bindings.copy()
+        body_bindings.update(expose_bindings)
+        
+        call_meths_bindings['call_meths'] = self.get_aux('call_meths').tbind({'typ': type_class})
+
+        inst_call_meths,minargs,maxargs = self.handle_expose_meth_sig(parms[1],call_meths_bindings,body,body_bindings)
+
+        expose_bindings['call_meths'] = inst_call_meths
+        expose_bindings['minargs'] = JavaTemplate(str(minargs))
+        expose_bindings['maxargs'] = JavaTemplate(str(maxargs))
+        
+        self.statements.append(expose.tbind(expose_bindings))
+
+    #XXX: First pass is a c&p and modify of dire_expose_meth: do better.
+    def dire_expose_cmeth(self,name,parm,body):
+        parm, prefix, body = self.expose_meth_body(name, parm, body)
+        expose = self.get_aux('expose_narrow_cmeth')
 
         type_class = getattr(self,'type_class',None)
         type_name = getattr(self,'type_name',None)
