@@ -2,5 +2,5 @@
 type_name: classmethod
 type_class: PyClassMethod
 # exposed methods
-expose_meth: __get__ oo
+expose_meth: __get__ oo?
 expose_new_immutable: 1 1
