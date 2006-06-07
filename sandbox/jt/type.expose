@@ -6,6 +6,7 @@ expose_getset: __dict__ getDict
 expose_getset: __name__ fastGetName
 expose_getset: __base__ getBase
 expose_getset: __bases__ getBases
+expose_getset: __mro__ getMro
 # exposed methods
 #expose_meth: :o mro o
 expose_meth: __getattribute__ n{attribute name}
