@@ -184,6 +184,8 @@ define: bdeleg: name deleg_prefix
   return Py.newBoolean(`deleg`(`name,`deleg_prefix));
 define: sdeleg: name deleg_prefix
   return new PyString(`deleg`(`name,`deleg_prefix));
+define: udeleg: name deleg_prefix
+  return new PyUnicode(`deleg`(`name,`deleg_prefix));
 define: void:
   return Py.None;
 define: expose_new

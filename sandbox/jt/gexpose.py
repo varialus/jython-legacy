@@ -258,7 +258,7 @@ class Gen:
             for dv in dfls[rng-1-dflc:]:
                 new_body_bindings["arg%d" % j] = dv
                 j += 1
-            for deleg_templ_name in ('void','deleg','vdeleg','rdeleg','ideleg','ldeleg','bdeleg','sdeleg'):
+            for deleg_templ_name in ('void','deleg','vdeleg','rdeleg','ideleg','ldeleg','bdeleg','sdeleg', 'udeleg'):
                 deleg_templ = self.get_aux(deleg_templ_name)
                 new_body_bindings[deleg_templ_name] = deleg_templ.tbind(new_body_bindings)
             body_jt = proto_body_jt.tbind(new_body_bindings)
@@ -293,6 +293,7 @@ class Gen:
                 ":l" : "`ldeleg;",
                 ":b" : "`bdeleg;",
                 ":s" : "`sdeleg;",
+                ":u" : "`udeleg;",
                 ":-" : "`vdeleg; `void; ",
                 ":o" : "`rdeleg;"
                 }.get(retk, None)
