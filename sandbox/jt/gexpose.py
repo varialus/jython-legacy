@@ -11,7 +11,20 @@ import java_templating
 from java_templating import JavaTemplate,jast_make,jast, make_id, make_literal
 
 
+# Some examples for modif_re
+# (one)two -> group 1 = "one"
+#             group 2 = "two"
+# (one,two,three)four -> group 1 = "one,two,three"
+#                        group 2 = "four"
+# hello -> group 1 = None
+#          group 2 = "hello"
 modif_re = re.compile(r"(?:\(([\w,]+)\))?(\w+)")
+
+# Explanation of named groups in regular expression ktg_re:
+# k = one character key ("o","i" and "s" in "ois")
+# opt = optional (the "?" in "o?")
+# dfl = default for optional (the "blah" in o?(blah) )
+# tg = ? (the "anything_can_go_here in o{anything_can_go_here} )
 ktg_re = re.compile("(?P<k>\w)(?P<opt>\?(:?\((?P<dfl>[^)]*)\))?)?(?:\{(?P<tg>[^}]*)\})?")
 
 def make_name(n):
