@@ -150,7 +150,6 @@ public class StandalonePackager {
         for (int i = 0; i < filesInDir.length; i++) {
             File currentFile = filesInDir[i];
             if (currentFile.isFile()) {
-                // check exclude
                 if (parentDir != null && parentDir.length() > 0) {
                     addFile(currentFile, parentDir + "/" + dir.getName());
                 } else {
@@ -159,11 +158,11 @@ public class StandalonePackager {
             } else {
                 String newParentDir = null;
                 if (parentDir != null && parentDir.length() > 0) {
-                    newParentDir = parentDir + File.separator + dir.getName();
+                    newParentDir = parentDir + "/" + dir.getName();
                 } else {
                     newParentDir = dir.getName();
                 }
-                addDirectory(filesInDir[i], newParentDir);
+                addDirectory(currentFile, newParentDir);
             }
         }
     }
