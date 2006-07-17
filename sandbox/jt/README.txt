@@ -11,5 +11,5 @@ with the script gderived.py.  For the PyInteger class it is created thus:
 
   python gderived.py int.derived >../../jython/src/org/python/core/PyIntegerDerived.java
 
-Note:  The above exmples assume that the whole jython trunk is checked out so 
+Note:  The above examples assume that the whole jython trunk is checked out so 
 that the trunk/sandbox directory is a sibling of the trunk/jython directory.
