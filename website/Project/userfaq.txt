@@ -32,13 +32,13 @@ paragraph 4 in the JPython-1.1 license: ::
 
 Is Jython the same language as Python?
 --------------------------------------
-We will always strive to ensure that Jython remains as compatible with
-CPython as possible. Nevertheless, there are a number of differences
-between the two implementations that are unlikely to go away. These range
-from the trivial - Jython's code objects don't have a co_code attribute
-because they don't have any Python bytecodes; to the significant -
-Jython uses Java's true garbage collection rather than Python's reference
-counting scheme.
+Yes. Jython is an implementation of the Python language in Java. We strive to ensure that Jython remains as compatible with CPython as possible. The latest Jython release (2.1) implements the same language as CPython 2.1 and many of the CPython standard library modules.
+
+There are two incompatibilities with modern CPython that often catch newcomers. First, Jython 2.1 does not implement any features added to CPython in version 2.2 or later. This includes language features such as generators, and library modules such as optparse. A more modern version of Jython is under active development.
+
+Second, Jython programs cannot use CPython extension modules written in C. These modules usually have files with the extension .pyc, .pyd or .dll. If you want to use such a module, you should look for an equivalent written in pure Python or Java.
+
+There are a number of other differences between the two implementations that are unlikely to go away. These range from the trivial - Jython's code objects don't have a co_code attribute because they don't have any Python bytecodes; to the significant - Jython uses Java's true garbage collection rather than Python's reference counting scheme.
 
   http://jython.sourceforge.net/docs/differences.html
 
@@ -306,13 +306,13 @@ Java classes that emulate Jython Dictionaries and Sequences
 In order to emulate Dictionaries and Sequences, first your Java class must
 "extend" the org.python.core.PyObject class. The following methods can
 then be defined on your class in order to emulate these basic Jython
-types:
+types::
 
-public PyObject __finditem__(PyObject key);
+  public PyObject __finditem__(PyObject key);
 
-public void __setitem__(PyObject key, PyObject value);
+  public void __setitem__(PyObject key, PyObject value);
 
-public void __delitem__(PyObject key);
+  public void __delitem__(PyObject key);
 
 Additionally, you might want to throw the org.python.core.Py.KeyError
 object if you have any exceptions (Note, you need not declare the Java
@@ -322,13 +322,13 @@ Emulating Jython object attribute access with a Java class
 ----------------------------------------------------------
 You can develop your own Java class that emulates Jython objects by
 first extending the org.python.core.PyObject class. Then, implement the
-following methods on your Java class:
+following methods on your Java class::
 
-public PyObject __findattr__(String name);
+  public PyObject __findattr__(String name);
 
-public void __setattr__(String name, PyObject value);
+  public void __setattr__(String name, PyObject value);
 
-public void __delattr__(String name);
+  public void __delattr__(String name);
 
 You may also want to raise exceptions using the
 org.python.core.Py.AttributeError error class. (Note, you do not need
@@ -342,17 +342,17 @@ If you plan on storing functions as attributes of your Java object (so
 that you could say "foo.bar('baz', 'fizzle')", be forwarned that Jython
 *may or may not* call the __findattr__ method to find the function object
 depending on the number/types of parameters. You should, additionally,
-implement the following methods:
+implement the following methods::
 
-public PyObject invoke(String name);
+  public PyObject invoke(String name);
 
-public PyObject invoke(String name, PyObject arg1);
+  public PyObject invoke(String name, PyObject arg1);
 
-public PyObject invoke(String name, PyObject arg1, PyObject arg2);
+  public PyObject invoke(String name, PyObject arg1, PyObject arg2);
 
-public PyObject invoke(String name, PyObject[] args);
+  public PyObject invoke(String name, PyObject[] args);
 
-public PyObject invoke(String name, PyObject[] args, String[] keywords);
+  public PyObject invoke(String name, PyObject[] args, String[] keywords);
 
 .. Note: Writing new-style classes (only possible in versions > 2.1)
    is a bit more complicated.  This needs more documentation.
@@ -389,7 +389,7 @@ and instances can be created from your application.
 
 Create a python module (say Foo.py) and make a class with the same
 name as the python module. The class must inherit from a java class
-or interface. If you don't need a particular java superclass, just use
+or interface. If you don't need a particular Java superclass, just use
 java.lang.Object.::
 
   import java
@@ -401,7 +401,7 @@ The python class can overwrite all existing methods on the java superclass
 or interface and these overridden methods can be called from the java
 application. New methods can by default not be accessed from java. If
 we add a "bar" method, the method can be used from python, but not from
-java. ::
+Java. ::
 
   import java
   class Foo(java.util.Date):
