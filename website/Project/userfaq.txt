@@ -5,19 +5,24 @@ Jython FAQ
 .. contents:: Table of Contents
 .. sectnum::
 
-General information and availability
+General Information
 ====================================
 
 What is Jython?
 ---------------
+Jython implements the Python programming language on the Java(tm)
+Platform. It consists of a compiler to compile Python source code down
+to Java bytecodes which can run directly on a JVM, a set of support
+libraries which are used by the compiled Java bytecodes, and extra
+support to make it trivial to use Java packages from within Jython. 
+
+How does Jython relate to JPython?
+------------------------------------------------------
 Jython is the successor to JPython. The Jython project was created in
 accordance with the CNRI JPython 1.1.x license, in order to ensure the
 continued existence and development of this important piece of Python
 software. The intent is to manage this project with the same open policies
 that are serving CPython so well.
-
-Mailing lists, SVN and all current information on the Jython project is
-available at SourceForge, at http://sourceforge.net/projects/jython
 
 The name had to be changed to something other than JPython, because of
 paragraph 4 in the JPython-1.1 license: ::
@@ -42,23 +47,18 @@ C-based implementation. The existence of Jython changed that for the first
 time and will hopefully lead to a much clearer sense of what Python the
 language is; independent of any specific implementation.
 
-.. FIXME: move/edit this paragraph.
-
-We will be preparing a version of Python's regression test that would
-be appropriate for new implementations of the language. This is a good
-first step towards defining what parts of Python are essential and which
-are incidental
-
 What is the current status of Jython?
 --------------------------------------
-The Jython project was announced on 19-oct-2000. The first alpha release
-occured on 26-nov-2000.
 
-The final release of Jython-2.0 occured on 17-jan-2001. The final release
-of Jython-2.1 occured on 31-dec-2001.
+Jython-2.1_ is the current production release.   It's feature set roughly
+corresponds to that of Python-2.1  It was released on 31-dec-2001.
 
-Current work include improvements to java integration and implementing
-the lastest features from CPython 2.2/3.
+Jython-2.2a1_ is the current development release.  It includes
+improvements to java integration and implements many new features from
+CPython 2.2/3.
+
+We're applying the finishing touches for 2.2b1 which completes
+new-style classes for 2.2 and solves many Java integration issues.
 
 How fast is Jython?
 -------------------
@@ -71,128 +71,25 @@ slow startup time, Jython starts much more slowly (2.4 s) than CPython
 (80 ms). This means you don't want to do standard CGI in Jython, but
 long-running processes are fine.
 
-The following notes are retained for historical interest.
-
-At IPC-6 JimH reported speeds equal to CPython 1.4 on the pystone
-benchmark. When Guido released CPython 1.5 he succeeded in making it
-about 2x faster than the 1.4 release. The current release of CPython
-is 1.5.2 which might be only slightly faster than 1.5. JimH re-ran his
-benchmark tests against CPython 1.5 and his then current release of
-Jython, finding that Jython was about 2.5x slower than CPython 1.5. I
-have recently run a few informal benchmarks and found some interesting
-numbers: using Sun's JDK 1.2.1 with JIT on a Solaris 2.6 Sparc Ultra 2,
-I found Jython 1.1beta3 to produce pystone numbers equal to (or very
-slightly better than) CPython 1.5.2+.
-
-The problem, of course, is that JITs are still not reliable enough for
-Jython. Turning off the JIT on the above platform, can slow Jython down
-by a factor of 10.
-
-The speed of Jython is tied very tightly to the speed of the underlying
-JVM. The benchmark results that JimH reported were all using Microsoft's
-JVM from Internet Explorer 4.0. The next fastest JVM that he used was
-almost a factor of 2 slower than this. Since the performance of JVMs
-changes nearly every day, at some point I'll need to collect a set of
-scores comparing pystone performance on a wider variety of JVM's.
-
-Finally, pystone is not the last word in benchmarking. At the moment
-I'm more concerned with making Jython complete and correct than with
-performance. We will continually be revisiting performance issues both to
-examine better benchmark's for comparing Jython and CPython (as well as
-other scripting languages for the JVM) and work at optimizing Jython's
-performance.
-
 Installing Jython
 =================
 
-Why do I get NoClassDefFoundError when running the installer
-------------------------------------------------------------
+Why do I get NoClassDefFoundError when running the installer?
+----------------------------------------------------------------------
 Make sure that the class name on the command line doesn't end in
 .class. Also make sure that the installer actually exists in your current
 working directory.
 
-Why can't I use "from java import ..." on Windows?"
----------------------------------------------------
-This problem can occur if you are using Microsoft's VM (i.e. jview.exe)
-which provides the standard classes in a different format. You need to
-run the following command in a console window before using Jython: ::
-
-    clspack -auto
-
-What is "python.path" and "python.prepath" mean in the Jython registry
-----------------------------------------------------------------------
-
-.. FIXME: do we need to even talk about pre-2.0 anymore?
-
-The key "python.path" in the Jython registry changed in the 2.0 version.  This
-FAQ entry is intended to clarify registry keys related to sys.path
-settings.
-
-Before Fri, December 15, 2000- the "python.path" key in the registry file
-appended the given value to the sys.path list before the (sys.prefix)/lib
-directory is added. This means for Jython-2.0a1 and before, the above
-behavior is expected.
-
-Changes committed on December 15, 2000 change the behavior so that
-the registry's "python.path" key is appended to sys.path after
-(sys.prefix)/lib directory. This applies to CVS versions and any
-subsequently released versions of Jython.
-
-This mimics the behavior of the appending that takes place in the
-autoloaded site.py. Traditionally JPython users have appended the CPython
-path in this registry key; however, this was unsafe as it then preceded
-the Jython lib directory. This change eliminates errors associated with
-appending the CPython lib path in this key.
-
-For those instances where you do intend to add something to the
-sys.path before (sys.prefix)/lib, there is a new registry key called
-"python.prepath". This exists only after the 20001215 change date.
-
-Here is the summary of changing sys.path:
-
-Before 20001215:
-
-        1. python.path key appends given path before (sys.prefix)/lib.
-        Do not put the CPython Lib dir in the python.path key unless
-        you precede it with the Jython lib path.  (using site.py may be
-        a better choice).
-        2. Jython-2.0a1 autoloads site.py (as does Python20) and appends
-        path changes after (sys.prefix)/lib- a better alternative to
-        appending to sys.path.
-
-After 20001215:
-
-        1. python.path key appends given path after (sys.prefix)/lib.
-        Same as autoloaded site.py file.
-        2. A new key, "python.prepath", was added to append path's before
-        (sys.prefix)/lib if needed.
-
-If there is confusion about site.py:
-
-        site.py is automatically loaded on normal startup in Python 2.0
-        and Jython-2.0a1.  This used to be user-loaded in Python 1.5.2
-        and JPython11.
-
-Edit this entry / Log info
-
-Why no command-line history in Jython?
---------------------------------------
-The shells and other tools commonly associated with having a command-line
-history get this functionality from the C 'readline' package. There is
-experimental 'readline' classes in Java, and is likely to be in Jython's
-future. For the current release, there is console.py in the demo directory
-that adds a simple up/down.
-
-It is not commonly the case that programs look to the shell for this
-functionality, it is more common that readline is compiled in to the shell
-(or CPython) you are using which provides this functionality. However,
-some shells wrap the stdin/out of other programs (Jython). Shell mode in
-emacs is an excellent example. "rlterm", a shell that comes with the Unix
-version of Yorick, also does this (i.e. "rlterm jython"). There may be
-many others do the same so you can supplant the functionality of readline.
-
-Why do I get the error, "can't create package cache dir, '/cachedir/packages'"
+Why doesn't Jython have a command-line history?
 ------------------------------------------------------------------------------
+The shells and other tools commonly associated with having a command-line
+history get this functionality from the C 'readline' package. The
+java-readline_ library exposes readline to java.  See ReadlineSetup_ in
+the wiki for instructions on configuring it and other alternatives.
+For the 2.1 release, there is console.py in the demo directory that adds a simple up/down.
+
+Why do I get the error, "can't create package cache dir, '/cachedir/packages'"?
+--------------------------------------------------------------------------------
 An essential optimization in Jython is the caching of Java package
 information. The caching requires '/cachedir/packages/' in the python.home
 directory. It is often the case on `*nix` that users lack sufficient
@@ -202,8 +99,8 @@ Because the problem is merely permissions, something similar to "mkdir
 cachedir; chmod a+rw cachedir" within Jython's directory should eliminate
 this error message.
 
-Where's the registry file
--------------------------
+Where's the registry file?
+---------------------------
 Jython's installation includes a file called "registry" that you will find
 in the root directory of the Jython installation (e.g. /usr/local/jython
 or c:\jython).
@@ -248,7 +145,7 @@ subdirectory in the current directory do::
 Programming in Jython
 =====================
 
-Why can't I multiply inherit from two Java classes?
+Why can't I inherit from two Java classes?
 ---------------------------------------------------
 In earlier versions of JPython, you actually could. This was deliberately
 disabled in 1.1 for a variety of good reasons. For a detailed discussion
@@ -268,26 +165,20 @@ Python, an instance's methods live in the instance's class's dictionary,
 so dir(someJavaObject.__class__) would return a list of the method names
 (although only for the direct class, not for any base classes).
 
-I'm trying to execute a 'protected' or 'private' Java Instance Method or attribute in a Java package. How can I get access?
+Why can't I execute a 'protected' or 'private' Java instance method or
+access a 'protected' or 'private' attribute in a Java package?
 ---------------------------------------------------------------------------------------------------------------------------
-By default, as in Java, these methods are protected from external access,
-but there may be reasons, such as test scaffolding scripts, that this
-feature is not wanted. In the [jython home]/registry file::
+By default, as in Java, these methods are protected from external
+access.  Access to all Java fields and methods can be enabled with the
+python.security.respectJavaAccessibility registry setting::
 
   # Setting this to false will allow Jython to provide access to
   # non-public fields, methods, and constructors of Java objects.
   python.security.respectJavaAccessibility = false
 
-Can I reload a java class as is possible for python modules?
+Can I reload a Java class like a Python module?
 ------------------------------------------------------------
-The support for reloading java classes through reload(java-class),
-is disabled. The reload(java-class) only worked when the java class
-was a standalone class without any dependencies on other java classes
-(except the system class). When there was more than one class involved,
-the simple reload(java-class) no longer worked.
-
-Now on the other hand Jython 2.0 comes with jreload_, an alternative
-(experimental) user-level java classes reloader.
+Jython 2.0 comes with jreload_, an(experimental) user-level Java class reloader.
 
 Further Jython 2.0 internal changes enable the expert user to play with
 reloading and class-loaders as he would from native java.
@@ -332,9 +223,8 @@ A java null is turned into a Python None value::
   null returned
   >>>
 
-
-Where's the -O switch
----------------------
+Where's the -O switch?
+-------------------------------
 Jython 2.0 does not have a -O command-line switch.
 
 Assigning __debug__=0 has been used to get -O behavior from things like
@@ -344,35 +234,29 @@ a read-only variable.
 
 When I write to a file, it's empty. Why?
 ----------------------------------------
-The addition of buffering to the org.python.core.PyFile class in the 2.1
-development cycle changed the autoflushing of Jython file objects. In
-Jython 2.1x, you must explicitly flush() and/or close() a file object
+In Jython 2.1 and later, you must explicitly flush() and/or close() a file object
 opened for writing or appending before any data will actually be saved.
 
-This reflects the current status and is not meant to imply this will
-always be the case for Jython (but it may be for certain java versions).
-
-Currently, For example::
+For example::
 
     f = open("myFile", "w")
-    # if the program terminates here, the file is empty
+    f.write('Vital data that must not be lost at any cost!')
+    # if the program terminates here, myFile is empty
     f.flush() # or f.close()
-    # If the program terminates here ,the file has data
+    # If the program terminates here ,the myFile contains the data
 
 Another example::
 
     open("myFile", "w").write("some data")
 
-This will create an empty file, but note that the standard lib does not
-use write on anonymous file objects as it is considered poor practice
-anyway.
+This creates an empty file.  Note that the standard lib does not
+use write on anonymous file objects as it is considered poor practice.
 
 
-The Jython's os module is missing some functions, why?
-------------------------------------------------------
-Python's and Jython's os modules differ necessarily because of differences
-Java imposes on native system access. For example, Java does not have
-a chdir equivalent, so it does not exist in Jython's os module.
+Why are items in Python's os module missing from Jython?
+----------------------------------------------------------------------
+Python's and Jython's os modules differ because Java doesn't allow
+native system access. For example, Java does not have a chdir equivalent, so it does not exist in Jython's os module.
 
 jnios_ is an alternative os module that replaces the default os module
 with a more complete Java/JNI implementation of Python's os and posix modules.
@@ -398,7 +282,7 @@ that works, you're probably all set. You can also do a dir() on the
 modules to check the list of functions it implements.
 
 If there is some standard Python module that you have a real need for
-that doesn't work with JPython yet, please send us mail.
+that doesn't work with Jython yet, please send us mail.
 
 Can I use the python DB API from Jython?
 ----------------------------------------
@@ -502,8 +386,6 @@ There are several ways to do that. The best way depends on the needs of
 your application. One possible way is to compile the python class into
 a real java class using the jythonc command. This real java can be used
 and instances can be created from your application.
-
-(See FAQ X.Y for other ways to access python classes from java)
 
 Create a python module (say Foo.py) and make a class with the same
 name as the python module. The class must inherit from a java class
@@ -612,7 +494,11 @@ called: ::
 The value for python.path must follow the operating system conventions
 for the PATH environment var (':' separator for unix, ';' for windows)
 
+.. _java-readline: http://java-readline.sourceforge.net/
+.. _jnios: http://sourceforge.net/projects/jnios
 .. _JNumeric: http://jnumerical.sourceforge.net/index.html
 .. _jreload: http://www.jython.org/docs/jreload.html
-.. _jnios: http://sourceforge.net/projects/jnios
+.. _Jython-2.1: http://prdownloads.sourceforge.net/jython/jython_21.class?download
+.. _Jython-2.2a1: http://prdownloads.sourceforge.net/jython/jython_Release_2_2alpha1.jar?download
+.. _ReadlineSetup: http://wiki.python.org/jython/ReadlineSetup
 
