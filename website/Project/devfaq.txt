@@ -83,7 +83,7 @@ The three projects above can be checked out using the following <URL> paths, res
 
     * https://svn.sourceforge.net/svnroot/jython/trunk/
     * https://svn.sourceforge.net/svnroot/jython/tags/Release_2_1
-    * https://svn.sourceforge.net/svnroot/jython/website/
+    * https://svn.sourceforge.net/svnroot/jython/trunk/website/
 
 How do I update my working copy to be in sync with the repository?
 ==================================================================

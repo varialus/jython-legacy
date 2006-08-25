@@ -16,7 +16,7 @@ continued existence and development of this important piece of Python
 software. The intent is to manage this project with the same open policies
 that are serving CPython so well.
 
-Mailing lists, CVS and all current information on the Jython project is
+Mailing lists, SVN and all current information on the Jython project is
 available at SourceForge, at http://sourceforge.net/projects/jython
 
 The name had to be changed to something other than JPython, because of
@@ -241,7 +241,7 @@ GUI-less installer?
 If you do not have a GUI, then add -o dir_to_install_to to the
 command. Jython will install to the specified directory without bringing
 up the graphical installer. E.g. to install all modules to a Jython-2.1
-subdirectory in the current directory do: ::
+subdirectory in the current directory do::
 
     <java interpreter> jython-21 -o Jython-2.1 demo lib source
 
@@ -252,7 +252,7 @@ Why can't I multiply inherit from two Java classes?
 ---------------------------------------------------
 In earlier versions of JPython, you actually could. This was deliberately
 disabled in 1.1 for a variety of good reasons. For a detailed discussion
-on this issue see the following archive messages: ::
+on this issue see the following archive messages::
 
   http://www.python.org/pipermail/jpython-interest/1998-April/000213.html
   http://www.python.org/pipermail/jpython-interest/1999-June/001874.html
@@ -272,7 +272,7 @@ I'm trying to execute a 'protected' or 'private' Java Instance Method or attribu
 ---------------------------------------------------------------------------------------------------------------------------
 By default, as in Java, these methods are protected from external access,
 but there may be reasons, such as test scaffolding scripts, that this
-feature is not wanted. In the [jython home]/registry file:
+feature is not wanted. In the [jython home]/registry file::
 
   # Setting this to false will allow Jython to provide access to
   # non-public fields, methods, and constructors of Java objects.
@@ -286,11 +286,8 @@ was a standalone class without any dependencies on other java classes
 (except the system class). When there was more than one class involved,
 the simple reload(java-class) no longer worked.
 
-Now on the other hand Jython 2.0 comes with some alternative
-(experimental) user-level support for java classes reloading ("jreload"
-module).
-
-See: http://www.jython.org/docs/jreload.html
+Now on the other hand Jython 2.0 comes with jreload_, an alternative
+(experimental) user-level java classes reloader.
 
 Further Jython 2.0 internal changes enable the expert user to play with
 reloading and class-loaders as he would from native java.
@@ -303,7 +300,7 @@ option python.security.respectJavaAccessibility to false.
 It is difficult to add in a nice manner. The problem is a bit like this:
 
 A normal (public) static method is from jython called on the parent
-java class:
+java class::
 
    javaclass.method()
 
@@ -323,17 +320,17 @@ will have to call the method on its own class, not the java class.
 
 How can I use a Java null value in Jython?
 ------------------------------------------
-A java null is turned into a Python None value.
+A java null is turned into a Python None value::
 
-import java
->>> h = java.util.Hashtable()
->>> print h.get("abc")
-None
->>> if h.get("abc") is None:
-...   print "null returned"
-...
-null returned
->>>
+  import java
+  >>> h = java.util.Hashtable()
+  >>> print h.get("abc")
+  None
+  >>> if h.get("abc") is None:
+  ...   print "null returned"
+  ...
+  null returned
+  >>>
 
 
 Where's the -O switch
@@ -355,55 +352,30 @@ opened for writing or appending before any data will actually be saved.
 This reflects the current status and is not meant to imply this will
 always be the case for Jython (but it may be for certain java versions).
 
-Currently, For example:
+Currently, For example::
 
     f = open("myFile", "w")
     # if the program terminates here, the file is empty
     f.flush() # or f.close()
     # If the program terminates here ,the file has data
 
-Another example:
+Another example::
 
     open("myFile", "w").write("some data")
 
 This will create an empty file, but note that the standard lib does not
-use write on anonymouse file objects as it is considered poor practice
+use write on anonymous file objects as it is considered poor practice
 anyway.
 
 
 The Jython's os module is missing some functions, why?
 ------------------------------------------------------
 Python's and Jython's os modules differ necessarily because of differences
-Java imposes on natvie system access. For example, Java does not have
-a chdir equivalent, so it does not exist in Jython's os.
+Java imposes on native system access. For example, Java does not have
+a chdir equivalent, so it does not exist in Jython's os module.
 
-There is an alternative os module that does provide additional
-functionality, and it is the jnios module found at:
-
-    http://sourceforge.net/projects/jnios
-
-The jnios module replaces the default os module with a Java/JNI
-implementation of Python's os and posix modules.
-
-Jython CVS also has more functions in the os module (like system
-and the popen* functions). See FAQ 3.10 for more information:
-http://www.jython.org/cgi-bin/faqw.py?req=show&file=faq03.010.htp
-
-or:
-
-Use the os.system or os.popen* functions from Jython CVS.
-
-To use these functions, you'll need javaos.py, javashell.py, and
-popen2.py:
-
-    http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/jython/jython/Lib/
-
-You'll need to delete the 'from __future__ import division' line from
-javaos.py (this is a Python 2.2 feature not supported in Jython 2.1)
-
-Alternatively, you could use java.lang.Runtime.exec() directly, but the
-os functions handle a lot of complexity for you.
-
+jnios_ is an alternative os module that replaces the default os module
+with a more complete Java/JNI implementation of Python's os and posix modules.
 
 Jython modules
 ==============
@@ -436,9 +408,8 @@ later.
 
 Can I use the Numeric package from Jython?
 ------------------------------------------
-Take a look at at Tim Hochberg's Java implementation of Numeric, JNumeric.
+Take a look at the Java implementation of Numeric, JNumeric_.
 
-- http://members.home.net/tim.hochberg/
 
 Extending Jython
 ================
@@ -504,28 +475,26 @@ public PyObject invoke(String name, PyObject[] args, String[] keywords);
 
 Supporting `*args` and `**kw` in Java methods
 ---------------------------------------------
+In Jython you can support keyword
+arguments on Java methods by defining a method like so (the parameters
+are the important point)::
 
-Embedding Jython
-================
-(thanks to Finn Bock for the information)
-
-In Jython (note, this does not work in JPython), you can support keyword
-arguments on Java methods by defining the method like so (the parameters
-are the important point):
-
-public PyObject foo(PyObject[] args, String[] keywords);
+  public PyObject foo(PyObject[] args, String[] keywords);
 
 The keywords array contains all of the keywords for the keyword-defined
-arguments. For example, if you called foo with:
+arguments. For example, if you called foo with::
 
-foo(1,2,3,four=4,five=5)
+  foo(1,2,3,four=4,five=5)
 
 args would be: [1, 2, 3, 4, 5] and keywords would be: ['four', 'five']
 (an array of 2 elements.)
 
 Additionally, you can use the experimental argument parser
-org.python.core.ArgParser to deal mapping these two arrays. Consult the
+org.python.core.ArgParser to deal with mapping these two arrays. Consult the
 Javadocs (or source) for further details on org.python.core.ArgParser.
+
+Embedding Jython
+================
 
 How can I use jython classes from my java application?
 ------------------------------------------------------
@@ -642,4 +611,8 @@ called: ::
 
 The value for python.path must follow the operating system conventions
 for the PATH environment var (':' separator for unix, ';' for windows)
+
+.. _JNumeric: http://jnumerical.sourceforge.net/index.html
+.. _jreload: http://www.jython.org/docs/jreload.html
+.. _jnios: http://sourceforge.net/projects/jnios
 
