@@ -20,7 +20,7 @@
         <property name="python.exe" value="/System/Library/Frameworks/Python.framework/Versions/2.3/bin/python"/>
         <property name="rst2jysite.command" value="/System/Library/Frameworks/Python.framework/Versions/2.3/bin/rst2jysite.py"/>
         -->
-        <property name="rst2jysite.command" value="rst2jysite"/>
+        <property name="rst2jysite.command" value="rst2jysite.py"/>
         <property name="scp.command" value="scp"/>
         <property name="scp.user" value="fwierzbicki"/>
         <!--
