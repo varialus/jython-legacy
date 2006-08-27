@@ -1,5 +1,8 @@
 package org.python.util.install;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
+
 import javax.swing.JOptionPane;
 
 import org.python.util.install.driver.Autotest;
@@ -35,6 +38,7 @@ public class Wizard extends AbstractWizard implements TextKeys {
         this.addPage(successPage);
 
         setSize(720, 330);
+        centerOnScreen();
         validate();
     }
 
@@ -75,6 +79,12 @@ public class Wizard extends AbstractWizard implements TextKeys {
 
     private final String getText(String textKey) {
         return Installation.getText(textKey);
+    }
+
+    private void centerOnScreen() {
+        Dimension dim = getToolkit().getScreenSize();
+        Rectangle rectBounds = getBounds();
+        setLocation((dim.width - rectBounds.width) / 2, (dim.height - rectBounds.height) / 2);
     }
 
 }
