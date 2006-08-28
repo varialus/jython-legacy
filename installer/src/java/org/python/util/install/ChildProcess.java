@@ -11,7 +11,8 @@ import java.io.InputStreamReader;
  * <ul>
  * <li>wait for the child process to finish.
  * <li>kill the child process after a specified timeout.
- * <li>get the output of the child process (System.out and System.err) redirected to the calling process.
+ * <li>get the output of the child process (System.out and System.err) redirected to the calling process, uness in
+ * silent mode.
  * </ul>
  */
 public class ChildProcess {
@@ -28,10 +29,14 @@ public class ChildProcess {
             BufferedReader stdout = new BufferedReader(new InputStreamReader(_process.getInputStream()));
             try {
                 while ((line = stdout.readLine()) != null) { // blocks until input found or process dead
-                    System.out.println(line);
+                    if (!isSilent()) {
+                        System.out.println(line);
+                    }
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                if (!isSilent()) {
+                    ioe.printStackTrace();
+                }
             } finally {
                 if (stdout != null)
                     try {
@@ -54,10 +59,14 @@ public class ChildProcess {
             BufferedReader stderr = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
             try {
                 while ((line = stderr.readLine()) != null) { // blocks until input found or process dead
-                    System.err.println(line);
+                    if (!isSilent()) {
+                        System.err.println(line);
+                    }
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                if (!isSilent()) {
+                    ioe.printStackTrace();
+                }
             } finally {
                 if (stderr != null)
                     try {
@@ -122,6 +131,11 @@ public class ChildProcess {
      * debug option (default is false)
      */
     private boolean _debug = false;
+
+    /**
+     * silent flag
+     */
+    private boolean _silent = false;
 
     /**
      * Default constructor
@@ -232,6 +246,22 @@ public class ChildProcess {
     }
 
     /**
+     * Set the silent flag.
+     * <p>
+     * Setting this to true will suppress output of the called command.
+     */
+    public void setSilent(boolean silent) {
+        _silent = silent;
+    }
+
+    /**
+     * Returns the silent flag.
+     */
+    public boolean isSilent() {
+        return _silent;
+    }
+
+    /**
      * Set the interval (in milliseconds) after which the subprocess is checked if it is still alive. Defaults to 1000
      * ms.
      */
@@ -290,7 +320,9 @@ public class ChildProcess {
                 try {
                     Thread.sleep(getPollAliveInterval());
                 } catch (InterruptedException ie) {
-                    ie.printStackTrace();
+                    if (!isSilent()) {
+                        ie.printStackTrace();
+                    }
                 }
             }
 
@@ -298,12 +330,14 @@ public class ChildProcess {
             if (isAlive()) { // sets the exit value in case process is dead
                 destroy();
             } else {
-                if(isDebug()) {
+                if (isDebug()) {
                     System.out.println("[ChildProcess] ended itself");
                 }
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            if (!isSilent()) {
+                ioe.printStackTrace();
+            }
         }
         return getExitValue();
     }
