@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
  * <ul>
  * <li>wait for the child process to finish.
  * <li>kill the child process after a specified timeout.
- * <li>get the output of the child process (System.out and System.err) redirected to the calling process, uness in
+ * <li>get the output of the child process (System.out and System.err) redirected to the calling process, unless in
  * silent mode.
  * </ul>
  */
