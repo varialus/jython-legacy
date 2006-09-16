@@ -71,7 +71,7 @@ The format of <URL> is:
 
 https://svn.sourceforge.net/svnroot/jython/<path>
 
-with <path> representing the path to the project. A list of projects can be viewed at http://svn.python.org/view/ . Do note that any subdirectory may also be checked out individually.
+with <path> representing the path to the project.
 
 The Subversion repository has many projects under it. Most people are probably interested in one of these three projects:
 
@@ -97,12 +97,7 @@ from the directory you wish to update (and all subdirectories).
 How do I browse the source code through a web browser?
 ======================================================
 
-Visit https://svn.sourceforge.net/svnroot/jython/ to browse the Subversion repository.
-
-What configuration settings should I use?
-=========================================
-
-TODO
+Visit http://fisheye3.cenqua.com/browse/jython to browse the Subversion repository.
 
 How do I add a file or directory to the repository?
 ===================================================
