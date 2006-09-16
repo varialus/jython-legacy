@@ -12,6 +12,7 @@ menupageitem     | User Guide         | ../Project/userguide.html
 #menupageitem    | CPython comparison | ../Project/differences.html
 menupageitem     | Related Projects   | ../Project/related.html
 section  | Community
+menupageitem     | Wiki     | http://wiki.python.org/jython/
 menupageitem     | Reporting Bugs     | ../Project/bugs.html
 menupageitem     | Mailing Lists      | http://sourceforge.net/mail/?group_id=12867
 menupageitem     | Developer FAQ      | ../Project/devfaq.html
