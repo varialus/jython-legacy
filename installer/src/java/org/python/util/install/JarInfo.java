@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -145,22 +146,73 @@ public class JarInfo {
     }
 
     private String readTextFile(JarEntry entry, JarFile jarFile) throws IOException {
-        StringBuffer buffer = new StringBuffer(10000);
+        StringBuffer buffer = new StringBuffer();
         BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry)));
-            for (String s; (s = reader.readLine()) != null;) {
-                buffer.append(s);
-                buffer.append("\n");
-            }
-        } finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        String charsetName = "US-ASCII";
+        boolean ok = false;
+        if (Charset.isSupported(charsetName)) {
+            try {
+                reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry), Charset
+                        .forName(charsetName)));
+                buffer = new StringBuffer(1000);
+                for (String s; (s = reader.readLine()) != null;) {
+                    buffer.append(s);
+                    buffer.append("\n");
                 }
+                ok = true;
+            } catch (IOException ioe) {
+                // TODO:oti rewrite after 390 tests
+                ioe.printStackTrace();
+            } finally {
+                if (reader != null)
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
+        }
+        if (!ok) {
+            charsetName = "ISO-8859-1";
+            if (Charset.isSupported(charsetName)) {
+                try {
+                    reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry), Charset
+                            .forName(charsetName)));
+                    buffer = new StringBuffer(1000);
+                    for (String s; (s = reader.readLine()) != null;) {
+                        buffer.append(s);
+                        buffer.append("\n");
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                } finally {
+                    if (reader != null)
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                }
+            }
+        }
+        if (!ok) {
+            try {
+                reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry)));
+                buffer = new StringBuffer(1000);
+                for (String s; (s = reader.readLine()) != null;) {
+                    buffer.append(s);
+                    buffer.append("\n");
+                }
+            } finally {
+                if (reader != null)
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
         }
         return buffer.toString();
     }
+
 }
