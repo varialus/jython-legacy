@@ -116,18 +116,10 @@ public class JarInstaller {
                         File file = createFile(targetDirectory, zipEntryName);
                         _progressListener.progressEntry(file.getAbsolutePath());
                         FileOutputStream output = new FileOutputStream(file);
-                        int uncompressedSize = getUncompressedSize(zipEntry);
-                        if (uncompressedSize > 0) {
-                            int totalRead = 0;
-                            while (totalRead < uncompressedSize) {
-                                int toRead = uncompressedSize - totalRead;
-                                if (toRead > BUFFER_SIZE)
-                                    toRead = BUFFER_SIZE;
-                                byte[] bytes = new byte[toRead];
-                                int read = zipInput.read(bytes, 0, toRead);
-                                output.write(bytes, 0, read);
-                                totalRead = totalRead + read;
-                            }
+                        byte[] buffer = new byte[BUFFER_SIZE];
+                        int len;
+                        while ((len = zipInput.read(buffer)) > 0) {
+                          output.write(buffer, 0, len);
                         }
                         output.close();
                         file.setLastModified(zipEntry.getTime());
@@ -215,17 +207,6 @@ public class JarInstaller {
             }
         }
         return file;
-    }
-
-    private int getUncompressedSize(final ZipEntry zipEntry) {
-        long size = zipEntry.getSize();
-        if (size > Integer.MAX_VALUE) {
-            throw new InstallerException(Installation.getText(TextKeys.ZIP_ENTRY_TOO_BIG, zipEntry.toString()));
-        }
-        if (size < 0) {
-            throw new InstallerException(Installation.getText(TextKeys.ZIP_ENTRY_SIZE, zipEntry.toString()));
-        }
-        return (int) size;
     }
 
     private List getCoreLibFiles() {
