@@ -145,13 +145,43 @@ public class JarInfo {
         jarFile.close();
     }
 
+    /**
+     * Read the text file with the most appropriate Charset.
+     * 
+     * @param entry
+     * @param jarFile
+     * 
+     * @return the contents of the text file
+     * 
+     * @throws IOException
+     */
     private String readTextFile(JarEntry entry, JarFile jarFile) throws IOException {
-        StringBuffer buffer = new StringBuffer();
-        BufferedReader reader = null;
-        String charsetName = "US-ASCII";
-        boolean ok = false;
+        String contents = readTextFileWithCharset(jarFile, entry, "US-ASCII"); // expected to run on most platforms
+        if (contents == null) {
+            contents = readTextFileWithCharset(jarFile, entry, "ISO-8859-1");
+        }
+        if (contents == null) {
+            contents = readTextFileWithDefaultCharset(jarFile, entry);
+        }
+        return contents;
+    }
+
+    /**
+     * Try to read the text file (jarEntry) from the jarFile, using a given <code>charsetName</code>.
+     * 
+     * @param jarFile
+     * @param entry
+     * @param charsetName the name of the Charset
+     * 
+     * @return the contents of the text file as String (if reading was successful), <code>null</code> otherwise.<br>
+     * No exception is thrown
+     */
+    private String readTextFileWithCharset(JarFile jarFile, JarEntry entry, String charsetName) {
+        String contents = null;
         if (Charset.isSupported(charsetName)) {
+            BufferedReader reader = null;
             try {
+                StringBuffer buffer = new StringBuffer(1000);
                 reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry), Charset
                         .forName(charsetName)));
                 buffer = new StringBuffer(1000);
@@ -159,60 +189,45 @@ public class JarInfo {
                     buffer.append(s);
                     buffer.append("\n");
                 }
-                ok = true;
+                contents = buffer.toString();
             } catch (IOException ioe) {
-                // TODO:oti rewrite after 390 tests
-                ioe.printStackTrace();
             } finally {
                 if (reader != null)
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
                     }
             }
         }
-        if (!ok) {
-            charsetName = "ISO-8859-1";
-            if (Charset.isSupported(charsetName)) {
-                try {
-                    reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry), Charset
-                            .forName(charsetName)));
-                    buffer = new StringBuffer(1000);
-                    for (String s; (s = reader.readLine()) != null;) {
-                        buffer.append(s);
-                        buffer.append("\n");
-                    }
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                } finally {
-                    if (reader != null)
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                }
+        return contents;
+    }
+
+    /**
+     * Read the text file (jarEntry) from the jarFile, using the platform default Charset.
+     * 
+     * @param jarFile
+     * @param entry
+     * 
+     * @return the contents of the text file as String.
+     * 
+     * @throws IOException if a problem occurs
+     */
+    private String readTextFileWithDefaultCharset(JarFile jarFile, JarEntry entry) throws IOException {
+        String contents = null;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry)));
+            StringBuffer buffer = new StringBuffer(1000);
+            for (String s; (s = reader.readLine()) != null;) {
+                buffer.append(s);
+                buffer.append("\n");
             }
+            contents = buffer.toString();
+        } finally {
+            if (reader != null)
+                reader.close();
         }
-        if (!ok) {
-            try {
-                reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry)));
-                buffer = new StringBuffer(1000);
-                for (String s; (s = reader.readLine()) != null;) {
-                    buffer.append(s);
-                    buffer.append("\n");
-                }
-            } finally {
-                if (reader != null)
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-        }
-        return buffer.toString();
+        return contents;
     }
 
 }
