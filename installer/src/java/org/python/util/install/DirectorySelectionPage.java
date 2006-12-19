@@ -107,31 +107,45 @@ public class DirectorySelectionPage extends AbstractWizardPage {
     }
 
     private File getDefaultDirectory() {
-        // 1st try: user.home
         String directory = "";
-        File parentDirectory = null;
-        directory = System.getProperty("user.home", "");
-        if (directory.length() > 0) {
-            parentDirectory = new File(directory);
-            if (parentDirectory.exists() && parentDirectory.isDirectory()) {
-                return makeJythonSubDirectory(parentDirectory);
+        File defaultDirectory = null;
+        // 1st try (on windows): root
+        if (Installation.isWindows()) {
+            directory = System.getProperty("java.home", "C:");
+            if (directory.length() > 2) {
+                directory = directory.substring(0, 2);
+            }
+            defaultDirectory = makeJythonSubDirectory(directory);
+        }
+        // 2st try: user.home
+        if (defaultDirectory == null) {
+            directory = System.getProperty("user.home", "");
+            if (directory.length() > 0) {
+                defaultDirectory = makeJythonSubDirectory(directory);
             }
         }
-        // 2nd try: user.dir
-        directory = System.getProperty("user.dir", "");
-        if (directory.length() > 0) {
-            parentDirectory = new File(directory);
-            if (parentDirectory.exists() && parentDirectory.isDirectory()) {
-                return makeJythonSubDirectory(parentDirectory);
+        // 3rd try: user.dir
+        if (defaultDirectory == null) {
+            directory = System.getProperty("user.dir", "");
+            if (directory.length() > 0) {
+                defaultDirectory = makeJythonSubDirectory(directory);
             }
         }
-        // 3rd try: current directory
-        return makeJythonSubDirectory(new File(new File(new File("dummy").getAbsolutePath()).getParent()));
+        // 4th try: current directory
+        if (defaultDirectory == null) {
+            defaultDirectory = makeJythonSubDirectory(new File(new File("dummy").getAbsolutePath()).getParent());
+        }
+        return defaultDirectory;
     }
 
-    private File makeJythonSubDirectory(File parentDirectory) {
-        String jythonSubDirectoryName = "jython" + _jarInfo.getVersion();
-        return new File(parentDirectory, jythonSubDirectoryName);
+    private File makeJythonSubDirectory(String directory) {
+        File defaultDirectory = null;
+        File parentDirectory = new File(directory);
+        if (parentDirectory.exists() && parentDirectory.isDirectory()) {
+            String jythonSubDirectoryName = "jython" + _jarInfo.getVersion();
+            defaultDirectory = new File(parentDirectory, jythonSubDirectoryName);
+        }
+        return defaultDirectory;
     }
 
     private class BrowseButtonListener implements ActionListener {
