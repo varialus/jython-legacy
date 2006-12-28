@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -22,7 +23,6 @@ public class JarInfo {
     private static final String VERSION_ATTRIBUTE = "version";
     private static final String EXCLUDE_DIRS_ATTRIBUTE = "exclude-dirs";
     private static final String EXCLUDE_DIRS_DELIM = ";";
-    private static final String URL_BLANK_REPLACEMENT = "%20";
 
     private File _jarFile;
     private int _numberOfEntries;
@@ -111,16 +111,12 @@ public class JarInfo {
         URL url = getClass().getResource(className + ".class");
         // we expect an URL like:
         // jar:file:/C:/stuff/jython21i.jar!/org/python/util/install/JarInfo.class
-        String urlString = url.toString();
+        String urlString = URLDecoder.decode(url.toString(), "UTF-8");
         int jarSeparatorIndex = urlString.indexOf(JAR_SEPARATOR);
         if (!urlString.startsWith(JAR_URL_PREFIX) || jarSeparatorIndex <= 0) {
             throw new InstallerException(Installation.getText(TextKeys.UNEXPECTED_URL, urlString));
         }
         String jarFileName = urlString.substring(JAR_URL_PREFIX.length(), jarSeparatorIndex);
-        // handle directories containing blanks
-        if (jarFileName.indexOf(URL_BLANK_REPLACEMENT) >= 0) {
-            jarFileName = jarFileName.replaceAll(URL_BLANK_REPLACEMENT, " ");
-        }
         _jarFile = new File(jarFileName);
         if (!_jarFile.exists()) {
             throw new InstallerException(Installation.getText(TextKeys.JAR_NOT_FOUND, _jarFile.getAbsolutePath()));
