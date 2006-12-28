@@ -154,7 +154,7 @@ public class StartScriptGenerator {
      */
     private String getUnixJythonTemplate() {
         StringBuffer buffer = getUnixHeaderTemplate();
-        buffer.append("CP={3}/" + JYTHON_JAR + "\n");
+        buffer.append("CP=\"{3}/" + JYTHON_JAR + "\"\n");
         buffer.append("if [ ! -z \"$CLASSPATH\" ]\nthen\n  CP=$CP:$CLASSPATH\nfi\n");
         buffer.append("\"{2}/bin/java\" -Dpython.home=\"{3}\" -classpath \"$CP\" org.python.util.jython \"$@\"\n");
         return buffer.toString();
@@ -216,7 +216,10 @@ public class StartScriptGenerator {
      */
     private void makeExecutable(File scriptFile) {
         try {
-            String command = "chmod" + " " + EXECUTABLE_MODE + " " + scriptFile.getAbsolutePath();
+            String command[] = new String[3];
+            command[0] = "chmod";
+            command[1] = EXECUTABLE_MODE;
+            command[2] = scriptFile.getAbsolutePath();
             long timeout = 3000;
             ChildProcess childProcess = new ChildProcess(command, timeout);
             childProcess.run();
