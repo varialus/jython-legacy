@@ -1,22 +1,15 @@
 package org.python.util.install.driver;
 
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.python.util.install.Installation;
 import org.python.util.install.InstallerCommandLine;
-import org.python.util.install.JarInstaller;
 
 public class InstallationDriver {
-    private static final String JYTHON_JAR = JarInstaller.JYTHON_JAR;
-    
     private SilentAutotest[] _silentTests;
     private ConsoleAutotest[] _consoleTests;
     private GuiAutotest[] _guiTests;
@@ -117,7 +110,9 @@ public class InstallationDriver {
     private void validate(Autotest autoTest) throws DriverException {
         autoTest.assertTargetDirNotEmpty();
         if (autoTest.getVerifier() != null) {
+            System.out.println("verifying installation ...");
             autoTest.getVerifier().verify();
+            System.out.println("... installation ok.\n");
         }
     }
 
@@ -141,12 +136,14 @@ public class InstallationDriver {
         String[] arguments = new String[] { "-s" };
         test1.setCommandLineArgs(arguments);
         test1.addAdditionalArguments(); // this also adds target directory
+        test1.setVerifier(new NormalVerifier());
         silentTests.add(test1);
 
         SilentAutotest test2 = new SilentAutotest(getOriginalCommandLine());
         arguments = new String[] { "-s", "-t", "minimum" };
         test2.setCommandLineArgs(arguments);
         test2.addAdditionalArguments();
+        test2.setVerifier(new NormalVerifier());
         silentTests.add(test2);
 
         SilentAutotest test3 = new SilentAutotest(getOriginalCommandLine());
@@ -198,6 +195,7 @@ public class InstallationDriver {
         test1.addAnswer(""); // simple enter for os version
         test1.addAnswer("y"); // confirm copying
         test1.addAnswer("n"); // no readme
+        test1.setVerifier(new NormalVerifier());
         consoleTests.add(test1);
 
         ConsoleAutotest test2 = new ConsoleAutotest(getOriginalCommandLine());
@@ -225,6 +223,7 @@ public class InstallationDriver {
         test2.addAnswer(""); // simple enter for os version
         test2.addAnswer("y"); // confirm copying
         test2.addAnswer("n"); // no readme
+        test2.setVerifier(new NormalVerifier());
         consoleTests.add(test2);
 
         ConsoleAutotest test3 = new ConsoleAutotest(getOriginalCommandLine());
@@ -276,6 +275,7 @@ public class InstallationDriver {
             guiTest1.addKeyAction(KeyEvent.VK_TAB);
             guiTest1.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest1);
+            guiTest1.setVerifier(new NormalVerifier());
             guiTests.add(guiTest1);
 
             GuiAutotest guiTest2 = new GuiAutotest(getOriginalCommandLine());
@@ -298,6 +298,7 @@ public class InstallationDriver {
             guiTest2.addKeyAction(KeyEvent.VK_TAB);
             guiTest2.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest2);
+            guiTest2.setVerifier(new NormalVerifier());
             guiTests.add(guiTest2);
 
             GuiAutotest guiTest3 = new GuiAutotest(getOriginalCommandLine());
@@ -319,6 +320,7 @@ public class InstallationDriver {
             guiTest3.addKeyAction(KeyEvent.VK_TAB);
             guiTest3.addKeyAction(KeyEvent.VK_SPACE);
             buildRestOfGuiPages(guiTest3);
+            guiTest3.setVerifier(new NormalVerifier());
             guiTests.add(guiTest3);
 
             GuiAutotest guiTest4 = new GuiAutotest(getOriginalCommandLine());
@@ -395,43 +397,5 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // success page
         guiTest.addKeyAction(KeyEvent.VK_SPACE);
-    }
-
-    private static class StandaloneVerifier extends AbstractVerifier {
-        public void verify() throws DriverException {
-            // make sure only JYTHON_JAR is in the target directory
-            if (getTargetDir().listFiles().length != 1) {
-                throw new DriverException("more than " + JYTHON_JAR + " installed");
-            }
-            // make sure JYTHON_JAR contains a MANIFEST and a /Lib directory
-            File jythonJar = getTargetDir().listFiles()[0];
-            JarFile jar = null;
-            try {
-                jar = new JarFile(jythonJar);
-                if (jar.getManifest() == null) {
-                    throw new DriverException(JYTHON_JAR + " contains no MANIFEST");
-                }
-                boolean hasLibDir = false;
-                Enumeration entries = jar.entries();
-                while (!hasLibDir && entries.hasMoreElements()) {
-                    JarEntry entry = (JarEntry) entries.nextElement();
-                    if (entry.getName().startsWith("Lib/")) {
-                        hasLibDir = true;
-                    }
-                }
-                if (!hasLibDir) {
-                    throw new DriverException(JYTHON_JAR + " contains no /Lib directory");
-                }
-            } catch (IOException e) {
-                throw new DriverException(e);
-            } finally {
-                if (jar != null) {
-                    try {
-                        jar.close();
-                    } catch (IOException ioe) {
-                    }
-                }
-            }
-        }
     }
 }

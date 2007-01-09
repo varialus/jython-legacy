@@ -174,7 +174,8 @@ public abstract class Autotest implements InstallationListener {
             countAsString += "0";
         }
         countAsString += _count;
-        _name = countAsString + "_" + getNameSuffix() + "_";
+        // explicitly use a blank in the directory name, to nail down some platform specific problems
+        _name = countAsString + " " + getNameSuffix() + "_";
     }
 
     /**

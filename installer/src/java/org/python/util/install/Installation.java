@@ -104,7 +104,7 @@ public class Installation {
         }
     }
 
-    protected static boolean isWindows() {
+    public static boolean isWindows() {
         boolean isWindows = false;
         String osName = System.getProperty(OS_NAME, "");
         if (osName.toLowerCase().indexOf("windows") >= 0) {

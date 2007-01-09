@@ -69,7 +69,7 @@ public class AutotestTest extends TestCase {
         }
     }
 
-    private static class TestVerifier extends AbstractVerifier {
+    private static class TestVerifier extends NormalVerifier {
         public void verify() throws DriverException {
             throw new DriverException("test verification failure");
         }

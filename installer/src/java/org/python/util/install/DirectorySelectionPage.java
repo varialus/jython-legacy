@@ -111,7 +111,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
         File defaultDirectory = null;
         // 1st try (on windows): root
         if (Installation.isWindows()) {
-            directory = System.getProperty("java.home", "C:");
+            directory = System.getProperty(JavaVersionTester.JAVA_HOME, "C:");
             if (directory.length() > 2) {
                 directory = directory.substring(0, 2);
             }
