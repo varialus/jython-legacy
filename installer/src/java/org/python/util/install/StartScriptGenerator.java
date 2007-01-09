@@ -10,6 +10,7 @@ public class StartScriptGenerator {
 
     protected final static int UNIX_FLAVOUR = 10;
     protected final static int WINDOWS_FLAVOUR = 30;
+    protected final static int BOTH_FLAVOUR = 50;
 
     private final static String EXECUTABLE_MODE = "755";
 
@@ -36,10 +37,31 @@ public class StartScriptGenerator {
 
     protected void setFlavour(int flavour) {
         _flavour = flavour;
+        if (flavour == WINDOWS_FLAVOUR) {
+            // check if we should create unix like scripts, too
+            if (hasUnixlikeShell()) {
+                _flavour = BOTH_FLAVOUR;
+           }
+        }
     }
 
     protected int getFlavour() {
         return _flavour;
+    }
+
+    protected boolean hasUnixlikeShell() {
+        int errorCode = 0;
+        try {
+            String command = "sh -c env";
+            long timeout = 3000;
+            ChildProcess childProcess = new ChildProcess(command, timeout);
+            childProcess.setDebug(false);
+            childProcess.setSilent(true);
+            errorCode = childProcess.run();
+        } catch (Throwable t) {
+            errorCode = 1;
+        }
+        return errorCode == 0;
     }
 
     protected final void generateStartScripts() throws IOException {
@@ -48,37 +70,49 @@ public class StartScriptGenerator {
     }
 
     private final void generateJythonScript() throws IOException {
-        if (getFlavour() == WINDOWS_FLAVOUR) {
-            writeToFile(JYTHON_BAT, getJythonScript());
-        } else {
-            makeExecutable(writeToFile(JYTHON, getJythonScript()));
+        switch (getFlavour()) {
+        case BOTH_FLAVOUR:
+            writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+            makeExecutable(writeToFile(JYTHON, getJythonScript(BOTH_FLAVOUR)));
+            break;
+        case WINDOWS_FLAVOUR:
+            writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+            break;
+        default:
+            makeExecutable(writeToFile(JYTHON, getJythonScript(UNIX_FLAVOUR)));
         }
     }
 
     private final void generateJythoncScript() throws IOException {
-        if (getFlavour() == WINDOWS_FLAVOUR) {
-            writeToFile(JYTHONC_BAT, getJythoncScript());
-        } else {
-            makeExecutable(writeToFile(JYTHONC, getJythoncScript()));
+        switch (getFlavour()) {
+        case BOTH_FLAVOUR:
+            writeToFile(JYTHONC_BAT, getJythoncScript(WINDOWS_FLAVOUR));
+            makeExecutable(writeToFile(JYTHONC, getJythoncScript(BOTH_FLAVOUR)));
+            break;
+        case WINDOWS_FLAVOUR:
+            writeToFile(JYTHONC_BAT, getJythoncScript(WINDOWS_FLAVOUR));
+            break;
+        default:
+            makeExecutable(writeToFile(JYTHONC, getJythoncScript(UNIX_FLAVOUR)));
         }
     }
 
     /**
      * only <code>protected</code> for unit test use
      */
-    protected final String getJythonScript() throws IOException {
-        if (getFlavour() == WINDOWS_FLAVOUR) {
+    protected final String getJythonScript(int flavour) throws IOException {
+        if (flavour == WINDOWS_FLAVOUR) {
             return getStartScript(getWindowsJythonTemplate());
         } else {
-            return getStartScript(getUnixJythonTemplate());
+            return getStartScript(getUnixJythonTemplate(flavour));
         }
     }
 
     /**
      * only <code>protected</code> for unit test use
      */
-    protected final String getJythoncScript() throws IOException {
-        if (getFlavour() == WINDOWS_FLAVOUR) {
+    protected final String getJythoncScript(int flavour) throws IOException {
+        if (flavour == WINDOWS_FLAVOUR) {
             return getStartScript(getWindowsJythoncTemplate());
         } else {
             return getStartScript(getUnixJythoncTemplate());
@@ -109,7 +143,8 @@ public class StartScriptGenerator {
      */
     private String getWindowsJythonTemplate() {
         StringBuffer buffer = getWindowsHeaderTemplate();
-        buffer.append("\"{2}\\bin\\java.exe\" -Dpython.home=\"{3}\" -classpath \"{3}\\" + JYTHON_JAR + ";%CLASSPATH%\" org.python.util.jython %ARGS%\n");
+        buffer.append("\"{2}\\bin\\java.exe\" -Dpython.home=\"{3}\" -classpath \"{3}\\" + JYTHON_JAR
+                + ";%CLASSPATH%\" org.python.util.jython %ARGS%\n");
         return buffer.toString();
     }
 
@@ -152,7 +187,7 @@ public class StartScriptGenerator {
      * 
      * @see getStartScript
      */
-    private String getUnixJythonTemplate() {
+    private String getUnixJythonTemplate(int flavour) {
         StringBuffer buffer = getUnixHeaderTemplate();
         buffer.append("CP=\"{3}/" + JYTHON_JAR + "\"\n");
         buffer.append("if [ ! -z \"$CLASSPATH\" ]\nthen\n  CP=$CP:$CLASSPATH\nfi\n");
