@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 import org.python.util.install.driver.Autotest;
 import org.python.util.install.driver.InstallationDriver;
@@ -96,12 +97,24 @@ public class Installation {
         if (Installation.isVerbose()) {
             ConsoleInstaller.message("specification version: '" + specificationVersion + "'");
         }
-        if (specificationVersion.equals("1.2") || specificationVersion.equals("1.3")
-                || specificationVersion.equals("1.4") || specificationVersion.equals("1.5")) {
-            return true;
-        } else {
-            return false;
+        // major.minor.micro
+        // according to http://java.sun.com/j2se/1.5.0/docs/guide/versioning/spec/versioning2.html
+        int major = 0;
+        int minor = 0;
+        StringTokenizer tokenizer = new StringTokenizer(specificationVersion, ".");
+        if( tokenizer.hasMoreTokens()) {
+            major = Integer.valueOf(tokenizer.nextToken()).intValue();
         }
+        if (tokenizer.hasMoreTokens()) {
+            minor = Integer.valueOf(tokenizer.nextToken()).intValue();
+        }
+        boolean valid = true;
+        if( major == 1) {
+            if( minor < 2) {
+                valid = false;
+            }
+        }
+        return valid;
     }
 
     public static boolean isWindows() {
