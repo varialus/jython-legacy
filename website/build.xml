@@ -36,14 +36,23 @@
         <copy todir="dist">
             <fileset dir=".">
                 <include name="index.html"/>
-                <include name="**/*.nav"/>
-                <include name="**/*.txt"/>
-                <include name="css/*"/>
-                <exclude name="dist"/>
             </fileset>
         </copy>
-        <copy todir="dist/Project" file="left.nav" />
-        <copy todir="dist/jeps" file="left.nav" />
+        <copy todir="dist/Project">
+            <fileset dir="Project">
+                <include name="*.txt"/>
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/jeps">
+            <fileset dir="jeps">
+                <include name="*.txt"/>
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/css">
+            <fileset dir="css"/>
+        </copy>
         <apply verbose="true" executable="${rst2jysite.command}" dest="dist">
             <arg line="--link-stylesheet" />
             <arg line="--stylesheet=../css/html4css1.css" />
