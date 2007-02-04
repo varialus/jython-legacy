@@ -17,6 +17,7 @@ menupageitem     | Reporting Bugs     | ../Project/bugs.html
 menupageitem     | Mailing Lists      | http://sourceforge.net/mail/?group_id=12867
 menupageitem     | Developer FAQ      | ../Project/devfaq.html
 menupageitem     | Developer Guide    | ../Project/devguide.html
+menupageitem     | Jython Roadmap    | ../Project/roadmap.html
 #menupageitem     | JEP Index          | ../jeps/jep-0000.html
 #menupageitem    | To Do List         | ../Project/todo.html
 menupageitem     | Contributors       | ../Project/contributors.html
