@@ -6,12 +6,11 @@ Contributors
 Active Commiters
 ----------------
 
+* Charlie Groves
 * Otmar Humbel
-* Sean McGrath
 * Samuele Pedroni
-* Clark Updike
 * Frank Wierzbicki
-* Brian Zimmer
+* Khalid Zuberi
 
 -------------------
 Emeritus Committers
@@ -20,7 +19,10 @@ Emeritus Committers
 * Finn Bock
 * Kevin J. Butler
 * Jim Hugunin
+* Sean McGrath
+* Clark Updike
 * Barry A. Warsaw
+* Brian Zimmer
 
 ------------------
 Other Contributors

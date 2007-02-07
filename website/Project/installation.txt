@@ -2,13 +2,43 @@
 Installation
 ============
 
-.. contents:: Table of Contents
+.. contents:: 
+
+----------
+Jython 2.2
+----------
+
+Jython 2.2 is distributed as an executable jar file installer.  After
+`downloading <download.html>`__ it, either double click the
+jython_installer_Release_2_2beta1.jar or run java with the -jar option::
+
+    java -jar jython_installer_Release_2_2beta1.jar
+
+This will start the regular GUI installer on most systems, or a
+consoler installer on headless systems.  To force the installer to
+work in headless mode invoke the installer with a console switch::
+
+  java -jar jython_installer_Release_2_2beta1.jar -console
+
+The installer will then walk through a similar set of steps in
+graphical or console mode: showing the license, selecting an install
+directory and JVM and actually copying Jython to the filesystem.
+After this completes, Jython is installed in the directory you
+selected.  There's a script in the install directory, jython on Unix
+like systems or jython.bat on Windows, that will start up the Jython
+console which can be used to dynamically explore Jython and the Java
+runtime.
 
 ----------
 Jython 2.1
 ----------
 
-Jython 2.1 is distributed as a self-extracting .class file created by LiftOff. To install Jython, open the command line to the directory in which you have placed the jython-21.class file and then type:
+Jython 2.1 is distributed as a self-extracting .class file created by
+LiftOff.  It is known to have problems running on Java 6, so if you
+want to use Jython with that JVM either install Jython-2.1 with an earlier
+JVM or use Jython-2.2.  
+
+To install Jython, open the command line to the directory in which you have placed the jython-21.class file and then type:
 
     <java interpreter> jython-21
 
@@ -40,46 +70,13 @@ After completing installation, you should be able to run Jython by typing:
 
     jython
 
-----------
-Jython 2.2
-----------
-
-Work in progress.  See http://homepage.sunrise.ch/mysunrise/ohumbel/ for a mockup.
-
-Platform Specific notes
-=======================
-
-Mac OSX
--------
-
-OSX comes with Java already installed. If you wish to download the latest version, it can be obtained from http://developer.apple.com/java/download/
-Download the Jython Installer from the Latest Development link on http://www.jython.org/Project/download.html.  The download is a jar file which once downloaded can be double-clicked.  This will install Jython in a location of your choice.  The default is
-::
-
-    /Users/<current_user>/jythonRelease_2_2alpha1
-
-Once it has been installed, open a terminal window and issue these two commands:
-::
-
-    echo 'export PATH=<path_to_jython_folder>:$PATH' >> ~/.bash_profile
-    source ~/.bash_profile
-
-where  <path_to_jython folder> is replaced by the appropriate text e.g. /Users/kiffer/jythonRelease_2_2alpha1. 
-
-Then navigate to the Jython folder and issue this command:
-
-::
-
-    chmod 500 jython
-
-This will make the script 'jython' executable.  This step should become unneccessary with the upcoming beta release.
-Run the jython interpreter from any terminal in any folder.
-
 -----------------
 What Can Go Wrong
 -----------------
 
-You should check out this section if your Jython installation doesn't quite work right. It will contain tips for solving the most common problems.
+You should check out this section if your Jython installation doesn't
+quite work right. It will contain tips for solving the most common
+problems.
 
 Can't Access Standard Python Modules
 ====================================

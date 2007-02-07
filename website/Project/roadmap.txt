@@ -1,25 +1,31 @@
 ==============
 Jython Roadmap
 ==============
-February 3, 2007
+February 7, 2007
 
 -------------------
-Jython Beta and 2.2
+Jython  2.2
 -------------------
 
-To get to a Beta we need the following:
+A first beta has been released towards Jython-2.2.  A second beta is
+needed to address a couple remaining issues in the new-style class integration:
 
-1. We need to get the tool output from Pedroni's program referenced at
+1. The tool output from Pedroni's program referenced at
 http://sourceforge.net/mailarchive/message.php?msg_id=37797385
-to give us a clean result, or at least very close to a clean result
+shows several differnces between Jython's type hierarchy and that of
+CPython's as well as highlighting the lack of many of the
+rich-comparision operators on our built-in types.  Both of these need
+to be fixed before beta 2.
 
 2. We need to get more of test_descr working.  Charlie Groves has 
 created bug reports for most of the remaining work for test_descr.
-At that point we will be ready for a beta, and on to a
-real release.  For 2.2 we will not be considering much beyond these
-problems.  Bugs will be looked at on a case by case basis and many
-will not be fixed for 2.2.  Jython in its current state is quite
-fragile, and fixing one bug often leads to many more.
+
+Once those two items are resolved, a second beta will be released, and
+then we'll move on to the release of 2.2 final.  For 2.2 we will not be
+considering much beyond these problems.  Bugs will be looked at on a
+case by case basis and many will not be fixed for 2.2.  Jython in its
+current state is quite fragile, and fixing one bug often leads to many
+more.
 
 --------------------------
 Jython 2.3/2.4 or even 2.5
