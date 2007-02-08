@@ -12,7 +12,7 @@ needed to address a couple remaining issues in the new-style class integration:
 
 1. The tool output from Pedroni's program referenced at
 http://sourceforge.net/mailarchive/message.php?msg_id=37797385
-shows several differnces between Jython's type hierarchy and that of
+shows several differences between Jython's type hierarchy and that of
 CPython's as well as highlighting the lack of many of the
 rich-comparision operators on our built-in types.  Both of these need
 to be fixed before beta 2.
