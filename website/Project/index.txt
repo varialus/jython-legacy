@@ -7,14 +7,13 @@ object-oriented language Python written in 100% Pure Java, and
 seamlessly integrated with the Java platform. It thus allows you to
 run Python on any Java platform.
 
-.. admonition:: New version of Jython available
+.. admonition:: Latest News
 
-  Jython-2.2.beta1 has just been released.  `Download
-  it
-  <http://prdownloads.sourceforge.net/jython/jython_Release_2_2beta1.jar?download>`__,
-  `install it <install.html>`__,
-  kick the tires and start filing bug reports to help get 2.2 out sooner.
-   
+  The Jython development team is proud to announce a new release: Jython 2.2 Beta1!
+
+  * `Download it <http://downloads.sourceforge.net/jython/jython_installer-2.2b1.jar>`__,
+  * `install it <installation.html>`__,
+  * then kick the tires and start `filing bug reports <bugs.html>`__ to help get 2.2 polished up and done, so we can get going on the next Jython 2.x.
 
 What is Jython?
 ===============
