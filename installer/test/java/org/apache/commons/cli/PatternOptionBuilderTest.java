@@ -9,12 +9,10 @@
  */
 package org.apache.commons.cli;
 
+import java.math.BigDecimal;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.io.StringWriter;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
 
 /** 
  * Test case for the PatternOptionBuilder class 

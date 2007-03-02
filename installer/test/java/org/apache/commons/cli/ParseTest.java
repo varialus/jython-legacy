@@ -150,9 +150,10 @@ public class ParseTest extends TestCase
 
         boolean caught = false;
 
+        CommandLine cl = null;
         try
         {
-            CommandLine cl = _parser.parse(_options, args);
+            cl = _parser.parse(_options, args);
         }
         catch (MissingArgumentException e)
         {
@@ -163,7 +164,7 @@ public class ParseTest extends TestCase
             fail( e.toString() );
         }
 
-        assertTrue( "Confirm MissingArgumentException caught", caught );
+        assertTrue( "Confirm MissingArgumentException caught " + cl, caught );
     }
 
     public void testStop()

@@ -9,12 +9,11 @@
  */
 package org.apache.commons.cli;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** 
  * Test case for the HelpFormatter class 

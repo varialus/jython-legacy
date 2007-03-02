@@ -53,47 +53,47 @@ public class ValuesTest extends TestCase
                        true,
                        "set -d");
         
-        opts.addOption( OptionBuilder.withLongOpt( "e" )
-                                     .hasArgs()
-                                     .withDescription( "set -e ")
-                                     .create( 'e' ) );
+        OptionBuilder.withLongOpt( "e" );
+        OptionBuilder.hasArgs();
+        OptionBuilder.withDescription( "set -e ");
+        opts.addOption( OptionBuilder.create( 'e' ) );
 
         opts.addOption("f",
                        "f",
                        false,
                        "jk");
         
-        opts.addOption( OptionBuilder.withLongOpt( "g" )
-                        .hasArgs( 2 )
-                        .withDescription( "set -g")
-                        .create( 'g' ) );
+        OptionBuilder.withLongOpt( "g" );
+        OptionBuilder.hasArgs( 2 );
+        OptionBuilder.withDescription( "set -g");
+        opts.addOption( OptionBuilder.create( 'g' ) );
 
-        opts.addOption( OptionBuilder.withLongOpt( "h" )
-                        .hasArgs( 2 )
-                        .withDescription( "set -h")
-                        .create( 'h' ) );
+        OptionBuilder.withLongOpt( "h" );
+        OptionBuilder.hasArgs( 2 );
+        OptionBuilder.withDescription( "set -h");
+        opts.addOption( OptionBuilder.create( 'h' ) );
 
-        opts.addOption( OptionBuilder.withLongOpt( "i" )
-                        .withDescription( "set -i")
-                        .create( 'i' ) );
+        OptionBuilder.withLongOpt( "i" );
+        OptionBuilder.withDescription( "set -i");
+        opts.addOption( OptionBuilder.create( 'i' ) );
 
-        opts.addOption( OptionBuilder.withLongOpt( "j" )
-                        .hasArgs( )
-                        .withDescription( "set -j")
-                        .withValueSeparator( '=' )
-                        .create( 'j' ) );
+        OptionBuilder.withLongOpt( "j" );
+        OptionBuilder.hasArgs( );
+        OptionBuilder.withDescription( "set -j");
+        OptionBuilder.withValueSeparator( '=' );
+        opts.addOption( OptionBuilder.create( 'j' ) );
 
-        opts.addOption( OptionBuilder.withLongOpt( "k" )
-                        .hasArgs( )
-                        .withDescription( "set -k")
-                        .withValueSeparator( '=' )
-                        .create( 'k' ) );
+        OptionBuilder.withLongOpt( "k" );
+        OptionBuilder.hasArgs( );
+        OptionBuilder.withDescription( "set -k");
+        OptionBuilder.withValueSeparator( '=' );
+        opts.addOption( OptionBuilder.create( 'k' ) );
 
-        _option = OptionBuilder.withLongOpt( "m" )
-                        .hasArgs( )
-                        .withDescription( "set -m")
-                        .withValueSeparator( )
-                        .create( 'm' );
+        OptionBuilder.withLongOpt( "m" );
+        OptionBuilder.hasArgs( );
+        OptionBuilder.withDescription( "set -m");
+        OptionBuilder.withValueSeparator( );
+        _option = OptionBuilder.create( 'm' );
 
         opts.addOption( _option );
         
@@ -152,7 +152,7 @@ public class ValuesTest extends TestCase
 
     public void testMultipleArgValues()
     {
-        String[] result = _cmdline.getOptionValues("e");
+        _cmdline.getOptionValues("e");
         String[] values = new String[] { "one", "two" };
         assertTrue( _cmdline.hasOption("e") );
         assertTrue( _cmdline.getOptionValues("e").length == 2);
@@ -161,7 +161,7 @@ public class ValuesTest extends TestCase
 
     public void testTwoArgValues()
     {
-        String[] result = _cmdline.getOptionValues("g");
+        _cmdline.getOptionValues("g");
         String[] values = new String[] { "val1", "val2" };
         assertTrue( _cmdline.hasOption("g") );
         assertTrue( _cmdline.getOptionValues("g").length == 2);
@@ -170,7 +170,7 @@ public class ValuesTest extends TestCase
 
     public void testComplexValues()
     {
-        String[] result = _cmdline.getOptionValues("h");
+        _cmdline.getOptionValues("h");
         String[] values = new String[] { "val1", "val2" };
         assertTrue( _cmdline.hasOption("i") );
         assertTrue( _cmdline.hasOption("h") );

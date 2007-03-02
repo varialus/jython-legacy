@@ -40,11 +40,16 @@ public class ApplicationTest extends TestCase {
         options.addOption( "a", "all", false, "do not hide entries starting with ." );
         options.addOption( "A", "almost-all", false, "do not list implied . and .." );
         options.addOption( "b", "escape", false, "print octal escapes for nongraphic characters" );
-        options.addOption( OptionBuilder.withLongOpt( "block-size" )
-                                        .withDescription( "use SIZE-byte blocks" )
-                                        .withValueSeparator( '=' )
-                                        .hasArg()
-                                        .create() );
+        OptionBuilder.withLongOpt( "block-size" );
+        OptionBuilder.withDescription( "use SIZE-byte blocks" );
+        OptionBuilder.withValueSeparator( '=' );
+        OptionBuilder.hasArg();
+        options.addOption(OptionBuilder.create());
+//        options.addOption( OptionBuilder.withLongOpt( "block-size" )
+//                .withDescription( "use SIZE-byte blocks" )
+//                .withValueSeparator( '=' )
+//                .hasArg()
+//                .create() );
         options.addOption( "B", "ignore-backups", false, "do not list implied entried ending with ~");
         options.addOption( "c", false, "with -lt: sort by, and show, ctime (time of last modification of file status information) with -l:show ctime and sort by name otherwise: sort by ctime" );
         options.addOption( "C", false, "list entries by columns" );
@@ -79,10 +84,10 @@ public class ApplicationTest extends TestCase {
         options.addOption( "logger", true, "the class which is to perform the logging" );
         options.addOption( "listener", true, "add an instance of a class as a project listener" );
         options.addOption( "buildfile", true, "use given buildfile" );
-        options.addOption( OptionBuilder.withDescription( "use value for given property" )
-                                        .hasArgs()
-                                        .withValueSeparator()
-                                        .create( 'D' ) );
+        OptionBuilder.withDescription( "use value for given property" );
+        OptionBuilder.hasArgs();
+        OptionBuilder.withValueSeparator();
+        options.addOption( OptionBuilder.create( 'D' ) );
                            //, null, true, , false, true );
         options.addOption( "find", true, "search for buildfile towards the root of the filesystem and use it" );
 

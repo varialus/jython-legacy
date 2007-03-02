@@ -22,7 +22,6 @@ public class ValueTest extends TestCase
     }
 
     private CommandLine _cl = null;
-    private CommandLine _clOptional = null;
     private Options opts = new Options();
 
     public ValueTest(String name)
@@ -50,26 +49,26 @@ public class ValueTest extends TestCase
                        true,
                        "set -d");
 
-        opts.addOption( OptionBuilder.hasOptionalArg()
-                        .create( 'e') );
+        OptionBuilder.hasOptionalArg();
+        opts.addOption( OptionBuilder.create( 'e') );
 
-        opts.addOption( OptionBuilder.hasOptionalArg()
-                        .withLongOpt( "fish" )
-                        .create( ) );
+        OptionBuilder.hasOptionalArg();
+        OptionBuilder.withLongOpt( "fish" );
+        opts.addOption( OptionBuilder.create( ) );
 
-        opts.addOption( OptionBuilder.hasOptionalArgs()
-                        .withLongOpt( "gravy" )
-                        .create( ) );
+        OptionBuilder.hasOptionalArgs();
+        OptionBuilder.withLongOpt( "gravy" );
+        opts.addOption( OptionBuilder.create( ) );
 
-        opts.addOption( OptionBuilder.hasOptionalArgs( 2 )
-                        .withLongOpt( "hide" )
-                        .create( ) );
+        OptionBuilder.hasOptionalArgs( 2 );
+        OptionBuilder.withLongOpt( "hide" );
+        opts.addOption( OptionBuilder.create( ) );
 
-        opts.addOption( OptionBuilder.hasOptionalArgs( 2 )
-                        .create( 'i' ) );
+        OptionBuilder.hasOptionalArgs( 2 );
+        opts.addOption( OptionBuilder.create( 'i' ) );
 
-        opts.addOption( OptionBuilder.hasOptionalArgs( )
-                        .create( 'j' ) );
+        OptionBuilder.hasOptionalArgs( );
+        opts.addOption( OptionBuilder.create( 'j' ) );
 
         String[] args = new String[] { "-a",
             "-b", "foo",

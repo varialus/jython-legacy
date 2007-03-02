@@ -23,13 +23,13 @@ public class OptionBuilderTest extends TestCase {
     }
 
     public void testCompleteOption( ) {
-        Option simple = OptionBuilder.withLongOpt( "simple option")
-                                     .hasArg( )
-                                     .isRequired( )
-                                     .hasArgs( )
-                                     .withType( new BigDecimal( "10" ) )
-                                     .withDescription( "this is a simple option" )
-                                     .create( 's' );
+        OptionBuilder.withLongOpt( "simple option");
+        OptionBuilder.hasArg( );
+        OptionBuilder.isRequired( );
+        OptionBuilder.hasArgs( );
+        OptionBuilder.withType( new BigDecimal( "10" ) );
+        OptionBuilder.withDescription( "this is a simple option" );
+        Option simple = OptionBuilder.create( 's' );
 
         assertEquals( "s", simple.getOpt() );
         assertEquals( "simple option", simple.getLongOpt() );
@@ -41,13 +41,13 @@ public class OptionBuilderTest extends TestCase {
     }
 
     public void testTwoCompleteOptions( ) {
-        Option simple = OptionBuilder.withLongOpt( "simple option")
-                                     .hasArg( )
-                                     .isRequired( )
-                                     .hasArgs( )
-                                     .withType( new BigDecimal( "10" ) )
-                                     .withDescription( "this is a simple option" )
-                                     .create( 's' );
+        OptionBuilder.withLongOpt( "simple option");
+        OptionBuilder.hasArg( );
+        OptionBuilder.isRequired( );
+        OptionBuilder.hasArgs( );
+        OptionBuilder.withType( new BigDecimal( "10" ) );
+        OptionBuilder.withDescription( "this is a simple option" );
+        Option simple = OptionBuilder.create( 's' );
 
         assertEquals( "s", simple.getOpt() );
         assertEquals( "simple option", simple.getLongOpt() );
@@ -57,10 +57,10 @@ public class OptionBuilderTest extends TestCase {
         assertTrue( simple.isRequired() );
         assertTrue( simple.hasArgs() );
 
-        simple = OptionBuilder.withLongOpt( "dimple option")
-                              .hasArg( )
-                              .withDescription( "this is a dimple option" )
-                              .create( 'd' );
+        OptionBuilder.withLongOpt( "dimple option");
+        OptionBuilder.hasArg( );
+        OptionBuilder.withDescription( "this is a dimple option" );
+        simple = OptionBuilder.create( 'd' );
 
         assertEquals( "d", simple.getOpt() );
         assertEquals( "dimple option", simple.getLongOpt() );
@@ -72,8 +72,8 @@ public class OptionBuilderTest extends TestCase {
     }
 
     public void testBaseOptionCharOpt() {
-        Option base = OptionBuilder.withDescription( "option description")
-                                   .create( 'o' );
+        OptionBuilder.withDescription( "option description");
+        Option base = OptionBuilder.create( 'o' );
 
         assertEquals( "o", base.getOpt() );
         assertEquals( "option description", base.getDescription() );
@@ -81,8 +81,8 @@ public class OptionBuilderTest extends TestCase {
     }
 
     public void testBaseOptionStringOpt() {
-        Option base = OptionBuilder.withDescription( "option description")
-                                   .create( "o" );
+        OptionBuilder.withDescription( "option description");
+        Option base = OptionBuilder.create( "o" );
 
         assertEquals( "o", base.getOpt() );
         assertEquals( "option description", base.getDescription() );
@@ -93,8 +93,8 @@ public class OptionBuilderTest extends TestCase {
 
         // '?'
         try {
-            Option opt = OptionBuilder.withDescription( "help options" )
-                                      .create( '?' );
+            OptionBuilder.withDescription( "help options" );
+            Option opt = OptionBuilder.create( '?' );
             assertEquals( "?", opt.getOpt() );
         }
         catch( IllegalArgumentException arg ) {
@@ -103,8 +103,8 @@ public class OptionBuilderTest extends TestCase {
 
         // '@'
         try {
-            Option opt = OptionBuilder.withDescription( "read from stdin" )
-                                      .create( '@' );
+            OptionBuilder.withDescription( "read from stdin" );
+            Option opt = OptionBuilder.create( '@' );
             assertEquals( "@", opt.getOpt() );
         }
         catch( IllegalArgumentException arg ) {
@@ -113,17 +113,17 @@ public class OptionBuilderTest extends TestCase {
     }
 
     public void testOptionArgNumbers() {
-        Option opt = OptionBuilder.withDescription( "option description" )
-                                  .hasArgs( 2 )
-                                  .create( 'o' );
+        OptionBuilder.withDescription( "option description" );
+        OptionBuilder.hasArgs( 2 );
+        Option opt = OptionBuilder.create( 'o' );
         assertEquals( 2, opt.getArgs() );
     }
 
     public void testIllegalOptions() {
         // bad single character option
         try {
-            Option opt = OptionBuilder.withDescription( "option description" )
-                                      .create( '"' );
+            OptionBuilder.withDescription( "option description" );
+            OptionBuilder.create( '"' );
             fail( "IllegalArgumentException not caught" );
         }
         catch( IllegalArgumentException exp ) {
@@ -132,7 +132,7 @@ public class OptionBuilderTest extends TestCase {
 
         // bad character in option string
         try {
-            Option opt = OptionBuilder.create( "opt`" );
+            OptionBuilder.create( "opt`" );
             fail( "IllegalArgumentException not caught" );
         }
         catch( IllegalArgumentException exp ) {
@@ -141,7 +141,7 @@ public class OptionBuilderTest extends TestCase {
 
         // null option
         try {
-            Option opt = OptionBuilder.create( null );
+            OptionBuilder.create( null );
             fail( "IllegalArgumentException not caught" );
         }
         catch( IllegalArgumentException exp ) {
@@ -150,7 +150,7 @@ public class OptionBuilderTest extends TestCase {
 
         // valid option 
         try {
-            Option opt = OptionBuilder.create( "opt" );
+            OptionBuilder.create( "opt" );
             // success
         }
         catch( IllegalArgumentException exp ) {

@@ -35,16 +35,17 @@ public class ParseRequiredTest extends TestCase
 
     public void setUp()
     {
+        OptionBuilder.withLongOpt( "bfile" );
+        OptionBuilder.hasArg();
+        OptionBuilder.isRequired();
+        OptionBuilder.withDescription( "set the value of [b]" );
+        Option opt2 = OptionBuilder.create( 'b' );
         _options = new Options()
             .addOption("a",
                        "enable-a",
                        false,
                        "turn [a] on or off")
-            .addOption( OptionBuilder.withLongOpt( "bfile" )
-                                     .hasArg()
-                                     .isRequired()
-                                     .withDescription( "set the value of [b]" )
-                                     .create( 'b' ) );
+            .addOption( opt2 );
     }
 
     public void tearDown()
@@ -94,16 +95,17 @@ public class ParseRequiredTest extends TestCase
     {
         String[] args = new String[] { "-a" };
 
+        CommandLine cl = null;
         try
         {
-            CommandLine cl = parser.parse(_options,args);
+            cl = parser.parse(_options,args);
             fail( "exception should have been thrown" );
         }
         catch (ParseException e)
         {
             if( !( e instanceof MissingOptionException ) )
             {
-                fail( "expected to catch MissingOptionException" );
+                fail( "expected to catch MissingOptionException in " + cl );
             }
         }
     }

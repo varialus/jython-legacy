@@ -188,16 +188,17 @@ public class OptionGroupTest extends TestCase
     {
         String[] args = new String[] { "-f", "-d" };
 
+        CommandLine cl = null;
         try
         {
-            CommandLine cl = parser.parse( _options, args);
+            cl = parser.parse( _options, args);
             fail( "two arguments from group not allowed" );
         }
         catch (ParseException e)
         {
             if( !( e instanceof AlreadySelectedException ) )
             {
-                fail( "incorrect exception caught:" + e.getMessage() );
+                fail( "incorrect exception caught:" + e.getMessage() + " in " + cl );
             }
         }
     }
@@ -206,16 +207,17 @@ public class OptionGroupTest extends TestCase
     {
         String[] args = new String[] { "--file", "--directory" };
 
+        CommandLine cl = null;
         try
         {
-            CommandLine cl = parser.parse( _options, args);
+            cl = parser.parse( _options, args);
             fail( "two arguments from group not allowed" );
         }
         catch (ParseException e)
         {
             if( !( e instanceof AlreadySelectedException ) )
             {
-                fail( "incorrect exception caught:" + e.getMessage() );
+                fail( "incorrect exception caught:" + e.getMessage() + " in " + cl );
             }
         }
     }

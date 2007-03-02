@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.apache.xalan.lib.Redirect;
-
 import junit.framework.TestCase;
 
 public class ChildProcessTest extends TestCase {

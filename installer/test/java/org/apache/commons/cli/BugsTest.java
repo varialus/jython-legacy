@@ -16,9 +16,6 @@ import junit.framework.TestSuite;
 
 public class BugsTest extends TestCase
 {
-    /** CommandLine instance */
-    private CommandLine _cmdline = null;
-    private Option _option = null;
 
     public static Test suite() { 
         return new TestSuite( BugsTest.class );
@@ -39,8 +36,8 @@ public class BugsTest extends TestCase
 
     public void test11457() {
         Options options = new Options();
-        options.addOption( OptionBuilder.withLongOpt( "verbose" )
-                           .create() );
+        OptionBuilder.withLongOpt( "verbose" );
+        options.addOption( OptionBuilder.create() );
         String[] args = new String[] { "--verbose" };
 
         CommandLineParser parser = new PosixParser();
@@ -58,12 +55,12 @@ public class BugsTest extends TestCase
     public void test11458()
     {
         Options options = new Options();
-        options.addOption( OptionBuilder.withValueSeparator( '=' )
-                           .hasArgs()
-                           .create( 'D' ) );
-        options.addOption( OptionBuilder.withValueSeparator( ':' )
-                           .hasArgs()
-                           .create( 'p' ) );
+        OptionBuilder.withValueSeparator( '=' );
+        OptionBuilder.hasArgs();
+        options.addOption(OptionBuilder.create( 'D' ) );
+        OptionBuilder.withValueSeparator( ':' );
+        OptionBuilder.hasArgs();
+        options.addOption( OptionBuilder.create( 'p' ) );
         String[] args = new String[] { "-DJAVA_HOME=/opt/java" ,
         "-pfile1:file2:file3" };
 
@@ -136,10 +133,10 @@ public class BugsTest extends TestCase
     {
         // Posix 
         Options options = new Options();
-        options.addOption( OptionBuilder.hasOptionalArg()
-                           .create( 'a' ) );
-        options.addOption( OptionBuilder.hasArg()
-                           .create( 'b' ) );
+        OptionBuilder.hasOptionalArg();
+        options.addOption( OptionBuilder.create( 'a' ) );
+        OptionBuilder.hasArg();
+        options.addOption( OptionBuilder.create( 'b' ) );
         String[] args = new String[] { "-a", "-bvalue" };
 
         CommandLineParser parser = new PosixParser();
@@ -154,10 +151,10 @@ public class BugsTest extends TestCase
 
         // GNU
         options = new Options();
-        options.addOption( OptionBuilder.hasOptionalArg()
-                           .create( 'a' ) );
-        options.addOption( OptionBuilder.hasArg()
-                           .create( 'b' ) );
+        OptionBuilder.hasOptionalArg();
+        options.addOption( OptionBuilder.create( 'a' ) );
+        OptionBuilder.hasArg();
+        options.addOption( OptionBuilder.create( 'b' ) );
         args = new String[] { "-a", "-b", "value" };
 
         parser = new GnuParser();
@@ -232,14 +229,14 @@ public class BugsTest extends TestCase
 
     public void test13425() {
         Options options = new Options();
-        Option oldpass = OptionBuilder.withLongOpt( "old-password" )
-            .withDescription( "Use this option to specify the old password" )
-            .hasArg()
-            .create( 'o' );
-        Option newpass = OptionBuilder.withLongOpt( "new-password" )
-            .withDescription( "Use this option to specify the new password" )
-            .hasArg()
-            .create( 'n' );
+        OptionBuilder.withLongOpt( "old-password" );
+        OptionBuilder.withDescription( "Use this option to specify the old password" );
+        OptionBuilder.hasArg();
+        Option oldpass = OptionBuilder.create( 'o' );
+        OptionBuilder.withLongOpt( "new-password" );
+        OptionBuilder.withDescription( "Use this option to specify the new password" );
+        OptionBuilder.hasArg();
+        Option newpass = OptionBuilder.create( 'n' );
 
         String[] args = { 
             "-o", 
@@ -252,22 +249,23 @@ public class BugsTest extends TestCase
 
         Parser parser = new PosixParser();
 
+        CommandLine line = null;
         try {
-            CommandLine line = parser.parse( options, args );
+            line = parser.parse( options, args );
         }
         // catch the exception and leave the method
         catch( Exception exp ) {
             assertTrue( exp != null );
             return;
         }
-        fail( "MissingArgumentException not caught." );
+        fail( "MissingArgumentException not caught." + line);
     }
 
     public void test13666() {
         Options options = new Options();
-        Option dir = OptionBuilder.withDescription( "dir" )
-                                       .hasArg()
-                                       .create( 'd' );
+        OptionBuilder.withDescription( "dir" );
+        OptionBuilder.hasArg();
+        Option dir = OptionBuilder.create( 'd' );
         options.addOption( dir );
         try {
             HelpFormatter formatter = new HelpFormatter();
@@ -298,9 +296,10 @@ public class BugsTest extends TestCase
         CommandLineParser parser = new PosixParser();
         boolean exception = false;
 
+        CommandLine line = null;
         String[] args = new String[] {  };
         try {
-            CommandLine line = parser.parse( opts, args );
+            line = parser.parse( opts, args );
         }
         catch( ParseException exp ) {
             exception = true;
@@ -314,7 +313,7 @@ public class BugsTest extends TestCase
 
         args = new String[] { "-s" };
         try {
-            CommandLine line = parser.parse( opts, args );
+            line = parser.parse( opts, args );
         }
         catch( ParseException exp ) {
             exception = true;
@@ -328,7 +327,7 @@ public class BugsTest extends TestCase
 
         args = new String[] { "-s", "-l" };
         try {
-            CommandLine line = parser.parse( opts, args );
+            line = parser.parse( opts, args );
         }
         catch( ParseException exp ) {
             fail( "Unexpected exception: " + exp.getMessage() );
@@ -337,10 +336,13 @@ public class BugsTest extends TestCase
         opts.addOption( forward );
         args = new String[] { "-s", "-l", "-f" };
         try {
-            CommandLine line = parser.parse( opts, args );
+            line = parser.parse( opts, args );
         }
         catch( ParseException exp ) {
             fail( "Unexpected exception: " + exp.getMessage() );
+        }
+        if(line != null) {
+            line = null;
         }
     }
 }
