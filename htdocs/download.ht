@@ -2,13 +2,7 @@ Title: Download Jython
 
 <h3>Download Jython</h3>
 
-<em><b>Developers note:</b> The latest snapshopts of the Jython
-source code is now <a href="http://sourceforge.net/cvs/?group_id=12867">
-available via CVS</a>!</em>
-
-<p>[<i>disabled at the moment (Jul 2003) - Nightly snapshots of the CVS repository are also available as 
-<a href="http://www.jython.org/cvssnaps/jython-nightly.tar.gz">.tar.gz</a>
-and <a href="http://www.jython.org/cvssnaps/jython-nightly.zip">.zip</a> files.</i>]
+<em><b>Note:</b> The following information refers to the older 2.1 release. For the latest Jython news and release information, please refer to the updated jython website. (March 2007)</em>
 
 <p>Here are the steps you need to perform in order to download Jython.
 Once you've done this, you should read the
