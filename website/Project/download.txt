@@ -2,10 +2,10 @@
 Downloads
 =========
 
-* `jython-2.1 <http://prdownloads.sourceforge.net/jython/jython_Release_2_2beta1.jar?download>`__ - The most recent stable release.  The installer has
+* `jython-2.1 <http://downloads.sourceforge.net/jython/jython_21.class>`__ - The most recent stable release.  The installer has
   known issues with Java 6
 
-* `jython-2.2beta1 <http://prdownloads.sourceforge.net/jython/jython_Release_2_2beta1.jar?download>`__ - A development release towards 2.2.  While
+* `jython-2.2beta1 <http://downloads.sourceforge.net/jython/jython_installer-2.2b1.jar>`__ - A development release towards 2.2.  While
   there's still `work to be done <roadmap.html>`__ before this becomes 2.2 final, many
   bugs have been fixed from jython-2.1 and this installer runs on Java
   6.   
