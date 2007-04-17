@@ -1,11 +1,21 @@
 ==============
 Jython Roadmap
 ==============
-February 7, 2007
+last modified: February 10, 2007
+
+.. contents:: Table of Contents
+.. sectnum::
 
 -------------------
-Jython  2.2
+Summary
 -------------------
+
+Note that Jython's version numbers represent the version of CPython from which
+Jython pull most of its libraries that are written in pure Python (as opposed
+to the parts that are written in Java).
+
+Jython  2.2
+===========
 
 A first beta has been released towards Jython-2.2.  A second beta is
 needed to address a couple remaining issues in the new-style class integration:
@@ -27,13 +37,12 @@ case by case basis and many will not be fixed for 2.2.  Jython in its
 current state is quite fragile, and fixing one bug often leads to many
 more.
 
---------------------------
-Jython 2.3/2.4 or even 2.5
---------------------------
+Jython 2.4 or 2.5
+==========================
 
 Jython's current fragility means that the next release will primarily
 be a cleanup release.  We will probably target
-either Python 2.3/2.4, although we might even consider 2.5, as it would
+either Python 2.4/2.5, although we might even consider 2.5, as it would
 be great to catch up, and the changes in the core language in the 2.x
 series at this point are fairly small.
 
@@ -44,7 +53,7 @@ nightmare, and makes learning the codebase from scratch
 extraordinarily difficult.
 
 This means that, at least for the core developers, we will be
-concentrated on making a clean 2.3/2.4, while improving the java
+concentrated on making a clean 2.4/2.5, while improving the java
 integration, but will not be spending much time trying to get CPython
 frameworks working.  Also, we will not be considering any big changes
 to the core (such as using ASM for bytecode generation) and will not
@@ -56,23 +65,21 @@ that CPython frameworks are the next target.  I'm just saying that
 this will not be the focus of the next release.  Making the codebase
 more consistent and accessible will be the primary focus.
 
-Of course, once we have a 2.3/2.4 release, then we can really look at
+Of course, once we have a 2.4/2.5 release, then we can really look at
 the issues above (CPython frameworks, performance, big changes to the
 core, etc) and I believe we will have a much better chance for
 success.
 
----------------
 Next Jython 2.x
----------------
+===============
 
 This release will build on the cleanup in the last release, and in this
 release we will be able to consider performance enhancements, CPython
 frameworks, and other considerations that where shelved for the last
 release.
 
-----------
 Jython 3.0
-----------
+==========
 
 Jython 3.0 (or Jython 3000 to denote the likely year of appearance) 
 will, like CPython 3.0, be a backwards incompatible version that can
@@ -82,6 +89,36 @@ old-style classes go away, ints and longs are completely unified,
 etc.)
 
 Serious discussions about Jython 3.0 can perhaps begin once CPython 3.0
-goes to a GA release.  I think that is all I am willing to say on the 
-subject for now.
+goes to a GA release.
 
+-------
+Details
+-------
+Below is a start at dividing the issues that may be addressed by future Jython releases.  The items listed here are just a beginning, they are not gaurantees.  We will certainly add and remove items as things progress.  I have labeled them "Jython 2.4", "Jython 2.6" and "Jython 3.0" (based on the version of CPython that will be targetted), although the exact versions are up for discussion (for example, Jython 2.4 may be re-targetted at 2.5).
+
+Jython 2.4
+==========
+
+Clean up is the primary goal of this release, though some enhancements will happen as well (incorporate CPython core language changes and improve Java integration).
+
+Clean up
+--------
+
+* All fundemental classes should be converted to new-style classes.
+
+Enhancements
+------------
+
+* method dispatch should be an Java implementation of Samuele's Jython prototye.
+
+Jython 2.6
+==========
+The primary goal of Jython 2.6 will be the enabling of CPython frameworks, especially the web frameworks.  I would like to see at least the following frameworks functioning:
+
+* TurboGears
+* Django
+* Twisted
+
+Jython 3.0
+==========
+TBD
