@@ -40,17 +40,19 @@ The standalone option does no caching and so avoids the startup overhead (most l
 You can try it out by downloading the beta installer from here:
 http://downloads.sourceforge.net/jython/jython_installer-2.2b1.jar
 
-running it like so:
-$ java -jar jython_installer-2.2b1.jar
+running it like so: ::
+
+    $ java -jar jython_installer-2.2b1.jar
 
 And when you come to the "Installation type" page, select "Standalone".
 
-When the installation is done, you will have a jython.jar with the /Lib files included that can be run like this:
-$ java -jar jython.jar
+When the installation is done, you will have a jython.jar with the /Lib files included that can be run like this: ::
 
-You will get a jython prompt with no caching.  Of course you can run scripts just by calling them as you might expect:
+    $ java -jar jython.jar
 
-$ java -jar jython.jar script.py
+You will get a jython prompt with no caching.  Of course you can run scripts just by calling them as you might expect: ::
+
+    $ java -jar jython.jar script.py
 
 And you can add this jar to the classpath of your app, which will allow standard imports.
 
