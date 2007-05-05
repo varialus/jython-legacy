@@ -157,12 +157,6 @@ public class DirectorySelectionPage extends AbstractWizardPage {
                     // switch to parent directory if user typed the name of a file
                     directory = directory.getParentFile();
                 }
-            } else {
-                // try to create the typed directory, switch to default
-                // directory if all else fails
-                if (!directory.mkdirs()) {
-                    directory = getDefaultDirectory();
-                }
             }
             JFileChooser fileChooser = new JFileChooser(directory);
             fileChooser.setDialogTitle(getText(SELECT_TARGET_DIRECTORY));
