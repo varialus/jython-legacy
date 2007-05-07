@@ -380,107 +380,24 @@ Javadocs (or source) for further details on org.python.core.ArgParser.
 Embedding Jython
 ================
 
-How can I use jython classes from my java application?
-------------------------------------------------------
-There are several ways to do that. The best way depends on the needs of
-your application. One possible way is to compile the python class into
-a real java class using the jythonc command. This real java can be used
-and instances can be created from your application.
+How can I use Jython classes from my Java application?
+------------------------------------------------------ 
+You can subclass Java classes in Python and then use them from Java code as
+that Java type.  This technique is explained in `Accessing Jython from Java
+Without Using jythonc`_ and its followup, `Simple and Efficient Jython Object
+Factories`_. 
 
-Create a python module (say Foo.py) and make a class with the same
-name as the python module. The class must inherit from a java class
-or interface. If you don't need a particular Java superclass, just use
-java.lang.Object.::
-
-  import java
-  class Foo(java.util.Date):
-      def toString(self):
-          return "Foo[" + java.util.Date.toString(self) + "]"
-
-The python class can overwrite all existing methods on the java superclass
-or interface and these overridden methods can be called from the java
-application. New methods can by default not be accessed from java. If
-we add a "bar" method, the method can be used from python, but not from
-Java. ::
-
-  import java
-  class Foo(java.util.Date):
-      def __init__(self):
-          self.count = 0
-      def bar(self, incr=1):
-          self.count += incr
-          return self.count
-      def toString(self):
-          cnt = self.bar()
-          return "Foo[" + java.util.Date.toString(self) + " " + `cnt` +
-          "]"
-
-The jythonc compiler can also create java methods for the python methods,
-but it need some additional help. This help is specified as a @sig line
-in the doc-string for the method. A doc-string is added to the example
-above. ::
-
-  import java
-  class Foo(java.util.Date):
-      def __init__(self):
-          self.count = 0
-      def bar(self, incr=1):
-          """@sig void bar(int incr)"""
-          self.count += incr
-          return self.count
-      def toString(self):
-          cnt = self.bar()
-          return "Foo[" + java.util.Date.toString(self) + " " + `cnt` +
-          "]"
-
-When this class is compiled with jythonc, A java class Foo.java and
-Foo.class is created with the java methods toString(), bar() and bar(int
-incr).
-
-When compiling the Foo.py class, make sure that the Foo actually extends
-the desired java class. You can check the output from the compilation. It
-should contain lines like: ::
-
-  Required packages:
-    java.util
-
-  Creating adapters:
-
-  Creating .java files:
-    Foo module
-      Foo extends java.util.Date
-
-If jython fails to recognize the superclass as a java class, it will
-silently assume that it is a python class and will not generate the
-desired java methods.
-
-The new Foo class can be used from java java class like this: ::
-
-   public class FooTest {
-       public static void main(String[] args) {
-	   Foo foo = new Foo();
-	   System.out.println(foo);
-	   foo.bar();
-	   foo.bar(43);
-	   System.out.println(foo);
-       }
-   }
-
-When compiling the FooTest.java class, the "jpywork" directory should
-be appended to your classpath.
-
-When running this little application, the jython.jar runtime must be
-available on the CLASSPATH or specified on the java command line.
+As the title of the first article above suggests, you can also expose Python
+code to Java with jythonc_.  However, as jythonc will not be included in
+Jython-2.3 its use is not recommended for the future.
 
 My modules can not be found when imported from an embedded application
 ----------------------------------------------------------------------
 The default value for sys.path in an embedded application depend on
 several things:
 
-1) A python.path property, if found in the registry file or in the
-$HOME/.jython file will be used.
-
-2) The <python.home>/Lib directory is added.
+1. A python.path property, if found in the registry file or in the $HOME/.jython file will be used.
+2. The <python.home>/Lib directory is added.
 
 An application can override the python.path property by calling
 PythonInterpreter.initialize(..) before any other python code is
@@ -501,4 +418,6 @@ for the PATH environment var (':' separator for unix, ';' for windows)
 .. _Jython-2.1: http://prdownloads.sourceforge.net/jython/jython_21.class?download
 .. _Jython-2.2a1: http://prdownloads.sourceforge.net/jython/jython_Release_2_2alpha1.jar?download
 .. _ReadlineSetup: http://wiki.python.org/jython/ReadlineSetup
-
+.. _Accessing Jython from Java Without Using jythonc: http://wiki.python.org/jython/JythonMonthly/Articles/September2006/1
+.. _Simple and Efficient Jython Object Factories: http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3
+.. _jythonc: jythonc.html
