@@ -26,14 +26,6 @@
   :active { voice-family: betty, female; pitch-range: 80; pitch: x-high }
 }
   
-a.external  {
-  padding: 0 20px 0px 0px;
-	display:inline;
-  background-repeat: no-repeat;
-	background-position: center right;
-	background-image: url(images/external-link.gif);
-}
-  
 #top          { background-color: #ffffff;}  
 #top .grouplogo {padding: 0;} 
 #top .header .current { background-color: #f5f6b5;} 

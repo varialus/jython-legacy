@@ -53,12 +53,13 @@ What is the current status of Jython?
 Jython-2.1_ is the current production release.   It's feature set roughly
 corresponds to that of Python-2.1  It was released on 31-dec-2001.
 
-Jython-2.2a1_ is the current development release.  It includes
+Jython-2.2b2_ is the current development release.  It includes
 improvements to java integration and implements many new features from
 CPython 2.2/3.
 
-We're applying the finishing touches for 2.2b1 which completes
-new-style classes for 2.2 and solves many Java integration issues.
+2.2b2 is the second and final beta towards a 2.2 release.  After some use from
+the community we plan to make a release candidate and if it has no serious
+problems, to make the 2.2 release a couple weeks after that.
 
 How fast is Jython?
 -------------------
@@ -416,7 +417,7 @@ for the PATH environment var (':' separator for unix, ';' for windows)
 .. _JNumeric: http://jnumerical.sourceforge.net/index.html
 .. _jreload: http://www.jython.org/docs/jreload.html
 .. _Jython-2.1: http://prdownloads.sourceforge.net/jython/jython_21.class?download
-.. _Jython-2.2a1: http://prdownloads.sourceforge.net/jython/jython_Release_2_2alpha1.jar?download
+.. _Jython-2.2b2: http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=507592
 .. _ReadlineSetup: http://wiki.python.org/jython/ReadlineSetup
 .. _Accessing Jython from Java Without Using jythonc: http://wiki.python.org/jython/JythonMonthly/Articles/September2006/1
 .. _Simple and Efficient Jython Object Factories: http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3

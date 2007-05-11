@@ -9,9 +9,9 @@ run Python on any Java platform.
 
 .. admonition:: Latest News
 
-  The Jython development team is proud to announce a new release: Jython 2.2 Beta1!
+  The Jython development team is proud to announce a new release: Jython 2.2 Beta2!
 
-  * `Download it <http://downloads.sourceforge.net/jython/jython_installer-2.2b1.jar>`__,
+  * `Download it <http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=507592>`__,
   * `install it <installation.html>`__,
   * then kick the tires and start `filing bug reports <bugs.html>`__ to help get 2.2 polished up and done, so we can get going on the next Jython 2.x.
 
