@@ -19,15 +19,23 @@ _defaulttimeout = None
 import threading
 import time
 import types
-
-import java.nio
-import java.net
 import org.python.core
 import jarray
 import string
 import sys
 
-from java.lang import InterruptedException
+import java.io.InterruptedIOException
+import java.lang.Exception
+import java.net.BindException
+import java.net.DatagramPacket
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.SocketTimeoutException
+import java.nio.ByteBuffer
+import java.nio.channels.DatagramChannel
+import java.nio.channels.IllegalBlockingModeException
+import java.nio.channels.ServerSocketChannel
+import java.nio.channels.SocketChannel
 
 class error(Exception): pass
 class herror(error): pass

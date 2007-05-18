@@ -1,8 +1,5 @@
 from __future__ import nested_scopes
 
-import sys
-sys.path.append("x:\\xhaus\\jython_trunk\\sandbox\\kennedya\\asynch_sockets")
-
 """
 AMAK: 20050515: This module is the test_socket.py from cpython 2.4, ported to jython.
 """
