@@ -140,6 +140,9 @@ class _client_socket_impl(_nio_impl):
             self.port = None
         self.jsocket = self.jchannel.socket()
 
+    def bind(self, host, port):
+        self.jsocket.bind(java.net.InetSocketAddress(host, port))
+
     def connect(self, host, port):
         self.host = host
         self.port = port
@@ -188,10 +191,10 @@ class _datagram_socket_impl(_nio_impl):
         self.jsocket = self.jchannel.socket()
         if port:
             if address is not None:
-                bind_address = java.net.InetSocketAddress(address, port)
+                local_address = java.net.InetSocketAddress(address, port)
             else:
-                bind_address = java.net.InetSocketAddress(port)
-            self.jsocket.bind(bind_address)
+                local_address = java.net.InetSocketAddress(port)
+            self.jsocket.bind(local_address)
         self._setreuseaddress(reuse_addr)
 
     def connect(self, host, port):
@@ -375,7 +378,7 @@ class _tcpsocket(_nonblocking_api_mixin):
     sock_impl = None
     istream = None
     ostream = None
-    addr = None
+    local_addr = None
     server = 0
     file_count = 0
     #reuse_addr = 1
@@ -383,18 +386,18 @@ class _tcpsocket(_nonblocking_api_mixin):
 
     def bind(self, addr):
         assert not self.sock_impl
-        assert not self.addr
+        assert not self.local_addr
         # Do the address format check
         host, port = _unpack_address_tuple(addr)
-        self.addr = addr
+        self.local_addr = addr
 
     def listen(self, backlog=50):
         "This signifies a server socket"
         try:
             assert not self.sock_impl
             self.server = 1
-            if self.addr:
-                host, port = self.addr
+            if self.local_addr:
+                host, port = self.local_addr
             else:
                 host, port = "", 0
             self.sock_impl = _server_socket_impl(host, port, backlog, self.reuse_addr)
@@ -429,22 +432,25 @@ class _tcpsocket(_nonblocking_api_mixin):
             host = java.net.InetAddress.getLocalHost()
         return host, port
 
-    def connect(self, addr):
-        "This signifies a client socket"
+    def _do_connect(self, addr):
         assert not self.sock_impl
         host, port = self._get_host_port(addr)
         self.sock_impl = _client_socket_impl()
+        if self.local_addr: # Has the socket been bound to a local address?
+            bind_host, bind_port = self.local_addr
+            self.sock_impl.bind(bind_host, bind_port)
         self._config() # Configure timeouts, etc, now that the socket exists
         self.sock_impl.connect(host, port)
         self._setup(self.sock_impl)
 
+    def connect(self, addr):
+        "This signifies a client socket"
+        self._do_connect(addr)
+        self._setup(self.sock_impl)
+
     def connect_ex(self, addr):
         "This signifies a client socket"
-        assert not self.sock_impl
-        host, port = self._get_host_port(addr)
-        self.sock_impl = _client_socket_impl()
-        self._config() # Configure timeouts, etc, now that the socket exists
-        self.sock_impl.connect(host, port)
+        self._do_connect(addr)
         if self.sock_impl.finish_connect():
             self._setup(self.sock_impl)
             return 0
@@ -489,7 +495,7 @@ class _tcpsocket(_nonblocking_api_mixin):
 
     def getsockname(self):
         if not self.sock_impl:
-            host, port = self.addr or ("", 0)
+            host, port = self.local_addr or ("", 0)
             host = java.net.InetAddress.getByName(host).getHostAddress()
         else:
             if self.server:
@@ -698,7 +704,7 @@ class _udpsocket(_nonblocking_api_mixin):
         if not self.sock_impl:
             return
         sock = self.sock_impl
-        self.sock_impl = 0
+        self.sock_impl = None
         sock.close()
 
     def setsockopt(self, level, optname, value):

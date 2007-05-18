@@ -1,5 +1,8 @@
 from __future__ import nested_scopes
 
+import sys
+sys.path.append("x:\\xhaus\\jython_trunk\\sandbox\\kennedya\\asynch_sockets")
+
 """
 AMAK: 20050515: This module is the test_socket.py from cpython 2.4, ported to jython.
 """
@@ -660,11 +663,11 @@ class NonBlockingTCPTests(ThreadedTCPSocketTest):
         # Make a connection to the server
         self.cli.connect((HOST, PORT))
 
-   #
-   # AMAK: 20070311
-   # Introduced a new test for non-blocking connect
-   # Renamed old testConnect to testBlockingConnect
-   # 
+    #
+    # AMAK: 20070311
+    # Introduced a new test for non-blocking connect
+    # Renamed old testConnect to testBlockingConnect
+    # 
 
     def testBlockingConnect(self):
         # Testing blocking connect
@@ -689,6 +692,23 @@ class NonBlockingTCPTests(ThreadedTCPSocketTest):
             self.cli.send(MSG)
         except socket.error:
             self.fail("Sending on connected socket should not have raised socket.error")
+
+    #
+    # AMAK: 20070518
+    # Introduced a new test for connect with bind to specific local address
+    # 
+
+    def testConnectWithLocalBind(self):
+        # Test blocking connect
+        conn, addr = self.serv.accept()
+
+    def _testConnectWithLocalBind(self):
+        # Testing blocking connect with local bind
+        self.cli.settimeout(10)
+        self.cli.bind( (HOST, PORT-1) )
+        self.cli.connect((HOST, PORT))
+        bound_host, bound_port = self.cli.getsockname()
+        self.failUnlessEqual(bound_port, PORT-1)
 
     def testRecvData(self):
         # Testing non-blocking recv
