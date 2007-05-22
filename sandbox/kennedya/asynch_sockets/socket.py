@@ -653,7 +653,7 @@ class _udpsocket(_nonblocking_api_mixin):
         if not self.sock_impl:
             self.sock_impl = _datagram_socket_impl()
         host, port = addr
-        bytes = jarray.array(map(ord, data), 'b')
+        bytes = java.lang.String(data).getBytes('iso-8859-1')
         a = java.net.InetAddress.getByName(host)
         packet = java.net.DatagramPacket(bytes, n, a, port)
         self.sock_impl.send(packet)

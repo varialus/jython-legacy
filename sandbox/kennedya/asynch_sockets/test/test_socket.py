@@ -18,6 +18,7 @@ from weakref import proxy
 PORT = 50007
 HOST = 'localhost'
 MSG = 'Michael Gilfix was here\n'
+EIGHT_BIT_MSG = 'Bh\xed Al\xe1in \xd3 Cinn\xe9ide anseo\n'
 
 try:
     True
@@ -584,6 +585,14 @@ class BasicUDPTest(ThreadedUDPSocketTest):
 
     def _testRecvFrom(self):
         self.cli.sendto(MSG, 0, (HOST, PORT))
+
+    def testSendtoEightBitSafe(self):
+        # This test is necessary because java only supports signed bytes
+        msg = self.serv.recv(len(EIGHT_BIT_MSG))
+        self.assertEqual(msg, EIGHT_BIT_MSG)
+
+    def _testSendtoEightBitSafe(self):
+        self.cli.sendto(EIGHT_BIT_MSG, 0, (HOST, PORT))
 
 class BasicSocketPairTest(SocketPairTest):
 
