@@ -1,38 +1,41 @@
 package org;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+/**
+ * A package recursive test suite.
+ * <p>
+ * All classes ending with 'Test' are added to the suite.
+ * 
+ * @see AllTests.TestClassFilter
+ */
 public class AllTests extends TestSuite {
 
+    /**
+     * @return Test suite at the directory where this class resists
+     * 
+     * @throws Exception
+     */
     public static Test suite() throws Exception {
-        String testPackageName = AllTests.class.getPackage().getName();
-
-        TestSuite suite = new TestSuite("All tests in package " + testPackageName + ", recursively");
-
-        String testSuiteClassName = AllTests.class.getName();
-
-        File testDir = new File(AllTests.class.getClassLoader().getResource(
-                testSuiteClassName.replace('.', '/') + ".class").getFile()).getParentFile();
-        Iterator testFiles = findTests(testDir).iterator();
-        while (testFiles.hasNext()) {
-            File testFile = (File) testFiles.next();
-
-            String testClassName = testFile.getPath().substring(testDir.getPath().length());
-            testClassName = testPackageName.replace('.', '/') + testClassName;
-            testClassName = testClassName.substring(0, testClassName.length() - ".class".length());
-            testClassName = testClassName.replace('\\', '.');
-            testClassName = testClassName.replace('/', '.');
-
-            Class testClass = Class.forName(testClassName);
-            suite.addTestSuite(testClass);
-        }
-
+        Class suiteClass = AllTests.class;
+        String testSuiteClassName = suiteClass.getName();
+        File suiteFile = new File(suiteClass.getClassLoader().getResource(
+                testSuiteClassName.replace('.', '/').concat(".class")).getFile());
+        String basePackage = suiteClass.getPackage().getName();
+        File baseDir = suiteFile.getParentFile();
+        TestSuite suite = new TestSuite("Test " + basePackage + " recursive.");
+        buildSuite(baseDir.getAbsolutePath().length(), basePackage, baseDir, new TestClassFilter(), suite);
         return suite;
     }
 
@@ -40,20 +43,62 @@ public class AllTests extends TestSuite {
     // private methods
     //
 
-    private static List findTests(File findDir) {
-        ArrayList result = new ArrayList(100);
+    private static void buildSuite(int prefixLength, String basePackage, File currentDir, FilenameFilter filter,
+            TestSuite currentSuite) throws Exception {
+        List potentialDirectories = Arrays.asList(currentDir.listFiles(filter));
+        if (potentialDirectories.size() == 0) {
+            return;
+        }
+        StringBuffer currentPackageName = new StringBuffer(200);
+        currentPackageName.append(basePackage);
+        currentPackageName.append(currentDir.getAbsolutePath().substring(prefixLength).replace('\\', '.').replace('/',
+                '.'));
 
-        File[] files = findDir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (file.isDirectory()) {
-                result.addAll(findTests(file));
-            } else if (file.getName().endsWith("Test.class")) {
-                result.add(file);
+        List classFiles = new ArrayList(potentialDirectories.size());
+        Collections.sort(potentialDirectories, new FileComparator());
+        Iterator directoryIterator = potentialDirectories.iterator();
+        while (directoryIterator.hasNext()) {
+            File potentialDirectory = (File) directoryIterator.next();
+            if (potentialDirectory.isDirectory()) {
+                TestSuite subTestSuite = new TestSuite(potentialDirectory.getName());
+                buildSuite(prefixLength, basePackage, potentialDirectory, filter, subTestSuite);
+                // only if suite contains tests
+                if (subTestSuite.countTestCases() > 0) {
+                    currentSuite.addTest(subTestSuite);
+                }
+            } else {
+                classFiles.add(potentialDirectory);
             }
         }
-
-        return result;
+        Iterator fileIterator = classFiles.iterator();
+        while (fileIterator.hasNext()) {
+            File file = (File) fileIterator.next();
+            StringBuffer className = new StringBuffer(200);
+            className.append(currentPackageName);
+            className.append('.');
+            String fileName = file.getName();
+            className.append(fileName);
+            className.setLength(className.length() - 6);
+            currentSuite.addTest(new TestSuite(Class.forName(className.toString()), fileName.substring(0, fileName
+                    .length() - 6)));
+        }
     }
 
+    private static class TestClassFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            if (name.endsWith("Test.class")) {
+                return true;
+            }
+            return new File(dir, name).isDirectory();
+        }
+    }
+
+    private static class FileComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            Assert.assertTrue(o1 instanceof File);
+            Assert.assertTrue(o2 instanceof File);
+            return ((File) o1).getAbsolutePath().compareTo(((File) o2).getAbsolutePath());
+        }
+    }
+    
 }
