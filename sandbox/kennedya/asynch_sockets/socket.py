@@ -19,23 +19,28 @@ _defaulttimeout = None
 import threading
 import time
 import types
-import org.python.core
 import jarray
 import string
 import sys
 
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.InterruptedIOException
 import java.lang.Exception
+import java.lang.String
 import java.net.BindException
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.Socket
 import java.net.SocketTimeoutException
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.IllegalBlockingModeException
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
+import javax.net.ssl.SSLSocketFactory
+import org.python.core.PyFile
 
 class error(Exception): pass
 class herror(error): pass
@@ -730,10 +735,6 @@ SocketType = _tcpsocket
 
 # Define the SSL support
 
-from javax.net.ssl import SSLSocketFactory
-from java.io import BufferedInputStream
-from java.io import BufferedOutputStream
-
 class ssl:
 
     def __init__(self, plain_sock, keyfile=None, certfile=None):
@@ -744,7 +745,7 @@ class ssl:
         assert isinstance(java_net_socket, java.net.Socket)
         host = java_net_socket.getInetAddress().getHostName()
         port = java_net_socket.getPort()
-        factory = SSLSocketFactory.getDefault();
+        factory = javax.net.ssl.SSLSocketFactory.getDefault();
         ssl_socket = factory.createSocket(java_net_socket, host, port, auto_close)
         ssl_socket.setEnabledCipherSuites(ssl_socket.getSupportedCipherSuites())
         ssl_socket.startHandshake()
@@ -752,7 +753,7 @@ class ssl:
 
     def read(self, n=4096):
         # Probably needs some work on efficency
-        in_buf = BufferedInputStream(self.ssl_sock.getInputStream())
+        in_buf = java.io.BufferedInputStream(self.ssl_sock.getInputStream())
         data = jarray.zeros(n, 'b')
         m = in_buf.read(data, 0, n)
         if m <= 0:
@@ -763,7 +764,7 @@ class ssl:
 
     def write(self, s):
         # Probably needs some work on efficency
-        out = BufferedOutputStream(self.ssl_sock.getOutputStream())
+        out = java.io.BufferedOutputStream(self.ssl_sock.getOutputStream())
         out.write(s)
         out.flush()
 

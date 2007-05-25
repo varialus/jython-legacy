@@ -2,7 +2,9 @@
 AMAK: 20070515: New select implementation that uses java.nio
 """
 
-import java.nio.channels
+import java.nio.channels.SelectableChannel
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
 from java.nio.channels.SelectionKey import OP_ACCEPT, OP_CONNECT, OP_WRITE, OP_READ
 
 class error(Exception): pass
