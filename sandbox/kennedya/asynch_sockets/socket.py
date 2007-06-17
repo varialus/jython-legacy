@@ -660,7 +660,7 @@ class _udpsocket(_nonblocking_api_mixin):
             self.sock_impl.connect(host, port)
             if self.sock_impl.finish_connect():
                 return 0
-            return 1
+            return ERRNO_EINPROGRESS
 
     def sendto(self, data, p1, p2=None):
         if not p2:
