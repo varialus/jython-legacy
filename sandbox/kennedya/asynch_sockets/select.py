@@ -13,12 +13,12 @@ class error(Exception): pass
 
 POLLIN   = 1
 POLLOUT  = 2
-POLLPRI  = 4
 
 # The following event types are completely ignored on jython
 # Java does not support them, AFAICT
 # They are declared only to support code compatibility with cpython
 
+POLLPRI  = 4
 POLLERR  = 8
 POLLHUP  = 16
 POLLNVAL = 32
@@ -126,6 +126,7 @@ def select ( read_fd_list, write_fd_list, outofband_fd_list, timeout=None):
     timeout = _calcselecttimeoutvalue(timeout)
     # First create a poll object to do the actual watching.
     pobj = poll()
+    already_registered = {}
     # Check the read list
     try:
         # AMAK: Need to remove all this list searching, change to a dictionary?
@@ -134,9 +135,10 @@ def select ( read_fd_list, write_fd_list, outofband_fd_list, timeout=None):
             if fd in write_fd_list:
                 mask |= POLLOUT
             pobj.register(fd, mask)
+            already_registered[fd] = 1
         # And now the write list
         for fd in write_fd_list:
-            if not fd in read_fd_list: # fds in both have already been registered.
+            if not already_registered.has_key(fd):
                 pobj.register(fd, POLLOUT)
         results = pobj.poll(timeout)
     except AttributeError, ax:

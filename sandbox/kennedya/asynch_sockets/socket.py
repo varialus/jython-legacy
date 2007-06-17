@@ -29,6 +29,7 @@ import java.io.InterruptedIOException
 import java.lang.Exception
 import java.lang.String
 import java.net.BindException
+import java.net.ConnectException
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.InetSocketAddress
@@ -42,6 +43,13 @@ import java.nio.channels.SocketChannel
 import javax.net.ssl.SSLSocketFactory
 import org.python.core.PyFile
 
+# Some errno constants, until we establish a separate errno module.
+
+ERRNO_EACCESS      = 10035
+ERRNO_EWOULDBLOCK  = 10035
+ERRNO_EINPROGRESS  = 10036
+ERRNO_ECONNREFUSED = 10061
+
 class error(Exception): pass
 class herror(error): pass
 class gaierror(error): pass
@@ -53,13 +61,15 @@ exception_map = {
 
 # (<javaexception>, <circumstance>) : lambda: <code that raises the python equivalent>
 
-(java.net.BindException, ALL) : lambda exc: error('TODO: find python errno and string'),
 (java.io.InterruptedIOException, ALL) : lambda exc: timeout('timed out'),
+(java.net.BindException, ALL) : lambda exc: error(ERRNO_EACCESS, 'Permission denied'),
+(java.net.ConnectException, ALL) : lambda exc: error( (ERRNO_ECONNREFUSED, 'Connection refused') ),
 (java.net.SocketTimeoutException, ALL) : lambda exc: timeout('timed out'),
+
 }
 
 def would_block_error(exc=None):
-    return error( (10035, 'The socket operation could not complete without blocking') )
+    return error( (ERRNO_EWOULDBLOCK, 'The socket operation could not complete without blocking') )
 
 def map_exception(exc, circumstance=ALL):
     try:
@@ -417,7 +427,6 @@ class _tcpsocket(_nonblocking_api_mixin):
             self.sock_impl = _server_socket_impl(host, port, backlog, self.reuse_addr)
             self._config()
         except java.lang.Exception, jlx:
-            raise 
             raise map_exception(jlx)
 
 #
@@ -447,15 +456,18 @@ class _tcpsocket(_nonblocking_api_mixin):
         return host, port
 
     def _do_connect(self, addr):
-        assert not self.sock_impl
-        host, port = self._get_host_port(addr)
-        self.sock_impl = _client_socket_impl()
-        if self.local_addr: # Has the socket been bound to a local address?
-            bind_host, bind_port = self.local_addr
-            self.sock_impl.bind(bind_host, bind_port)
-        self._config() # Configure timeouts, etc, now that the socket exists
-        self.sock_impl.connect(host, port)
-        self._setup(self.sock_impl)
+        try:
+            assert not self.sock_impl
+            host, port = self._get_host_port(addr)
+            self.sock_impl = _client_socket_impl()
+            if self.local_addr: # Has the socket been bound to a local address?
+                bind_host, bind_port = self.local_addr
+                self.sock_impl.bind(bind_host, bind_port)
+            self._config() # Configure timeouts, etc, now that the socket exists
+            self.sock_impl.connect(host, port)
+            self._setup(self.sock_impl)
+        except java.lang.Exception, jlx:
+            raise map_exception(jlx)
 
     def connect(self, addr):
         "This signifies a client socket"
@@ -468,7 +480,7 @@ class _tcpsocket(_nonblocking_api_mixin):
         if self.sock_impl.finish_connect():
             self._setup(self.sock_impl)
             return 0
-        return 1
+        return ERRNO_EINPROGRESS
 
     def _setup(self, sock):
         self.sock_impl = sock
