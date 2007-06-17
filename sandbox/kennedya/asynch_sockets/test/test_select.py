@@ -105,10 +105,7 @@ class TestSelectInvalidParameters(unittest.TestCase):
 
 class TestSelectClientSocket(unittest.TestCase):
 
-    def testUnopenedSocket(self):
-        # This one passes on cpython
-        # But fails on jython, because of the deferred creation of impl sockets
-        if sys.platform[:4] == 'java': return
+    def testUnconnectedSocket(self):
         sockets = [socket.socket(socket.AF_INET, socket.SOCK_STREAM) for x in range(5)]
         for pos in range(2): # OOB not supported on Java
             args = [[], [], []]
@@ -118,6 +115,52 @@ class TestSelectClientSocket(unittest.TestCase):
             for s in sockets:
                 self.failIf(s in rfd)
                 self.failIf(s in wfd)
+
+def check_server_running_on_localhost_port(port_number):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect( ('localhost', port_number) )
+        s.close()
+    except:
+        return 0
+    return 1
+
+class TestPollClientSocket(unittest.TestCase):
+
+    def testSocketRegisteredBeforeConnected(self):
+        # You MUST be running a server on port 80 for this one to work
+        if not check_server_running_on_localhost_port(80):
+            print "Unable to run testSocketRegisteredBeforeConnected: no server on port 80"
+            return
+        sockets = [socket.socket(socket.AF_INET, socket.SOCK_STREAM) for x in range(5)]
+        timeout = 1 # Can't wait forever
+        poll_object = select.poll()
+        for s in sockets:
+            # Register the sockets before they are connected
+            poll_object.register(s, select.POLLOUT)
+        result_list = poll_object.poll(timeout)
+        result_sockets = [r[0] for r in result_list]
+        for s in sockets:
+            self.failIf(s in result_sockets)
+        # Now connect the sockets, but DO NOT register them again
+        for s in sockets:
+            s.setblocking(0)
+            s.connect( ('localhost', 80) )
+        # Now poll again, to see if the poll object has recognised that the sockets are now connected
+        result_list = poll_object.poll(timeout)
+        result_sockets = [r[0] for r in result_list]
+        for s in sockets:
+            self.failUnless(s in result_sockets)
+
+    def testUnregisterRaisesKeyError(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        poll_object = select.poll()
+        try:
+            poll_object.unregister(s)
+        except KeyError:
+            pass
+        else:
+            self.fail("Unregistering socket that is not registered should have raised KeyError")
 
 class TestPipes(unittest.TestCase):
 
@@ -154,6 +197,7 @@ def test_main():
     tests = [
         TestSelectInvalidParameters,
         TestSelectClientSocket,
+        TestPollClientSocket,
     ]
     if sys.platform[:4] != 'java':
         tests.append(TestPipes)

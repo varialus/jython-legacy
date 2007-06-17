@@ -7,6 +7,8 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 from java.nio.channels.SelectionKey import OP_ACCEPT, OP_CONNECT, OP_WRITE, OP_READ
 
+import socket
+
 class error(Exception): pass
 
 POLLIN   = 1
@@ -18,19 +20,18 @@ class poll:
     def __init__(self):
         self.selector = java.nio.channels.Selector.open()
         self.chanmap = {}
+        self.unconnected_sockets = []
 
-    def _getselectable(self, userobject):
-        if isinstance(userobject, java.nio.channels.SelectableChannel):
-            return userobject
-        else:
-            if hasattr(userobject, 'fileno') and callable(getattr(userobject, 'fileno')):
-                result = getattr(userobject, 'fileno')()
-                if isinstance(result, java.nio.channels.SelectableChannel):
-                    return result
-            raise error("Object '%s' is not a watchable channel" % userobject, 10038)
+    def _getselectable(self, socket_object):
+        for st in socket.SocketTypes:
+            if isinstance(socket_object, st):
+                try:
+                    return socket_object.getchannel()
+                except:
+                    return None
+        raise error("Object '%s' is not watchable" % socket_object, 10038)
 
-    def register(self, userobject, mask):
-        channel = self._getselectable(userobject)
+    def _register_channel(self, socket_object, channel, mask):
         jmask = 0
         if mask & POLLIN:
             # Note that OP_READ is NOT a valid event on server socket channels.
@@ -43,10 +44,29 @@ class poll:
             if channel.validOps() & OP_CONNECT:
                 jmask |= OP_CONNECT
         selectionkey = channel.register(self.selector, jmask)
-        self.chanmap[channel] = (userobject, selectionkey)
+        self.chanmap[channel] = (socket_object, selectionkey)
 
-    def unregister(self, userobject):
-        channel = self._getselectable(userobject)
+    def _check_unconnected_sockets(self):
+        temp_list = []
+        for socket_object, mask in self.unconnected_sockets:
+            channel = self._getselectable(socket_object)
+            if channel is not None:
+                self._register_channel(socket_object, channel, mask)
+            else:
+                temp_list.append( (socket_object, mask) )
+        self.unconnected_sockets = temp_list
+
+    def register(self, socket_object, mask):
+        channel = self._getselectable(socket_object)
+        if channel is None:
+            # The socket is not yet connected, and thus has no channel
+            # Add it to a pending list, and return
+            self.unconnected_sockets.append( (socket_object, mask) )
+            return
+        self._register_channel(socket_object, channel, mask)
+
+    def unregister(self, socket_object):
+        channel = self._getselectable(socket_object)
         self.chanmap[channel][1].cancel()
         del self.chanmap[channel]
 
@@ -62,6 +82,7 @@ class poll:
         return self.selector.selectedKeys()
 
     def poll(self, timeout=None):
+        self._check_unconnected_sockets()
         selectedkeys = self._dopoll(timeout)
         results = []
         for k in selectedkeys.iterator():
@@ -72,7 +93,6 @@ class poll:
             if jmask & OP_ACCEPT: pymask |= POLLIN
             if jmask & OP_CONNECT: pymask |= POLLOUT
             # Now return the original userobject, and the return event mask
-            # A python 2.2 generator would be sweet here
             results.append( (self.chanmap[k.channel()][0], pymask) )
         return results
 

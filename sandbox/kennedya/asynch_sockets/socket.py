@@ -224,7 +224,7 @@ class _datagram_socket_impl(_nio_impl):
 
 __all__ = [ 'AF_INET', 'SO_REUSEADDR', 'SOCK_DGRAM', 'SOCK_RAW',
         'SOCK_RDM', 'SOCK_SEQPACKET', 'SOCK_STREAM', 'SOL_SOCKET',
-        'SocketType', 'error', 'herror', 'gaierror', 'timeout',
+        'SocketType', 'SocketTypes', 'error', 'herror', 'gaierror', 'timeout',
         'getfqdn', 'gethostbyaddr', 'gethostbyname', 'gethostname',
         'socket', 'getaddrinfo', 'getdefaulttimeout', 'setdefaulttimeout',
         'has_ipv6', 'htons', 'htonl', 'ntohs', 'ntohl',
@@ -368,10 +368,11 @@ class _nonblocking_api_mixin:
 
     def getchannel(self):
         if not self.sock_impl:
-            raise error("No channel for indeterminate socket")
-        if hasattr(self.sock_impl, 'getchannel'):
-            return self.sock_impl.getchannel()
-        raise error('Operation not implemented on this JVM')            
+            return None
+        return self.sock_impl.getchannel()
+#        if hasattr(self.sock_impl, 'getchannel'):
+#            return self.sock_impl.getchannel()
+#        raise error('Operation not implemented on this JVM')            
 
     fileno = getchannel
 
@@ -732,6 +733,7 @@ class _udpsocket(_nonblocking_api_mixin):
             return None
 
 SocketType = _tcpsocket
+SocketTypes = [_tcpsocket, _udpsocket]
 
 # Define the SSL support
 
