@@ -127,6 +127,10 @@ def check_server_running_on_localhost_port(port_number):
 
 class TestPollClientSocket(unittest.TestCase):
 
+    def testEventConstants(self):
+        for event_name in ['IN', 'OUT', 'PRI', 'ERR', 'HUP', 'NVAL', ]:
+            self.failUnless(hasattr(select, 'POLL%s' % event_name))
+
     def testSocketRegisteredBeforeConnected(self):
         # You MUST be running a server on port 80 for this one to work
         if not check_server_running_on_localhost_port(80):

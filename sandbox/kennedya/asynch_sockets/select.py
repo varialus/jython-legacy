@@ -15,6 +15,14 @@ POLLIN   = 1
 POLLOUT  = 2
 POLLPRI  = 4
 
+# The following event types are completely ignored on jython
+# Java does not support them, AFAICT
+# They are declared only to support code compatibility with cpython
+
+POLLERR  = 8
+POLLHUP  = 16
+POLLNVAL = 32
+
 class poll:
 
     def __init__(self):
@@ -56,7 +64,7 @@ class poll:
                 temp_list.append( (socket_object, mask) )
         self.unconnected_sockets = temp_list
 
-    def register(self, socket_object, mask):
+    def register(self, socket_object, mask = POLLIN|POLLOUT|POLLPRI):
         channel = self._getselectable(socket_object)
         if channel is None:
             # The socket is not yet connected, and thus has no channel
