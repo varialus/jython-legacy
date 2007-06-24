@@ -1,6 +1,12 @@
 Jython News
 ================
 
+**23rd June 2007: Jython-2.2rc1**
+
+The first release candidate for Jython 2.2 is now available for `download`_.   This release includes a new implementation of socket with non-blocking socket and SSL support.  It also contains many bugfixes.  See the NEWS file in the install for more detail.
+
+If no major bugs are found in this candidate, the code in it will become the 2.2 release in a couple weeks.
+
 **10th May 2007: Jython-2.2beta2**
 
 The second beta for Jython 2.2 is now available for `download`_.   Since the
@@ -70,6 +76,6 @@ This is a snapshot that contains a mixture of Python 2.1 and 2.2 features. Use t
 
 There has been no validation of which parts of the Python library are functional with this relase. Expect pickle and related modules to be broken, probably others as well.
 
-.. _`download`: http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=507592
+.. _`download`: download.html
 .. _`Jython wiki`: http://wiki.python.org/jython/
 .. _`a blog`: http://fwierzbicki.blogspot.com/

@@ -46,6 +46,8 @@ Other Contributors
 * Bryn Keller
 * Ype Kingma
 * Ivan Kougaenko
+* Pekka Laukkanen
+* leouser
 * Noel (Nick) Lockwood
 * Harry Mantakos
 * Drew Morrissey
