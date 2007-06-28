@@ -2,17 +2,18 @@ package org.python.util.install;
 
 import java.util.ListResourceBundle;
 
-public class TextConstants_de extends ListResourceBundle implements TextKeys {
+public class TextConstants_de extends ListResourceBundle implements TextKeys, UnicodeSequences {
 
     static final Object[][] contents = {
-        // Die folgenden Texte dürfen Umlaute und Sonderzeichen enthalten:
+        // Die folgenden Texte duerfen Umlaute und Sonderzeichen enthalten, aber nur als Unicode Escape Sequenzen aus UnicodeSequences
+        // The following texts may contain special characters, but only as unicode escape sequences from UnicodeSequences
         { ACCEPT, "Ja, ich akzeptiere" }, // license
         { ALL, "Alles (volle Installation, inklusive Quellcode)" }, // installation type
         { BROWSE, "Suchen..." }, // button (open the JFileChooser)
         { CANCEL, "Abbrechen" }, // button text
-        { CHOOSE_LOCATION, "Wählen Sie das Verzeichnis, in das Jython installiert werden soll" }, // selection
+        { CHOOSE_LOCATION, "W"+a2+"hlen Sie das Verzeichnis, in das Jython installiert werden soll" }, // selection
         { CHOOSE_JRE, "Bestimmen Sie die Java Version (JRE/JDK), mit welcher Jython gestartet werden soll" }, // selection
-        { CONFIRM_START, "Bitte drücken Sie {0}, um die Installation zu starten" }, // overview
+        { CONFIRM_START, "Bitte dr"+u2+"cken Sie {0}, um die Installation zu starten" }, // overview
         { CONGRATULATIONS, "Gratulation!" }, // congratulations
         { CORE, "Kern" }, // installation type
         { CREATED_DIRECTORY, "Verzeichnis {0} wurde erstellt" }, // directory
@@ -32,8 +33,8 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { INFLATING, "Entpacke {0}" }, // progress
         { INFORMATION, "Information" }, // information
         { INSTALLATION_CANCELLED, "Sie haben die Installation abgebrochen." }, // final
-        { INSTALLATION_IN_PROGRESS, "Die Installation läuft" }, // progress
-        { INSTALLATION_TYPE_DESCRIPTION, "Die folgenden Installationstypen sind verfügbar" }, // installation type
+        { INSTALLATION_IN_PROGRESS, "Die Installation l"+a2+"uft" }, // progress
+        { INSTALLATION_TYPE_DESCRIPTION, "Die folgenden Installationstypen sind verf"+u2+"gbar" }, // installation type
         { INSTALLATION_TYPE, "Installationstyp" }, // installation type
         { JAVA_INFO, "Java Hersteller / Version" }, // version
         { JAR_NOT_FOUND, "Jar File {0} nicht gefunden." }, // error
@@ -41,47 +42,48 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys {
         { LANGUAGE_PROPERTY, "Sprache" }, // language
         { LIBRARY_MODULES, "Bibliotheksmodule" }, // installation type
         { LICENSE, "Lizenzvereinbarung" }, // license
-        { MAYBE_NOT_SUPPORTED, "Eventuell nicht unterstützt" }, // version
+        { MAYBE_NOT_SUPPORTED, "Eventuell nicht unterst"+u2+"tzt" }, // version
         { MINIMUM, "Minimum (Kern)" }, // installation type
         { NEXT, "Weiter" }, // button
-        { NON_EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis enthält bereits Daten." }, // error
-        { NO_MANIFEST, "Jar File {0} enthält kein Manifest." }, // error
+        { NON_EMPTY_TARGET_DIRECTORY, "Das Zielverzeichnis enth"+a2+"lt bereits Daten." }, // error
+        { NO_MANIFEST, "Jar File {0} enth"+a2+"lt kein Manifest." }, // error
         { NOT_OK, "Nicht ok !" }, // version
         { OK, "Ok" }, // version
         { OS_INFO, "Betriebssystem / Version" }, // version
         { OTHER, "Ein abweichendes" }, // directory
-        { OVERVIEW_DESCRIPTION, "Sie haben folgende Einstellungen für die Installation ausgewählt" }, // overview
-        { OVERVIEW_TITLE, "Übersicht über die gewählten Einstellungen" }, // overview
+        { OVERVIEW_DESCRIPTION, "Sie haben folgende Einstellungen f"+u2+"r die Installation ausgew"+a2+"hlt" }, // overview
+        { OVERVIEW_TITLE, U2+"bersicht "+u2+"ber die gew"+a2+"hlten Einstellungen" }, // overview
         { PACKING_STANDALONE_JAR, "Das standalone " + JarInstaller.JYTHON_JAR + " File wird erstellt ..." }, // progress
         { PLEASE_ACCEPT_LICENSE, "Bitte lesen und akzeptieren Sie die Lizenzvereinbarung" }, // license
         { PLEASE_README, "Bitte lesen Sie die folgenden Informationen" }, // readme
-        { PLEASE_READ_LICENSE, "Bitte lesen Sie die Lizenzvereinbarung sorfältig durch" }, // license
+        { PLEASE_READ_LICENSE, "Bitte lesen Sie die Lizenzvereinbarung sorf"+a2+"ltig durch" }, // license
         { PLEASE_WAIT, "Bitte um etwas Geduld, die Installation kann einige Sekunden dauern ..." }, // progress
-        { PRESS_FINISH, "Bitte drücken Sie {0}, um die Installation abzuschliessen." }, // finish
-        { PREVIOUS, "Zurück" }, // button
+        { PRESS_FINISH, "Bitte dr"+u2+"cken Sie {0}, um die Installation abzuschliessen." }, // finish
+        { PREVIOUS, "Zur"+u2+"ck" }, // button
         { PROGRESS, "Fortschritt" }, // progress
         { README, "README" }, // readme
-        { SELECT, "Auswählen" }, // button (approval in JFileChooser)
-        { SELECT_INSTALLATION_TYPE, "Bitte wählen Sie den Installationstyp" }, // installation type
-        { SELECT_JAVA_HOME, "Bitte wählen Sie das Java Home Verzeichnis" }, // directory
-        { SELECT_LANGUAGE, "Bitte wählen Sie Ihre Sprache" }, // language
-        { SELECT_TARGET_DIRECTORY, "Bitte wählen Sie das Zielverzeichnis" }, // directory
+        { SELECT, "Ausw"+a2+"hlen" }, // button (approval in JFileChooser)
+        { SELECT_INSTALLATION_TYPE, "Bitte w"+a2+"hlen Sie den Installationstyp" }, // installation type
+        { SELECT_JAVA_HOME, "Bitte w"+a2+"hlen Sie das Java Home Verzeichnis" }, // directory
+        { SELECT_LANGUAGE, "Bitte w"+a2+"hlen Sie Ihre Sprache" }, // language
+        { SELECT_TARGET_DIRECTORY, "Bitte w"+a2+"hlen Sie das Zielverzeichnis" }, // directory
         { SOURCES, "Quellcode" }, // installation type
         { STANDARD, "Standard (Kern, Bibliotheksmodule, Demos, Beispiele, Dokumentation)" }, // installation type
-        { STANDALONE, "Standalone (ein ausführbares .jar File)" }, // installation type
+        { STANDALONE, "Standalone (ein ausf"+u2+"hrbares .jar File)" }, // installation type
         { SUCCESS, "Sie haben Jython {0} erfolgreich im Verzeichnis {1} installiert." }, // final
         { TARGET_DIRECTORY_PROPERTY, "Zielverzeichnis" }, // property als Titel
         { TARGET_JAVA_HOME_PROPERTY, "Java Home Verzeichnis" }, // property als Titel
         { UNABLE_CREATE_DIRECTORY, "Fehler beim Erstellen von Verzeichnis {0}." }, // error
         { UNABLE_CREATE_FILE, "Fehler beim Erstellen von File {0}." }, // error
-        { UNABLE_TO_DELETE, "Fehler beim Löschen von {0}" }, // console
-        { UNEXPECTED_URL, "Das Jar File für die Installation weist eine unerwartete URL {0} auf." }, // error
+        { UNABLE_TO_DELETE, "Fehler beim L"+o2+"schen von {0}" }, // console
+        { UNEXPECTED_URL, "Das Jar File f"+u2+"r die Installation weist eine unerwartete URL {0} auf." }, // error
         { VERSION_INFO, "Sie sind im Begriff, Jython Version {0} zu installieren." }, // version
         { WELCOME_TO_JYTHON, "Willkommen bei Jython !" }, // welcome
-        { ZIP_ENTRY_SIZE, "Der Zip Eintrag {0} hat eine unbekannte Grösse." }, // error
+        { ZIP_ENTRY_SIZE, "Der Zip Eintrag {0} hat eine unbekannte Gr"+o2+"sse." }, // error
         { ZIP_ENTRY_TOO_BIG, "Der Zip Eintrag {0} ist zu gross." }, // error
 
-        // Konsole Texte (beginnend mit C_) sollten keine Umlaute und andere Sonderzeichen enthalten:
+        // Konsole Texte (beginnend mit C_) duerfen keine Umlaute und andere Sonderzeichen enthalten:
+        // console texts (beginning with C_) must not contain special characters (use ASCII only):
         { C_ACCEPT, "Akzeptieren Sie die Lizenzvereinbarung ?" }, // license
         { C_ALL, "Alles (volle Installation, inklusive Quellcode)" }, // installation type
         { C_AT_ANY_TIME_CANCEL, "(Sie koennen die Installation jederzeit durch Eingabe von {0} abbrechen)" }, // console
