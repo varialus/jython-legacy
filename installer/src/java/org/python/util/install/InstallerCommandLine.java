@@ -58,7 +58,7 @@ public class InstallerCommandLine {
     private static final String TYPE_ALL = "all";
     private static final String TYPE_MINIMUM = "minimum";
     protected static final String TYPE_STANDALONE = "standalone";
-    private static final String STANDALONE_DOCUMENTATION = "install a single, executable .jar,\n(containing all the modules)";
+    private static final String STANDALONE_DOCUMENTATION = "install a single, executable .jar,\ncontaining all the modules";
 
     private static final String INEXCLUDE_ARG = "part(s)";
     private static final String INEXCLUDE_PARTS = "more than one of the following is possible:\n" + "- "
@@ -72,7 +72,7 @@ public class InstallerCommandLine {
     private static final String TYPE_DESC = "installation type\n" + "one of the following types is possible\n"
             + "(see also include/exclude parts):\n" + "- " + TYPE_ALL + ": everything (including " + INEXCLUDE_SOURCES
             + ")\n" + "- " + TYPE_STANDARD + ": core, " + INEXCLUDE_LIBRARY_MODULES + ", "
-            + INEXCLUDE_DEMOS_AND_EXAMPLES + ", " + INEXCLUDE_DOCUMENTATION + "\n" + "- " + TYPE_MINIMUM + ": core\n"
+            + INEXCLUDE_DEMOS_AND_EXAMPLES + ", " + INEXCLUDE_DOCUMENTATION + ",\n"+ TYPE_STANDARD+ " is the default\n" + "- " + TYPE_MINIMUM + ": core\n"
             + "- " + TYPE_STANDALONE + ": " + STANDALONE_DOCUMENTATION;
 
     private static final String INCLUDE_SHORT = "i";
@@ -90,10 +90,10 @@ public class InstallerCommandLine {
     private static final String HELP_DESC = "print this help (overrides any other options)";
 
     private static final String SYNTAX = "\n\tjava -jar jython_version.jar";
-    private static final String HEADER = "\nno option at all will start the interactive GUI installer, except:\n"
-            + "options respected in GUI mode are '" + DIRECTORY_LONG + "' and '" + JRE_LONG
-            + "': the values provided for these serve as defaults;\n"
-            + "in non GUI mode the following options are available:\n.";
+    private static final String HEADER = "\nNo option at all will start the interactive GUI installer, except:\n"
+            + "Options respected in GUI mode are '" + DIRECTORY_LONG + "' and '" + JRE_LONG
+            + "', which serve as default values in the wizard.\n"
+            + "In non-GUI mode the following options are available:\n.";
     private static final String SYNTAX_WITHOUT_JAR = "\n\tjava -jar ";
     private static final String FOOTER = "";
     private static final String EXAMPLES = "\nexample of a GUI installation:{0}"
