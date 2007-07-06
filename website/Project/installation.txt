@@ -56,6 +56,13 @@ You will get a jython prompt with no caching.  Of course you can run scripts jus
 
 And you can add this jar to the classpath of your app, which will allow standard imports.
 
+Installation options
+====================
+
+You can get a list of the installer options by running: ::
+
+	$ java -jar jython_installer-2.2rc1.jar --help
+
 ----------
 Jython 2.1
 ----------
