@@ -1,6 +1,10 @@
 Jython News
 ================
 
+**10th July 2007: Jython-2.2rc2**
+
+The second release candidate for Jython 2.2 is now available for `download`_.  Several bugs have been fixed from the first candidate.  See the NEWS file in the install for details.
+
 **23rd June 2007: Jython-2.2rc1**
 
 The first release candidate for Jython 2.2 is now available for `download`_.   This release includes a new implementation of socket with non-blocking socket and SSL support.  It also contains many bugfixes.  See the NEWS file in the install for more detail.
