@@ -1,0 +1,4 @@
+.. |latest.installer.jar| replace:: jython_installer-2.2rc2.jar
+
+.. _latest.download: http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=522109
+.. _stable.download: http://downloads.sourceforge.net/jython/jython_21.class

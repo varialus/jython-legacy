@@ -1,3 +1,5 @@
+.. include:: constants.txt
+
 ============
 Installation
 ============
@@ -13,15 +15,19 @@ Basic Install
 
 Jython 2.2 is distributed as an executable jar file installer.  After
 `downloading <download.html>`__ it, either double click the
-jython_installer_2.2rc2.jar or run java with the -jar option::
+|latest.installer.jar| or run java with the -jar option
 
-    java -jar jython_installer-2.2rc2.jar
+.. parsed-literal::
+
+    java -jar |latest.installer.jar|
 
 This will start the regular GUI installer on most systems, or a
 consoler installer on headless systems.  To force the installer to
-work in headless mode invoke the installer with a console switch::
+work in headless mode invoke the installer with a console switch
 
-  java -jar jython_installer-2.2rc2.jar --console
+.. parsed-literal::
+
+  java -jar |latest.installer.jar| --console
 
 The installer will then walk through a similar set of steps in
 graphical or console mode: showing the license, selecting an install
@@ -37,12 +43,15 @@ Standalone mode
 
 The standalone option does no caching and so avoids the startup overhead (most likely at the cost of some speed in calling Java classes, but I have not profiled it)
 
-You can try it out by downloading the installer from here:
-http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=522109
+You can try it out by downloading the installer from here_
 
-running it like so: ::
+.. _here: latest.download_
 
-    $ java -jar jython_installer-2.2rc2.jar
+running it like so:
+
+.. parsed-literal::
+
+    $ java -jar |latest.installer.jar|
 
 And when you come to the "Installation type" page, select "Standalone".
 
@@ -59,9 +68,11 @@ And you can add this jar to the classpath of your app, which will allow standard
 Installation options
 ====================
 
-You can get a list of the installer options by running: ::
+You can get a list of the installer options by running:
 
-	$ java -jar jython_installer-2.2rc2.jar --help
+.. parsed-literal::
+
+	$ java -jar |latest.installer.jar| --help
 
 ----------
 Jython 2.1

@@ -1,3 +1,5 @@
+.. include:: constants.txt
+
 ====================================
 The Jython Project
 ====================================
@@ -11,9 +13,10 @@ run Python on any Java platform.
 
   The Jython development team is proud to announce a new release: Jython 2.2 RC2!
 
-  * `Download it <http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=522109>`__,
+  * `Download it`_,
   * `install it <installation.html>`__,
   * then kick the tires and start `filing bug reports <bugs.html>`__ to help get 2.2 polished up and done, so we can get going on the next Jython 2.x.
+
 
 What is Jython?
 ===============
@@ -36,4 +39,5 @@ There are numerous alternative languages implemented for the Java VM. The follow
 * Bean Properties - make use of Java packages much easier.
 * Python Language - combines remarkable power with very clear syntax. It also supports a full object-oriented programming model which makes it a natural fit for Java's OO design. 
 
+.. _Download it: latest.download_
 .. _Sean McGrath, CTO, Propylon: http://seanmcgrath.blogspot.com/2003_07_27_seanmcgrath_archive.html#105971971904416520

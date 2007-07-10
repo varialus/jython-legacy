@@ -1,3 +1,5 @@
+.. include:: constants.txt
+
 ==========
 Jython FAQ
 ==========
@@ -416,8 +418,8 @@ for the PATH environment var (':' separator for unix, ';' for windows)
 .. _jnios: http://sourceforge.net/projects/jnios
 .. _JNumeric: http://jnumerical.sourceforge.net/index.html
 .. _jreload: http://www.jython.org/docs/jreload.html
-.. _Jython-2.1: http://prdownloads.sourceforge.net/jython/jython_21.class?download
-.. _Jython-2.2rc2: http://sourceforge.net/project/showfiles.php?group_id=12867&package_id=12218&release_id=522109
+.. _Jython-2.1: stable.download_
+.. _Jython-2.2rc2: latest.download_
 .. _ReadlineSetup: http://wiki.python.org/jython/ReadlineSetup
 .. _Accessing Jython from Java Without Using jythonc: http://wiki.python.org/jython/JythonMonthly/Articles/September2006/1
 .. _Simple and Efficient Jython Object Factories: http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3
