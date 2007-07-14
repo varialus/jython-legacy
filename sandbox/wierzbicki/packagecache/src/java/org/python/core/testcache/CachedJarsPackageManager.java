@@ -158,7 +158,6 @@ public abstract class CachedJarsPackageManager extends PackageManager {
 
         ZipEntry entry;
         while ((entry = zip.getNextEntry()) != null) {
-            System.err.println("XXX: entry: " + entry);
             addZipEntry(zipPackages, entry, zip);
             zip.closeEntry();
         }
@@ -218,7 +217,6 @@ public abstract class CachedJarsPackageManager extends PackageManager {
     }
 
     private void addJarToPackages(URL jarurl, File jarfile, boolean cache) {
-        System.err.println("XXX: addJarToPackages " + jarurl + "; " + jarfile);
         try {
             boolean caching = this.jarfiles != null;
 
@@ -319,7 +317,6 @@ public abstract class CachedJarsPackageManager extends PackageManager {
 
             addPackages(zipPackages, jarcanon);
         } catch (IOException ioe) {
-            System.err.println("XXX: ERROR HERE:::"); 
             ioe.printStackTrace(); 
             // silently skip any bad directories
             warning("skipping bad jar, '"
