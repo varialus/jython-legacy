@@ -1,0 +1,3 @@
+JYTHON_HOME=/Users/frank/src/jython/trunk/jython/dist
+JYTHON_JAVA_ARGS="-classpath $JYTHON_HOME/jython.jar:../../target"
+$JAVA_HOME/bin/java $JYTHON_JAVA_ARGS -Dpython.home=$JYTHON_HOME org.python.util.jython test.py

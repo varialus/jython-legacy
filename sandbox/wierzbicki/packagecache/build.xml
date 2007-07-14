@@ -1,0 +1,19 @@
+<project name="pacman" default="compile">
+
+    <target name="init">
+        <property file="build.properties" />
+        <mkdir dir="target"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="src/java"
+            destdir="target"
+        />
+    </target>
+
+    <target name="clean">
+        <delete dir="target"/>
+        <delete dir="src/jython/cachedir"/>
+        <delete dir="src/jruby/cachedir"/>
+    </target>
+</project>
