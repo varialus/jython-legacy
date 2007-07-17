@@ -1,7 +1,7 @@
 from sqlalchemy import *
 
-db = create_engine('mysql://rhxuser:rhxuser@localhost/rhxuser')
-#             'jdbc:mysql://rhxuser:rhxuser@localhost/rhxuser'
+db = create_engine('mysql://mydb:mydb@localhost/mydb')
+#             'jdbc:mysql://mydb:mydb@localhost/mydb'
 #jdbc:mysql://localhost:3306/MySql"
 metadata = BoundMetaData(db)
 
