@@ -4,7 +4,7 @@
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-import sys, StringIO, string, types, sre, datetime, inspect, warnings
+import sys, StringIO, string, types, re, datetime, inspect, warnings
 
 from sqlalchemy import sql,engine,schema,ansisql
 from sqlalchemy.engine import default
@@ -1068,7 +1068,7 @@ class MySQLDialect(ansisql.ANSIDialect):
             # leave column names as unicode
             ###name = name.decode(decode_from)
 
-            match = sre.match(r'(\w+)(\(.*?\))?\s*(\w+)?\s*(\w+)?', type)
+            match = re.match(r'(\w+)(\(.*?\))?\s*(\w+)?\s*(\w+)?', type)
             col_type = match.group(1)
             args = match.group(2)
             extra_1 = match.group(3)
@@ -1088,7 +1088,7 @@ class MySQLDialect(ansisql.ANSIDialect):
                     argslist = args.split(',')
                     coltype = coltype(*argslist, **kw)
                 else:
-                    argslist = sre.findall(r'(\d+)', args)
+                    argslist = re.findall(r'(\d+)', args)
                     coltype = coltype(*[int(a) for a in argslist], **kw)
 
             colargs= []
@@ -1114,17 +1114,17 @@ class MySQLDialect(ansisql.ANSIDialect):
         desc = row[1].strip()
 
         tabletype = ''
-        lastparen = sre.search(r'\)[^\)]*\Z', desc)
+        lastparen = re.search(r'\)[^\)]*\Z', desc)
         if lastparen:
-            match = sre.search(r'\b(?:TYPE|ENGINE)=(?P<ttype>.+)\b', desc[lastparen.start():], sre.I)
+            match = re.search(r'\b(?:TYPE|ENGINE)=(?P<ttype>.+)\b', desc[lastparen.start():], re.I)
             if match:
                 tabletype = match.group('ttype')
 
         # \x27 == ' (single quote)  (avoid xemacs syntax highlighting issue)
         fkpat = r'''CONSTRAINT [`"\x27](?P<name>.+?)[`"\x27] FOREIGN KEY \((?P<columns>.+?)\) REFERENCES [`"\x27](?P<reftable>.+?)[`"\x27] \((?P<refcols>.+?)\)'''
-        for match in sre.finditer(fkpat, desc):
-            columns = sre.findall(r'''[`"\x27](.+?)[`"\x27]''', match.group('columns'))
-            refcols = [match.group('reftable') + "." + x for x in sre.findall(r'''[`"\x27](.+?)[`"\x27]''', match.group('refcols'))]
+        for match in re.finditer(fkpat, desc):
+            columns = re.findall(r'''[`"\x27](.+?)[`"\x27]''', match.group('columns'))
+            refcols = [match.group('reftable') + "." + x for x in re.findall(r'''[`"\x27](.+?)[`"\x27]''', match.group('refcols'))]
             schema.Table(match.group('reftable'), table.metadata, autoload=True, autoload_with=connection)
             constraint = schema.ForeignKeyConstraint(columns, refcols, name=match.group('name'))
             table.append_constraint(constraint)
