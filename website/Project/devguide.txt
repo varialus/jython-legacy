@@ -30,19 +30,19 @@ This checks out all of the jython subprojects (bugtests, jython -- the main code
 
 ::
 
-    svn co https://svn.sourceforge.net/svnroot/jython/trunk/
+    svn co https://jython.svn.sourceforge.net/svnroot/jython/trunk/
 
 * 2.1 Stable:
 
 ::
 
-    svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_1
+    svn co https://jython.svn.sourceforge.net/svnroot/jython/tags/Release_2_1
 
 * 2.2 Alpha 1:
 
 ::
 
-    svn co https://svn.sourceforge.net/svnroot/jython/tags/Release_2_2alpha1
+    svn co https://jython.svn.sourceforge.net/svnroot/jython/tags/Release_2_2alpha1
 
 * Preparing a Patch on Unix command line: (note multiple changes can be concatencated into one patch file using >> as shown.
 
