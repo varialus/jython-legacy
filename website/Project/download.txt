@@ -4,7 +4,7 @@
 Downloads
 =========
 
-* jython-2.2rc3__ - The second release candidate for 2.2.  Contains many bugs fixes from jython-2.1 and this installer runs on Java 6.
+* jython-2.2rc3__ - The third release candidate for 2.2.  Contains many bugs fixes from jython-2.1 and this installer runs on Java 6.
 
 __ latest.download_
 
