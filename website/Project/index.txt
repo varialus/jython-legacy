@@ -11,7 +11,7 @@ run Python on any Java platform.
 
 .. admonition:: Latest News
 
-  The Jython development team is proud to announce a new release: Jython 2.2 RC2!
+  The Jython development team is proud to announce a new release: Jython 2.2 RC3!
 
   * `Download it`_,
   * `install it <installation.html>`__,

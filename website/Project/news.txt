@@ -1,6 +1,10 @@
 Jython News
 ================
 
+**2nd August 2007: Jython-2.2rc3**
+
+The third release candidate for Jython 2.2 is now available for `download`_.  Several bugs have been fixed from the second candidate.  See the NEWS file in the install for details.
+
 **10th July 2007: Jython-2.2rc2**
 
 The second release candidate for Jython 2.2 is now available for `download`_.  Several bugs have been fixed from the first candidate.  See the NEWS file in the install for details.
