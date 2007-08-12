@@ -466,6 +466,16 @@ type can either be a single character typecode (using the same mappings as Pytho
 | d                  | double                  |
 +--------------------+-------------------------+
 
+A quick example::
+
+    from jarray import array
+    a = array([ 1 ], 'i')
+    print a
+    from java.net import URL
+    u = URL('http://jython.org')
+    b = array([], URL)
+    print b
+
 ----------------------------------
 Subclassing Java Classes in Jython
 ----------------------------------
