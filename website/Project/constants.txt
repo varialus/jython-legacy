@@ -1,4 +1,3 @@
-.. |latest.installer.jar| replace:: jython_installer-2.2rc3.jar
+.. |stable.installer.jar| replace:: jython_installer-2.2.jar
 
-.. _latest.download: http://downloads.sourceforge.net/jython/jython_installer-2.2rc3.jar
-.. _stable.download: http://downloads.sourceforge.net/jython/jython_21.class
+.. _stable.download: http://downloads.sourceforge.net/jython/jython_installer-2.2.jar

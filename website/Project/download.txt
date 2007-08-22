@@ -4,11 +4,7 @@
 Downloads
 =========
 
-* jython-2.2rc3__ - The third release candidate for 2.2.  Contains many bugs fixes from jython-2.1 and this installer runs on Java 6.
-
-__ latest.download_
-
-* jython-2.1__ - The most recent stable release.  The installer has known issues with Java 6.
+* jython-2.2__ - Released on August 22, 2007.  Requires Java 1.4.2 or later.
 
 __ stable.download_
 

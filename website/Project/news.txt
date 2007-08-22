@@ -1,6 +1,10 @@
 Jython News
 ================
 
+**22nd August 2007: Jython-2.2**
+
+Jython 2.2, the first stable release in nearly six years, is now available for `download`_.
+
 **2nd August 2007: Jython-2.2rc3**
 
 The third release candidate for Jython 2.2 is now available for `download`_.  Several bugs have been fixed from the second candidate.  See the NEWS file in the install for details.
