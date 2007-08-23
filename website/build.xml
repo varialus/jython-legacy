@@ -9,30 +9,25 @@
 <!-- ant file to build the jython website -->
 <project name="website" default="all" basedir=".">
     <target name="init">
+        <property file="ant.properties" />
         <property name="website.tar" value="website.tar"/>
         <property name="website.tgz" value="website.tgz"/>
         
         <property name="scp.destination"
                   value="shell.sourceforge.net:/home/groups/j/jy/jython"/>
+        <property name="news.file" value="../jython/NEWS"/>
 
-        <!-- These properties should be assigned in one of the
-             the ant.properties files
-        <property name="python.exe" value="/System/Library/Frameworks/Python.framework/Versions/2.3/bin/python"/>
-        <property name="rst2jysite.command" value="/System/Library/Frameworks/Python.framework/Versions/2.3/bin/rst2jysite.py"/>
-        -->
         <property name="rst2jysite.command" value="rst2jysite.py"/>
         <property name="scp.command" value="scp"/>
         <property name="scp.user" value="fwierzbicki"/>
-        <!--
-        -->
 
-        <property file="ant.properties" />
         <property file="../ant.properties" />
     </target>
 
     <target name="generate" depends="init">
     <!-- Create .html files in website -->
         <mkdir dir="dist" />
+        <copy file="${news.file}" todir="dist"/>
         <copy todir="dist">
             <fileset dir=".">
                 <include name="index.html"/>

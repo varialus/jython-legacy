@@ -3,7 +3,7 @@ Jython News
 
 **22nd August 2007: Jython-2.2**
 
-Jython 2.2, the first stable release in nearly six years, is now available for `download`_.
+Jython 2.2, the first production release of Jython in nearly six years, is now available for `download`_.  Its feature set is equivalent to the 2.2 release of CPython.  Only the version numbers changed from rc3 to this release; the code is identical otherwise.  The `changelog`_ has a more complete list of the changes from 2.1 to 2.2.
 
 **2nd August 2007: Jython-2.2rc3**
 
@@ -89,5 +89,6 @@ This is a snapshot that contains a mixture of Python 2.1 and 2.2 features. Use t
 There has been no validation of which parts of the Python library are functional with this relase. Expect pickle and related modules to be broken, probably others as well.
 
 .. _`download`: download.html
+.. _`change log`: ../NEWS
 .. _`Jython wiki`: http://wiki.python.org/jython/
 .. _`a blog`: http://fwierzbicki.blogspot.com/

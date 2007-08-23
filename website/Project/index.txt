@@ -13,8 +13,8 @@ run Python on any Java platform.
 
   The Jython development team is proud to announce a new release: Jython 2.2!
 
-  * `Download location`_,
-  * `Installation instructions <installation.html>`__,
+  * `Download location`_
+  * `Installation instructions <installation.html>`__
 
 
 What is Jython?
