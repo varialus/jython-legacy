@@ -53,6 +53,9 @@
         <copy todir="dist/css">
             <fileset dir="css"/>
         </copy>
+        <copy todir="dist/checksums">
+            <fileset dir="checksums"/>
+        </copy>
         <apply verbose="true" executable="${rst2jysite.command}" dest="dist">
             <arg line="--link-stylesheet" />
             <arg line="--stylesheet=../css/html4css1.css" />
