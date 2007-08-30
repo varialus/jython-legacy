@@ -49,7 +49,7 @@ public class FrameInstaller {
             }
         });
         wizard.addWizardListener(new SimpleWizardListener());
-        wizard.show();
+        wizard.setVisible(true);
     }
 
     protected static void setProperty(String key, String value) {

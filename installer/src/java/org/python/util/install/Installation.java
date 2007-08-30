@@ -57,17 +57,8 @@ public class Installation {
         return _textConstants.getString(key);
     }
 
-    protected static String getText(String key, String parameter0) {
-        String parameters[] = new String[1];
-        parameters[0] = parameter0;
-        return MessageFormat.format(_textConstants.getString(key), parameters);
-    }
-
-    protected static String getText(String key, String parameter0, String parameter1) {
-        String parameters[] = new String[2];
-        parameters[0] = parameter0;
-        parameters[1] = parameter1;
-        return MessageFormat.format(_textConstants.getString(key), parameters);
+    protected static String getText(String key, String... parameters) {
+        return MessageFormat.format(_textConstants.getString(key), (Object[])parameters);
     }
 
     protected static void setLanguage(Locale locale) {

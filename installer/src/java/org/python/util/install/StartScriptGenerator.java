@@ -140,7 +140,7 @@ public class StartScriptGenerator {
         parameters[1] = System.getProperty("user.name");
         parameters[2] = _javaHome.getCanonicalPath();
         parameters[3] = _targetDirectory.getCanonicalPath();
-        return MessageFormat.format(template, parameters);
+        return MessageFormat.format(template, (Object[])parameters);
     }
 
     /**

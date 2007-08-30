@@ -251,9 +251,7 @@ public class InstallerCommandLine {
             }
         }
         formatter.printHelp(syntax, HEADER, _options, FOOTER, true);
-        String exampleSyntax[] = new String[1];
-        exampleSyntax[0] = syntax;
-        String examples = MessageFormat.format(EXAMPLES, exampleSyntax);
+        String examples = MessageFormat.format(EXAMPLES, syntax);
         System.out.println(examples);
     }
 

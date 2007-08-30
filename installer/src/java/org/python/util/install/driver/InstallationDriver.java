@@ -130,7 +130,7 @@ public class InstallationDriver {
      * @throws DriverException
      */
     private void buildSilentTests() throws IOException, DriverException {
-        List silentTests = new ArrayList(50);
+        List<SilentAutotest> silentTests = new ArrayList<SilentAutotest>(50);
 
         SilentAutotest test1 = new SilentAutotest(getOriginalCommandLine());
         String[] arguments = new String[] { "-s" };
@@ -156,9 +156,9 @@ public class InstallationDriver {
         // build array
         int size = silentTests.size();
         _silentTests = new SilentAutotest[size];
-        Iterator silentIterator = silentTests.iterator();
+        Iterator<SilentAutotest> silentIterator = silentTests.iterator();
         for (int i = 0; i < size; i++) {
-            _silentTests[i] = (SilentAutotest) silentIterator.next();
+            _silentTests[i] = silentIterator.next();
         }
     }
 
@@ -169,7 +169,7 @@ public class InstallationDriver {
      * @throws DriverException
      */
     private void buildConsoleTests() throws IOException, DriverException {
-        List consoleTests = new ArrayList(50);
+        List<ConsoleAutotest> consoleTests = new ArrayList<ConsoleAutotest>(5);
         final String[] arguments;
         if (getOriginalCommandLine().hasVerboseOption()) {
             arguments = new String[] { "-c", "-v" };
@@ -244,13 +244,36 @@ public class InstallationDriver {
         test3.addAnswer("n"); // no readme
         test3.setVerifier(new StandaloneVerifier());
         consoleTests.add(test3);
-
+        
+        // test for bug 1783960
+        ConsoleAutotest test4 = new ConsoleAutotest(getOriginalCommandLine());
+        test4.setCommandLineArgs(arguments);
+        test4.addAnswer("e"); // language
+        test4.addAnswer("n"); // no read of license
+        test4.addAnswer("y"); // accept license
+        test4.addAnswer("2"); // type: standard
+        test4.addAnswer("n"); // no includes
+        test4.addAnswer("y"); // exclude
+        test4.addAnswer("n"); // no further excludes
+        test4.addAnswer(test4.getTargetDir().getAbsolutePath()); // target directory
+        if (test4.hasJavaHomeDeviation()) {
+            test4.addAnswer(test4.getJavaHome().getAbsolutePath()); // different jre
+        } else {
+            test4.addAnswer("=="); // current jre
+        }
+        test4.addAnswer(""); // simple enter for java version
+        test4.addAnswer(""); // simple enter for os version
+        test4.addAnswer("y"); // confirm copying
+        test4.addAnswer("n"); // no readme
+        test4.setVerifier(new NormalVerifier());
+        consoleTests.add(test4);
+        
         // build array
         int size = consoleTests.size();
         _consoleTests = new ConsoleAutotest[size];
-        Iterator consoleIterator = consoleTests.iterator();
+        Iterator<ConsoleAutotest> consoleIterator = consoleTests.iterator();
         for (int i = 0; i < size; i++) {
-            _consoleTests[i] = (ConsoleAutotest) consoleIterator.next();
+            _consoleTests[i] = consoleIterator.next();
         }
     }
 
@@ -261,7 +284,7 @@ public class InstallationDriver {
      * @throws DriverException
      */
     private void buildGuiTests() throws IOException, DriverException {
-        List guiTests = new ArrayList(50);
+        List<GuiAutotest> guiTests = new ArrayList<GuiAutotest>(50);
 
         if (Installation.isGuiAllowed()) {
             GuiAutotest guiTest1 = new GuiAutotest(getOriginalCommandLine());
@@ -342,9 +365,9 @@ public class InstallationDriver {
         // build array
         int size = guiTests.size();
         _guiTests = new GuiAutotest[size];
-        Iterator guiIterator = guiTests.iterator();
+        Iterator<GuiAutotest> guiIterator = guiTests.iterator();
         for (int i = 0; i < size; i++) {
-            _guiTests[i] = (GuiAutotest) guiIterator.next();
+            _guiTests[i] = guiIterator.next();
         }
     }
 

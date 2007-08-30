@@ -78,7 +78,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         return question(question, null, answerRequired);
     }
 
-    private String question(String question, List answers) {
+    private String question(String question, List<String> answers) {
         return question(question, answers, true);
     }
 
@@ -88,15 +88,15 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
      * @param answers Possible answers (may be null)
      * @return (chosen) answer
      */
-    private String question(String question, List answers, boolean answerRequired) {
+    private String question(String question, List<String> answers, boolean answerRequired) {
         try {
             if (answers != null && answers.size() > 0) {
                 question = question + " " + _BEGIN_ANSWERS;
-                Iterator answersAsIterator = answers.iterator();
+                Iterator<String> answersAsIterator = answers.iterator();
                 while (answersAsIterator.hasNext()) {
                     if (!question.endsWith(_BEGIN_ANSWERS))
                         question = question + "/";
-                    question = question + (String) answersAsIterator.next();
+                    question = question + answersAsIterator.next();
                 }
                 question = question + _END_ANSWERS;
             }
@@ -108,9 +108,9 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 System.out.print(question); // intended print, not println (!)
                 answer = readLine();
                 if (answers != null && answers.size() > 0) {
-                    Iterator answersAsIterator = answers.iterator();
+                    Iterator<String> answersAsIterator = answers.iterator();
                     while (answersAsIterator.hasNext()) {
-                        if (answer.equalsIgnoreCase((String) answersAsIterator.next())) {
+                        if (answer.equalsIgnoreCase(answersAsIterator.next())) {
                             match = true;
                         }
                     }
@@ -157,13 +157,13 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     }
 
     private void selectLanguage() {
-        List availableLanguages = new ArrayList(2);
+        List<String> availableLanguages = new ArrayList<String>(2);
         availableLanguages.add(getText(C_ENGLISH));
         availableLanguages.add(getText(C_GERMAN)); // 1 == German
-        List answers = new ArrayList(availableLanguages.size());
+        List<String> answers = new ArrayList<String>(availableLanguages.size());
         String languages = "";
-        for (Iterator iterator = availableLanguages.iterator(); iterator.hasNext();) {
-            String language = (String) iterator.next();
+        for (Iterator<String> iterator = availableLanguages.iterator(); iterator.hasNext();) {
+            String language = iterator.next();
             languages = languages + language + ", ";
             answers.add(language.substring(0, 1).toLowerCase());
         }
@@ -186,12 +186,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         message("  " + Installation.STANDARD + ". " + getText(C_STANDARD));
         message("  " + Installation.MINIMUM + ". " + getText(C_MINIMUM));
         message("  " + Installation.STANDALONE + ". " + getText(C_STANDALONE));
-        List answers = new ArrayList(4);
-        answers.add(Installation.ALL);
-        answers.add(Installation.STANDARD);
-        answers.add(Installation.MINIMUM);
-        answers.add(Installation.STANDALONE);
-        String answer = question(getText(C_SELECT_INSTALL_TYPE), answers);
+        String answer = question(getText(C_SELECT_INSTALL_TYPE), getTypeAnswers());
         if (Installation.ALL.equals(answer)) {
             installationType.setAll();
         } else if (Installation.STANDARD.equals(answer)) {
@@ -206,14 +201,8 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
             if (!installationType.isAll()) {
                 answer = question(getText(C_INCLUDE), getYNAnswers());
                 if (yes.equals(answer)) {
-                    answers = new ArrayList(5);
-                    answers.add(InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES);
-                    answers.add(InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES);
-                    answers.add(InstallerCommandLine.INEXCLUDE_DOCUMENTATION);
-                    answers.add(InstallerCommandLine.INEXCLUDE_SOURCES);
-                    answers.add(no);
                     do {
-                        answer = question(getText(C_INEXCLUDE_PARTS, no), answers);
+                        answer = question(getText(C_INEXCLUDE_PARTS, no), getInExcludeAnswers());
                         if (InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES.equals(answer)) {
                             installationType.addLibraryModules();
                         } else if (InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES.equals(answer)) {
@@ -234,7 +223,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 answer = question(getText(C_EXCLUDE), getYNAnswers());
                 if (yes.equals(answer)) {
                     do {
-                        answer = question(getText(C_INEXCLUDE_PARTS, no), answers);
+                        answer = question(getText(C_INEXCLUDE_PARTS, no), getInExcludeAnswers());
                         if (InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES.equals(answer)) {
                             installationType.removeLibraryModules();
                         } else if (InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES.equals(answer)) {
@@ -490,13 +479,32 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         }
     }
 
-    private List getYNAnswers() {
-        List answers = new ArrayList(2);
+	private List<String> getTypeAnswers() {
+		List<String> answers = new ArrayList<String>(4);
+        answers.add(Installation.ALL);
+        answers.add(Installation.STANDARD);
+        answers.add(Installation.MINIMUM);
+        answers.add(Installation.STANDALONE);
+		return answers;
+	}
+
+    private List<String> getYNAnswers() {
+        List<String> answers = new ArrayList<String>(2);
         answers.add(getText(C_YES));
         answers.add(getText(C_NO));
         return answers;
     }
 
+    private List<String> getInExcludeAnswers() {
+        List<String> answers = new ArrayList<String>(5);
+        answers.add(InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES);
+        answers.add(InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES);
+        answers.add(InstallerCommandLine.INEXCLUDE_DOCUMENTATION);
+        answers.add(InstallerCommandLine.INEXCLUDE_SOURCES);
+        answers.add(getText(C_NO));
+    	return answers;
+    }
+    
     private void progressMessage(int percentage) {
         message(" " + percentage + " %");
     }

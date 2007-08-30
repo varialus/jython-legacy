@@ -364,14 +364,17 @@ public abstract class AbstractWizard extends JDialog implements ValidationListen
             _header.setVisible(visible);
     }
 
-    public void show() {
-        fireStartedEvent();
-        if (_pages.size() > 0) {
-            _activePage = (AbstractWizardPage) _pages.get(0);
-            showActivePage();
-        }
-        super.show();
-    }
+    @Override
+    public void setVisible(boolean visible) {
+		if (visible) {
+			fireStartedEvent();
+			if (_pages.size() > 0) {
+				_activePage = (AbstractWizardPage) _pages.get(0);
+				showActivePage();
+			}
+		}
+		super.setVisible(visible);
+	}
 
     private void showActivePage() {
         if (_activePage == null)
