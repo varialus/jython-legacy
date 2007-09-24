@@ -9,5 +9,11 @@ Downloads
   [`SHA1 <../checksums/jython_installer-2.2.jar.sha1>`__]
   - Released on August 22, 2007.  Requires Java 1.4.2 or later.
 
-__ stable.download_
+* jython-2.2.1_
+  [`MD5 <../checksums/jython_installer-2.2.1rc1.jar.md5>`__]
+  [`SHA1 <../checksums/jython_installer-2.2.1rc1.jar.sha1>`__]
+  - Released on September 24, 2007.  Requires Java 1.4.2 or later.
 
+
+__ stable.download_
+.. _`jython-2.2.1`: http://downloads.sourceforge.net/jython/jython_installer-2.2.1rc1.jar

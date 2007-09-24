@@ -1,6 +1,10 @@
 Jython News
 ================
 
+**24th September 2007: Jython-2.2.1rc1**
+
+A release candidate for Jython 2.2.1, a bugfix release for 2.2, is available for `download`_.  The `changelog`_ has the complete list of bugs fixed.
+
 **22nd August 2007: Jython-2.2**
 
 Jython 2.2, the first production release of Jython in nearly six years, is now available for `download`_.  Its feature set is equivalent to the 2.2 release of CPython.  Only the version numbers changed from rc3 to this release; the code is identical otherwise.  The `changelog`_ has a more complete list of the changes from 2.1 to 2.2.
