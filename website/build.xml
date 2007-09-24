@@ -7,11 +7,9 @@
 -->
 
 <!-- ant file to build the jython website -->
-<project name="website" default="all" basedir=".">
+<project name="website" default="generate" basedir=".">
     <target name="init">
         <property file="ant.properties" />
-        <property name="website.tar" value="website.tar"/>
-        <property name="website.tgz" value="website.tgz"/>
         
         <property name="scp.destination"
                   value="shell.sourceforge.net:/home/groups/j/jy/jython"/>
@@ -69,23 +67,19 @@
     </target>
 
     <target name="collect" depends="generate">
-        <tar tarfile="${website.tar}" basedir="."
-             includes="dist/**" />
-        <gzip zipfile="${website.tgz}" src="${website.tar}" />
+        <tar tarfile="website.tar.bz2" basedir="dist"
+             includes="**" compression="bzip2"/>
     </target>
 
-    <target name="all" depends="init, generate, collect"/>
-
-    <target name="copy2sf" depends="init">
+    <target name="copy2sf" depends="collect">
         <exec executable="${scp.command}">
-            <arg line="${website.tgz}"/>
+            <arg line="website.tar.bz2"/>
             <arg line="${scp.user}@${scp.destination}"/>
         </exec>
     </target>
 
     <target name="clean" depends="init">
         <delete dir="dist" />
-        <delete file="${website.tar}" />
-        <delete file="${website.tgz}" />
+        <delete file="website.tar.bz2" />
     </target>
 </project>
