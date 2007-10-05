@@ -1,6 +1,10 @@
 Jython News
 ================
 
+**4th October 2007: Jython-2.2.1rc2**
+
+A second release candidate for Jython 2.2.1 is available for `download_`.  This candidate removes a couple more places that Jython used the JVM's default encoding.  See the `changelog`_ for the full list.
+
 **24th September 2007: Jython-2.2.1rc1**
 
 A release candidate for Jython 2.2.1, a bugfix release for 2.2, is available for `download`_.  The `changelog`_ has the complete list of bugs fixed.
