@@ -6,14 +6,14 @@ Installation
 
 .. contents:: 
 
-----------
-Jython 2.2
-----------
+------------
+Jython 2.2.1
+------------
 
 Basic Install
 =============
 
-Jython 2.2 is distributed as an executable jar file installer.  After
+Jython 2.2.1 is distributed as an executable jar file installer.  After
 `downloading <download.html>`__ it, either double click the
 |stable.installer.jar| or run java with the -jar option
 
@@ -81,7 +81,7 @@ Jython 2.1
 Jython 2.1 is distributed as a self-extracting .class file created by
 LiftOff.  It is known to have problems running on Java 6, so if you
 want to use Jython with that JVM either install Jython-2.1 with an earlier
-JVM or use Jython-2.2.  
+JVM or use Jython-2.2.1.  
 
 To install Jython, open the command line to the directory in which you have placed the jython-21.class file and then type:
 

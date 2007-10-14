@@ -34,9 +34,9 @@ paragraph 4 in the JPython-1.1 license: ::
 
 Is Jython the same language as Python?
 --------------------------------------
-Yes. Jython is an implementation of the Python language in Java. We strive to ensure that Jython remains as compatible with CPython as possible. The latest Jython release (2.1) implements the same language as CPython 2.1 and many of the CPython standard library modules.
+Yes. Jython is an implementation of the Python language in Java. We strive to ensure that Jython remains as compatible with CPython as possible. The latest Jython release (2.2) implements the same language as CPython 2.2 and many of the CPython standard library modules.
 
-There are two incompatibilities with modern CPython that often catch newcomers. First, Jython 2.1 does not implement any features added to CPython in version 2.2 or later. This includes language features such as generators, and library modules such as optparse. A more modern version of Jython is under active development.
+There are two incompatibilities with modern CPython that often catch newcomers. First, Jython 2.2 does not implement any features added to CPython in version 2.3 or later. This includes language features such as decorators, and library modules such as optparse. A more modern version of Jython is under active development.
 
 Second, Jython programs cannot use CPython extension modules written in C. These modules usually have files with the extension .pyc, .pyd or .dll. If you want to use such a module, you should look for an equivalent written in pure Python or Java.
 
@@ -52,8 +52,8 @@ language is; independent of any specific implementation.
 What is the current status of Jython?
 --------------------------------------
 
-Jython-2.2_ is the current production release.   Its feature set roughly
-corresponds to that of Python-2.2.  It was released on 22-Aug-2007.
+Jython-2.2.1_ is the current production release.   Its feature set roughly
+corresponds to that of Python-2.2.  It was released on 14-Oct-2007.
 
 How fast is Jython?
 -------------------
@@ -410,7 +410,7 @@ for the PATH environment var (':' separator for unix, ';' for windows)
 .. _jnios: http://sourceforge.net/projects/jnios
 .. _JNumeric: http://jnumerical.sourceforge.net/index.html
 .. _jreload: http://www.jython.org/docs/jreload.html
-.. _Jython-2.2: stable.download_
+.. _Jython-2.2.1: stable.download_
 .. _ReadlineSetup: http://wiki.python.org/jython/ReadlineSetup
 .. _Accessing Jython from Java Without Using jythonc: http://wiki.python.org/jython/JythonMonthly/Articles/September2006/1
 .. _Simple and Efficient Jython Object Factories: http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3

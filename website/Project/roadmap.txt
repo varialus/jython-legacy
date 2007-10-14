@@ -14,11 +14,11 @@ Note that Jython's version numbers represent the version of CPython from which
 Jython pull most of its libraries that are written in pure Python (as opposed
 to the parts that are written in Java).
 
-Jython  2.2
-===========
+Jython 2.2.1
+============
 
-Jython 2.2 has been released.  We are also producing point releases
-for bug fixing.
+Jython 2.2.1 has been released.  We will produce additional point releases
+for bug fixing as necessary.
 
 Jython 2.5
 ==========================
