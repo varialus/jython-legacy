@@ -1,0 +1,62 @@
+<project name="grammer" default="all">
+
+    <path id="libs">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+            <include name="**/*.pom"/>
+        </fileset>
+    </path>
+
+    <target name="init" depends="clean">
+        <mkdir dir="build/gensrc/"/>
+    </target>
+
+    <target name="test">
+        <java classname="org.antlr.Tool">
+            <classpath refid="libs"/>
+        </java>
+    </target>
+ 
+    <target name="translate" depends="init">
+        <java fork="yes" classname="org.antlr.Tool">
+            <arg value="grammar/MiniPy.g"/>
+            <arg value="-o"/>
+            <arg value="build/gensrc/"/>
+            <classpath refid="libs"/>
+        </java>
+        <copy file="build/gensrc/grammar/MiniPy.tokens"
+              todir="."
+        />
+        <java fork="yes" classname="org.antlr.Tool">
+            <arg value="grammar/MiniPyWalker.g"/>
+            <arg value="-o"/>
+            <arg value="build/gensrc/"/>
+            <classpath refid="libs"/>
+        </java>
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac destdir="build" 
+               debug="true"
+                deprecation="false" optimize="false" failonerror="true">
+            <src path="build/gensrc"/>
+            <classpath refid="libs"/>
+            <classpath location="build"/>
+        </javac>
+
+        <javac destdir="build" 
+               debug="true"
+                deprecation="false" optimize="false" failonerror="true">
+            <src path="src"/>
+            <classpath refid="libs"/>
+            <classpath location="build"/>
+        </javac>
+
+    </target>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+    <target name="all" depends="translate, compile"/>
+</project>
+
