@@ -3,26 +3,42 @@ tree grammar MiniPyWalker;
 options {
     tokenVocab=MiniPy;
     ASTLabelType=CommonTree;
-//    output=AST;
 }
 
 @header {
 package org.python.antlr;
-import java.util.HashMap;
+import org.objectweb.asm.*;
+
+import java.io.*;
 }
 
 @members {
-HashMap locals;
+    ClassWriter cw = new ClassWriter(0);
+    String name;
 }
 
-file_input
-scope {
-    List symbols;
-}
+file_input[String name]
 @init {
-    $file_input::symbols = new ArrayList();
+    System.out.println("begin");
+    cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
+                name, null, "java/lang/Object", null);
 }
-    : stmt+ {System.out.println("symbols="+$file_input::symbols);}
+
+@after {
+    try {
+        byte[] ba = cw.toByteArray();
+        FileOutputStream fos = new FileOutputStream(name + ".class");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(ba.length);
+        baos.write(ba, 0, ba.length);
+        baos.writeTo(fos);
+        baos.close();
+        fos.close();
+    } catch (IOException e) {
+        System.err.println("Error writing " + name + ".class: " + e);
+    }
+    System.out.println("finished");
+}
+    : stmt+
     ;
 
 stmt : simple_stmt
@@ -32,8 +48,8 @@ stmt : simple_stmt
 simple_stmt : small_stmt
             ;
 
-small_stmt : expr {$file_input::symbols.add($expr.text);System.out.println("EXPR:" + $expr.text);}
-           | ^(Print expr) {$file_input::symbols.add($expr.text);System.out.println("PRINT:" + $expr.text);}
+small_stmt : expr
+           | ^(Print expr)
            ;
 
 compound_stmt : funcdef

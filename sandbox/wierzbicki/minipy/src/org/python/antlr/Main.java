@@ -52,6 +52,6 @@ public class Main {
         CommonTreeNodeStream nodes = new CommonTreeNodeStream(new PyTreeAdaptor(), (Tree)r.tree);
         nodes.setTokenStream(tokens);
         MiniPyWalker walker = new MiniPyWalker(nodes);
-        walker.file_input();
+        walker.file_input("Test");
 }
 }
