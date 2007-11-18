@@ -1,0 +1,57 @@
+<project name="grammer" default="compile">
+
+    <path id="libs">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+            <include name="**/*.pom"/>
+        </fileset>
+    </path>
+
+    <target name="init" depends="clean">
+        <mkdir dir="build/gensrc/org/python/antlr"/>
+    </target>
+
+    <target name="test">
+        <java classname="org.antlr.Tool">
+            <classpath refid="libs"/>
+        </java>
+    </target>
+ 
+    <target name="translate" depends="init">
+        <java classname="org.antlr.Tool">
+            <arg value="grammar/Python.g"/>
+            <arg value="-o"/>
+            <arg value="build/gensrc/org/python/antlr"/>
+            <classpath refid="libs"/>
+        </java>
+
+        <java classname="org.antlr.Tool">
+            <arg value="grammar/PythonWalker.g"/>
+            <arg value="-o"/>
+            <arg value="build/gensrc/org/python/antlr"/>
+            <classpath refid="libs"/>
+        </java>
+    </target>
+    
+    <target name="compile" depends="translate">
+        <javac destdir="build" debug="true"
+                deprecation="false" optimize="false" failonerror="true">
+            <src path="build/gensrc"/>
+            <classpath refid="libs"/>
+            <classpath location="build"/>
+        </javac>
+
+        <javac destdir="build" debug="true"
+                deprecation="false" optimize="false" failonerror="true">
+            <src path="src"/>
+            <classpath refid="libs"/>
+            <classpath location="build"/>
+        </javac>
+
+    </target>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+</project>
+
