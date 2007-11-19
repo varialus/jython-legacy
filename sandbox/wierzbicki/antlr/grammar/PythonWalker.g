@@ -183,7 +183,8 @@ string
     ;
 
 trailer
-    : DOT NAME
+    : ^(ArgList arglist?)
+    | DOT NAME
     ;
 
 subscriptlist
@@ -209,17 +210,13 @@ classdef
     }
     ;
 
-arglist: argument (COMMA argument)*
-        ( COMMA
-          ( STAR test (COMMA DOUBLESTAR test)?
-          | DOUBLESTAR test
-          )?
-        )?
-    |   STAR test (COMMA DOUBLESTAR test)?
-    |   DOUBLESTAR test
+arglist
+    : ^(Arguments argument+) (^(StarArgs test))? (^(KWArgs test))?
+    | ^(StarArgs test) (^(KWArgs test))?
+    | ^(KWArgs test)
     ;
 
-argument : test (ASSIGN test)?
+argument : ^(Arg test (ASSIGN test)?)
          ;
 
 list_iter: list_for
