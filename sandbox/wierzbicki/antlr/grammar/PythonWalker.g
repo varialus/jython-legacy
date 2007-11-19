@@ -10,7 +10,7 @@ package org.python.antlr;
 } 
 
 module
-    : (^(Stmt stmt))+ {
+    : stmt+ {
         //System.out.println("<STMT>");
     }
     ;
@@ -22,7 +22,7 @@ funcdef
     ;
 
 varargslist
-    : ^(Arguments defparameter) {
+    : ^(Arguments defparameter*) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
     }
     | ^(StarArgs sname=NAME) (^(KWArgs kname=NAME))? {
     }
@@ -35,7 +35,11 @@ defparameter
     }
     ;
 
-stmt
+stmt:
+    ^(Stmt any_stmt+)
+    ;
+
+any_stmt
     : expr_stmt
     | print_stmt
     | del_stmt
@@ -56,8 +60,6 @@ expr_stmt
     | ^(Expr ^(augassign targ=test value=test)) {
     }
     | ^(Expr ^(Assign targs=test value=test)) {
-       //System.out.println("<Assign>");
-       System.out.println($targs.text + " = " + $value.text);
     }
     ;
 
@@ -203,16 +205,9 @@ testlist
     ;
 
 classdef
-    : ^(ClassDef ^(Name NAME) (^(Bases bases))? ^(Body suite)) {
+    : ^(ClassDef ^(Name NAME) (^(Bases testlist))? ^(Body suite)) {
+        //System.out.println("class ");
     }
-    ;
-
-bases
-    : base+ {}
-    ;
-
-base
-    : NAME {} 
     ;
 
 arglist: argument (COMMA argument)*

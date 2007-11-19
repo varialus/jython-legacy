@@ -169,7 +169,7 @@ varargslist : defparameter (options {greedy=true;}:COMMA defparameter)*
                   | DOUBLESTAR kwargs=NAME
                   )?
               )?
-           -> ^(Arguments defparameter*) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
+           -> ^(Arguments defparameter+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
             | STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?
            -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
             | DOUBLESTAR kwargs=NAME
@@ -190,6 +190,7 @@ fplist : fpdef (options {greedy=true;}:COMMA fpdef)* (COMMA)?
 stmt : simple_stmt
     -> ^(Stmt simple_stmt)
      | compound_stmt
+    -> ^(Stmt compound_stmt)
      ;
 
 simple_stmt : small_stmt (options {greedy=true;}:SEMI small_stmt)* (SEMI)? NEWLINE
