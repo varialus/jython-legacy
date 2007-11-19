@@ -124,6 +124,12 @@ tokens {
     BinOp;
     ArgList;
     Subscript;
+    SubscriptList;
+    Targets;
+    Values;
+    Start;
+    End;
+    SliceOp;
 }
 
 @header { 
@@ -208,10 +214,10 @@ small_stmt : expr_stmt -> ^(Expr expr_stmt)
            | assert_stmt
            ;
 
-expr_stmt : testlist
-            ( (augassign testlist -> ^(augassign testlist testlist))
-            | ((ASSIGN testlist)+ -> ^(Assign testlist testlist+))
-            | -> testlist
+expr_stmt : lhs=testlist
+            ( (augassign testlist -> ^(augassign $lhs testlist))
+            | ((ASSIGN rhs=testlist)+ -> ^(Assign ^(Targets $lhs) ^(Values $rhs)))
+            | -> $lhs
             )
           ;
 
@@ -336,7 +342,6 @@ test : and_test ('or'^ and_test)*
      | lambdef
      ;
 
-
 and_test : not_test ('and'^ not_test)*
          ;
 
@@ -420,7 +425,7 @@ lambdef: 'lambda' (varargslist)? COLON test
        ;
 
 trailer : LPAREN (arglist)? RPAREN -> ^(ArgList arglist?)
-        | LBRACK! subscriptlist RBRACK!
+        | LBRACK subscriptlist RBRACK -> ^(SubscriptList subscriptlist)
         | DOT NAME
         ;
 
@@ -430,8 +435,8 @@ subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
 
 //XXX: ^Subscript needs a better name
 subscript : DOT DOT DOT -> Ellipsis
-          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript $t1) $t2? sliceop?
-          | COLON (test)? (sliceop)? -> test? sliceop?
+          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Start $t1) ^(End $t2)? ^(SliceOp sliceop)?)
+          | COLON (test)? (sliceop)? -> ^(Subscript ^(End test)? ^(SliceOp sliceop)?)
           ;
 
 sliceop : COLON (test)? -> test?

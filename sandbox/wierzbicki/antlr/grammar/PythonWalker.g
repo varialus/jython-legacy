@@ -59,7 +59,7 @@ expr_stmt
     }
     | ^(Expr ^(augassign targ=test value=test)) {
     }
-    | ^(Expr ^(Assign targs=test value=test)) {
+    | ^(Expr ^(Assign ^(Targets targs=testlist) ^(Values values=testlist))) {
     }
     ;
 
@@ -140,6 +140,7 @@ test
     | ^('or' test test) {}
     | ^('not' test) {}
     | ^(comp_op left=test targs=test) {}
+    | ^(PLUS test test)
     | atom (trailer)* {}
     ;
 
@@ -184,21 +185,17 @@ string
 
 trailer
     : ^(ArgList arglist?)
+    | ^(SubscriptList subscriptlist)
     | DOT NAME
     ;
 
 subscriptlist
-    :   subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
+    :   subscript+
     ;
 
-subscript
-    : DOT DOT DOT
-    | test (COLON (test)? (sliceop)?)?
-    | COLON (test)? (sliceop)?
-    ;
-
-sliceop: COLON (test)?
-    ;
+subscript : Ellipsis
+          | ^(Subscript (^(Start test))? (^(End test))? (^(SliceOp test?))?)
+          ;
 
 testlist
     : test+ {}

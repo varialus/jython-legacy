@@ -25,6 +25,12 @@
             <classpath refid="libs"/>
         </java>
 
+        <copy todir="." preservelastmodified="true">
+            <fileset dir="build/gensrc/org/python/antlr/grammar">
+                <include name="Python.tokens" />
+            </fileset>
+        </copy>
+
         <java classname="org.antlr.Tool">
             <arg value="grammar/PythonWalker.g"/>
             <arg value="-o"/>
