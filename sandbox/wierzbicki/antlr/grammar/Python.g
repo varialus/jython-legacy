@@ -100,6 +100,7 @@ tokens {
     Dict;
     If;
     Else;
+    Elif;
     While; 
     Pass;
     Print;
@@ -305,7 +306,7 @@ assert_stmt : 'assert' t1=test (COMMA t2=test)?
            -> ^(Assert $t1 $t2?)
             ;
 
-compound_stmt : if_stmt -> ^(If if_stmt)
+compound_stmt : if_stmt
               | while_stmt
               | for_stmt
               | try_stmt -> ^(Try try_stmt)
@@ -313,8 +314,13 @@ compound_stmt : if_stmt -> ^(If if_stmt)
               | classdef
               ;
 
-if_stmt: 'if' test COLON! s1=suite ('elif' test COLON! suite)* ('else' COLON! suite)?
+if_stmt: 'if' test COLON ifsuite=suite elif_clause*  ('else' COLON elsesuite=suite)?
+      -> ^(If test $ifsuite elif_clause* ^(Else $elsesuite)?)
        ;
+
+elif_clause : 'elif' test COLON suite
+           -> ^(Elif test suite)
+            ;
 
 while_stmt : 'while' test COLON s1=suite ('else' COLON s2=suite)?
           -> ^(While test $s1 ^(Else $s2)?)
@@ -349,7 +355,7 @@ not_test : 'not'^ not_test
          | comparison
          ;
 
-comparison: expr (comp_op expr)*
+comparison: expr (comp_op^ expr)*
 	;
 
 //comparison : expr

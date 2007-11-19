@@ -51,6 +51,7 @@ any_stmt
 //    | assert_stmt
     | funcdef
     | classdef
+    | if_stmt
     ;
 
 expr_stmt
@@ -79,7 +80,7 @@ augassign
     ;
 
 print_stmt
-    : ^(Print RIGHTSHIFT? testlist)
+    : ^(Print RIGHTSHIFT? testlist?)
     {
     }
     ;
@@ -130,6 +131,12 @@ dotted_name
     }
     ;
 
+if_stmt: ^(If test suite elif_clause* (^(Else suite))?)
+       ;
+
+elif_clause : ^(Elif test suite)
+            ;
+ 
 suite
     : INDENT stmt+ DEDENT
     ;
@@ -139,8 +146,9 @@ test
 : ^('and' test test) {}
     | ^('or' test test) {}
     | ^('not' test) {}
-    | ^(comp_op left=test targs=test) {}
+    | ^(comp_op left=test targs=test)
     | ^(PLUS test test)
+    | ^(MINUS left=test right=test) {System.out.println("MINUS left:" + $left.text + "; right:" + $right.text);}
     | atom (trailer)* {}
     ;
 
