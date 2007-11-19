@@ -140,8 +140,7 @@ test
     | ^('or' test test) {}
     | ^('not' test) {}
     | ^(comp_op left=test targs=test) {}
-    | atom {}
-    | NAME {}
+    | atom (trailer)* {}
     ;
 
 comp_op
@@ -166,6 +165,7 @@ atom
     }
     | ^(Dict testlist?) {
     }
+    | NAME {}
     | INT {}
     | LONGINT {}
     | FLOAT {}
@@ -182,9 +182,8 @@ string
     : STRING {}
     ;
 
-trailer: LPAREN (arglist)? RPAREN
-    | LBRACK subscriptlist RBRACK
-    | DOT NAME
+trailer
+    : DOT NAME
     ;
 
 subscriptlist
