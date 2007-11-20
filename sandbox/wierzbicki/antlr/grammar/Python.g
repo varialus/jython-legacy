@@ -438,7 +438,10 @@ atom : LPAREN (testlist)? RPAREN -> ^(Parens testlist?)
      | (STRING)+ -> ^(String STRING+)
      ;
 
-listmaker : test ( list_for | (options {greedy=true;}:COMMA! test)* ) (COMMA!)?
+listmaker : test 
+            ( list_for -> ^(ListComp list_for)
+            | (options {greedy=true;}:COMMA test)* -> test+
+            ) (COMMA)?
           ;
 
 lambdef: 'lambda' (varargslist)? COLON test
@@ -498,9 +501,7 @@ argument : t1=test (ASSIGN t2=test)?
          ;
 
 list_iter : list_for
-         -> ^(ListComp list_for)
           | list_if
-         -> ^(ListComp list_if)
           ;
 
 list_for : 'for' exprlist 'in' testlist (list_iter)?

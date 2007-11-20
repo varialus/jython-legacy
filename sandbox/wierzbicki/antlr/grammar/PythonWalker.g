@@ -218,6 +218,7 @@ comp_op
 //FIXME: lots of placeholders
 atom
     : ^(List testlist?) {}
+    | ^(ListComp list_for) {}
     | ^(Parens testlist?) {}
     | ^(Dict testlist?) {}
     | ^(Repr testlist?) {}
