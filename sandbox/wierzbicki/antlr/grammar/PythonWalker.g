@@ -10,7 +10,7 @@ package org.python.antlr;
 } 
 
 module
-    : stmt+ {
+    : stmt* {
         //System.out.println("<STMT>");
     }
     ;
@@ -39,24 +39,26 @@ stmt:
     ^(Stmt any_stmt+)
     ;
 
-any_stmt
+any_stmt //combines simple_stmt and compound_stmt from Python.g
     : expr_stmt
     | print_stmt
     | del_stmt
     | pass_stmt
     | flow_stmt
     | import_stmt
-//    | global_stmt
-//    | exec_stmt
-//    | assert_stmt
+    | global_stmt
+    | exec_stmt
+    | assert_stmt
     | funcdef
     | classdef
     | if_stmt
+    | while_stmt
+    | for_stmt
+    | try_stmt
     ;
 
 expr_stmt
     : ^(Expr testlist) {
-        //System.out.println("<testlist>");
     }
     | ^(Expr ^(augassign targ=test value=test)) {
     }
@@ -85,7 +87,7 @@ print_stmt
     }
     ;
 
-del_stmt : 'del' testlist
+del_stmt : ^(Delete exprlist)
          ;
 
 pass_stmt : Pass {
@@ -95,7 +97,7 @@ pass_stmt : Pass {
 flow_stmt : break_stmt
           | continue_stmt
           | return_stmt
-//          | raise_stmt
+          | raise_stmt
           | yield_stmt
           ;
 
@@ -110,6 +112,9 @@ return_stmt : ^(Return (testlist)?)
 
 yield_stmt : 'yield' testlist
            ;
+
+raise_stmt: ^(Raise (^(Type test))? (^(Inst test))? (^(Tback test))?)
+          ;
 
 import_stmt
     : ^(Import dotted_as_name+) {
@@ -131,24 +136,68 @@ dotted_name
     }
     ;
 
+global_stmt : ^(Global NAME+)
+            ;
+
+exec_stmt : ^(Exec test (^(Globals test))? (^(Locals test))?)
+          ;
+
+assert_stmt : ^(Assert ^(Test test) (^(Msg test))?)
+            ;
+
+
 if_stmt: ^(If test suite elif_clause* (^(Else suite))?)
        ;
 
 elif_clause : ^(Elif test suite)
             ;
+
+while_stmt : ^(While test ^(Body suite) (^(Else suite))?)
+           ;
+
+for_stmt : ^(For exprlist ^(In testlist) ^(Body suite) (^(Else suite))?)
+         ;
+
+try_stmt : ^(TryExcept ^(Body suite) except_clause+ (^(Else suite))?)
+         | ^(TryFinally suite)
+         ;
+
+except_clause : ^(Except (^(Type test))? (^(Name test))? ^(Body suite))
+              ;
  
 suite
     : INDENT stmt+ DEDENT
+    | stmt+
     ;
 
 //FIXME: lots of placeholders
 test
-: ^('and' test test) {}
+    : ^('and' test test) {}
     | ^('or' test test) {}
     | ^('not' test) {}
     | ^(comp_op left=test targs=test)
     | ^(PLUS test test)
-    | ^(MINUS left=test right=test) {System.out.println("MINUS left:" + $left.text + "; right:" + $right.text);}
+    | ^(MINUS left=test right=test) {}
+    | ^(AMPER test test)
+    | ^(VBAR test test)
+    | ^(LEFTSHIFT test test)
+    | ^(RIGHTSHIFT test test)
+    | lambdef
+    | term
+    ;
+
+term  
+    : ^(STAR factor factor)
+    | ^(SLASH factor factor)
+    | ^(PERCENT factor factor)
+    | ^(DOUBLESLASH factor factor)
+    | factor
+    ;
+
+factor
+    : ^(UnaryPlus factor)
+    | ^(UnaryMinus factor)
+    | ^(UnaryTilde factor)
     | atom (trailer)* {}
     ;
 
@@ -168,12 +217,10 @@ comp_op
 
 //FIXME: lots of placeholders
 atom
-    : ^(List testlist?) {
-    }
-    | ^(Tuple testlist?) {
-    }
-    | ^(Dict testlist?) {
-    }
+    : ^(List testlist?) {}
+    | ^(Parens testlist?) {}
+    | ^(Dict testlist?) {}
+    | ^(Repr testlist?) {}
     | NAME {}
     | INT {}
     | LONGINT {}
@@ -191,6 +238,9 @@ string
     : STRING {}
     ;
 
+lambdef: ^(Lambda varargslist? ^(Body test))
+       ;
+
 trailer
     : ^(ArgList arglist?)
     | ^(SubscriptList subscriptlist)
@@ -204,6 +254,9 @@ subscriptlist
 subscript : Ellipsis
           | ^(Subscript (^(Start test))? (^(End test))? (^(SliceOp test?))?)
           ;
+
+exprlist : ^(ExprList test+)
+         ;
 
 testlist
     : test+ {}
@@ -221,14 +274,14 @@ arglist
     | ^(KWArgs test)
     ;
 
-argument : ^(Arg test (ASSIGN test)?)
+argument : ^(Arg test (^(Default test))?)
          ;
 
 list_iter: list_for
     | list_if
     ;
 
-list_for: 'for' testlist 'in' testlist (list_iter)?
+list_for: 'for' exprlist 'in' testlist (list_iter)?
     ;
 
 list_if: 'if' test (list_iter)?

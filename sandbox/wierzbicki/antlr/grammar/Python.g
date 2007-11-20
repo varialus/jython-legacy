@@ -78,6 +78,7 @@ tokens {
     DEDENT;
     
     Test;
+    Msg;
     Stmt;
     Import;
     ImportFrom;
@@ -104,12 +105,15 @@ tokens {
     While; 
     Pass;
     Print;
-    Try;
+    TryExcept;
+    TryFinally;
+    Except;
     For;
     Return;
     Yield;
     String;
     IsNot;
+    In;
     NotIn;
     Raise;
     Type;
@@ -131,6 +135,12 @@ tokens {
     Start;
     End;
     SliceOp;
+    UnaryPlus;
+    UnaryMinus;
+    UnaryTilde;
+    Delete;
+    Default;
+    Parens;
 }
 
 @header { 
@@ -216,7 +226,7 @@ small_stmt : expr_stmt -> ^(Expr expr_stmt)
            ;
 
 expr_stmt : lhs=testlist
-            ( (augassign testlist -> ^(augassign $lhs testlist))
+            ( (augassign rhs=testlist -> ^(augassign $lhs $rhs))
             | ((ASSIGN rhs=testlist)+ -> ^(Assign ^(Targets $lhs) ^(Values $rhs)))
             | -> $lhs
             )
@@ -244,6 +254,7 @@ print_stmt : 'print'
            ;
 
 del_stmt : 'del' exprlist
+        -> ^(Delete exprlist)
          ;
 
 pass_stmt : 'pass'
@@ -303,13 +314,13 @@ exec_stmt : 'exec' expr ('in' t1=test (COMMA t2=test)?)?
           ;
 
 assert_stmt : 'assert' t1=test (COMMA t2=test)?
-           -> ^(Assert $t1 $t2?)
+           -> ^(Assert ^(Test $t1) ^(Msg $t2)?)
             ;
 
 compound_stmt : if_stmt
               | while_stmt
               | for_stmt
-              | try_stmt -> ^(Try try_stmt)
+              | try_stmt
               | funcdef
               | classdef
               ;
@@ -323,24 +334,26 @@ elif_clause : 'elif' test COLON suite
             ;
 
 while_stmt : 'while' test COLON s1=suite ('else' COLON s2=suite)?
-          -> ^(While test $s1 ^(Else $s2)?)
+          -> ^(While test ^(Body $s1) ^(Else $s2)?)
            ;
 
 for_stmt : 'for' exprlist 'in' testlist COLON s1=suite ('else' COLON s2=suite)?
-        -> ^(For exprlist ^('in' testlist) ^(Body $s1) ^(Else $s2)?)
+        -> ^(For exprlist ^(In testlist) ^(Body $s1) ^(Else $s2)?)
          ;
 
-try_stmt : 'try' COLON! suite
-           ( (except_clause COLON! suite)+ ('else' COLON! suite)?
-           | 'finally' COLON! suite
+try_stmt : 'try' COLON trysuite=suite
+           ( (except_clause+ ('else' COLON elsesuite=suite)?
+          -> ^(TryExcept ^(Body $trysuite) except_clause+ ^(Else $elsesuite)?))
+           | ('finally' COLON suite
+          -> ^(TryFinally suite))
            )
          ;
 
-except_clause : 'except' (t1=test (COMMA t2=test)?)?
-             -> 'except' ^(Type $t1)? ^(Name $t2)?
+except_clause : 'except' (t1=test (COMMA t2=test)?)? COLON suite
+             -> ^(Except ^(Type $t1)? ^(Name $t2)? ^(Body suite))
               ;
 
-suite : simple_stmt
+suite : simple_stmt -> ^(Stmt simple_stmt)
       | NEWLINE! INDENT (stmt)+ DEDENT
       ;
 
@@ -403,7 +416,9 @@ arith_expr: term ((PLUS^|MINUS^) term)*
 term : factor ((STAR^ | SLASH^ | PERCENT^ | DOUBLESLASH^ ) factor)*
      ;
 
-factor : (PLUS^|MINUS^|TILDE^) factor
+factor : PLUS factor -> ^(UnaryPlus factor)
+       | MINUS factor -> ^(UnaryMinus factor)
+       | TILDE factor -> ^(UnaryTilde factor)
        | power
        ;
 
@@ -411,7 +426,7 @@ power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR factor)?
      -> atom (trailer)* (DOUBLESTAR factor)?
       ;
 
-atom : LPAREN (testlist)? RPAREN -> ^(Tuple testlist?)
+atom : LPAREN (testlist)? RPAREN -> ^(Parens testlist?)
      | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
@@ -478,8 +493,8 @@ arglist : argument (COMMA argument)*
        -> ^(KWArgs $kwargs)
         ;
 
-argument : test (ASSIGN test)?
-        -> ^(Arg test+)
+argument : t1=test (ASSIGN t2=test)?
+        -> ^(Arg $t1 ^(Default $t2)?)
          ;
 
 list_iter : list_for
