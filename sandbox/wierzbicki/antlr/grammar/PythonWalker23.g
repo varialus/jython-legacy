@@ -15,14 +15,11 @@ module
     }
     ;
 
-decorator: ^(Decorator dotted_name ^(ArgList arglist?))
-         ;
 
-decorators: decorator+
-          ;
-
-funcdef : ^(FunctionDef (^(Decorators decorators))? ^(Name NAME) ^(Args varargslist?) ^(Body suite))
-        ;
+funcdef
+    : ^(FunctionDef ^(Name NAME) ^(Args varargslist?) ^(Body suite)) {
+    }
+    ;
 
 varargslist
     : ^(Arguments defparameter*) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
@@ -52,13 +49,12 @@ any_stmt //combines simple_stmt and compound_stmt from Python.g
     | global_stmt
     | exec_stmt
     | assert_stmt
+    | funcdef
+    | classdef
     | if_stmt
     | while_stmt
     | for_stmt
     | try_stmt
-    | with_stmt
-    | funcdef
-    | classdef
     ;
 
 expr_stmt
@@ -114,7 +110,7 @@ continue_stmt : 'continue'
 return_stmt : ^(Return (testlist)?)
             ;
 
-yield_stmt : ^(Yield testlist?)
+yield_stmt : ^(Yield testlist)
            ;
 
 raise_stmt: ^(Raise (^(Type test))? (^(Inst test))? (^(Tback test))?)
@@ -166,13 +162,6 @@ try_stmt : ^(TryExcept ^(Body suite) except_clause+ (^(Else suite))?)
 
 except_clause : ^(Except (^(Type test))? (^(Name test))? ^(Body suite))
               ;
-
-with_stmt: ^(With test with_var? ^(Body suite))
-         ;
-
-with_var: ('as' | NAME) test
-        ;
-
  
 suite
     : INDENT stmt+ DEDENT
@@ -222,7 +211,6 @@ comp_op
 atom
     : ^(List testlist?) {}
     | ^(ListComp list_for) {}
-    | ^(GenExpFor gen_for) {}
     | ^(Parens testlist?) {}
     | ^(Dict testlist?) {}
     | ^(Repr testlist?) {}
@@ -291,14 +279,4 @@ list_for: 'for' exprlist 'in' testlist (list_iter)?
 
 list_if: 'if' test (list_iter)?
     ;
-
-gen_iter: gen_for
-        | gen_if
-        ;
-
-gen_for: 'for' exprlist 'in' test gen_iter?
-       ;
-
-gen_if: 'if' test gen_iter?
-      ;
 
