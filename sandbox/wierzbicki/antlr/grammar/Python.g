@@ -247,9 +247,11 @@ expr_stmt : lhs=testlist
             )
           ;
 
+//not in CPython's Grammar file
 assigns : assign+
         ;
 
+//not in CPython's Grammar file
 assign : ASSIGN testlist -> ^(Assign testlist)
         ;
 
