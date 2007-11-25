@@ -93,6 +93,7 @@ tokens {
     Arg;
     Arguments;
     Assign;
+    Assigns;
     Compare;
     Expr;
     ExprList;
@@ -140,13 +141,8 @@ tokens {
     UnaryTilde;
     Delete;
     Default;
-    Parens;
     Alias;
     Asname;
-    Decorator;
-    Decorators;
-    With;
-    GenExpFor;
 }
 
 @header { 
@@ -181,18 +177,9 @@ file_input : (NEWLINE! | stmt)*
 eval_input : (NEWLINE!)* testlist (NEWLINE!)*
            ;
 
-//decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
-decorator: AT dotted_name (LPAREN arglist? RPAREN)? NEWLINE
-        -> ^(Decorator dotted_name ^(ArgList arglist?))
-         ;
-
-//decorators: decorator+
-decorators: decorator+
-          ;
-
-//funcdef: [decorators] 'def' NAME parameters ':' suite
-funcdef : decorators? 'def' NAME parameters COLON suite
-       -> ^(FunctionDef ^(Decorators decorators)? ^(Name NAME) ^(Args parameters) ^(Body suite))
+//funcdef: 'def' NAME parameters ':' suite
+funcdef : 'def' NAME parameters COLON suite
+       -> ^(FunctionDef ^(Name NAME) ^(Args parameters) ^(Body suite))
         ;
 
 //parameters: '(' [varargslist] ')'
@@ -254,13 +241,17 @@ small_stmt : expr_stmt -> ^(Expr expr_stmt)
 
 //expr_stmt: testlist (augassign testlist | ('=' testlist)*)
 expr_stmt : lhs=testlist
-            ( (augassign yield_expr -> ^(augassign $lhs yield_expr))
-            | (augassign rhs=testlist -> ^(augassign $lhs $rhs))
-            | ((ASSIGN yield_expr)+ -> ^(Assign ^(Targets $lhs) ^(Values yield_expr)))
-            | ((ASSIGN rhs=testlist)+ -> ^(Assign ^(Targets $lhs) ^(Values $rhs)))
+            ( (augassign rhs=testlist -> ^(augassign $lhs $rhs))
+            | ((assigns) -> ^(Assigns ^(Assign $lhs) assigns))
             | -> $lhs
             )
           ;
+
+assigns : assign+
+        ;
+
+assign : ASSIGN testlist -> ^(Assign testlist)
+        ;
 
 //augassign: '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//='
 augassign : PLUSEQUAL
@@ -316,8 +307,9 @@ return_stmt : 'return' (testlist)?
           -> ^(Return testlist?)
             ;
 
-//yield_stmt: yield_expr
-yield_stmt : yield_expr
+//yield_stmt: 'yield' testlist
+yield_stmt : 'yield' testlist
+          -> ^(Yield testlist)
            ;
 
 //raise_stmt: 'raise' [test [',' test [',' test]]]
@@ -325,46 +317,27 @@ raise_stmt: 'raise' (t1=test (COMMA t2=test (COMMA t3=test)?)?)?
           -> ^(Raise ^(Type $t1)? ^(Inst $t2)? ^(Tback $t3)?)
           ;
 
-//import_stmt: import_name | import_from
-import_stmt : import_name
-            | import_from
-            ;
-
-//import_name: 'import' dotted_as_names
-import_name : 'import' dotted_as_names
-           -> ^(Import dotted_as_names)
-            ;
-
-//XXX: needs work?
-//import_from: ('from' ('.'* dotted_name | '.'+)
-//              'import' ('*' | '(' import_as_names ')' | import_as_names))
-import_from: 'from' (DOT* dotted_name | DOT+) 'import'
+//import_stmt: 'import' dotted_as_name (',' dotted_as_name)* | 'from' dotted_name 'import' ('*' | import_as_name (',' import_as_name)*)
+import_stmt : 'import' dotted_as_name (COMMA dotted_as_name)*
+           -> ^(Import dotted_as_name+)
+            | 'from' dotted_name 'import'
               (STAR
              -> ^(ImportFrom dotted_name ^(Import STAR))
-              | import_as_names
-             -> ^(ImportFrom dotted_name ^(Import import_as_names))
-              | LPAREN import_as_names RPAREN
-             -> ^(ImportFrom dotted_name ^(Import import_as_names))
+              | import_as_name (COMMA import_as_name)*
+             -> ^(ImportFrom dotted_name ^(Import import_as_name+))
               )
-           ;
+            ;
 
-//import_as_name: NAME [('as' | NAME) NAME]
+//import_as_name: NAME [NAME NAME]
 import_as_name : name=NAME ('as' asname=NAME)?
               -> ^(Alias $name ^(Asname $asname)?)
                ;
 
-//dotted_as_name: dotted_name [('as' | NAME) NAME]
+//dotted_as_name: dotted_name [NAME NAME]
 dotted_as_name : dotted_name ('as' asname=NAME)?
               -> ^(Alias dotted_name ^(Asname NAME)?)
                ;
 
-//import_as_names: import_as_name (',' import_as_name)* [',']
-import_as_names : import_as_name (COMMA! import_as_name)* (COMMA!)?
-                ;
-
-//dotted_as_names: dotted_as_name (',' dotted_as_name)*
-dotted_as_names : dotted_as_name (COMMA! dotted_as_name)*
-                ;
 //dotted_name: NAME ('.' NAME)*
 dotted_name : NAME (DOT NAME)*
             ;
@@ -389,7 +362,6 @@ compound_stmt : if_stmt
               | while_stmt
               | for_stmt
               | try_stmt
-              | with_stmt
               | funcdef
               | classdef
               ;
@@ -424,15 +396,6 @@ try_stmt : 'try' COLON trysuite=suite
            )
          ;
 
-//with_stmt: 'with' test [ with_var ] ':' suite
-with_stmt: 'with' test (with_var)? COLON suite
-        -> ^(With test with_var? ^(Body suite))
-         ;
-
-//with_var: ('as' | NAME) expr
-with_var: ('as' | NAME) expr
-        ;
-
 //except_clause: 'except' [test [',' test]]
 except_clause : 'except' (t1=test (COMMA t2=test)?)? COLON suite
              -> ^(Except ^(Type $t1)? ^(Name $t2)? ^(Body suite))
@@ -443,14 +406,9 @@ suite : simple_stmt -> ^(Stmt simple_stmt)
       | NEWLINE! INDENT (stmt)+ DEDENT
       ;
 
-//FIXME: looks like this one is going to be tough.
-//test: or_test ['if' or_test 'else' test] | lambdef
-test: or_test //('if' test 'else' test)?
-    | lambdef
-    ;
-
-//or_test: and_test ('or' and_test)*
-or_test : and_test ('or'^ and_test)*
+//test: and_test ('or' and_test)* | lambdef
+test : and_test ('or'^ and_test)*
+     | lambdef
      ;
 
 //and_test: not_test ('and' not_test)*
@@ -530,12 +488,7 @@ power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR^ factor)?
       ;
 
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
-atom : LPAREN 
-       ( yield_expr    -> ^(Parens yield_expr)
-       | testlist_gexp -> ^(Parens testlist_gexp?)
-       | -> ^(Parens)
-       )
-       RPAREN
+atom : LPAREN (testlist)? RPAREN -> ^(Tuple testlist?)
      | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
@@ -553,14 +506,6 @@ listmaker : test
             | (options {greedy=true;}:COMMA test)* -> test+
             ) (COMMA)?
           ;
-
-//testlist_gexp: test ( gen_for | (',' test)* [','] )
-testlist_gexp : test ( gen_for -> ^(GenExpFor gen_for)
-                     | (options {k=2;}: COMMA test)* -> test+
-                     )
-                     (COMMA)?
-              ;
-
 
 //lambdef: 'lambda' [varargslist] ':' test
 lambdef: 'lambda' (varargslist)? COLON test
@@ -643,24 +588,6 @@ list_for : 'for' exprlist 'in' testlist (list_iter)?
 //list_if: 'if' test [list_iter]
 list_if : 'if' test (list_iter)?
         ;
-
-//gen_iter: gen_for | gen_if
-gen_iter: gen_for
-        | gen_if
-        ;
-
-//gen_for: 'for' exprlist 'in' or_test [gen_iter]
-gen_for: 'for' exprlist 'in' or_test gen_iter?
-       ;
-
-//gen_if: 'if' old_test [gen_iter]
-gen_if: 'if' test gen_iter?
-      ;
-
-//yield_expr: 'yield' [testlist]
-yield_expr : 'yield' testlist?
-          -> ^(Yield testlist?)
-           ;
 
 //XXX:
 //testlist1: test (',' test)*
@@ -753,8 +680,6 @@ DOUBLESTAREQUAL    : '**=' ;
 DOUBLESLASHEQUAL    : '//=' ;
 
 DOT : '.' ;
-
-AT : '@' ;
 
 FLOAT
     :    '.' DIGITS (Exponent)?

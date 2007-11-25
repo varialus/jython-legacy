@@ -1,4 +1,4 @@
-<project name="grammer" default="compile">
+<project name="grammar" default="compile">
 
     <path id="libs">
         <fileset dir="lib">
