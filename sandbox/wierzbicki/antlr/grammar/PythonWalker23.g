@@ -211,7 +211,7 @@ comp_op
 atom
     : ^(List testlist?) {}
     | ^(ListComp list_for) {}
-    | ^(Parens testlist?) {}
+    | ^(Tuple testlist?) {}
     | ^(Dict testlist?) {}
     | ^(Repr testlist?) {}
     | NAME {}

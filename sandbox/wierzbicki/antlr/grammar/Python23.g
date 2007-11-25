@@ -140,7 +140,6 @@ tokens {
     UnaryTilde;
     Delete;
     Default;
-    Parens;
     Alias;
     Asname;
 }
@@ -482,7 +481,7 @@ power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR^ factor)?
       ;
 
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
-atom : LPAREN (testlist)? RPAREN -> ^(Parens testlist?)
+atom : LPAREN (testlist)? RPAREN -> ^(Tuple testlist?)
      | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
