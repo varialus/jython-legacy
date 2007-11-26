@@ -62,7 +62,7 @@ expr_stmt
     }
     | ^(Expr ^(augassign targ=test value=test)) {
     }
-    | ^(Expr ^(Assigns (^(Assign testlist))+)) {
+    | ^(Expr ^(Assign (^(Target testlist))+ ^(Value testlist))) {
     }
     ;
 
@@ -211,7 +211,7 @@ comp_op
 atom
     : ^(List testlist?) {}
     | ^(ListComp list_for) {}
-    | ^(Tuple testlist?) {}
+    | ^(Parens testlist?) {}
     | ^(Dict testlist?) {}
     | ^(Repr testlist?) {}
     | NAME {}

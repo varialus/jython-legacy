@@ -93,6 +93,7 @@ tokens {
     Arg;
     Arguments;
     Assign;
+    Assigns;
     Compare;
     Expr;
     ExprList;
@@ -131,7 +132,7 @@ tokens {
     Subscript;
     SubscriptList;
     Targets;
-    Values;
+    Value;
     Start;
     End;
     SliceOp;
@@ -239,12 +240,25 @@ small_stmt : expr_stmt -> ^(Expr expr_stmt)
            ;
 
 //expr_stmt: testlist (augassign testlist | ('=' testlist)*)
-expr_stmt : lhs=testlist
-            ( (augassign rhs=testlist -> ^(augassign $lhs $rhs))
-            | ((ASSIGN rhs=testlist)+ -> ^(Assign ^(Targets $lhs) ^(Values $rhs)))
-            | -> $lhs
-            )
-          ;
+expr_stmt
+@after {
+    System.out.println($expr_stmt.text);
+}
+    : lhs=testlist
+        ( (augassign rhs=testlist -> ^(augassign $lhs $rhs))
+        | ((assigns) -> ^(Assigns ^(Assign $lhs) assigns))
+        | -> $lhs
+        )
+    ;
+
+//not in CPython's Grammar file
+assigns : assign+
+        ;
+
+//not in CPython's Grammar file
+assign : (ASSIGN testlist ASSIGN) => ASSIGN testlist -> ^(Assign testlist)
+       | ASSIGN testlist -> ^(Value testlist)
+       ;
 
 //augassign: '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//='
 augassign : PLUSEQUAL

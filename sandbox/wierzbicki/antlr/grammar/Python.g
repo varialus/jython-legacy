@@ -93,11 +93,11 @@ tokens {
     Arg;
     Arguments;
     Assign;
-    Assigns;
     Compare;
     Expr;
     ExprList;
     Tuple;
+    Parens;//do we need?
     List;
     Dict;
     If;
@@ -131,8 +131,8 @@ tokens {
     ArgList;
     Subscript;
     SubscriptList;
-    Targets;
-    Values;
+    Target;
+    Value;
     Start;
     End;
     SliceOp;
@@ -240,20 +240,22 @@ small_stmt : expr_stmt -> ^(Expr expr_stmt)
            ;
 
 //expr_stmt: testlist (augassign testlist | ('=' testlist)*)
-expr_stmt : lhs=testlist
-            ( (augassign rhs=testlist -> ^(augassign $lhs $rhs))
-            | ((assigns) -> ^(Assigns ^(Assign $lhs) assigns))
-            | -> $lhs
-            )
-          ;
+expr_stmt
+    : lhs=testlist
+        ( (augassign rhs=testlist -> ^(augassign $lhs $rhs))
+        | ((assigns) -> ^(Assign ^(Target $lhs) assigns))
+        | -> $lhs
+        )
+    ;
 
 //not in CPython's Grammar file
 assigns : assign+
         ;
 
 //not in CPython's Grammar file
-assign : ASSIGN testlist -> ^(Assign testlist)
-        ;
+assign : (ASSIGN testlist ASSIGN) => ASSIGN testlist -> ^(Target testlist)
+       | ASSIGN testlist -> ^(Value testlist)
+       ;
 
 //augassign: '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//='
 augassign : PLUSEQUAL
@@ -490,7 +492,7 @@ power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR^ factor)?
       ;
 
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
-atom : LPAREN (testlist)? RPAREN -> ^(Tuple testlist?)
+atom : LPAREN (testlist)? RPAREN -> ^(Parens testlist?)
      | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
