@@ -97,7 +97,6 @@ tokens {
     Expr;
     ExprList;
     Tuple;
-    Parens;//do we need?
     List;
     Dict;
     If;
@@ -112,7 +111,7 @@ tokens {
     For;
     Return;
     Yield;
-    String;
+    Str;
     IsNot;
     In;
     NotIn;
@@ -143,6 +142,12 @@ tokens {
     Default;
     Alias;
     Asname;
+    Num;
+    Module;
+    Call;
+    ListCompFor;
+    ListCompIf;
+    Iter;
 }
 
 @header { 
@@ -170,7 +175,7 @@ single_input : NEWLINE!
              ;
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
-file_input : (NEWLINE! | stmt)*
+file_input : (NEWLINE | stmt)* -> ^(Module ^(Body stmt*))
            ;
 
 //eval_input: testlist NEWLINE* ENDMARKER
@@ -206,7 +211,7 @@ defparameter : fpdef (ASSIGN test)?
              ;
 
 //fpdef: NAME | '(' fplist ')'
-fpdef : NAME
+fpdef : NAME -> ^(Name NAME)
       | LPAREN! fplist RPAREN!
       ;
 
@@ -217,9 +222,7 @@ fplist : fpdef (options {greedy=true;}:COMMA fpdef)* (COMMA)?
 
 //stmt: simple_stmt | compound_stmt
 stmt : simple_stmt
-    -> ^(Stmt simple_stmt)
      | compound_stmt
-    -> ^(Stmt compound_stmt)
      ;
 
 //simple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE
@@ -228,7 +231,7 @@ simple_stmt : small_stmt (options {greedy=true;}:SEMI small_stmt)* (SEMI)? NEWLI
             ;
 
 //small_stmt: expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | exec_stmt | assert_stmt
-small_stmt : expr_stmt -> ^(Expr expr_stmt)
+small_stmt : expr_stmt
            | print_stmt
            | del_stmt
            | pass_stmt
@@ -406,7 +409,7 @@ except_clause : 'except' (t1=test (COMMA t2=test)?)? COLON suite
               ;
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
-suite : simple_stmt -> ^(Stmt simple_stmt)
+suite : simple_stmt
       | NEWLINE! INDENT (stmt)+ DEDENT
       ;
 
@@ -488,26 +491,37 @@ factor : PLUS factor -> ^(UnaryPlus factor)
        ;
 
 //power: atom trailer* ['**' factor]
-power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR^ factor)?
+power : (atom LPAREN) => atom (trailer)* powers? -> ^(Call atom (trailer)*) 
+      | atom (trailer)* powers?
       ;
 
+powers : (options {greedy=true;}:DOUBLESTAR^ factor)
+       ;
+
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
-atom : LPAREN (testlist)? RPAREN -> ^(Parens testlist?)
-     | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
+atom : LPAREN
+       ( testlist -> testlist
+       | -> Tuple
+       )
+       RPAREN
+     | LBRACK
+       ( listmaker -> listmaker
+       | -> List
+       ) RBRACK
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
-     | NAME
-     | INT
-     | LONGINT
-     | FLOAT
-     | COMPLEX
-     | (STRING)+ -> ^(String STRING+)
+     | NAME -> ^(Name NAME)
+     | INT -> ^(Num INT)
+     | LONGINT -> ^(Num LONGINT)
+     | FLOAT -> ^(Num FLOAT)
+     | COMPLEX -> ^(Num COMPLEX)
+     | (STRING)+ -> ^(Str STRING+)
      ;
 
 //listmaker: test ( list_for | (',' test)* [','] )
 listmaker : test 
-            ( list_for -> ^(ListComp list_for)
-            | (options {greedy=true;}:COMMA test)* -> test+
+            ( list_for -> ^(ListComp test list_for)
+            | (options {greedy=true;}:COMMA test)* -> ^(List test+)
             ) (COMMA)?
           ;
 
@@ -517,7 +531,7 @@ lambdef: 'lambda' (varargslist)? COLON test
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer : LPAREN (arglist)? RPAREN -> ^(ArgList arglist?)
+trailer : LPAREN! (arglist)? RPAREN!
         | LBRACK subscriptlist RBRACK -> ^(SubscriptList subscriptlist)
         | DOT NAME
         ;
@@ -543,8 +557,8 @@ exprlist : expr (options {k=2;}: COMMA expr)* (COMMA)?
          ;
 
 //testlist: test (',' test)* [',']
-testlist : test (options {k=2;}: COMMA test)* (COMMA)?
-        -> test+
+testlist : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple test+)
+         | test -> test
          ;
 
 //XXX:
@@ -568,7 +582,7 @@ arglist : argument (COMMA argument)*
             | DOUBLESTAR kwargs=test
             )?
           )?
-       -> ^(Arguments argument+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
+       -> ^(Args argument+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
         |   STAR starargs=test (COMMA DOUBLESTAR kwargs=test)?
        -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
         |   DOUBLESTAR kwargs=test
@@ -587,10 +601,12 @@ list_iter : list_for
 
 //list_for: 'for' exprlist 'in' testlist_safe [list_iter]
 list_for : 'for' exprlist 'in' testlist (list_iter)?
+        -> ^(ListCompFor exprlist ^(Iter testlist list_iter?))
          ;
 
 //list_if: 'if' test [list_iter]
 list_if : 'if' test (list_iter)?
+       -> ^(ListCompIf test list_iter?)
         ;
 
 //XXX:

@@ -10,8 +10,8 @@ package org.python.antlr;
 } 
 
 module
-    : stmt* {
-        //System.out.println("<STMT>");
+    : ^(Module ^(Body stmt*)) {
+        System.out.println("<STMT>");
     }
     ;
 
@@ -35,11 +35,7 @@ defparameter
     }
     ;
 
-stmt:
-    ^(Stmt any_stmt+)
-    ;
-
-any_stmt //combines simple_stmt and compound_stmt from Python.g
+stmt //combines simple_stmt and compound_stmt from Python.g
     : expr_stmt
     | print_stmt
     | del_stmt
@@ -58,11 +54,11 @@ any_stmt //combines simple_stmt and compound_stmt from Python.g
     ;
 
 expr_stmt
-    : ^(Expr testlist) {
+    : test {
     }
-    | ^(Expr ^(augassign targ=test value=test)) {
+    | ^(augassign targ=test value=test) {
     }
-    | ^(Expr ^(Assign (^(Target testlist))+ ^(Value testlist))) {
+    | ^(Assign (^(Target test))+ ^(Value test)) {
     }
     ;
 
@@ -82,7 +78,7 @@ augassign
     ;
 
 print_stmt
-    : ^(Print RIGHTSHIFT? testlist?)
+    : ^(Print RIGHTSHIFT? test?)
     {
     }
     ;
@@ -107,10 +103,10 @@ break_stmt : 'break'
 continue_stmt : 'continue'
               ;
 
-return_stmt : ^(Return (testlist)?)
+return_stmt : ^(Return (test)?)
             ;
 
-yield_stmt : ^(Yield testlist)
+yield_stmt : ^(Yield test)
            ;
 
 raise_stmt: ^(Raise (^(Type test))? (^(Inst test))? (^(Tback test))?)
@@ -153,7 +149,7 @@ elif_clause : ^(Elif test suite)
 while_stmt : ^(While test ^(Body suite) (^(Else suite))?)
            ;
 
-for_stmt : ^(For exprlist ^(In testlist) ^(Body suite) (^(Else suite))?)
+for_stmt : ^(For exprlist ^(In test) ^(Body suite) (^(Else suite))?)
          ;
 
 try_stmt : ^(TryExcept ^(Body suite) except_clause+ (^(Else suite))?)
@@ -209,22 +205,23 @@ comp_op
 
 //FIXME: lots of placeholders
 atom
-    : ^(List testlist?) {}
+    : ^(List test*) {}
     | ^(ListComp list_for) {}
-    | ^(Parens testlist?) {}
-    | ^(Dict testlist?) {}
-    | ^(Repr testlist?) {}
-    | NAME {}
-    | INT {}
-    | LONGINT {}
-    | FLOAT {}
-    | COMPLEX {}
+    | ^(Tuple test*) {}
+    | ^(Dict test*) {}
+    | ^(Repr test*) {}
+    | ^(Name NAME) {}
+//    | ^(Num (INT|LONGINT|FLOAT|COMPLEX)) {}
+    | ^(Num INT) {}
+    | ^(Num LONGINT) {}
+    | ^(Num FLOAT) {}
+    | ^(Num COMPLEX) {}
     | stringlist {
     }
     ;
 
 stringlist
-    : ^(String string+) {}
+    : ^(Str string+) {}
     ;
 
 string
@@ -256,7 +253,7 @@ testlist
     ;
 
 classdef
-    : ^(ClassDef ^(Name NAME) (^(Bases testlist))? ^(Body suite)) {
+    : ^(ClassDef ^(Name NAME) (^(Bases test*))? ^(Body suite)) {
         //System.out.println("class ");
     }
     ;
