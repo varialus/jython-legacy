@@ -11,10 +11,9 @@ package org.python.antlr;
 
 module
     : ^(Module ^(Body stmt*)) {
-        System.out.println("<STMT>");
+        //System.out.println("<STMT>");
     }
     ;
-
 
 funcdef
     : ^(FunctionDef ^(Name NAME) ^(Args varargslist?) ^(Body suite)) {
@@ -31,7 +30,7 @@ varargslist
     ;
 
 defparameter
-    : NAME (ASSIGN test )? {
+    : ^(Name NAME) (ASSIGN test )? {
     }
     ;
 
@@ -206,12 +205,13 @@ comp_op
 //FIXME: lots of placeholders
 atom
     : ^(List test*) {}
-    | ^(ListComp list_for) {}
+    | ^(ListComp test list_for) {}
     | ^(Tuple test*) {}
     | ^(Dict test*) {}
     | ^(Repr test*) {}
-    | ^(Name NAME) {}
-//    | ^(Num (INT|LONGINT|FLOAT|COMPLEX)) {}
+    | ^(Name NAME) {
+        //System.out.println("matched NAME:" + $NAME.text);
+    }
     | ^(Num INT) {}
     | ^(Num LONGINT) {}
     | ^(Num FLOAT) {}
@@ -232,9 +232,9 @@ lambdef: ^(Lambda varargslist? ^(Body test))
        ;
 
 trailer
-    : ^(ArgList arglist?)
+    : ^(Call arglist?)
     | ^(SubscriptList subscriptlist)
-    | DOT NAME
+    | ^(GetAttr NAME)
     ;
 
 subscriptlist
@@ -259,7 +259,7 @@ classdef
     ;
 
 arglist
-    : ^(Arguments argument+) (^(StarArgs test))? (^(KWArgs test))?
+    : ^(Args argument+) (^(StarArgs test))? (^(KWArgs test))?
     | ^(StarArgs test) (^(KWArgs test))?
     | ^(KWArgs test)
     ;
@@ -271,9 +271,10 @@ list_iter: list_for
     | list_if
     ;
 
-list_for: 'for' exprlist 'in' testlist (list_iter)?
-    ;
+list_for : ^(ListCompFor exprlist ^(Iter testlist list_iter?))
+         ;
 
-list_if: 'if' test (list_iter)?
-    ;
+list_if : ^(ListCompIf test list_iter?)
+        ;
+
 

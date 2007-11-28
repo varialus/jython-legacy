@@ -127,7 +127,6 @@ tokens {
     Lambda;
     Repr;
     BinOp;
-    ArgList;
     Subscript;
     SubscriptList;
     Target;
@@ -148,6 +147,7 @@ tokens {
     ListCompFor;
     ListCompIf;
     Iter;
+    GetAttr;
 }
 
 @header { 
@@ -491,12 +491,8 @@ factor : PLUS factor -> ^(UnaryPlus factor)
        ;
 
 //power: atom trailer* ['**' factor]
-power : (atom LPAREN) => atom (trailer)* powers? -> ^(Call atom (trailer)*) 
-      | atom (trailer)* powers?
+power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR^ factor)?
       ;
-
-powers : (options {greedy=true;}:DOUBLESTAR^ factor)
-       ;
 
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
 atom : LPAREN
@@ -531,9 +527,9 @@ lambdef: 'lambda' (varargslist)? COLON test
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer : LPAREN! (arglist)? RPAREN!
+trailer : LPAREN (arglist)? RPAREN -> ^(Call arglist?)
         | LBRACK subscriptlist RBRACK -> ^(SubscriptList subscriptlist)
-        | DOT NAME
+        | DOT NAME -> ^(GetAttr NAME)
         ;
 
 //subscriptlist: subscript (',' subscript)* [',']
