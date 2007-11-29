@@ -495,9 +495,9 @@ everybody is happy. ::
     from java import awt
 
     class SpamListener(awt.event.ActionListener):
-	def actionPerformed(self,event):
-	    if event.getActionCommand() == "Spam":
-	    print 'Spam and eggs!'
+        def actionPerformed(self,event):
+            if event.getActionCommand() == "Spam":
+                print 'Spam and eggs!'
 
     f = awt.Frame("Subclassing Example")
     b = awt.Button("Spam")
