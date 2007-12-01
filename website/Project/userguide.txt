@@ -375,29 +375,29 @@ These properties are generated automatically using the JavaBean Introspector whi
 
 As a first example, consider the case where you wish to create a button that is disabled.
 
-The first example shows how you would do this in the typical Java fashion:
+The first example shows how you would do this in the typical Java fashion::
 
-b = awt.Button()
-b.setEnabled(0)
+    b = awt.Button()
+    b.setEnabled(0)
 
-The second example shows how enabled can be set as a property:
+The second example shows how enabled can be set as a property::
 
-b = awt.Button()
-b.enabled = 0
+    b = awt.Button()
+    b.enabled = 0
 
-The final example sets this property at instantiation time using a keyword argument:
+The final example sets this property at instantiation time using a keyword argument::
 
-b = awt.Button(enabled=0)
+    b = awt.Button(enabled=0)
 
 Tuples
 ======
-If the value of a property is specified as a tuple, then the property will be created by applying the constructor for the type of the property to the tuple. This is particularly handy for specifying sizes:
+If the value of a property is specified as a tuple, then the property will be created by applying the constructor for the type of the property to the tuple. This is particularly handy for specifying sizes::
 
-frame = awt.Frame(size=(500,100))
+    frame = awt.Frame(size=(500,100))
 
-It can also be handy for specifying color as an RGB triple:
+It can also be handy for specifying color as an RGB triple::
 
-frame.background = 255,255,0
+    frame.background = 255,255,0
 
 will set the background color of the frame to yellow.
 
@@ -405,23 +405,23 @@ Event Properties
 ================
 In standard Java, the event handlers for a widget are specified by passing in an instance of a class that implements the appropriate interface. This is the only reasonable approach to take in a language that doesn't have first-class functions. In Jython, for every event listener supported by a class, there will be a property added to the class for each method supplied by the event listener class. These properties can be set to give a function to be called when the appropriate event occurs.
 
-The standard Java style for setting an event listener is shown below:
+The standard Java style for setting an event listener is shown below::
 
-  class action(awt.event.ActionListener):
-      def actionPerformed(self,event):
-          java.lang.System.exit(0)
+    class action(awt.event.ActionListener):
+        def actionPerformed(self,event):
+            java.lang.System.exit(0)
 
-button = awt.Button("Close Me!")
-button.addActionListener(action())
+    button = awt.Button("Close Me!")
+    button.addActionListener(action())
 
 This can be written in a more Pythonesque (and compact) style by using event properties as follows:
 
 ::
 
   def exit(event):
-      java.lang.System.exit(0)
+    java.lang.System.exit(0)
 
-button = awt.Button("Close Me!", actionPerformed=exit)
+  button = awt.Button("Close Me!", actionPerformed=exit)
 
 Methods, Properties and Event Properties
 ========================================
@@ -437,10 +437,10 @@ Java Arrays
 Java Arrays in Jython - JArray
 Many Java methods require Java array objects as arguments. The way that these arguments are used means that they must correspond to fixed-length, mutable sequences, sometimes of primitive data types. The PyArray class is added to support these Java arrays and instances of this class will be automatically returned from any Java method call that produces an array. In addition, the "jarray" module is provided to allow users of Jython to create these arrays themselves, primarily for the purpose of passing them to a Java method.
 
-The jarray module exports two functions:
+The jarray module exports two functions::
 
-array(sequence, type)
-zeros(length, type)
+    array(sequence, type)
+    zeros(length, type)
 
 array will create a new array of the same length as the input sequence and will populate it with the values in sequence. zeros will create a new array of the given length filled with zeros (or null's if appropriate).
 
