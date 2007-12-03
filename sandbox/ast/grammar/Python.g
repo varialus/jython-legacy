@@ -134,6 +134,7 @@ tokens {
     Subscript;
     SubscriptList;
     Target;
+    Targets;
     Value;
     Start;
     End;
@@ -151,8 +152,6 @@ tokens {
     With;
     GenExpFor;
     Id;
-    Ctx;
-    Store;
 }
 
 @header { 
@@ -183,7 +182,7 @@ single_input : NEWLINE!
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
 file_input : (NEWLINE | stmt)*
-          -> ^(Module ^(Body stmt*))
+          -> ^(Module stmt*)
            ;
 
 //eval_input: testlist NEWLINE* ENDMARKER
@@ -615,8 +614,8 @@ exprlist : expr (options {k=2;}: COMMA expr)* (COMMA)?
          ;
 
 //testlist: test (',' test)* [',']
-testlist : test (options {k=2;}: COMMA test)* (COMMA)?
-        -> test+
+testlist : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple test+)
+         | test -> test
          ;
 
 //XXX:
