@@ -1,10 +1,10 @@
 <project name="grammar" default="compile">
 
-    <path id="libs">
+    <path id="main.classpath">
         <fileset dir="lib">
             <include name="**/*.jar"/>
-            <include name="**/*.pom"/>
         </fileset>
+        <pathelement path="build" />
     </path>
 
     <target name="init" depends="clean">
@@ -13,46 +13,55 @@
 
     <target name="test">
         <java classname="org.antlr.Tool">
-            <classpath refid="libs"/>
+            <classpath refid="main.classpath"/>
         </java>
     </target>
  
     <target name="translate" depends="init">
         <java classname="org.antlr.Tool">
-            <arg value="grammar/Python.g"/>
+            <arg value="grammar25/Python.g"/>
             <arg value="-o"/>
             <arg value="build/gensrc/org/python/antlr"/>
-            <classpath refid="libs"/>
+            <classpath refid="main.classpath"/>
         </java>
 
         <copy todir="." preservelastmodified="true">
-            <fileset dir="build/gensrc/org/python/antlr/grammar">
+            <fileset dir="build/gensrc/org/python/antlr/grammar25">
                 <include name="Python.tokens" />
             </fileset>
         </copy>
 
         <java classname="org.antlr.Tool">
-            <arg value="grammar/PythonWalker.g"/>
+            <arg value="grammar25/PythonWalker.g"/>
             <arg value="-o"/>
             <arg value="build/gensrc/org/python/antlr"/>
-            <classpath refid="libs"/>
+            <classpath refid="main.classpath"/>
         </java>
     </target>
     
     <target name="compile" depends="translate">
         <javac destdir="build" debug="true"
                 deprecation="false" optimize="false" failonerror="true">
+            <src path="src"/>
+            <exclude name="org/python/antlr/*"/>
+            <classpath refid="main.classpath"/>
+            <classpath location="build"/>
+        </javac>
+
+        <javac destdir="build" debug="true"
+                deprecation="false" optimize="false" failonerror="true">
             <src path="build/gensrc"/>
-            <classpath refid="libs"/>
+            <classpath refid="main.classpath"/>
             <classpath location="build"/>
         </javac>
 
         <javac destdir="build" debug="true"
                 deprecation="false" optimize="false" failonerror="true">
             <src path="src"/>
-            <classpath refid="libs"/>
+            <classpath refid="main.classpath"/>
             <classpath location="build"/>
         </javac>
+
 
     </target>
 

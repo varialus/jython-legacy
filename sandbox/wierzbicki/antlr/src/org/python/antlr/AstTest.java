@@ -11,7 +11,7 @@ import org.python.antlr.PythonTokenSource;
 
 import org.python.antlr.ast.modType;
 
-public class Main {
+public class AstTest {
     // override nextToken to set startPos (this seems too hard)
     public static class MyLexer extends PythonLexer {
         public MyLexer(CharStream lexer) {
@@ -36,7 +36,6 @@ public class Main {
 
         try {
             PythonParser.file_input_return r = parser.file_input();
-            //PythonParser.module_return r = parser.module();
             if (args.length > 1) {
                 System.out.println(((Tree)r.tree).toStringTree());
             }
