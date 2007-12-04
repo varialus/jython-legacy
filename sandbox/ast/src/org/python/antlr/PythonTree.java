@@ -15,13 +15,18 @@ public class PythonTree extends CommonTree {
         super(token);
     }
 
+    public PythonTree(PythonTree node) {
+        super(node);
+    }
+
     public String toString() {
 		if ( isNil() ) {
 			return "None";
 		}
-		return token.getText().toLowerCase();
+		return token.getText();
 	}
 
+    /*
     public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
 			return this.toString();
@@ -44,4 +49,5 @@ public class PythonTree extends CommonTree {
 		}
 		return buf.toString();
 	}
+    */
 }

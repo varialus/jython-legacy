@@ -25,14 +25,12 @@
             </fileset>
         </copy>
 
-        <!--
         <java classname="org.antlr.Tool">
             <arg value="grammar/PythonWalker.g"/>
             <arg value="-o"/>
             <arg value="build/gensrc/org/python/antlr"/>
             <classpath refid="main.classpath"/>
         </java>
-        -->
 
     </target>
     
@@ -48,13 +46,11 @@
     </target>
 
     <target name="asdl_gen" depends="init">
-    <!--
         <apply
             verbose="true"
             executable="./asdl_antlr.py">
             <fileset dir="." includes="Python.asdl"/>
         </apply>
-    -->
     </target>
 
     <target name="clean">

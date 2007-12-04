@@ -14,8 +14,8 @@ import org.python.antlr.PythonTokenSource;
 
 public class Main {
     // override nextToken to set startPos (this seems too hard)
-    public static class MyLexer extends PythonLexer {
-        public MyLexer(CharStream lexer) {
+    public static class PyLexer extends PythonLexer {
+        public PyLexer(CharStream lexer) {
             super(lexer);
         }
         public Token nextToken() {
@@ -24,8 +24,13 @@ public class Main {
         }
     }
 
-	public static TreeAdaptor myadaptor = new CommonTreeAdaptor() {
+	public static TreeAdaptor pyadaptor = new CommonTreeAdaptor() {
 		public Object create(Token token) {
+            /*
+            if (token != null && token.getType() == PythonParser.Target) {
+                System.out.println("Target found");
+            }
+            */
 			return new PythonTree(token);
 		}
 		public Object dupNode(Object t) {
@@ -36,31 +41,31 @@ public class Main {
 		}
 	};
 
-    public /*modType*/ void parse(String[] args) throws Exception {
-        //modType result = null;
+    public PythonTree parse(String[] args) throws Exception {
+        PythonTree result = null;
         CharStream input = new ANTLRFileStream(args[0]);
-        PythonLexer lexer = new MyLexer(input);
+        PythonLexer lexer = new PyLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         tokens.discardOffChannelTokens(true);
         PythonTokenSource indentedSource = new PythonTokenSource(tokens);
         tokens = new CommonTokenStream(indentedSource);
         //System.out.println("tokens="+tokens.getTokens());
         PythonParser parser = new PythonParser(tokens);
-        parser.setTreeAdaptor(myadaptor);
+        parser.setTreeAdaptor(pyadaptor);
         try {
             PythonParser.file_input_return r = parser.file_input();
-            //PythonParser.module_return r = parser.module();
             if (args.length > 1) {
                 System.out.println(((Tree)r.tree).toStringTree());
             }
             CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);
             nodes.setTokenStream(tokens);
-            //PythonWalker walker = new PythonWalker(nodes);
-            //result = walker.module();
+            PythonWalker walker = new PythonWalker(nodes);
+            result = walker.module();
+            System.out.println(result.toStringTree());
         } catch (RecognitionException e) {
             System.err.println("Error: " + e);
         }
-        //return result;
+        return result;
     }
 
     public static void main(String[] args) throws Exception {

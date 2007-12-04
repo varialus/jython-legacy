@@ -57,6 +57,7 @@ class EmitVisitor(asdl.VisitorBase):
         print >> self.file, 'package org.python.antlr.ast;'
         if refersToPythonTree:
             print >> self.file, 'import org.python.antlr.PythonTree;'
+            print >> self.file, 'import org.antlr.runtime.Token;'
         if useDataOutput:
             print >> self.file, 'import java.io.DataOutputStream;'
             print >> self.file, 'import java.io.IOException;'
@@ -157,6 +158,16 @@ class JavaVisitor(EmitVisitor):
         self.open("%sType" % name)
         self.emit("public abstract class %(name)sType extends PythonTree {" %
                     locals(), depth)
+        self.emit("public %(name)sType(Token token) {" % locals(), depth+1)
+        self.emit("super(token);", depth+2)
+        self.emit("}", depth+1)
+        self.emit("", 0)
+
+        self.emit("public %(name)sType(PythonTree node) {" % locals(), depth+1)
+        self.emit("super(node);", depth+2)
+        self.emit("}", depth+1)
+        self.emit("", 0)
+
         self.emit("}", depth)
         self.close()
         for t in sum.types:
@@ -207,7 +218,6 @@ class JavaVisitor(EmitVisitor):
                     ",".join(field_list), depth+1)
         self.emit("", 0)
 
-
         self.javaMethods(cons, cons.name, cons.name, cons.fields, depth+1)
 
         self.emit("}", depth)
@@ -215,9 +225,22 @@ class JavaVisitor(EmitVisitor):
 
     def javaMethods(self, type, clsname, ctorname, fields, depth):
         # The java ctors
-        fpargs = ", ".join([self.fieldDef(f) for f in fields])
+        token = asdl.Field('Token', 'token')
+        token.typedef = False
+        fpargs = ", ".join([self.fieldDef(f) for f in [token] + fields])
 
         self.emit("public %s(%s) {" % (ctorname, fpargs), depth)
+        self.emit("super(token);", depth+1)
+        for f in fields:
+            self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
+        self.emit("}", depth)
+        self.emit("", 0)
+
+        tree = asdl.Field('PythonTree', 'tree')
+        tree.typedef = False
+        fpargs = ", ".join([self.fieldDef(f) for f in [tree] + fields])
+        self.emit("public %s(%s) {" % (ctorname, fpargs), depth)
+        self.emit("super(tree);", depth+1)
         for f in fields:
             self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
         self.emit("}", depth)
@@ -225,78 +248,76 @@ class JavaVisitor(EmitVisitor):
 
         if fpargs:
             fpargs += ", "
-        self.emit("public %s(%sPythonTree parent) {" % (ctorname, fpargs), depth)
-        self.emit("this(%s);" %
-                    ", ".join([str(f.name) for f in fields]), depth+1)
-        self.emit("this.beginLine = parent.beginLine;", depth+1);
-        self.emit("this.beginColumn = parent.beginColumn;", depth+1);
-        self.emit("}", depth)
-        self.emit("", 0)
+        #self.emit("public %s(%sPythonTree parent) {" % (ctorname, fpargs), depth)
+        #self.emit("this(%s);" %
+        #            ", ".join([str(f.name) for f in fields]), depth+1)
+        #self.emit("this.beginLine = parent.beginLine;", depth+1);
+        #self.emit("this.beginColumn = parent.beginColumn;", depth+1);
+        #self.emit("}", depth)
+        #self.emit("", 0)
 
         # The toString() method
         self.emit("public String toString() {", depth)
-        self.emit('StringBuffer sb = new StringBuffer("\'%s\', ");' % clsname,
-                    depth+1)
-        self.emit("return sb.toString();", depth+1)
+        self.emit('return "%s";' % clsname, depth+1)
         self.emit("}", depth)
         self.emit("", 0)
 
         # The toStringTree() method
-        self.emit("public String toStringTree() {", depth)
-        self.emit('StringBuffer sb = new StringBuffer("%s[");' % clsname,
-                    depth+1)
-        for f in fields:
-            self.emit('sb.append("%s=");' % f.name, depth+1)
-            if not self.bltinnames.has_key(str(f.type)) and f.typedef.simple:
-                self.emit("sb.append(dumpThis(this.%s, %sType.%sTypeNames));" %
-                        (f.name, f.type, f.type), depth+1)
-            else:
-                self.emit("sb.append(dumpThis(this.%s));" % f.name, depth+1)
-            if f != fields[-1]:
-                self.emit('sb.append(", ");', depth+1)
-        self.emit('sb.append("]");', depth+1)
-        self.emit("return sb.toString();", depth+1)
-        self.emit("}", depth)
-        self.emit("", 0)
+        #self.emit("public String toStringTree() {", depth)
+        #self.emit('StringBuffer sb = new StringBuffer("%s[");' % clsname,
+        #            depth+1)
+        #for f in fields:
+        #    self.emit('sb.append("%s=");' % f.name, depth+1)
+        #    if not self.bltinnames.has_key(str(f.type)) and f.typedef.simple:
+        #        self.emit("sb.append(dumpThis(this.%s, %sType.%sTypeNames));" %
+        #                (f.name, f.type, f.type), depth+1)
+        #    else:
+        #        self.emit("sb.append(dumpThis(this.%s));" % f.name, depth+1)
+        #    if f != fields[-1]:
+        #        self.emit('sb.append(", ");', depth+1)
+        #self.emit('sb.append("]");', depth+1)
+        #self.emit("return sb.toString();", depth+1)
+        #self.emit("}", depth)
+        #self.emit("", 0)
 
         # The pickle() method
-        self.emit("public void pickle(DataOutputStream ostream) throws IOException {", depth)
-        self.emit("pickleThis(%s, ostream);" % type.index, depth+1);
-        for f in fields:
-            self.emit("pickleThis(this.%s, ostream);" % f.name, depth+1)
-        self.emit("}", depth)
-        self.emit("", 0)
+        #self.emit("public void pickle(DataOutputStream ostream) throws IOException {", depth)
+        #self.emit("pickleThis(%s, ostream);" % type.index, depth+1);
+        #for f in fields:
+        #    self.emit("pickleThis(this.%s, ostream);" % f.name, depth+1)
+        #self.emit("}", depth)
+        #self.emit("", 0)
 
         # The accept() method
-        self.emit("public Object accept(VisitorIF visitor) throws Exception {", depth)
-        if clsname == ctorname:
-            self.emit('return visitor.visit%s(this);' % clsname, depth+1)
-        else:
-            self.emit('traverse(visitor);' % clsname, depth+1)
-            self.emit('return null;' % clsname, depth+1)
-        self.emit("}", depth)
-        self.emit("", 0)
+        #self.emit("public Object accept(VisitorIF visitor) throws Exception {", depth)
+        #if clsname == ctorname:
+        #    self.emit('return visitor.visit%s(this);' % clsname, depth+1)
+        #else:
+        #    self.emit('traverse(visitor);' % clsname, depth+1)
+        #    self.emit('return null;' % clsname, depth+1)
+        #self.emit("}", depth)
+        #self.emit("", 0)
 
         # The visitChildren() method
-        self.emit("public void traverse(VisitorIF visitor) throws Exception {", depth)
-        for f in fields:
-            if self.bltinnames.has_key(str(f.type)):
-                continue
-            if f.typedef.simple:
-                continue
-            if f.seq:
-                self.emit('if (%s != null) {' % f.name, depth+1)
-                self.emit('for (int i = 0; i < %s.length; i++) {' % f.name,
-                        depth+2)
-                self.emit('if (%s[i] != null)' % f.name, depth+3)
-                self.emit('%s[i].accept(visitor);' % f.name, depth+4)
-                self.emit('}', depth+2)
-                self.emit('}', depth+1)
-            else:
-                self.emit('if (%s != null)' % f.name, depth+1)
-                self.emit('%s.accept(visitor);' % f.name, depth+2)
-        self.emit('}', depth)
-        self.emit("", 0)
+        #self.emit("public void traverse(VisitorIF visitor) throws Exception {", depth)
+        #for f in fields:
+        #    if self.bltinnames.has_key(str(f.type)):
+        #        continue
+        #    if f.typedef.simple:
+        #        continue
+        #    if f.seq:
+        #        self.emit('if (%s != null) {' % f.name, depth+1)
+        #        self.emit('for (int i = 0; i < %s.length; i++) {' % f.name,
+        #                depth+2)
+        #        self.emit('if (%s[i] != null)' % f.name, depth+3)
+        #        self.emit('%s[i].accept(visitor);' % f.name, depth+4)
+        #        self.emit('}', depth+2)
+        #        self.emit('}', depth+1)
+        #    else:
+        #        self.emit('if (%s != null)' % f.name, depth+1)
+        #        self.emit('%s.accept(visitor);' % f.name, depth+2)
+        #self.emit('}', depth)
+        #self.emit("", 0)
 
     def visitField(self, field, depth):
         self.emit("public %s;" % self.fieldDef(field), depth)
@@ -307,6 +328,8 @@ class JavaVisitor(EmitVisitor):
         'identifier' : 'String',
         'string' : 'String',
         'object' : 'Object', # was PyObject
+        'Token'  : 'Token', # to get antlr token type through
+        'PythonTree'  : 'PythonTree', # also for antlr type
     }
 
     def fieldDef(self, field):
