@@ -233,6 +233,10 @@ class JavaVisitor(EmitVisitor):
         self.emit("super(token);", depth+1)
         for f in fields:
             self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
+            if f.seq:
+                self.emit("for(int i%(name)s=0;i%(name)s<%(name)s.length;i%(name)s++) {" % {"name":f.name}, depth+1)
+                self.emit("addChild(%s[i%s]);" % (f.name, f.name), depth+2)
+                self.emit("}", depth+1)
         self.emit("}", depth)
         self.emit("", 0)
 
@@ -248,37 +252,12 @@ class JavaVisitor(EmitVisitor):
 
         if fpargs:
             fpargs += ", "
-        #self.emit("public %s(%sPythonTree parent) {" % (ctorname, fpargs), depth)
-        #self.emit("this(%s);" %
-        #            ", ".join([str(f.name) for f in fields]), depth+1)
-        #self.emit("this.beginLine = parent.beginLine;", depth+1);
-        #self.emit("this.beginColumn = parent.beginColumn;", depth+1);
-        #self.emit("}", depth)
-        #self.emit("", 0)
 
         # The toString() method
         self.emit("public String toString() {", depth)
         self.emit('return "%s";' % clsname, depth+1)
         self.emit("}", depth)
         self.emit("", 0)
-
-        # The toStringTree() method
-        #self.emit("public String toStringTree() {", depth)
-        #self.emit('StringBuffer sb = new StringBuffer("%s[");' % clsname,
-        #            depth+1)
-        #for f in fields:
-        #    self.emit('sb.append("%s=");' % f.name, depth+1)
-        #    if not self.bltinnames.has_key(str(f.type)) and f.typedef.simple:
-        #        self.emit("sb.append(dumpThis(this.%s, %sType.%sTypeNames));" %
-        #                (f.name, f.type, f.type), depth+1)
-        #    else:
-        #        self.emit("sb.append(dumpThis(this.%s));" % f.name, depth+1)
-        #    if f != fields[-1]:
-        #        self.emit('sb.append(", ");', depth+1)
-        #self.emit('sb.append("]");', depth+1)
-        #self.emit("return sb.toString();", depth+1)
-        #self.emit("}", depth)
-        #self.emit("", 0)
 
         # The pickle() method
         #self.emit("public void pickle(DataOutputStream ostream) throws IOException {", depth)
@@ -341,7 +320,6 @@ class JavaVisitor(EmitVisitor):
         name = field.name
         seq = field.seq and "[]" or ""
         return "%(jtype)s%(seq)s %(name)s" % locals()
-
 
 class VisitorVisitor(EmitVisitor):
     def __init__(self, dir):

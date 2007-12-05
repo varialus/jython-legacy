@@ -26,9 +26,9 @@ public class PythonTree extends CommonTree {
 		return token.getText();
 	}
 
-    /*
     public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
+            System.out.println("Where are my children?  -- asks " + token.getText());
 			return this.toString();
 		}
 		StringBuffer buf = new StringBuffer();
@@ -49,5 +49,4 @@ public class PythonTree extends CommonTree {
 		}
 		return buf.toString();
 	}
-    */
 }

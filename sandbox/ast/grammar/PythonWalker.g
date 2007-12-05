@@ -42,6 +42,14 @@ import java.util.Map;
 import java.util.Set;
 } 
 @members {
+    boolean debugOn = true;
+
+    public void debug(String message) {
+        if (debugOn) {
+            System.out.println(message);
+        }
+    }
+
     String name = "Test";
 
     //XXX: Not sure I need any below...
@@ -51,7 +59,18 @@ import java.util.Set;
     boolean printResults = false;
     //CompilerFlags cflags = Py.getCompilerFlags();
 
-    private FunctionDef extractFunctionDef(Token t, PythonTree nameToken, argumentsType args, List funcStatements) {
+    private modType makeMod(PythonTree t, List stmts) {
+        System.out.println("stmts: " + stmts.size());
+        stmtType[] s;
+        if (stmts != null) {
+            s = (stmtType[])stmts.toArray(new stmtType[stmts.size()]);
+        } else {
+            s = new stmtType[0];
+        }
+        return new Module(t, s);
+    }
+
+    private FunctionDef makeFunctionDef(Token t, PythonTree nameToken, argumentsType args, List funcStatements) {
         argumentsType a;
         if (args != null) {
             a = args;
@@ -62,7 +81,7 @@ import java.util.Set;
         return new FunctionDef(t, nameToken.getText(), a, s, null);
     }
 
-    private argumentsType extractArgumentsType(Token t, List params, PythonTree snameToken,
+    private argumentsType makeArgumentsType(Token t, List params, PythonTree snameToken,
         PythonTree knameToken, List defaults) {
 
         exprType[] p = (exprType[])params.toArray(new exprType[params.size()]);
@@ -131,7 +150,7 @@ import java.util.Set;
     }
 
 
-    Num extractNum(Token t, String s) {
+    Num makeNum(Token t, String s) {
         int radix = 10;
         if (s.startsWith("0x") || s.startsWith("0X")) {
             radix = 16;
@@ -164,13 +183,9 @@ import java.util.Set;
 }
 
 module returns [modType mod]
-@init {
-    List moduleStatements = new ArrayList();
-}
     : ^(Module stmts?) {
-        stmtType[] s = (stmtType[])moduleStatements.toArray(new stmtType[moduleStatements.size()]);
-        $mod = new Module($Module, s);
         System.out.println("matched module");
+        $mod = makeMod($Module, $stmts.stypes);
     }
     ;
 
@@ -197,14 +212,16 @@ defparameter
     }
     ;
 
-stmts
+stmts returns [List stypes]
 scope {
     List statements;
 }
 @init {
     $stmts::statements = new ArrayList();
 }
-    : stmt+
+    : stmt+ {
+        $stypes = $stmts::statements;
+    }
     ;
 
 stmt //combines simple_stmt and compound_stmt from Python.g
@@ -232,6 +249,7 @@ expr_stmt
     | ^(Expr ^(augassign targ=test[expr_contextType.Load] value=test[expr_contextType.Load])) {
     }
     | ^(Expr ^(Assign targets ^(Value value=test[expr_contextType.Load]))) {
+        debug("Matched Assign");
         exprType[] e = new exprType[$targets.etypes.size()];
         for(int i=0;i<$targets.etypes.size();i++) {
             e[i] = (exprType)$targets.etypes.get(i);
@@ -383,7 +401,8 @@ test[int ctype] returns [exprType etype]
         int[] ops = new int[1];
         ops[0] = $comp_op.op;
         targets[0] = $targs.etype;
-        $etype = new Compare($comp_op.token, $left.etype, ops, targets);
+        $etype = new Compare($comp_op.start, $left.etype, ops, targets);
+        System.out.println("COMP_OP: " + $comp_op.start);
     }
     | atom[ctype] (trailer)* {$etype = $atom.etype;}
     | ^(PLUS test[expr_contextType.Load] test[expr_contextType.Load])
