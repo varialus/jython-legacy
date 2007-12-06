@@ -233,7 +233,10 @@ class JavaVisitor(EmitVisitor):
         self.emit("super(token);", depth+1)
         for f in fields:
             self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
-            if f.seq:
+            fparg = self.fieldDef(f)
+            #For now ignoring int and String -- will want to wrap in a PythonTree later I think.
+            if f.seq and not fparg.startswith("int") and not fparg.startswith("String"):
+                print self.fieldDef(f)
                 self.emit("for(int i%(name)s=0;i%(name)s<%(name)s.length;i%(name)s++) {" % {"name":f.name}, depth+1)
                 self.emit("addChild(%s[i%s]);" % (f.name, f.name), depth+2)
                 self.emit("}", depth+1)

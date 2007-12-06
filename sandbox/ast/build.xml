@@ -48,7 +48,8 @@
     <target name="asdl_gen" depends="init">
         <apply
             verbose="true"
-            executable="./asdl_antlr.py">
+            executable="python">
+            <arg value="./asdl_antlr.py" />
             <fileset dir="." includes="Python.asdl"/>
         </apply>
     </target>
