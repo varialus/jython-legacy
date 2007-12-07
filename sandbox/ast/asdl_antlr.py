@@ -223,6 +223,16 @@ class JavaVisitor(EmitVisitor):
         self.emit("}", depth)
         self.close()
 
+    def javaConstructorHelper(self, fields, depth):
+        for f in fields:
+            self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
+            fparg = self.fieldDef(f)
+            #For now ignoring int and String -- will want to wrap in a PythonTree later I think.
+            if f.seq and not fparg.startswith("int") and not fparg.startswith("String"):
+                self.emit("for(int i%(name)s=0;i%(name)s<%(name)s.length;i%(name)s++) {" % {"name":f.name}, depth+1)
+                self.emit("addChild(%s[i%s]);" % (f.name, f.name), depth+2)
+                self.emit("}", depth+1)
+
     def javaMethods(self, type, clsname, ctorname, fields, depth):
         # The java ctors
         token = asdl.Field('Token', 'token')
@@ -231,15 +241,7 @@ class JavaVisitor(EmitVisitor):
 
         self.emit("public %s(%s) {" % (ctorname, fpargs), depth)
         self.emit("super(token);", depth+1)
-        for f in fields:
-            self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
-            fparg = self.fieldDef(f)
-            #For now ignoring int and String -- will want to wrap in a PythonTree later I think.
-            if f.seq and not fparg.startswith("int") and not fparg.startswith("String"):
-                print self.fieldDef(f)
-                self.emit("for(int i%(name)s=0;i%(name)s<%(name)s.length;i%(name)s++) {" % {"name":f.name}, depth+1)
-                self.emit("addChild(%s[i%s]);" % (f.name, f.name), depth+2)
-                self.emit("}", depth+1)
+        self.javaConstructorHelper(fields, depth)
         self.emit("}", depth)
         self.emit("", 0)
 
@@ -248,8 +250,7 @@ class JavaVisitor(EmitVisitor):
         fpargs = ", ".join([self.fieldDef(f) for f in [tree] + fields])
         self.emit("public %s(%s) {" % (ctorname, fpargs), depth)
         self.emit("super(tree);", depth+1)
-        for f in fields:
-            self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
+        self.javaConstructorHelper(fields, depth)
         self.emit("}", depth)
         self.emit("", 0)
 

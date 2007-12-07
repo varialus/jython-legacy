@@ -60,7 +60,6 @@ import java.util.Set;
     //CompilerFlags cflags = Py.getCompilerFlags();
 
     private modType makeMod(PythonTree t, List stmts) {
-        System.out.println("stmts: " + stmts.size());
         stmtType[] s;
         if (stmts != null) {
             s = (stmtType[])stmts.toArray(new stmtType[stmts.size()]);
@@ -70,7 +69,7 @@ import java.util.Set;
         return new Module(t, s);
     }
 
-    private FunctionDef makeFunctionDef(Token t, PythonTree nameToken, argumentsType args, List funcStatements) {
+    private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements) {
         argumentsType a;
         if (args != null) {
             a = args;
@@ -81,7 +80,7 @@ import java.util.Set;
         return new FunctionDef(t, nameToken.getText(), a, s, null);
     }
 
-    private argumentsType makeArgumentsType(Token t, List params, PythonTree snameToken,
+    private argumentsType makeArgumentsType(PythonTree t, List params, PythonTree snameToken,
         PythonTree knameToken, List defaults) {
 
         exprType[] p = (exprType[])params.toArray(new exprType[params.size()]);
@@ -150,7 +149,9 @@ import java.util.Set;
     }
 
 
-    Num makeNum(Token t, String s) {
+    Num makeNum(PythonTree t) {
+        debug("Num matched");
+        String s = t.getText();
         int radix = 10;
         if (s.startsWith("0x") || s.startsWith("0X")) {
             radix = 16;
@@ -184,7 +185,7 @@ import java.util.Set;
 
 module returns [modType mod]
     : ^(Module stmts?) {
-        System.out.println("matched module");
+        debug("matched module");
         $mod = makeMod($Module, $stmts.stypes);
     }
     ;
@@ -254,6 +255,7 @@ expr_stmt
         for(int i=0;i<$targets.etypes.size();i++) {
             e[i] = (exprType)$targets.etypes.get(i);
         }
+        debug("exprs: " + e.length);
         Assign a = new Assign($Assign, e, $value.etype);
         $stmts::statements.add(a);
     }
@@ -402,7 +404,7 @@ test[int ctype] returns [exprType etype]
         ops[0] = $comp_op.op;
         targets[0] = $targs.etype;
         $etype = new Compare($comp_op.start, $left.etype, ops, targets);
-        System.out.println("COMP_OP: " + $comp_op.start);
+        debug("COMP_OP: " + $comp_op.start);
     }
     | atom[ctype] (trailer)* {$etype = $atom.etype;}
     | ^(PLUS test[expr_contextType.Load] test[expr_contextType.Load])
@@ -445,11 +447,11 @@ atom[int ctype] returns [exprType etype]
     | ^(Parens test[expr_contextType.Load]*) {}
     | ^(Dict test[expr_contextType.Load]*) {}
     | ^(Repr test[expr_contextType.Load]*) {}
-    | ^(Name NAME) {System.out.println("NAME matched");}
-    | ^(Num INT) {System.out.println("INT matched");}
-    | ^(Num LONGINT) {}
-    | ^(Num FLOAT) {}
-    | ^(Num COMPLEX) {}
+    | ^(Name NAME) {$etype = new Name($NAME, $NAME.text, ctype);}
+    | ^(Num INT) {$etype = makeNum($INT);}
+    | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
+    | ^(Num FLOAT) {$etype = makeNum($FLOAT);}
+    | ^(Num COMPLEX) {$etype = makeNum($COMPLEX);}
     | stringlist {
     }
     ;
@@ -484,7 +486,7 @@ exprlist : ^(ExprList test[expr_contextType.Load]+)
 
 classdef
     : ^(ClassDef ^(Name NAME) (^(Bases test[expr_contextType.Load]))? ^(Body suite)) {
-        //System.out.println("class ");
+        debug("class matched");
     }
     ;
 
