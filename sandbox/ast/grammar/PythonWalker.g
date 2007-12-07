@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 } 
 @members {
-    boolean debugOn = true;
+    boolean debugOn = false;
 
     public void debug(String message) {
         if (debugOn) {
