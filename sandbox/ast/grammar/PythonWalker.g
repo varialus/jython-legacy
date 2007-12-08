@@ -250,7 +250,7 @@ expr_stmt
     }
     | ^(augassign targ=test[expr_contextType.Load] value=test[expr_contextType.Load]) {
     }
-    | ^(Assign targets ^(Value value=test[expr_contextType.Load])) {
+    | ^(Assign targets ^(Value value=test[expr_contextType.Store])) {
         debug("Matched Assign");
         exprType[] e = new exprType[$targets.etypes.size()];
         for(int i=0;i<$targets.etypes.size();i++) {
@@ -396,10 +396,10 @@ suite
 
 //FIXME: lots of placeholders
 test[int ctype] returns [exprType etype]
-    : ^('and' test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^('or' test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^('not' test[expr_contextType.Load])
-    | ^(comp_op left=test[expr_contextType.Load] targs=test[expr_contextType.Load]) {
+    : ^('and' test[ctype] test[ctype])
+    | ^('or' test[ctype] test[ctype])
+    | ^('not' test[ctype])
+    | ^(comp_op left=test[ctype] targs=test[ctype]) {
         exprType[] targets = new exprType[1];
         int[] ops = new int[1];
         ops[0] = $comp_op.op;
@@ -408,21 +408,21 @@ test[int ctype] returns [exprType etype]
         debug("COMP_OP: " + $comp_op.start);
     }
     | atom[ctype] (trailer)* {$etype = $atom.etype;}
-    | ^(PLUS test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(MINUS left=test[expr_contextType.Load] right=test[expr_contextType.Load]) {}
-    | ^(AMPER test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(VBAR test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(CIRCUMFLEX test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(LEFTSHIFT test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(RIGHTSHIFT test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(STAR test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(SLASH test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(PERCENT test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(DOUBLESLASH test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(DOUBLESTAR test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(UAdd test[expr_contextType.Load])
-    | ^(USub test[expr_contextType.Load])
-    | ^(Invert test[expr_contextType.Load])
+    | ^(PLUS test[ctype] test[ctype])
+    | ^(MINUS left=test[ctype] right=test[ctype]) {}
+    | ^(AMPER test[ctype] test[ctype])
+    | ^(VBAR test[ctype] test[ctype])
+    | ^(CIRCUMFLEX test[ctype] test[ctype])
+    | ^(LEFTSHIFT test[ctype] test[ctype])
+    | ^(RIGHTSHIFT test[ctype] test[ctype])
+    | ^(STAR test[ctype] test[ctype])
+    | ^(SLASH test[ctype] test[ctype])
+    | ^(PERCENT test[ctype] test[ctype])
+    | ^(DOUBLESLASH test[ctype] test[ctype])
+    | ^(DOUBLESTAR test[ctype] test[ctype])
+    | ^(UAdd test[ctype])
+    | ^(USub test[ctype])
+    | ^(Invert test[ctype])
     | lambdef
     ;
 
@@ -440,15 +440,43 @@ comp_op returns [int op]
     | IsNot {$op = cmpopType.IsNot;}
     ;
 
+//I *think* only sequences need to collect test rules in the walker since
+//testlist in the parser either results in one test or a tuple.
+elts[int ctype] returns [List etypes]
+scope {
+    List elements;
+}
+@init {
+    $elts::elements = new ArrayList();
+}
+
+    : elt[ctype]+ {
+        $etypes = $elts::elements;
+    }
+    ;
+
+elt[int ctype]
+    : test[ctype] {
+        $elts::elements.add($test.etype);
+    }
+    ;
+
 //FIXME: lots of placeholders
 atom[int ctype] returns [exprType etype]
-    : ^(List test[expr_contextType.Load]*) {}
+    : ^(Tuple elts[ctype]) {
+        exprType[] e = new exprType[$elts.etypes.size()];
+        for(int i=0;i<$elts.etypes.size();i++) {
+            e[i] = (exprType)$elts.etypes.get(i);
+        }
+        $etype = new Tuple($Tuple, e, ctype);
+    }
+    | ^(List test[ctype]*) {}
     | ^(ListComp list_for) {}
     | ^(GenExpFor gen_for) {}
-    | ^(Tuple test[expr_contextType.Load]*) {}
-    | ^(Parens test[expr_contextType.Load]*) {}
-    | ^(Dict test[expr_contextType.Load]*) {}
-    | ^(Repr test[expr_contextType.Load]*) {}
+//    | ^(Tuple test[ctype]*) {}
+    | ^(Parens test[ctype]*) {}
+    | ^(Dict test[ctype]*) {}
+    | ^(Repr test[ctype]*) {}
     | ^(Name NAME) {$etype = new Name($NAME, $NAME.text, ctype);}
     | ^(Num INT) {$etype = makeNum($INT);}
     | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
