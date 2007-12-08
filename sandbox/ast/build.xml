@@ -21,6 +21,14 @@
             <arg file="grammar/PythonWalker.g"/>
             <classpath refid="main.classpath"/>
         </java>
+        
+        <!-- copy the .tokens to /grammar, for usage in ANTLRWorks -->
+        <copy todir="grammar" preservelastmodified="true">
+            <fileset dir="build/gensrc/org/python/antlr">
+                <include name="Python.tokens" />
+            </fileset>
+        </copy>
+
     </target>
     
     <target name="compile" depends="init">
