@@ -88,11 +88,11 @@ tokens {
     ClassDef;
     Bases; 
     FunctionDef;
+    Arguments;
     Args;
+    Arg;
     StarArgs;
     KWArgs;
-    Arg;
-    Arguments;
     Assign;
     AugAssign;
     Compare;
@@ -124,7 +124,9 @@ tokens {
     Inst;
     Tback;
     Global;
-    Exec;Globals;Locals;
+    Exec;
+    Globals;
+    Locals;
     Assert;
     Ellipsis;
     Comprehension;
@@ -159,6 +161,7 @@ tokens {
     Ifs;
     Elts;
     Ctx;
+    //The tokens below are not represented in the 2.5 Python.asdl
     GenFor;
     GenIf;
     ListFor;
@@ -915,7 +918,11 @@ COMMENT
     |    {startPos>0}?=> '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
     ;
 
-/* XXX: Just discarding form feeds -- Does python assing any meaning to formfeed? */
+/* XXX: Just discarding form feeds -- Does python assign any meaning to formfeed?
+      Since most of these where in the email package, I bet they have meaning as part
+      of a string and are being used in email headers or some such.  If so I'll need
+      to move this to STRING.
+*/
 FORMFEED : '\u000C' {$channel=HIDDEN;}
          ;
  
