@@ -69,19 +69,27 @@ import java.util.Set;
         return new Module(t, s);
     }
 
-    private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements) {
+    private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements, List decorators) {
         argumentsType a;
+        debug("Matched FunctionDef");
         if (args != null) {
             a = args;
         } else {
             a = new argumentsType(t, new exprType[0], null, null, new exprType[0]); 
         }
         stmtType[] s = (stmtType[])funcStatements.toArray(new stmtType[funcStatements.size()]);
-        return new FunctionDef(t, nameToken.getText(), a, s, null);
+        exprType[] d;
+        if (decorators != null) {
+            d = (exprType[])decorators.toArray(new exprType[decorators.size()]);
+        } else {
+            d = new exprType[0];
+        }
+        return new FunctionDef(t, nameToken.getText(), a, s, d);
     }
 
     private argumentsType makeArgumentsType(PythonTree t, List params, PythonTree snameToken,
         PythonTree knameToken, List defaults) {
+        debug("Matched Arguments");
 
         exprType[] p = (exprType[])params.toArray(new exprType[params.size()]);
         exprType[] d = (exprType[])defaults.toArray(new exprType[defaults.size()]);
@@ -191,28 +199,50 @@ module returns [modType mod]
     }
     ;
 
-decorator: ^(Decorator dotted_name ^(ArgList arglist?))
-         ;
+funcdef
+    : ^(FunctionDef ^(Name NAME) ^(Arguments varargslist?) ^(Body stmts) ^(Decorators decorators?)) {
+        $stmts::statements.add(makeFunctionDef($FunctionDef, $NAME, $varargslist.args, $stmts.stypes, $decorators.etypes));
+    }
+    ;
 
-decorators: decorator+
-          ;
-
-funcdef : ^(FunctionDef  ^(Name NAME) ^(Arguments varargslist?) ^(Body suite) (^(Decorators decorators))? )
-        ;
-
-varargslist
-    : ^(Args defparameter*) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
+varargslist returns [argumentsType args]
+@init {
+    List params = new ArrayList();
+    List defaults = new ArrayList();
+}
+    : ^(Args defparameter[params, defaults]+) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
+        $args = makeArgumentsType($Args,params, $sname, $kname, defaults);
     }
     | ^(StarArgs sname=NAME) (^(KWArgs kname=NAME))? {
+        $args = makeArgumentsType($StarArgs,params, $sname, $kname, defaults);
     }
     | ^(KWArgs NAME) {
+        $args = makeArgumentsType($KWArgs, params, null, $NAME, defaults);
     }
     ;
 
-defparameter
+defparameter[List params, List defaults]
     : NAME (ASSIGN test[expr_contextType.Load] )? {
+        params.add(new Name($NAME, $NAME.text, org.python.antlr.ast.Name.Param));
+        if ($test.etype != null) {
+            defaults.add($test.etype);
+        }
     }
     ;
+
+decorator
+    : ^(Decorator dotted_name ^(ArgList arglist?))
+    ;
+
+decorators returns [List etypes]
+@init {
+    List decs = new ArrayList();
+}
+    : decorator+ {
+        $etypes = decs;
+    }
+    ;
+
 
 stmts returns [List stypes]
 scope {
@@ -222,6 +252,11 @@ scope {
     $stmts::statements = new ArrayList();
 }
     : stmt+ {
+        debug("Matched stmts");
+        $stypes = $stmts::statements;
+    }
+    | INDENT stmt+ DEDENT {
+        debug("Matched stmts");
         $stypes = $stmts::statements;
     }
     ;
@@ -304,6 +339,7 @@ del_stmt
 
 pass_stmt
     : Pass {
+       debug("Matched Pass");
     }
     ;
 
@@ -477,7 +513,7 @@ atom[int ctype] returns [exprType etype]
     | ^(Parens test[ctype]*) {}
     | ^(Dict test[ctype]*) {}
     | ^(Repr test[ctype]*) {}
-    | ^(Name NAME) {$etype = new Name($NAME, $NAME.text, ctype);}
+    | ^(Name NAME) {$etype = new Name($NAME, $NAME.text, ctype); debug("Matched Name");}
     | ^(Num INT) {$etype = makeNum($INT);}
     | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
     | ^(Num FLOAT)

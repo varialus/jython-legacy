@@ -214,7 +214,7 @@ decorators: decorator+
 
 //funcdef: [decorators] 'def' NAME parameters ':' suite
 funcdef : decorators? 'def' NAME parameters COLON suite
-       -> ^(FunctionDef ^(Name NAME) ^(Arguments parameters) ^(Body suite) ^(Decorators decorators)?)
+       -> ^(FunctionDef ^(Name NAME) ^(Arguments parameters) ^(Body suite) ^(Decorators decorators?))
         ;
 
 //parameters: '(' [varargslist] ')'
