@@ -914,3 +914,8 @@ COMMENT
     :    {startPos==0}?=> (' '|'\t')* '#' (~'\n')* '\n'+
     |    {startPos>0}?=> '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
     ;
+
+/* XXX: Just discarding form feeds -- Does python assing any meaning to formfeed? */
+FORMFEED : '\u000C' {$channel=HIDDEN;}
+         ;
+ 
