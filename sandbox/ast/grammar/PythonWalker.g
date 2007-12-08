@@ -69,6 +69,12 @@ import java.util.Set;
         return new Module(t, s);
     }
 
+    private ClassDef makeClassDef(PythonTree t, PythonTree nameToken, List bases, List body) {
+        exprType[] b = (exprType[])bases.toArray(new exprType[bases.size()]);
+        stmtType[] s = (stmtType[])body.toArray(new stmtType[body.size()]);
+        return new ClassDef(t, nameToken.getText(), b, s);
+    }
+
     private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements, List decorators) {
         argumentsType a;
         debug("Matched FunctionDef");
@@ -285,7 +291,7 @@ expr_stmt
     }
     | ^(augassign targ=test[expr_contextType.Load] value=test[expr_contextType.Load]) {
     }
-    | ^(Assign targets ^(Value value=test[expr_contextType.Store])) {
+    | ^(Assign targets ^(Value value=test[expr_contextType.Load])) {
         debug("Matched Assign");
         exprType[] e = new exprType[$targets.etypes.size()];
         for(int i=0;i<$targets.etypes.size();i++) {
@@ -307,7 +313,7 @@ targets returns [List etypes]
     ;
 
 target[List etypes]
-    : ^(Target test[expr_contextType.Load]) {
+    : ^(Target test[expr_contextType.Store]) {
         etypes.add($test.etype);
     }
     ;
@@ -548,9 +554,22 @@ subscript : Ellipsis
           ;
 
 classdef
-    : ^(ClassDef ^(Name NAME) (^(Bases test[expr_contextType.Load]))? ^(Body suite)) {
-        debug("class matched");
+    : ^(ClassDef ^(Name classname=NAME) bases ^(Body stmts)) {
+        $stmts::statements.add(makeClassDef($ClassDef, $classname, $bases.names, $stmts.stypes));
     }
+    ;
+
+bases returns [List names]
+@init {
+    List nms = new ArrayList();
+}
+    :^(Bases base[nms]*) {
+        $names = nms;
+    }
+    ;
+
+base[List names]
+    : test[expr_contextType.Store] {names.add($test.etype);}
     ;
 
 arglist
