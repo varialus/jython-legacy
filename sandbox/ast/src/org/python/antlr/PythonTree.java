@@ -28,7 +28,7 @@ public class PythonTree extends CommonTree {
 
     public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
-            System.out.println("Where are my children?  -- asks " + token.getText());
+            //System.out.println("Where are my children?  -- asks " + token.getText());
 			return this.toString();
 		}
 		StringBuffer buf = new StringBuffer();

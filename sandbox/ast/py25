@@ -1,0 +1,1 @@
+find ~/src/python/release25-maint/Lib -name '*.py' -print -exec ./run {} \;

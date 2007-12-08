@@ -81,7 +81,6 @@ tokens {
     Module;
     Test;
     Msg;
-    Stmt;
     Import;
     ImportFrom;
     Name;
@@ -95,17 +94,19 @@ tokens {
     Arg;
     Arguments;
     Assign;
+    AugAssign;
     Compare;
     Expr;
-    ExprList;
     Tuple;
     List;
     Dict;
     If;
-    Else;
+    OrElse;
     Elif;
     While; 
     Pass;
+    Break;
+    Continue;
     Print;
     TryExcept;
     TryFinally;
@@ -126,6 +127,7 @@ tokens {
     Exec;Globals;Locals;
     Assert;
     Ellipsis;
+    Comprehension;
     ListComp;
     Lambda;
     Repr;
@@ -139,9 +141,10 @@ tokens {
     Start;
     End;
     SliceOp;
-    UnaryPlus;
-    UnaryMinus;
-    UnaryTilde;
+    UnaryOp;
+    UAdd;
+    USub;
+    Invert;
     Delete;
     Default;
     Parens;
@@ -152,6 +155,14 @@ tokens {
     With;
     GenExpFor;
     Id;
+    Iter;
+    Ifs;
+    Elts;
+    Ctx;
+    GenFor;
+    GenIf;
+    ListFor;
+    ListIf;
 }
 
 @header { 
@@ -215,7 +226,7 @@ varargslist : defparameter (options {greedy=true;}:COMMA defparameter)*
                   | DOUBLESTAR kwargs=NAME
                   )?
               )?
-           -> ^(Arguments defparameter+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
+           -> ^(Args defparameter+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
             | STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?
            -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
             | DOUBLESTAR kwargs=NAME
@@ -247,7 +258,7 @@ simple_stmt : small_stmt (options {greedy=true;}:SEMI small_stmt)* (SEMI)? NEWLI
             ;
 
 //small_stmt: expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | exec_stmt | assert_stmt
-small_stmt : expr_stmt -> ^(Expr expr_stmt)
+small_stmt : expr_stmt
            | print_stmt
            | del_stmt
            | pass_stmt
@@ -307,7 +318,7 @@ print_stmt : 'print'
 
 //del_stmt: 'del' exprlist
 del_stmt : 'del' exprlist
-        -> ^(Delete exprlist)
+        -> ^(Delete ^(Targets exprlist))
          ;
 
 //pass_stmt: 'pass'
@@ -416,7 +427,7 @@ compound_stmt : if_stmt
 
 //if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
 if_stmt: 'if' test COLON ifsuite=suite elif_clause*  ('else' COLON elsesuite=suite)?
-      -> ^(If test $ifsuite elif_clause* ^(Else $elsesuite)?)
+      -> ^(If test $ifsuite elif_clause* ^(OrElse $elsesuite)?)
        ;
 
 //not in CPython's Grammar file
@@ -426,19 +437,19 @@ elif_clause : 'elif' test COLON suite
 
 //while_stmt: 'while' test ':' suite ['else' ':' suite]
 while_stmt : 'while' test COLON s1=suite ('else' COLON s2=suite)?
-          -> ^(While test ^(Body $s1) ^(Else $s2)?)
+          -> ^(While test ^(Body $s1) ^(OrElse $s2)?)
            ;
 
 //for_stmt: 'for' exprlist 'in' testlist ':' suite ['else' ':' suite]
 for_stmt : 'for' exprlist 'in' testlist COLON s1=suite ('else' COLON s2=suite)?
-        -> ^(For exprlist ^(In testlist) ^(Body $s1) ^(Else $s2)?)
+        -> ^(For ^(Target exprlist) ^(Iter testlist) ^(Body $s1) ^(OrElse $s2)?)
          ;
 
 //try_stmt: ('try' ':' suite (except_clause ':' suite)+ #diagram:break
 //           ['else' ':' suite] | 'try' ':' suite 'finally' ':' suite)
 try_stmt : 'try' COLON trysuite=suite
            ( (except_clause+ ('else' COLON elsesuite=suite)?
-          -> ^(TryExcept ^(Body $trysuite) except_clause+ ^(Else $elsesuite)?))
+          -> ^(TryExcept ^(Body $trysuite) except_clause+ ^(OrElse $elsesuite)?))
            | ('finally' COLON suite
           -> ^(TryFinally suite))
            )
@@ -459,7 +470,7 @@ except_clause : 'except' (t1=test (COMMA t2=test)?)? COLON suite
               ;
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
-suite : simple_stmt -> ^(Stmt simple_stmt)
+suite : simple_stmt
       | NEWLINE! INDENT (stmt)+ DEDENT
       ;
 
@@ -539,9 +550,9 @@ term : factor ((STAR^ | SLASH^ | PERCENT^ | DOUBLESLASH^ ) factor)*
      ;
 
 //factor: ('+'|'-'|'~') factor | power
-factor : PLUS factor -> ^(UnaryPlus factor)
-       | MINUS factor -> ^(UnaryMinus factor)
-       | TILDE factor -> ^(UnaryTilde factor)
+factor : PLUS factor -> ^(UAdd factor)
+       | MINUS factor -> ^(USub factor)
+       | TILDE factor -> ^(Invert factor)
        | power
        ;
 
@@ -610,7 +621,7 @@ sliceop : COLON (test)? -> test?
 
 //exprlist: expr (',' expr)* [',']
 exprlist : expr (options {k=2;}: COMMA expr)* (COMMA)?
-        -> ^(ExprList expr+)
+        -> expr+
          ;
 
 //testlist: test (',' test)* [',']
@@ -658,10 +669,12 @@ list_iter : list_for
 
 //list_for: 'for' exprlist 'in' testlist_safe [list_iter]
 list_for : 'for' exprlist 'in' testlist (list_iter)?
+        -> ^(ListFor ^(Target exprlist) ^(Iter testlist) ^(Ifs list_iter)?)
          ;
 
 //list_if: 'if' test [list_iter]
 list_if : 'if' test (list_iter)?
+       -> ^(ListIf ^(Target test) (Ifs list_iter)?)
         ;
 
 //gen_iter: gen_for | gen_if
@@ -671,10 +684,12 @@ gen_iter: gen_for
 
 //gen_for: 'for' exprlist 'in' or_test [gen_iter]
 gen_for: 'for' exprlist 'in' or_test gen_iter?
+        -> ^(GenFor ^(Target exprlist) ^(Iter gen_iter)?)
        ;
 
 //gen_if: 'if' old_test [gen_iter]
 gen_if: 'if' test gen_iter?
+     -> ^(GenIf ^(Target test) ^(Iter gen_iter)?)
       ;
 
 //yield_expr: 'yield' [testlist]

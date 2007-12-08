@@ -12,7 +12,7 @@ import org.python.antlr.PythonTokenSource;
 
 //import org.python.antlr.ast.modType;
 
-public class Main {
+public class GrammarOnly {
     // override nextToken to set startPos (this seems too hard)
     public static class PyLexer extends PythonLexer {
         public PyLexer(CharStream lexer) {
@@ -59,11 +59,9 @@ public class Main {
             }
             CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);
             nodes.setTokenStream(tokens);
-            PythonWalker walker = new PythonWalker(nodes);
-            result = walker.module();
-            if (args.length > 1) {
-                System.out.println(result.toStringTree());
-            }
+            //PythonWalker walker = new PythonWalker(nodes);
+            //result = walker.module();
+            //System.out.println(result.toStringTree());
         } catch (RecognitionException e) {
             System.err.println("Error: " + e);
         }
@@ -71,6 +69,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        new Main().parse(args);
+        new GrammarOnly().parse(args);
     }
 }

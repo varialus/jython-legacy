@@ -155,6 +155,7 @@ import java.util.Set;
         int radix = 10;
         if (s.startsWith("0x") || s.startsWith("0X")) {
             radix = 16;
+            s = s.substring(2, s.length());
         } else if (s.startsWith("0")) {
             radix = 8;
         }
@@ -196,11 +197,11 @@ decorator: ^(Decorator dotted_name ^(ArgList arglist?))
 decorators: decorator+
           ;
 
-funcdef : ^(FunctionDef (^(Decorators decorators))? ^(Name NAME) ^(Args varargslist?) ^(Body suite))
+funcdef : ^(FunctionDef  ^(Name NAME) ^(Arguments varargslist?) ^(Body suite) (^(Decorators decorators))? )
         ;
 
 varargslist
-    : ^(Arguments defparameter*) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
+    : ^(Args defparameter*) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
     }
     | ^(StarArgs sname=NAME) (^(KWArgs kname=NAME))? {
     }
@@ -245,11 +246,11 @@ stmt //combines simple_stmt and compound_stmt from Python.g
     ;
 
 expr_stmt
-    : ^(Expr test[expr_contextType.Load]) {
+    : test[expr_contextType.Load] {
     }
-    | ^(Expr ^(augassign targ=test[expr_contextType.Load] value=test[expr_contextType.Load])) {
+    | ^(augassign targ=test[expr_contextType.Load] value=test[expr_contextType.Load]) {
     }
-    | ^(Expr ^(Assign targets ^(Value value=test[expr_contextType.Load]))) {
+    | ^(Assign targets ^(Value value=test[expr_contextType.Load])) {
         debug("Matched Assign");
         exprType[] e = new exprType[$targets.etypes.size()];
         for(int i=0;i<$targets.etypes.size();i++) {
@@ -298,7 +299,7 @@ print_stmt
     ;
 
 del_stmt
-    : ^(Delete exprlist)
+    : ^(Delete ^(Targets test[expr_contextType.Load]+))
     ;
 
 pass_stmt
@@ -362,19 +363,19 @@ assert_stmt : ^(Assert ^(Test test[expr_contextType.Load]) (^(Msg test[expr_cont
             ;
 
 
-if_stmt: ^(If test[expr_contextType.Load] suite elif_clause* (^(Else suite))?)
+if_stmt: ^(If test[expr_contextType.Load] suite elif_clause* (^(OrElse suite))?)
        ;
 
 elif_clause : ^(Elif test[expr_contextType.Load] suite)
             ;
 
-while_stmt : ^(While test[expr_contextType.Load] ^(Body suite) (^(Else suite))?)
+while_stmt : ^(While test[expr_contextType.Load] ^(Body suite) (^(OrElse suite))?)
            ;
 
-for_stmt : ^(For exprlist ^(In test[expr_contextType.Load]) ^(Body suite) (^(Else suite))?)
+for_stmt : ^(For ^(Target test[expr_contextType.Load]+) ^(Iter test[expr_contextType.Load]) ^(Body suite) (^(OrElse suite))?)
          ;
 
-try_stmt : ^(TryExcept ^(Body suite) except_clause+ (^(Else suite))?)
+try_stmt : ^(TryExcept ^(Body suite) except_clause+ (^(OrElse suite))?)
          | ^(TryFinally suite)
          ;
 
@@ -419,9 +420,9 @@ test[int ctype] returns [exprType etype]
     | ^(PERCENT test[expr_contextType.Load] test[expr_contextType.Load])
     | ^(DOUBLESLASH test[expr_contextType.Load] test[expr_contextType.Load])
     | ^(DOUBLESTAR test[expr_contextType.Load] test[expr_contextType.Load])
-    | ^(UnaryPlus test[expr_contextType.Load])
-    | ^(UnaryMinus test[expr_contextType.Load])
-    | ^(UnaryTilde test[expr_contextType.Load])
+    | ^(UAdd test[expr_contextType.Load])
+    | ^(USub test[expr_contextType.Load])
+    | ^(Invert test[expr_contextType.Load])
     | lambdef
     ;
 
@@ -444,20 +445,21 @@ atom[int ctype] returns [exprType etype]
     : ^(List test[expr_contextType.Load]*) {}
     | ^(ListComp list_for) {}
     | ^(GenExpFor gen_for) {}
+    | ^(Tuple test[expr_contextType.Load]*) {}
     | ^(Parens test[expr_contextType.Load]*) {}
     | ^(Dict test[expr_contextType.Load]*) {}
     | ^(Repr test[expr_contextType.Load]*) {}
     | ^(Name NAME) {$etype = new Name($NAME, $NAME.text, ctype);}
     | ^(Num INT) {$etype = makeNum($INT);}
     | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
-    | ^(Num FLOAT) {$etype = makeNum($FLOAT);}
-    | ^(Num COMPLEX) {$etype = makeNum($COMPLEX);}
+    | ^(Num FLOAT)
+    | ^(Num COMPLEX)
     | stringlist {
     }
     ;
 
 stringlist
-    : ^(String string+) {}
+    : ^(Str string+) {}
     ;
 
 string
@@ -481,9 +483,6 @@ subscript : Ellipsis
           | ^(Subscript (^(Start test[expr_contextType.Load]))? (^(End test[expr_contextType.Load]))? (^(SliceOp test[expr_contextType.Load]?))?)
           ;
 
-exprlist : ^(ExprList test[expr_contextType.Load]+)
-         ;
-
 classdef
     : ^(ClassDef ^(Name NAME) (^(Bases test[expr_contextType.Load]))? ^(Body suite)) {
         debug("class matched");
@@ -503,19 +502,19 @@ list_iter: list_for
     | list_if
     ;
 
-list_for: 'for' exprlist 'in' test[expr_contextType.Load] (list_iter)?
+list_for: ^(ListFor ^(Target test[expr_contextType.Load]+) ^(Iter test[expr_contextType.Load]+) (^(Ifs list_iter))?)
     ;
 
-list_if: 'if' test[expr_contextType.Load] (list_iter)?
+list_if: ^(ListIf ^(Target test[expr_contextType.Load]) (Ifs list_iter)?)
     ;
 
 gen_iter: gen_for
         | gen_if
         ;
 
-gen_for: 'for' exprlist 'in' test[expr_contextType.Load] gen_iter?
+gen_for: ^(GenFor ^(Target test[expr_contextType.Load]+) (^(Iter gen_iter))?)
        ;
 
-gen_if: 'if' test[expr_contextType.Load] gen_iter?
+gen_if: ^(GenIf ^(Target test[expr_contextType.Load]) (^(Iter gen_iter))?)
       ;
 
