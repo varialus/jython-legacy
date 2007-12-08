@@ -14,7 +14,7 @@
     <target name="antlr_gen" depends="init">
         <java classname="org.antlr.Tool">
             <arg value="grammar/Python.g"/>
-            <arg value="-o"/>
+            <arg value="-fo"/>
             <arg value="build/gensrc/org/python/antlr"/>
             <classpath refid="main.classpath"/>
         </java>
@@ -27,7 +27,7 @@
 
         <java classname="org.antlr.Tool">
             <arg value="grammar/PythonWalker.g"/>
-            <arg value="-o"/>
+            <arg value="-fo"/>
             <arg value="build/gensrc/org/python/antlr"/>
             <classpath refid="main.classpath"/>
         </java>
