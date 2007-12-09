@@ -665,8 +665,11 @@ arglist : argument (COMMA argument)*
         ;
 
 //argument: [test '='] test	// Really [keyword '='] test
-argument : t1=test (ASSIGN t2=test)?
-        -> ^(Arg $t1 ^(Default $t2)?)
+argument : t1=test
+         ( (ASSIGN t2=test) -> ^(Arg $t1 ^(Default $t2)?)
+         | gen_for -> ^(GenFor $t1 gen_for)
+         | -> ^(Arg $t1)
+         )
          ;
 
 //list_iter: list_for | list_if

@@ -46,8 +46,7 @@ echo Lib/_
 ./run /Users/frank/src/python/release25-maint/Lib/bsddb/test/test_sequence.py
 ./run /Users/frank/src/python/release25-maint/Lib/bsddb/test/test_thread.py
 echo Lib/c
-
-#./run /Users/frank/src/python/release25-maint/Lib/calendar.py
+./run /Users/frank/src/python/release25-maint/Lib/calendar.py
 ./run /Users/frank/src/python/release25-maint/Lib/cgi.py
 ./run /Users/frank/src/python/release25-maint/Lib/CGIHTTPServer.py
 ./run /Users/frank/src/python/release25-maint/Lib/cgitb.py
@@ -72,7 +71,7 @@ echo Lib/c
 ./run /Users/frank/src/python/release25-maint/Lib/compiler/visitor.py
 ./run /Users/frank/src/python/release25-maint/Lib/ConfigParser.py
 ./run /Users/frank/src/python/release25-maint/Lib/contextlib.py
-#./run /Users/frank/src/python/release25-maint/Lib/Cookie.py
+./run /Users/frank/src/python/release25-maint/Lib/Cookie.py
 ./run /Users/frank/src/python/release25-maint/Lib/cookielib.py
 ./run /Users/frank/src/python/release25-maint/Lib/copy.py
 ./run /Users/frank/src/python/release25-maint/Lib/copy_reg.py
@@ -465,7 +464,7 @@ echo Lib/k
 ./run /Users/frank/src/python/release25-maint/Lib/logging/handlers.py
 ./run /Users/frank/src/python/release25-maint/Lib/macpath.py
 ./run /Users/frank/src/python/release25-maint/Lib/macurl2path.py
-#./run /Users/frank/src/python/release25-maint/Lib/mailbox.py
+./run /Users/frank/src/python/release25-maint/Lib/mailbox.py
 ./run /Users/frank/src/python/release25-maint/Lib/mailcap.py
 ./run /Users/frank/src/python/release25-maint/Lib/markupbase.py
 ./run /Users/frank/src/python/release25-maint/Lib/md5.py
@@ -756,7 +755,7 @@ echo Lib/plat-mac
 ./run /Users/frank/src/python/release25-maint/Lib/SimpleHTTPServer.py
 ./run /Users/frank/src/python/release25-maint/Lib/SimpleXMLRPCServer.py
 ./run /Users/frank/src/python/release25-maint/Lib/site.py
-#./run /Users/frank/src/python/release25-maint/Lib/smtpd.py
+./run /Users/frank/src/python/release25-maint/Lib/smtpd.py
 ./run /Users/frank/src/python/release25-maint/Lib/smtplib.py
 ./run /Users/frank/src/python/release25-maint/Lib/sndhdr.py
 ./run /Users/frank/src/python/release25-maint/Lib/socket.py
@@ -843,7 +842,7 @@ echo Lib/test/f
 ./run /Users/frank/src/python/release25-maint/Lib/test/regrtest.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/reperf.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/sample_doctest.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/seq_tests.py
+./run /Users/frank/src/python/release25-maint/Lib/test/seq_tests.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/sortperf.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/string_tests.py
 echo Lib/test/t
@@ -873,9 +872,9 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_bsddb185.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_bsddb3.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_bufio.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_builtin.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_builtin.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_bz2.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_calendar.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_calendar.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_call.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_capi.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_cd.py
@@ -887,7 +886,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_cmath.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_cmd_line.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_code.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_codeccallbacks.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_codeccallbacks.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codecencodings_cn.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codecencodings_hk.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codecencodings_jp.py
@@ -898,7 +897,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codecmaps_jp.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codecmaps_kr.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codecmaps_tw.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_codecs.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_codecs.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_codeop.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_coding.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_coercion.py
@@ -946,7 +945,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_enumerate.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_eof.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_errno.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_exception_variations.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_exception_variations.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_exceptions.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_extcall.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_fcntl.py
@@ -992,7 +991,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_imaplib.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_imgfile.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_imp.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_import.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_import.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_importhooks.py
 #./run /Users/frank/src/python/release25-maint/Lib/test/test_index.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_inspect.py
@@ -1046,7 +1045,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pep263.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pep277.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pep292.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_pep352.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_pep352.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pickle.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pickletools.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pkg.py
@@ -1068,7 +1067,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_pyexpat.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_queue.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_quopri.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_random.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_random.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_re.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_repr.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_resource.py
@@ -1081,7 +1080,7 @@ echo Lib/test/t
 #./run /Users/frank/src/python/release25-maint/Lib/test/test_scope.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_scriptpackages.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_select.py
-#./run /Users/frank/src/python/release25-maint/Lib/test/test_set.py
+./run /Users/frank/src/python/release25-maint/Lib/test/test_set.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_sets.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_sgmllib.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_sha.py

@@ -452,7 +452,11 @@ try_stmt
         TryExcept te = makeTryExcept($TryExcept, $body.stypes, handlers, o);
         $stmts::statements.add(te);
     }
-    | ^(TryFinally ^(Body suite) ^(FinalBody suite))
+    | ^(TryFinally
+          ( ^(TryExcept ^(Body suite) except_clause[handlers]+ (^(OrElse suite))?)
+          | ^(Body suite)
+          )
+      ^(FinalBody suite))
     ;
 
 except_clause[List handlers]
@@ -622,6 +626,7 @@ arglist
     ;
 
 argument : ^(Arg test[expr_contextType.Load] (^(Default test[expr_contextType.Load]))?)
+         | ^(GenFor test[expr_contextType.Load] gen_for)
          ;
 
 list_iter: list_for
