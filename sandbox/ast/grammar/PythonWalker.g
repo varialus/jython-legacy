@@ -384,51 +384,64 @@ import_stmt
     | ^(ImportFrom dotted_name ^(Import import_as_name+))
     ;
 
-import_as_name : ^(Alias NAME (^(Asname NAME))?)
-               ;
+import_as_name
+    : ^(Alias NAME (^(Asname NAME))?)
+    ;
 
-dotted_as_name : ^(Alias dotted_name (^(Asname NAME))?)
-               ;
+dotted_as_name
+    : ^(Alias dotted_name (^(Asname NAME))?)
+    ;
 
 dotted_name
     : start=NAME (DOT NAME)* {
     }
     ;
 
-global_stmt : ^(Global NAME+)
-            ;
+global_stmt
+    : ^(Global NAME+)
+    ;
 
-exec_stmt : ^(Exec test[expr_contextType.Load] (^(Globals test[expr_contextType.Load]))? (^(Locals test[expr_contextType.Load]))?)
-          ;
+exec_stmt
+    : ^(Exec test[expr_contextType.Load] (^(Globals test[expr_contextType.Load]))? (^(Locals test[expr_contextType.Load]))?)
+    ;
 
-assert_stmt : ^(Assert ^(Test test[expr_contextType.Load]) (^(Msg test[expr_contextType.Load]))?)
-            ;
+assert_stmt
+    : ^(Assert ^(Test test[expr_contextType.Load]) (^(Msg test[expr_contextType.Load]))?)
+    ;
 
 
-if_stmt: ^(If test[expr_contextType.Load] suite elif_clause* (^(OrElse suite))?)
-       ;
+if_stmt
+    : ^(If test[expr_contextType.Load] suite elif_clause* (^(OrElse suite))?)
+    ;
 
-elif_clause : ^(Elif test[expr_contextType.Load] suite)
-            ;
+elif_clause
+    : ^(Elif test[expr_contextType.Load] suite)
+    ;
 
-while_stmt : ^(While test[expr_contextType.Load] ^(Body suite) (^(OrElse suite))?)
-           ;
+while_stmt
+    : ^(While test[expr_contextType.Load] ^(Body suite) (^(OrElse suite))?)
+    ;
 
-for_stmt : ^(For ^(Target test[expr_contextType.Load]+) ^(Iter test[expr_contextType.Load]) ^(Body suite) (^(OrElse suite))?)
-         ;
+for_stmt
+    : ^(For ^(Target test[expr_contextType.Load]+) ^(Iter test[expr_contextType.Load]) ^(Body suite) (^(OrElse suite))?)
+    ;
 
-try_stmt : ^(TryExcept ^(Body suite) except_clause+ (^(OrElse suite))?)
-         | ^(TryFinally suite)
-         ;
+try_stmt
+    : ^(TryExcept ^(Body suite) except_clause+ (^(OrElse suite))? (^(FinalBody 'finally' suite))?)
+    | ^(TryFinally ^(Body suite) ^(FinalBody suite))
+    ;
 
-except_clause : ^(Except (^(Type test[expr_contextType.Load]))? (^(Name test[expr_contextType.Load]))? ^(Body suite))
-              ;
+except_clause
+    : ^(ExceptHandler (^(Type test[expr_contextType.Load]))? (^(Name test[expr_contextType.Load]))? ^(Body suite))
+    ;
 
-with_stmt: ^(With test[expr_contextType.Load] with_var? ^(Body suite))
-         ;
+with_stmt
+    : ^(With test[expr_contextType.Load] with_var? ^(Body suite))
+    ;
 
-with_var: ('as' | NAME) test[expr_contextType.Load]
-        ;
+with_var
+    : ('as' | NAME) test[expr_contextType.Load]
+    ;
 
  
 suite

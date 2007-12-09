@@ -110,7 +110,7 @@ tokens {
     Print;
     TryExcept;
     TryFinally;
-    Except;
+    ExceptHandler;
     For;
     Return;
     Yield;
@@ -166,6 +166,7 @@ tokens {
     GenIf;
     ListFor;
     ListIf;
+    FinalBody;
 }
 
 @header { 
@@ -448,13 +449,16 @@ for_stmt : 'for' exprlist 'in' testlist COLON s1=suite ('else' COLON s2=suite)?
         -> ^(For ^(Target exprlist) ^(Iter testlist) ^(Body $s1) ^(OrElse $s2)?)
          ;
 
-//try_stmt: ('try' ':' suite (except_clause ':' suite)+ #diagram:break
-//           ['else' ':' suite] | 'try' ':' suite 'finally' ':' suite)
+//try_stmt: ('try' ':' suite
+//           ((except_clause ':' suite)+
+//	    ['else' ':' suite]
+//	    ['finally' ':' suite] |
+//	   'finally' ':' suite))
 try_stmt : 'try' COLON trysuite=suite
-           ( (except_clause+ ('else' COLON elsesuite=suite)?
-          -> ^(TryExcept ^(Body $trysuite) except_clause+ ^(OrElse $elsesuite)?))
-           | ('finally' COLON suite
-          -> ^(TryFinally suite))
+           ( (except_clause+ ('else' COLON elsesuite=suite)? ('finally' COLON finalsuite=suite)?
+          -> ^(TryExcept ^(Body $trysuite) except_clause+ ^(OrElse $elsesuite)? ^(FinalBody 'finally' $finalsuite)?))
+           | ('finally' COLON finalsuite=suite
+          -> ^(TryFinally ^(Body $trysuite) ^(FinalBody $finalsuite)))
            )
          ;
 
@@ -469,7 +473,7 @@ with_var: ('as' | NAME) expr
 
 //except_clause: 'except' [test [',' test]]
 except_clause : 'except' (t1=test (COMMA t2=test)?)? COLON suite
-             -> ^(Except ^(Type $t1)? ^(Name $t2)? ^(Body suite))
+             -> ^(ExceptHandler ^(Type $t1)? ^(Name $t2)? ^(Body suite))
               ;
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
