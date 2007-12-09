@@ -197,13 +197,25 @@ import java.util.Set;
         return new Num(t, new Long(l));
     }
 
+    private TryExcept makeTryExcept(PythonTree t, List body, List handlers, List orelses) {
+        excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        stmtType[] o;
+        if (orelses != null) {
+            o = (stmtType[])orelses.toArray(new stmtType[orelses.size()]);
+        } else {
+            o = new stmtType[0];
+        }
+        return new TryExcept(t, b, e, o);
+    }
 }
 
 module returns [modType mod]
-    : ^(Module stmts?) {
-        debug("matched module");
-        $mod = makeMod($Module, $stmts.stypes);
-    }
+    : ^(Module
+        ( stmts {$mod = makeMod($Module, $stmts.stypes); }
+        | {$mod = makeMod($Module, null);}
+        )
+    )
     ;
 
 funcdef
@@ -433,11 +445,11 @@ try_stmt
     List handlers = new ArrayList();
 }
     : ^(TryExcept ^(Body body=stmts) except_clause[handlers]+ (^(OrElse orelse=stmts))? (^(FinalBody 'finally' fin=stmts))?) {
-        excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
-        stmtType[] b = (stmtType[])$body.stypes.toArray(new stmtType[$body.stypes.size()]);
-        stmtType[] o = (stmtType[])$orelse.stypes.toArray(new stmtType[$orelse.stypes.size()]);
-        stmtType[] f = (stmtType[])$orelse.stypes.toArray(new stmtType[$fin.stypes.size()]);
-        TryExcept te = new TryExcept($TryExcept, b, e, o, f);
+        List o = null;
+        if ($OrElse != null) {
+            o = $orelse.stypes;
+        }
+        TryExcept te = makeTryExcept($TryExcept, $body.stypes, handlers, o);
         $stmts::statements.add(te);
     }
     | ^(TryFinally ^(Body suite) ^(FinalBody suite))
@@ -445,7 +457,10 @@ try_stmt
 
 except_clause[List handlers]
     : ^(ExceptHandler (^(Type type=test[expr_contextType.Load]))? (^(Name name=test[expr_contextType.Load]))? ^(Body stmts)) {
-        stmtType[] b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
+        stmtType[] b;
+        if ($stmts.start != null) {
+            b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
+        } else b = new stmtType[0];
         handlers.add(new excepthandlerType($ExceptHandler, $type.etype, $name.etype, b));
     }
     ;
