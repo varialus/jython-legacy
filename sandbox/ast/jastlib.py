@@ -29,7 +29,7 @@ def lispify_field(field, child):
     if not isinstance(child, ArrayType):
         children = [child]
     else:
-        children = child
+        children = child.tolist()
 
     for node in children:
         if isinstance(node, (str, int)):

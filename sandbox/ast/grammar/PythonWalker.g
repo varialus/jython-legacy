@@ -14,6 +14,7 @@ package org.python.antlr;
 import org.python.antlr.ast.aliasType;
 import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.cmpopType;
+import org.python.antlr.ast.excepthandlerType;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.modType;
@@ -30,7 +31,7 @@ import org.python.antlr.ast.Import;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
-import org.python.antlr.ast.Pass;
+import org.python.antlr.ast.TryExcept;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
@@ -346,6 +347,7 @@ del_stmt
 pass_stmt
     : Pass {
        debug("Matched Pass");
+       $stmts::statements.add(new Pass($Pass));
     }
     ;
 
@@ -427,12 +429,25 @@ for_stmt
     ;
 
 try_stmt
-    : ^(TryExcept ^(Body suite) except_clause+ (^(OrElse suite))? (^(FinalBody 'finally' suite))?)
+@init {
+    List handlers = new ArrayList();
+}
+    : ^(TryExcept ^(Body body=stmts) except_clause[handlers]+ (^(OrElse orelse=stmts))? (^(FinalBody 'finally' fin=stmts))?) {
+        excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
+        stmtType[] b = (stmtType[])$body.stypes.toArray(new stmtType[$body.stypes.size()]);
+        stmtType[] o = (stmtType[])$orelse.stypes.toArray(new stmtType[$orelse.stypes.size()]);
+        stmtType[] f = (stmtType[])$orelse.stypes.toArray(new stmtType[$fin.stypes.size()]);
+        TryExcept te = new TryExcept($TryExcept, b, e, o, f);
+        $stmts::statements.add(te);
+    }
     | ^(TryFinally ^(Body suite) ^(FinalBody suite))
     ;
 
-except_clause
-    : ^(ExceptHandler (^(Type test[expr_contextType.Load]))? (^(Name test[expr_contextType.Load]))? ^(Body suite))
+except_clause[List handlers]
+    : ^(ExceptHandler (^(Type type=test[expr_contextType.Load]))? (^(Name name=test[expr_contextType.Load]))? ^(Body stmts)) {
+        stmtType[] b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
+        handlers.add(new excepthandlerType($ExceptHandler, $type.etype, $name.etype, b));
+    }
     ;
 
 with_stmt
