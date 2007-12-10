@@ -175,6 +175,17 @@ package org.python.antlr;
 import org.python.antlr.PythonTree;
 } 
 
+@members {
+    boolean debugOn = false;
+
+    private void debug(String message) {
+        if (debugOn) {
+            System.out.println(message);
+        }
+    }
+}
+
+
 @lexer::header { 
 package org.python.antlr;
 } 
@@ -196,7 +207,7 @@ single_input : NEWLINE!
              ;
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
-file_input : (NEWLINE | stmt)*
+file_input : (NEWLINE | stmt)* {debug("parsed file_input");}
           -> ^(Module stmt*)
            ;
 
@@ -484,12 +495,12 @@ suite : simple_stmt
 //FIXME: looks like this one is going to be tough.
 //test: or_test ['if' or_test 'else' test] | lambdef
 test: or_test //('if' test 'else' test)?
-    | lambdef
+    | lambdef {debug("parsed lambdef");}
     ;
 
 //or_test: and_test ('or' and_test)*
 or_test : and_test ('or'^ and_test)*
-     ;
+        ;
 
 //and_test: not_test ('and' not_test)*
 and_test : not_test ('and'^ not_test)*
@@ -577,7 +588,7 @@ atom : LPAREN
      | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
-     | NAME -> ^(Name NAME)
+     | NAME {debug("parsed NAME");} -> ^(Name NAME)
      | INT -> ^(Num INT)
      | LONGINT -> ^(Num LONGINT)
      | FLOAT -> ^(Num FLOAT)
@@ -599,10 +610,11 @@ testlist_gexp : test ( gen_for -> ^(GenExpFor gen_for)
                      (COMMA)?
               ;
 
-
+//FIXME: switched to or_test for now which allows simple lambdas to work - but
+//      this prevents nested lambdas. see test_scope.py for examples that fail.
 //lambdef: 'lambda' [varargslist] ':' test
-lambdef: 'lambda' (varargslist)? COLON test
-      -> ^(Lambda varargslist? ^(Body test))
+lambdef: 'lambda' (varargslist)? COLON or_test {debug("parsed lambda");}
+      -> ^(Lambda varargslist? ^(Body or_test))
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
