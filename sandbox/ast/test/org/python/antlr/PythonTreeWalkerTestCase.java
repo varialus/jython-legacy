@@ -1,6 +1,9 @@
 package org.python.antlr;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -40,7 +43,11 @@ public class PythonTreeWalkerTestCase extends TestCase {
 		treeWalker.setTolerant(false);
 		treeWalker.setParseOnly(false);
 		PythonTree tree = treeWalker.parse(new String[] { path });
-		assertNotNull("no tree generated for file ".concat(path), tree);
+		if (tree == null) {
+			if (!isEmpty(file)) {
+				assertNotNull("no tree generated for file ".concat(path), tree);
+			}
+		}
 	}
 
 	@Override
@@ -54,6 +61,33 @@ public class PythonTreeWalkerTestCase extends TestCase {
 
 	private String getPath() {
 		return _path;
+	}
+
+	/**
+	 * 'empty' check for a .py file
+	 * 
+	 * @param file The file to check
+	 * @return <code>true</code> if the file is really empty, or only contains
+	 *         comments
+	 * @throws IOException
+	 */
+	private boolean isEmpty(File file) throws IOException {
+		boolean isEmpty = true;
+		assertTrue("file " + file.getAbsolutePath() + " is not readable", file.canRead());
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		try {
+			String line = reader.readLine();
+			while (line != null && isEmpty) {
+				line = line.trim();
+				if (line.length() > 0 && !line.startsWith("#")) {
+					isEmpty = false;
+				}
+				line = reader.readLine();
+			}
+		} finally {
+			reader.close();
+		}
+		return isEmpty;
 	}
 
 }
