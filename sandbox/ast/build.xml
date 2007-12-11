@@ -36,6 +36,7 @@
                 deprecation="false" optimize="false" failonerror="true">
             <src path="src"/>
             <src path="build/gensrc"/>
+            <src path="test"/>
             <classpath refid="main.classpath"/>
             <classpath location="build"/>
         </javac>
@@ -53,6 +54,17 @@
 
     <target name="clean">
         <delete dir="build"/>
+    </target>
+    
+    <target name="test">
+        <junit printsummary="withOutAndErr" showoutput="true"
+            fork="true" forkmode="once" failureproperty="testfailure">
+            <formatter type="plain" />
+            <classpath refid="main.classpath"/>
+            <batchtest todir="test">
+                <fileset dir="test"/>
+            </batchtest>
+        </junit>
     </target>
 
     <target name="antlr" depends="antlr_gen, compile"/>
