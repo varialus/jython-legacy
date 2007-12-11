@@ -32,6 +32,7 @@ import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.TryExcept;
+import org.python.antlr.ast.TryFinally;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
@@ -197,16 +198,29 @@ import java.util.Set;
         return new Num(t, new Long(l));
     }
 
-    private TryExcept makeTryExcept(PythonTree t, List body, List handlers, List orelses) {
-        excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
+    private stmtType makeTryExcept(PythonTree t, List body, List handlers, List orelses, List finBody) {
         stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
         stmtType[] o;
         if (orelses != null) {
             o = (stmtType[])orelses.toArray(new stmtType[orelses.size()]);
         } else {
             o = new stmtType[0];
         }
-        return new TryExcept(t, b, e, o);
+ 
+        stmtType te = new TryExcept(t, b, e, o);
+        if (finBody == null) {
+            return te;
+        }
+        stmtType[] f = (stmtType[])finBody.toArray(new stmtType[finBody.size()]);
+        stmtType[] mainBody = new stmtType[]{te};
+        return new TryFinally(t, mainBody, f);
+    }
+
+    private TryFinally makeTryFinally(PythonTree t,  List body, List finBody) {
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        stmtType[] f = (stmtType[])finBody.toArray(new stmtType[finBody.size()]);
+        return new TryFinally(t, b, f);
     }
 }
 
@@ -446,17 +460,20 @@ try_stmt
 }
     : ^(TryExcept ^(Body body=stmts) except_clause[handlers]+ (^(OrElse orelse=stmts))? (^(FinalBody 'finally' fin=stmts))?) {
         List o = null;
+        List f = null;
         if ($OrElse != null) {
             o = $orelse.stypes;
         }
-        TryExcept te = makeTryExcept($TryExcept, $body.stypes, handlers, o);
+        if ($FinalBody != null) {
+            f = $fin.stypes;
+        }
+        stmtType te = makeTryExcept($TryExcept, $body.stypes, handlers, o, f);
         $stmts::statements.add(te);
     }
-    | ^(TryFinally
-          ( ^(TryExcept ^(Body suite) except_clause[handlers]+ (^(OrElse suite))?)
-          | ^(Body suite)
-          )
-      ^(FinalBody suite))
+    | ^(TryFinally ^(Body body=stmts) ^(FinalBody fin=stmts)) {
+        TryFinally tf = makeTryFinally($TryFinally, $body.stypes, $fin.stypes);
+        $stmts::statements.add(tf);
+    }
     ;
 
 except_clause[List handlers]
