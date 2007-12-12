@@ -27,6 +27,7 @@ import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Compare;
+import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.FunctionDef;
@@ -383,19 +384,21 @@ augassign returns [int op]
     ;
 
 print_stmt
-    : ^(Print RIGHTSHIFT? test[expr_contextType.Load]?)
-    {
+    : ^(Print RIGHTSHIFT? test[expr_contextType.Load]?) {
     }
     ;
 
 del_stmt
-    : ^(Delete ^(Targets test[expr_contextType.Load]+))
+    : ^(Delete elts[expr_contextType.Del]) {
+        exprType[] t = (exprType[])$elts.etypes.toArray(new exprType[$elts.etypes.size()]);
+        $stmts::statements.add(new Delete($Delete, t));
+    }
     ;
 
 pass_stmt
     : Pass {
-       debug("Matched Pass");
-       $stmts::statements.add(new Pass($Pass));
+        debug("Matched Pass");
+        $stmts::statements.add(new Pass($Pass));
     }
     ;
 

@@ -339,7 +339,7 @@ print_stmt : 'print'
 
 //del_stmt: 'del' exprlist
 del_stmt : 'del' exprlist
-        -> ^(Delete ^(Targets exprlist))
+        -> ^(Delete exprlist)
          ;
 
 //pass_stmt: 'pass'
