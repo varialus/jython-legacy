@@ -24,9 +24,11 @@ import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Compare;
+import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.Expr;
@@ -40,7 +42,9 @@ import org.python.antlr.ast.TryFinally;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
+import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
+import org.python.antlr.ast.Yield;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -411,19 +415,35 @@ flow_stmt
     ;
 
 break_stmt
-    : 'break'
+    : Break {
+        $stmts::statements.add(new Break($Break));
+    }
     ;
 
 continue_stmt
-    : 'continue'
+    : Continue {
+        $stmts::statements.add(new Continue($Continue));
+    }
     ;
 
 return_stmt
-    : ^(Return (test[expr_contextType.Load])?)
+    : ^(Return (^(Value test[expr_contextType.Load]))?) {
+        exprType v = null;
+        if ($Value != null) {
+            v = $test.etype;
+        }
+        $stmts::statements.add(new Return($Return, v));
+    }
     ;
 
 yield_stmt
-    : ^(Yield test[expr_contextType.Load]?)
+    : ^(Yield (^(Value test[expr_contextType.Load]))?) {
+        exprType v = null;
+        if ($Value != null) {
+            v = $test.etype; 
+        }
+        //$stmts::statements.add(new Yield($Yield, v));
+    }
     ;
 
 raise_stmt

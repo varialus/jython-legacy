@@ -357,15 +357,17 @@ flow_stmt : break_stmt
 
 //break_stmt: 'break'
 break_stmt : 'break'
+          -> Break
            ;
 
 //continue_stmt: 'continue'
 continue_stmt : 'continue'
+             -> Continue
               ;
 
 //return_stmt: 'return' [testlist]
 return_stmt : 'return' (testlist)?
-          -> ^(Return testlist?)
+          -> ^(Return ^(Value testlist)?)
             ;
 
 //yield_stmt: yield_expr
@@ -722,7 +724,7 @@ gen_if: 'if' test gen_iter?
 
 //yield_expr: 'yield' [testlist]
 yield_expr : 'yield' testlist?
-          -> ^(Yield testlist?)
+          -> ^(Yield ^(Value testlist)?)
            ;
 
 //XXX:
