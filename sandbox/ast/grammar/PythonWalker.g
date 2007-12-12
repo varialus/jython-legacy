@@ -17,11 +17,14 @@ import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.excepthandlerType;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
+import org.python.antlr.ast.keywordType;
 import org.python.antlr.ast.modType;
 import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Assign;
+import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Compare;
 import org.python.antlr.ast.Dict;
@@ -244,7 +247,7 @@ varargslist returns [argumentsType args]
     List defaults = new ArrayList();
 }
     : ^(Args defparameter[params, defaults]+) (^(StarArgs sname=NAME))? (^(KWArgs kname=NAME))? {
-        $args = makeArgumentsType($Args,params, $sname, $kname, defaults);
+        $args = makeArgumentsType($Args, params, $sname, $kname, defaults);
     }
     | ^(StarArgs sname=NAME) (^(KWArgs kname=NAME))? {
         $args = makeArgumentsType($StarArgs,params, $sname, $kname, defaults);
@@ -257,25 +260,42 @@ varargslist returns [argumentsType args]
 defparameter[List params, List defaults]
     : NAME (ASSIGN test[expr_contextType.Load] )? {
         params.add(new Name($NAME, $NAME.text, org.python.antlr.ast.Name.Param));
-        if ($test.etype != null) {
+        if ($ASSIGN != null) {
             defaults.add($test.etype);
         }
     }
-    ;
-
-decorator
-    : ^(Decorator dotted_name ^(ArgList arglist?))
     ;
 
 decorators returns [List etypes]
 @init {
     List decs = new ArrayList();
 }
-    : decorator+ {
+    : decorator[decs]+ {
         $etypes = decs;
     }
     ;
 
+decorator [List decs]
+    : ^(Decorator dotted_attr (^(ArgList arglist))?) {
+        if ($ArgList == null) {
+            debug("not call site!");
+            decs.add($dotted_attr.etype);
+        } else {
+            exprType[] args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
+            keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
+            Call c = new Call($ArgList, $dotted_attr.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
+            debug("call site!");
+            decs.add(c);
+        }
+    }
+    ;
+
+dotted_attr returns [exprType etype]
+    : NAME {$etype = new Name($NAME, $NAME.text, expr_contextType.Load); debug("Matched Name");}
+    | ^(DOT n1=dotted_attr n2=dotted_attr) {
+        $etype = new Attribute($DOT, $n1.etype, $n2.text, expr_contextType.Load);
+    }
+    ;
 
 stmts returns [List stypes]
 scope {
@@ -421,8 +441,7 @@ dotted_as_name
     ;
 
 dotted_name
-    : start=NAME (DOT NAME)* {
-    }
+    : start=NAME (DOT NAME)*
     ;
 
 global_stmt
@@ -482,7 +501,16 @@ except_clause[List handlers]
         if ($stmts.start != null) {
             b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
         } else b = new stmtType[0];
-        handlers.add(new excepthandlerType($ExceptHandler, $type.etype, $name.etype, b));
+        exprType t = null;
+        if ($Type != null) {
+            t = $type.etype;
+        }
+        exprType n = null;
+        if ($Name != null) {
+            n = $name.etype;
+        }
+        //handlers.add(new excepthandlerType($ExceptHandler, $type.etype, $name.etype, b));
+        handlers.add(new excepthandlerType($ExceptHandler, t, n, b));
     }
     ;
 
@@ -604,7 +632,8 @@ lambdef: ^(Lambda varargslist? ^(Body test[expr_contextType.Load]))
        ;
 
 trailer
-    : ^(ArgList arglist?)
+    : ^(ArgList arglist?) {
+    }
     | ^(SubscriptList subscriptlist)
     | DOT NAME
     ;
@@ -636,15 +665,37 @@ base[List names]
     : test[expr_contextType.Store] {names.add($test.etype);}
     ;
 
-arglist
-    : ^(Arguments argument+) (^(StarArgs test[expr_contextType.Load]))? (^(KWArgs test[expr_contextType.Load]))?
-    | ^(StarArgs test[expr_contextType.Load]) (^(KWArgs test[expr_contextType.Load]))?
-    | ^(KWArgs test[expr_contextType.Load])
+arglist returns [List args, List keywords, exprType starargs, exprType kwargs]
+@init {
+    List arguments = new ArrayList();
+    List kws = new ArrayList();
+}
+    : ^(Args argument[arguments]* keyword[kws]*) (^(StarArgs stest=test[expr_contextType.Load]))? (^(KWArgs ktest=test[expr_contextType.Load]))? {
+        $args=arguments;
+        $keywords=kws;
+        //$starargs=stest.etype;
+        //$kwargs=ktest.etype;
+    }
+    | ^(StarArgs test[expr_contextType.Load]) (^(KWArgs test[expr_contextType.Load]))? {
+        $args=arguments;
+        $keywords=kws;
+    }
+    | ^(KWArgs test[expr_contextType.Load]) {
+        $args=arguments;
+        $keywords=kws;
+    }
     ;
 
-argument : ^(Arg test[expr_contextType.Load] (^(Default test[expr_contextType.Load]))?)
-         | ^(GenFor test[expr_contextType.Load] gen_for)
-         ;
+argument[List arguments]
+    : ^(Arg test[expr_contextType.Load] (^(Default test[expr_contextType.Load]))?)
+    | ^(GenFor test[expr_contextType.Load] gen_for)
+    ;
+
+keyword[List kws]
+    : ^(Keyword ^(Arg arg=test[expr_contextType.Load]) ^(Value val=test[expr_contextType.Load])) {
+        kws.add(new keywordType($Keyword, $arg.text, $val.etype));
+    }
+    ;
 
 list_iter: list_for
     | list_if

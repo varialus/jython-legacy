@@ -91,6 +91,7 @@ tokens {
     Arguments;
     Args;
     Arg;
+    Keyword;
     StarArgs;
     KWArgs;
     Assign;
@@ -161,6 +162,7 @@ tokens {
     Ifs;
     Elts;
     Ctx;
+    Attr;
     //The tokens below are not represented in the 2.5 Python.asdl
     GenFor;
     GenIf;
@@ -215,14 +217,18 @@ file_input : (NEWLINE | stmt)* {debug("parsed file_input");}
 eval_input : (NEWLINE!)* testlist (NEWLINE!)*
            ;
 
-//decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
-decorator: AT dotted_name (LPAREN arglist? RPAREN)? NEWLINE
-        -> ^(Decorator dotted_name ^(ArgList arglist?))
-         ;
-
 //decorators: decorator+
 decorators: decorator+
           ;
+
+//decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
+decorator: AT dotted_attr (LPAREN arglist? RPAREN)? NEWLINE
+        -> ^(Decorator dotted_attr ^(ArgList arglist)?)
+         ;
+
+dotted_attr
+    : NAME (DOT^ NAME)*
+    ;
 
 //funcdef: [decorators] 'def' NAME parameters ':' suite
 funcdef : decorators? 'def' NAME parameters COLON suite
@@ -669,7 +675,7 @@ arglist : argument (COMMA argument)*
             | DOUBLESTAR kwargs=test
             )?
           )?
-       -> ^(Arguments argument+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
+       -> ^(Args argument+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
         |   STAR starargs=test (COMMA DOUBLESTAR kwargs=test)?
        -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
         |   DOUBLESTAR kwargs=test
@@ -678,7 +684,7 @@ arglist : argument (COMMA argument)*
 
 //argument: [test '='] test	// Really [keyword '='] test
 argument : t1=test
-         ( (ASSIGN t2=test) -> ^(Arg $t1 ^(Default $t2)?)
+         ( (ASSIGN t2=test) -> ^(Keyword ^(Arg $t1) ^(Value $t2)?)
          | gen_for -> ^(GenFor $t1 gen_for)
          | -> ^(Arg $t1)
          )
@@ -706,7 +712,7 @@ gen_iter: gen_for
 
 //gen_for: 'for' exprlist 'in' or_test [gen_iter]
 gen_for: 'for' exprlist 'in' or_test gen_iter?
-        -> ^(GenFor ^(Target exprlist) ^(Iter gen_iter)?)
+      -> ^(GenFor ^(Target exprlist) ^(Iter gen_iter)?)
        ;
 
 //gen_if: 'if' old_test [gen_iter]

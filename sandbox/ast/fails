@@ -51,8 +51,6 @@ echo /Users/frank/src/python/release25-maint/Lib/plat-unixware7/IN.py
 
 echo /Users/frank/src/python/release25-maint/Lib/pydoc.py
 ./run /Users/frank/src/python/release25-maint/Lib/pydoc.py
-echo /Users/frank/src/python/release25-maint/Lib/sqlite3/test/types.py
-./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/types.py
 echo /Users/frank/src/python/release25-maint/Lib/tarfile.py
 ./run /Users/frank/src/python/release25-maint/Lib/tarfile.py
 echo /Users/frank/src/python/release25-maint/Lib/test/bad_coding2.py

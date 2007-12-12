@@ -768,7 +768,7 @@ echo Lib/plat-mac
 ./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/hooks.py
 ./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/regression.py
 ./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/transactions.py
-#./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/types.py
+./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/types.py
 ./run /Users/frank/src/python/release25-maint/Lib/sqlite3/test/userfunctions.py
 ./run /Users/frank/src/python/release25-maint/Lib/sre.py
 ./run /Users/frank/src/python/release25-maint/Lib/sre_compile.py
@@ -1008,6 +1008,7 @@ echo Lib/test/t
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_long.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_long_future.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_longexp.py
+echo Lib/test/m
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_macfs.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_macostools.py
 ./run /Users/frank/src/python/release25-maint/Lib/test/test_macpath.py
