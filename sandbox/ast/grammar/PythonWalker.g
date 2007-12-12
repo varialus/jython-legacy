@@ -336,7 +336,9 @@ stmt //combines simple_stmt and compound_stmt from Python.g
 expr_stmt
     : test[expr_contextType.Load] {
     }
-    | ^(augassign targ=test[expr_contextType.Load] value=test[expr_contextType.Load]) {
+    | ^(augassign targ=test[expr_contextType.Store] value=test[expr_contextType.Load]) {
+        AugAssign a = new AugAssign($augassign.start, $targ.etype, $augassign.op, $value.etype);
+        $stmts::statements.add(a);
     }
     | ^(Assign targets ^(Value value=test[expr_contextType.Load])) {
         debug("Matched Assign");
@@ -365,19 +367,19 @@ target[List etypes]
     }
     ;
 
-augassign
-    : PLUSEQUAL {}
-    | MINUSEQUAL {}
-    | STAREQUAL {}
-    | SLASHEQUAL {}
-    | PERCENTEQUAL {}
-    | AMPEREQUAL {}
-    | VBAREQUAL {}
-    | CIRCUMFLEXEQUAL {}
-    | LEFTSHIFTEQUAL {}
-    | RIGHTSHIFTEQUAL {}
-    | DOUBLESTAREQUAL {}
-    | DOUBLESLASHEQUAL {}
+augassign returns [int op]
+    : PLUSEQUAL {$op = operatorType.Add;}
+    | MINUSEQUAL {$op = operatorType.Sub;}
+    | STAREQUAL {$op = operatorType.Mult;}
+    | SLASHEQUAL {$op = operatorType.Div;}
+    | PERCENTEQUAL {$op = operatorType.Mod;}
+    | AMPEREQUAL {$op = operatorType.BitAnd;}
+    | VBAREQUAL {$op = operatorType.BitOr;}
+    | CIRCUMFLEXEQUAL {$op = operatorType.BitXor;}
+    | LEFTSHIFTEQUAL {$op = operatorType.LShift;}
+    | RIGHTSHIFTEQUAL {$op = operatorType.RShift;}
+    | DOUBLESTAREQUAL {$op = operatorType.Pow;}
+    | DOUBLESLASHEQUAL {$op = operatorType.FloorDiv;}
     ;
 
 print_stmt
