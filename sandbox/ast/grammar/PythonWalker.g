@@ -442,7 +442,8 @@ yield_stmt
         if ($Value != null) {
             v = $test.etype; 
         }
-        //$stmts::statements.add(new Yield($Yield, v));
+        Yield y = new Yield($Yield, v);
+        $stmts::statements.add(new Expr($Yield, y));
     }
     ;
 
