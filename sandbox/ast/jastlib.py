@@ -8,16 +8,22 @@ Since this is a tuple, we can directly compare, and this is going to
 be handy when comparing Jython's implementation vs CPython.
 
 """
-import org.python.antlr.ast as _ast
+import org.python.antlr.PythonTree as AST
 import org.python.antlr.Main as parser
 
 from types import ArrayType
+
+contexts = {0:("0Store"),1:tuple(["Load"]),2:tuple(["Store"]),3:["3Store"],4:["4Store"],5:["5Store"],6:tuple(["Param"])}
 
 def lispify_ast(node):
     return tuple(lispify_ast2(node))
 
 def lispify_ast2(node):
-    yield str(node)
+    s = node.__class__.__name__
+    name = s.split(".")[-1]
+    if name.endswith("Type"):
+        name = name[:-4]
+    yield name
     try:
         for field in node._fields:
             yield tuple(lispify_field(field, getattr(node, field)))
@@ -25,17 +31,23 @@ def lispify_ast2(node):
         pass
 
 def lispify_field(field, child):
+    fname = field
     yield field
     if not isinstance(child, ArrayType):
         children = [child]
     else:
-        children = child.tolist()
+        children = child
 
     for node in children:
-        if isinstance(node, (str, int)):
-            yield node
-        else:
+        if isinstance(node, AST):
             yield lispify_ast(node)
+        else:
+            if fname == "ctx":
+                yield contexts[node]
+            elif fname == "n":
+                yield int(node)
+            else:
+                yield node
 
 if __name__ == '__main__':
     import sys
@@ -43,5 +55,7 @@ if __name__ == '__main__':
 
     code_path = sys.argv[1]
     ast = parser().parse([code_path])
+
     lispified = lispify_ast(ast)
     pprint(lispified)
+    #assert(lispified == lispify_ast(ast2))
