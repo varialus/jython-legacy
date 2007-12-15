@@ -45,6 +45,7 @@ import org.python.antlr.ast.Print;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
+import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
 
 import java.util.Arrays;
@@ -209,12 +210,12 @@ import java.util.Set;
         return new Num(t, new Long(l));
     }
 
-    private stmtType makeTryExcept(PythonTree t, List body, List handlers, List orelses, List finBody) {
+    private stmtType makeTryExcept(PythonTree t, List body, List handlers, List orelse, List finBody) {
         stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
         excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
         stmtType[] o;
-        if (orelses != null) {
-            o = (stmtType[])orelses.toArray(new stmtType[orelses.size()]);
+        if (orelse != null) {
+            o = (stmtType[])orelse.toArray(new stmtType[orelse.size()]);
         } else {
             o = new stmtType[0];
         }
@@ -232,6 +233,17 @@ import java.util.Set;
         stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
         stmtType[] f = (stmtType[])finBody.toArray(new stmtType[finBody.size()]);
         return new TryFinally(t, b, f);
+    }
+
+    private While makeWhile(PythonTree t, exprType test, List body, List orelse) {
+        stmtType[] o;
+        if (orelse != null) {
+            o = (stmtType[])orelse.toArray(new stmtType[orelse.size()]);
+        } else {
+            o = new stmtType[0];
+        }
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        return new While(t, test, b, o);
     }
 }
 
@@ -358,7 +370,6 @@ expr_stmt
         Assign a = new Assign($Assign, e, $value.etype);
         $stmts::statements.add(a);
     }
-//    | call_expr
     ;
 
 call_expr
@@ -528,7 +539,14 @@ elif_clause
     ;
 
 while_stmt
-    : ^(While test[expr_contextType.Load] ^(Body suite) (^(OrElse suite))?)
+    : ^(While test[expr_contextType.Load] ^(Body body=stmts) (^(OrElse orelse=stmts))?) {
+        List o = null;
+        if ($OrElse != null) {
+            o = $orelse.stypes;
+        }
+        While w = makeWhile($While, $test.etype, $body.stypes, o);
+        $stmts::statements.add(w);
+    }
     ;
 
 for_stmt
