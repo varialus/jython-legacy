@@ -101,8 +101,8 @@ module Python version "$Revision: 53731 $"
 	-- TODO(jhylton): Figure out if there is a better way to handle
 	--                lineno and col_offset fields, particularly when
         --                ast is exposed to Python.
-    -- XXX(fwierzbicki): removed lineno and col_offset -- antlr handles this
-	excepthandler = (expr? type, expr? name, stmt* body)
+	excepthandler = (expr? type, expr? name, stmt* body, int lineno,
+	                 int col_offset)
 
 	arguments = (expr* args, identifier? vararg, 
 		     identifier? kwarg, expr* defaults)

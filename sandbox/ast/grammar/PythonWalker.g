@@ -42,6 +42,7 @@ import org.python.antlr.ast.TryFinally;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
+import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Yield;
@@ -137,24 +138,25 @@ import java.util.Set;
         char quoteChar = s.charAt(0);
         int start=0;
         boolean ustring = false;
-        boolean raw = false;
         if (quoteChar == 'u' || quoteChar == 'U') {
             ustring = true;
             start++;
         }
         quoteChar = s.charAt(start);
+        boolean raw = false;
         if (quoteChar == 'r' || quoteChar == 'R') {
             raw = true;
             start++;
         }
-        quoteChar = s.charAt(start);
-        int quotes = 1;
-        if (quoteChar == '"' && s.charAt(start +1) == '"' ||
-            quoteChar == '\'' && s.charAt(start+1) == '\'') {
-            quotes = 3;
+        int quotes = 3;
+        if (s.length() - start == 2) {
+            quotes = 1;
         }
+        if (s.charAt(start) != s.charAt(start+1)) {
+            quotes = 1;
+        }
+
         if (raw) {
-            //XXX: What about ur?
             return s.substring(quotes+start+1, s.length()-quotes);
         } else {
             StringBuffer sb = new StringBuffer(s.length());
@@ -169,7 +171,7 @@ import java.util.Set;
 
     //FIXME: placeholder until I re-integrate with Jython.
     public static String decode_UnicodeEscape(String str, int start, int end, String errors, boolean unicode) {
-        return str;
+        return str.substring(start, end);
     }
 
 
@@ -281,14 +283,14 @@ decorators returns [List etypes]
     ;
 
 decorator [List decs]
-    : ^(Decorator dotted_attr (^(ArgList arglist))?) {
-        if ($ArgList == null) {
+    : ^(Decorator dotted_attr (^(Call arglist))?) {
+        if ($Call == null) {
             debug("not call site!");
             decs.add($dotted_attr.etype);
         } else {
             exprType[] args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
             keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
-            Call c = new Call($ArgList, $dotted_attr.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
+            Call c = new Call($Call, $dotted_attr.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
             debug("call site!");
             decs.add(c);
         }
@@ -296,7 +298,7 @@ decorator [List decs]
     ;
 
 dotted_attr returns [exprType etype]
-    : NAME {$etype = new Name($NAME, $NAME.text, expr_contextType.Load); debug("Matched Name");}
+    : NAME {$etype = new Name($NAME, $NAME.text, expr_contextType.Load); debug("matched NAME in dotted_attr");}
     | ^(DOT n1=dotted_attr n2=dotted_attr) {
         $etype = new Attribute($DOT, $n1.etype, $n2.text, expr_contextType.Load);
     }
@@ -354,6 +356,24 @@ expr_stmt
         debug("exprs: " + e.length);
         Assign a = new Assign($Assign, e, $value.etype);
         $stmts::statements.add(a);
+    }
+//    | call_expr
+    ;
+
+call_expr
+    : ^(Call (^(Args arglist))? test[expr_contextType.Load]) {
+        Call c;
+        if ($Args == null) {
+            c = new Call($Call, $test.etype, new exprType[0], new keywordType[0], null, null);
+            debug("Matched Call site no args");
+        } else {
+            debug($arglist.text + "!!!!" + $test.text);
+            debug("Matched Call w/ args");
+            exprType[] args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
+            keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
+            c = new Call($Call, $test.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
+        }
+        $stmts::statements.add(new Expr($Call, c));
     }
     ;
 
@@ -448,7 +468,22 @@ yield_stmt
     ;
 
 raise_stmt
-    : ^(Raise (^(Type test[expr_contextType.Load]))? (^(Inst test[expr_contextType.Load]))? (^(Tback test[expr_contextType.Load]))?)
+    : ^(Raise (^(Type type=test[expr_contextType.Load]))? (^(Inst inst=test[expr_contextType.Load]))? (^(Tback tback=test[expr_contextType.Load]))?) {
+        exprType t = null;
+        if ($Type != null) {
+            t = $type.etype;
+        }
+        exprType i = null;
+        if ($Inst != null) {
+            i = $inst.etype;
+        }
+        exprType b = null;
+        if ($Tback != null) {
+            b = $tback.etype;
+        }
+
+        $stmts::statements.add(new Raise($Raise, t, i, b));
+    }
     ;
 
 import_stmt
@@ -535,8 +570,9 @@ except_clause[List handlers]
         if ($Name != null) {
             n = $name.etype;
         }
-        //handlers.add(new excepthandlerType($ExceptHandler, $type.etype, $name.etype, b));
-        handlers.add(new excepthandlerType($ExceptHandler, t, n, b));
+        //XXX: getCharPositionInLine() -7 is only accurate in the simplist cases -- need to
+        //     look harder at CPython to figure out what is really needed here.
+        handlers.add(new excepthandlerType($ExceptHandler, t, n, b, $ExceptHandler.getLine(), $ExceptHandler.getCharPositionInLine()));
     }
     ;
 
@@ -567,7 +603,11 @@ test[int ctype] returns [exprType etype]
         $etype = new Compare($comp_op.start, $left.etype, ops, targets);
         debug("COMP_OP: " + $comp_op.start);
     }
-    | atom[ctype] (trailer)* {$etype = $atom.etype;}
+    | atom[ctype] {
+        debug("matched atom");
+        debug("***" + $atom.etype);
+        $etype = $atom.etype;
+    }
     | ^(PLUS test[ctype] test[ctype])
     | ^(MINUS left=test[ctype] right=test[ctype]) {}
     | ^(AMPER test[ctype] test[ctype])
@@ -584,6 +624,7 @@ test[int ctype] returns [exprType etype]
     | ^(USub test[ctype])
     | ^(Invert test[ctype])
     | lambdef
+    | call_expr
     ;
 
 comp_op returns [int op]
@@ -637,32 +678,36 @@ atom[int ctype] returns [exprType etype]
     | ^(Parens test[ctype]*) {}
     | ^(Dict test[ctype]*) {}
     | ^(Repr test[ctype]*) {}
-    | ^(Name NAME) {$etype = new Name($NAME, $NAME.text, ctype); debug("Matched Name");}
+    | ^(Name NAME) {
+        debug("matched Name " + $NAME.text);
+        $etype = new Name($NAME, $NAME.text, ctype);
+    }
+    | ^(DOT NAME test[ctype]) {
+        $etype = new Attribute($DOT, $atom.etype, $NAME.text, expr_contextType.Load);
+    }
+    | ^(SubscriptList subscriptlist test[ctype])
     | ^(Num INT) {$etype = makeNum($INT);}
     | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
     | ^(Num FLOAT)
     | ^(Num COMPLEX)
     | stringlist {
+        $etype = new Str($stringlist.start, extractStrings($stringlist.strings));
     }
     ;
 
-stringlist
-    : ^(Str string+) {}
+stringlist returns [List strings]
+@init {
+    List strs = new ArrayList();
+}
+    : ^(Str string[strs]+) {$strings = strs;}
     ;
 
-string
-    : STRING {}
+string[List strs]
+    : STRING {strs.add($STRING.text);}
     ;
 
 lambdef: ^(Lambda varargslist? ^(Body test[expr_contextType.Load]))
        ;
-
-trailer
-    : ^(ArgList arglist?) {
-    }
-    | ^(SubscriptList subscriptlist)
-    | DOT NAME
-    ;
 
 subscriptlist
     :   subscript+
@@ -699,22 +744,34 @@ arglist returns [List args, List keywords, exprType starargs, exprType kwargs]
     : ^(Args argument[arguments]* keyword[kws]*) (^(StarArgs stest=test[expr_contextType.Load]))? (^(KWArgs ktest=test[expr_contextType.Load]))? {
         $args=arguments;
         $keywords=kws;
-        //$starargs=stest.etype;
-        //$kwargs=ktest.etype;
+        if ($StarArgs != null) {
+            $starargs=$stest.etype;
+        }
+        if ($KWArgs != null) {
+            $kwargs=$ktest.etype;
+        }
     }
-    | ^(StarArgs test[expr_contextType.Load]) (^(KWArgs test[expr_contextType.Load]))? {
+    | ^(StarArgs stest=test[expr_contextType.Load]) (^(KWArgs ktest=test[expr_contextType.Load]))? {
         $args=arguments;
         $keywords=kws;
+        $starargs=$stest.etype;
+        if ($KWArgs != null) {
+            $kwargs=$ktest.etype;
+        }
     }
     | ^(KWArgs test[expr_contextType.Load]) {
         $args=arguments;
         $keywords=kws;
+        $kwargs=$test.etype;
     }
     ;
 
 argument[List arguments]
-    : ^(Arg test[expr_contextType.Load] (^(Default test[expr_contextType.Load]))?)
+    : ^(Arg test[expr_contextType.Load]) {
+        arguments.add($test.etype);
+    }
     | ^(GenFor test[expr_contextType.Load] gen_for)
+        //arguments.add($test.etype));
     ;
 
 keyword[List kws]

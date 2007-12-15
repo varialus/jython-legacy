@@ -135,7 +135,6 @@ tokens {
     Lambda;
     Repr;
     BinOp;
-    ArgList;
     Subscript;
     SubscriptList;
     Target;
@@ -163,6 +162,7 @@ tokens {
     Elts;
     Ctx;
     Attr;
+    Call;
     //The tokens below are not represented in the 2.5 Python.asdl
     GenFor;
     GenIf;
@@ -223,7 +223,7 @@ decorators: decorator+
 
 //decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
 decorator: AT dotted_attr (LPAREN arglist? RPAREN)? NEWLINE
-        -> ^(Decorator dotted_attr ^(ArgList arglist)?)
+        -> ^(Decorator dotted_attr ^(Call arglist)?)
          ;
 
 dotted_attr
@@ -583,7 +583,7 @@ factor : PLUS factor -> ^(UAdd factor)
        ;
 
 //power: atom trailer* ['**' factor]
-power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR^ factor)?
+power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
       ;
 
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
@@ -626,9 +626,9 @@ lambdef: 'lambda' (varargslist)? COLON or_test {debug("parsed lambda");}
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer : LPAREN (arglist)? RPAREN -> ^(ArgList arglist?)
+trailer : LPAREN (arglist)? RPAREN -> ^(Call ^(Args arglist)?)
         | LBRACK subscriptlist RBRACK -> ^(SubscriptList subscriptlist)
-        | DOT NAME
+        | DOT^ NAME {debug("motched DOT^ NAME");}
         ;
 
 //subscriptlist: subscript (',' subscript)* [',']
@@ -653,7 +653,7 @@ exprlist : expr (options {k=2;}: COMMA expr)* (COMMA)?
 
 //testlist: test (',' test)* [',']
 testlist : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple test+)
-         | test -> test
+         | test
          ;
 
 //XXX:

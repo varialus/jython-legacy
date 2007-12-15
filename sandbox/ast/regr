@@ -139,6 +139,7 @@ echo Lib/c
 ./run /Users/frank/src/python/release25-maint/Lib/curses/panel.py
 ./run /Users/frank/src/python/release25-maint/Lib/curses/textpad.py
 ./run /Users/frank/src/python/release25-maint/Lib/curses/wrapper.py
+echo Lib/d
 ./run /Users/frank/src/python/release25-maint/Lib/dbhash.py
 ./run /Users/frank/src/python/release25-maint/Lib/decimal.py
 ./run /Users/frank/src/python/release25-maint/Lib/difflib.py
@@ -206,6 +207,7 @@ echo Lib/c
 ./run /Users/frank/src/python/release25-maint/Lib/dumbdbm.py
 ./run /Users/frank/src/python/release25-maint/Lib/dummy_thread.py
 ./run /Users/frank/src/python/release25-maint/Lib/dummy_threading.py
+echo Lib/e
 ./run /Users/frank/src/python/release25-maint/Lib/email/__init__.py
 ./run /Users/frank/src/python/release25-maint/Lib/email/_parseaddr.py
 ./run /Users/frank/src/python/release25-maint/Lib/email/base64mime.py
