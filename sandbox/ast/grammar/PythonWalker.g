@@ -47,6 +47,7 @@ import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Yield;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -683,7 +684,8 @@ atom[int ctype] returns [exprType etype]
         $etype = new Name($NAME, $NAME.text, ctype);
     }
     | ^(DOT NAME test[ctype]) {
-        $etype = new Attribute($DOT, $atom.etype, $NAME.text, expr_contextType.Load);
+        debug("matched DOT in atom: " + $test.etype + "###" + $NAME.text);
+        $etype = new Attribute($DOT, $test.etype, $NAME.text, expr_contextType.Load);
     }
     | ^(SubscriptList subscriptlist test[ctype])
     | ^(Num INT) {$etype = makeNum($INT);}
@@ -718,8 +720,14 @@ subscript : Ellipsis
           ;
 
 classdef
-    : ^(ClassDef ^(Name classname=NAME) bases ^(Body stmts)) {
-        $stmts::statements.add(makeClassDef($ClassDef, $classname, $bases.names, $stmts.stypes));
+    : ^(ClassDef ^(Name classname=NAME) (^(Bases bases))? ^(Body stmts)) {
+        List b;
+        if ($Bases != null) {
+            b = $bases.names;
+        } else {
+            b = new ArrayList();
+        }
+        $stmts::statements.add(makeClassDef($ClassDef, $classname, b, $stmts.stypes));
     }
     ;
 
@@ -727,13 +735,29 @@ bases returns [List names]
 @init {
     List nms = new ArrayList();
 }
-    :^(Bases base[nms]*) {
-        $names = nms;
+    : base[nms] {
+        //The instanceof and tuple unpack here is gross.  I *should* be able to detect
+        //"Tuple or Tuple DOWN or some such in a syntactic predicate in the "base" rule
+        //instead, but I haven't been able to get it to work.
+        if (nms.get(0) instanceof Tuple) {
+            debug("TUPLE");
+            Tuple t = (Tuple)nms.get(0);
+            $names = Arrays.asList(t.elts);
+        } else {
+            debug("NOT TUPLE");
+            $names = nms;
+        }
     }
     ;
 
+//FIXME: right now test matches a Tuple from Python.g output -- I'd rather
+//       unpack the tuple here instead of in bases, otherwise this rule
+//       should just get absorbed back into bases, since it is never matched
+//       more than once as it is now.
 base[List names]
-    : test[expr_contextType.Store] {names.add($test.etype);}
+    : test[expr_contextType.Load] {
+        names.add($test.etype);
+    }
     ;
 
 arglist returns [List args, List keywords, exprType starargs, exprType kwargs]
