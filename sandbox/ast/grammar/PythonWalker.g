@@ -37,6 +37,7 @@ import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
+import org.python.antlr.ast.If;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
@@ -238,6 +239,18 @@ import java.util.Set;
         stmtType[] f = (stmtType[])finBody.toArray(new stmtType[finBody.size()]);
         return new TryFinally(t, b, f);
     }
+
+    private If makeIf(PythonTree t, exprType test, List body, List orelse) {
+        stmtType[] o;
+        if (orelse != null) {
+            o = (stmtType[])orelse.toArray(new stmtType[orelse.size()]);
+        } else {
+            o = new stmtType[0];
+        }
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        return new If(t, test, b, o);
+    }
+
 
     private While makeWhile(PythonTree t, exprType test, List body, List orelse) {
         stmtType[] o;
@@ -573,7 +586,14 @@ assert_stmt
     ;
 
 if_stmt
-    : ^(If test[expr_contextType.Load] stmts elif_clause* (^(OrElse stmts))?)
+    : ^(If test[expr_contextType.Load] body=stmts elif_clause* (^(OrElse orelse=stmts))?) {
+        List o = null;
+        if ($OrElse != null) {
+            o = $orelse.stypes;
+        }
+        If i = makeIf($If, $test.etype, $body.stypes, o);
+        $stmts::statements.add(i);
+    }
     ;
 
 elif_clause
