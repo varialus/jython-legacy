@@ -149,7 +149,6 @@ tokens {
     Invert;
     Delete;
     Default;
-    Parens;
     Alias;
     Asname;
     Decorator;

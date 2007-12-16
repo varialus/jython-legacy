@@ -543,11 +543,11 @@ assert_stmt
 
 
 if_stmt
-    : ^(If test[expr_contextType.Load] suite elif_clause* (^(OrElse suite))?)
+    : ^(If test[expr_contextType.Load] stmts elif_clause* (^(OrElse stmts))?)
     ;
 
 elif_clause
-    : ^(Elif test[expr_contextType.Load] suite)
+    : ^(Elif test[expr_contextType.Load] stmts)
     ;
 
 while_stmt
@@ -615,17 +615,11 @@ except_clause[List handlers]
     ;
 
 with_stmt
-    : ^(With test[expr_contextType.Load] with_var? ^(Body suite))
+    : ^(With test[expr_contextType.Load] with_var? ^(Body stmts))
     ;
 
 with_var
     : ('as' | NAME) test[expr_contextType.Load]
-    ;
-
- 
-suite
-    : INDENT stmt+ DEDENT
-    | stmt+
     ;
 
 //FIXME: lots of placeholders
@@ -722,10 +716,8 @@ atom[int ctype] returns [exprType etype]
         }
         $etype = new org.python.antlr.ast.List($List, e, ctype);
     }
-
     | ^(ListComp list_for) {}
     | ^(GenExpFor gen_for) {}
-    | ^(Parens test[ctype]*) {}
     | ^(Dict test[ctype]*) {}
     | ^(Repr test[ctype]*) {}
     | ^(Name NAME) {
