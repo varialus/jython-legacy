@@ -712,7 +712,17 @@ atom[int ctype] returns [exprType etype]
         }
         $etype = new Tuple($Tuple, e, ctype);
     }
-    | ^(List test[ctype]*) {}
+    | ^(List (^(Elts elts[ctype]))?) {
+        debug("matched List");
+        exprType[] e;
+        if ($Elts != null) {
+            e = (exprType[])$elts.etypes.toArray(new exprType[$elts.etypes.size()]);
+        } else {
+            e = new exprType[0];
+        }
+        $etype = new org.python.antlr.ast.List($List, e, ctype);
+    }
+
     | ^(ListComp list_for) {}
     | ^(GenExpFor gen_for) {}
     | ^(Parens test[ctype]*) {}

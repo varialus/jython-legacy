@@ -594,7 +594,7 @@ atom : LPAREN
        | -> ^(Tuple)
        )
        RPAREN
-     | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
+     | LBRACK (listmaker)? RBRACK -> ^(List ^(Elts listmaker)?)
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
      | NAME {debug("parsed NAME");} -> ^(Name NAME)
