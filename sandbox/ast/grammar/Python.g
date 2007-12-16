@@ -647,8 +647,8 @@ sliceop : COLON (test)? -> test?
         ;
 
 //exprlist: expr (',' expr)* [',']
-exprlist : expr (options {k=2;}: COMMA expr)* (COMMA)?
-        -> expr+
+exprlist : (expr COMMA) => expr (options {k=2;}: COMMA expr)* (COMMA)? -> ^(Tuple expr+)
+         | expr
          ;
 
 //testlist: test (',' test)* [',']

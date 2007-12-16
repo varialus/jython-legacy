@@ -32,6 +32,7 @@ import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.Expr;
+import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.Module;
@@ -244,6 +245,17 @@ import java.util.Set;
         }
         stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
         return new While(t, test, b, o);
+    }
+
+    private For makeFor(PythonTree t, exprType target, exprType iter, List body, List orelse) {
+        stmtType[] o;
+        if (orelse != null) {
+            o = (stmtType[])orelse.toArray(new stmtType[orelse.size()]);
+        } else {
+            o = new stmtType[0];
+        }
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        return new For(t, target, iter, b, o);
     }
 }
 
@@ -550,7 +562,14 @@ while_stmt
     ;
 
 for_stmt
-    : ^(For ^(Target test[expr_contextType.Load]+) ^(Iter test[expr_contextType.Load]) ^(Body suite) (^(OrElse suite))?)
+    : ^(For ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Load]) ^(Body body=stmts) (^(OrElse orelse=stmts))?) {
+        List o = null;
+        if ($OrElse != null) {
+            o = $orelse.stypes;
+        }
+        For f = makeFor($For, $targ.etype, $iter.etype, $body.stypes, o);
+        $stmts::statements.add(f);
+    }
     ;
 
 try_stmt
@@ -693,7 +712,6 @@ atom[int ctype] returns [exprType etype]
     | ^(List test[ctype]*) {}
     | ^(ListComp list_for) {}
     | ^(GenExpFor gen_for) {}
-//    | ^(Tuple test[ctype]*) {}
     | ^(Parens test[ctype]*) {}
     | ^(Dict test[ctype]*) {}
     | ^(Repr test[ctype]*) {}
