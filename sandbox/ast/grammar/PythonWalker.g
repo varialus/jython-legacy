@@ -21,6 +21,7 @@ import org.python.antlr.ast.keywordType;
 import org.python.antlr.ast.modType;
 import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.stmtType;
+import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
@@ -31,6 +32,7 @@ import org.python.antlr.ast.Compare;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
+import org.python.antlr.ast.Exec;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
@@ -547,13 +549,28 @@ name_expr[List nms]
     ;
 
 exec_stmt
-    : ^(Exec test[expr_contextType.Load] (^(Globals test[expr_contextType.Load]))? (^(Locals test[expr_contextType.Load]))?)
+    : ^(Exec exec=test[expr_contextType.Load] (^(Globals globals=test[expr_contextType.Load]))? (^(Locals locals=test[expr_contextType.Load]))?) {
+        exprType g = null;
+        if ($Globals != null) {
+            g = $globals.etype;
+        }
+        exprType loc = null;
+        if ($Locals != null) {
+            loc = $locals.etype;
+        }
+        $stmts::statements.add(new Exec($Exec, $exec.etype, g, loc));
+    }
     ;
 
 assert_stmt
-    : ^(Assert ^(Test test[expr_contextType.Load]) (^(Msg test[expr_contextType.Load]))?)
+    : ^(Assert ^(Test tst=test[expr_contextType.Load]) (^(Msg msg=test[expr_contextType.Load]))?) {
+        exprType m = null;
+        if ($Msg != null) {
+            m = $msg.etype;
+        }
+        $stmts::statements.add(new Assert($Assert, $tst.etype, m));
+    }
     ;
-
 
 if_stmt
     : ^(If test[expr_contextType.Load] stmts elif_clause* (^(OrElse stmts))?)

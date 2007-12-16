@@ -589,7 +589,7 @@ power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
 atom : LPAREN 
        //XXX: calling all of these "Tuple" is almost certainly incorrect.
        ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
-       | testlist_gexp -> ^(Tuple ^(Elts testlist_gexp))
+       | testlist_gexp {debug("parsed testlist_gexp");} -> ^(Tuple ^(Elts testlist_gexp))
        | -> ^(Tuple)
        )
        RPAREN
