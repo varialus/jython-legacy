@@ -34,6 +34,7 @@ import org.python.antlr.ast.Dict;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.Global;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
@@ -530,7 +531,19 @@ dotted_name
     ;
 
 global_stmt
-    : ^(Global NAME+)
+@init {
+    List nms = new ArrayList();
+}
+    : ^(Global name_expr[nms]+) {
+        String[] n = (String[])nms.toArray(new String[nms.size()]);
+        $stmts::statements.add(new Global($Global, n));
+    }
+    ;
+
+name_expr[List nms]
+    : NAME {
+        nms.add($NAME.text);
+    }
     ;
 
 exec_stmt
