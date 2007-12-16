@@ -588,9 +588,10 @@ power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
 
 //atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
 atom : LPAREN 
-       ( yield_expr    -> ^(Parens yield_expr)
-       | testlist_gexp -> ^(Parens testlist_gexp?)
-       | -> ^(Parens)
+       //XXX: calling all of these "Tuple" is almost certainly incorrect.
+       ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
+       | testlist_gexp -> ^(Tuple ^(Elts testlist_gexp))
+       | -> ^(Tuple)
        )
        RPAREN
      | LBRACK (listmaker)? RBRACK -> ^(List listmaker?)
@@ -647,12 +648,12 @@ sliceop : COLON (test)? -> test?
         ;
 
 //exprlist: expr (',' expr)* [',']
-exprlist : (expr COMMA) => expr (options {k=2;}: COMMA expr)* (COMMA)? -> ^(Tuple expr+)
+exprlist : (expr COMMA) => expr (options {k=2;}: COMMA expr)* (COMMA)? -> ^(Tuple ^(Elts expr+))
          | expr
          ;
 
 //testlist: test (',' test)* [',']
-testlist : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple test+)
+testlist : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple ^(Elts test+))
          | test
          ;
 

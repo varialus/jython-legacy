@@ -702,10 +702,13 @@ elt[int ctype]
 
 //FIXME: lots of placeholders
 atom[int ctype] returns [exprType etype]
-    : ^(Tuple elts[ctype]) {
-        exprType[] e = new exprType[$elts.etypes.size()];
-        for(int i=0;i<$elts.etypes.size();i++) {
-            e[i] = (exprType)$elts.etypes.get(i);
+    : ^(Tuple (^(Elts elts[ctype]))?) {
+        debug("matched Tuple");
+        exprType[] e;
+        if ($Elts != null) {
+            e = (exprType[])$elts.etypes.toArray(new exprType[$elts.etypes.size()]);
+        } else {
+            e = new exprType[0];
         }
         $etype = new Tuple($Tuple, e, ctype);
     }
