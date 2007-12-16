@@ -383,6 +383,7 @@ stmt //combines simple_stmt and compound_stmt from Python.g
 
 expr_stmt
     : test[expr_contextType.Load] {
+        $stmts::statements.add(new Expr($test.start, $test.etype));
     }
     | ^(augassign targ=test[expr_contextType.Store] value=test[expr_contextType.Load]) {
         AugAssign a = new AugAssign($augassign.start, $targ.etype, $augassign.op, $value.etype);
@@ -527,18 +528,37 @@ raise_stmt
     ;
 
 import_stmt
-    : ^(Import dotted_as_name+) {
+@init {
+    List nms = new ArrayList();
+}
+    : ^(Import dotted_as_name[nms]+) {
+        aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
+        $stmts::statements.add(new Import($Import, n));
     }
     | ^(ImportFrom dotted_name ^(Import STAR))
     | ^(ImportFrom dotted_name ^(Import import_as_name+))
     ;
 
 import_as_name
-    : ^(Alias NAME (^(Asname NAME))?)
+    : ^(Alias name=NAME (^(Asname asname=NAME))?) {
+        String as = null;
+        if ($Asname != null) {
+            as = $asname.text;
+        }
+        aliasType a = new aliasType($Alias, $name.text, as);
+        //nms.add(a);
+    }
     ;
 
-dotted_as_name
-    : ^(Alias dotted_name (^(Asname NAME))?)
+dotted_as_name [List nms]
+    : ^(Alias dotted_name (^(Asname NAME))?) {
+        String as = null;
+        if ($Asname != null) {
+            as = $NAME.text;
+        }
+        aliasType a = new aliasType($Alias, $dotted_name.text, as);
+        nms.add(a);
+    }
     ;
 
 dotted_name
