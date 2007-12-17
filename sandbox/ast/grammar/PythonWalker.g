@@ -247,7 +247,12 @@ import java.util.Set;
         } else {
             o = new stmtType[0];
         }
-        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        stmtType[] b;
+        if (body != null) {
+            b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        } else {
+            b = new stmtType[0];
+        }
         return new If(t, test, b, o);
     }
 
