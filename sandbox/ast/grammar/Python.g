@@ -162,6 +162,9 @@ tokens {
     Ctx;
     Attr;
     Call;
+    Dest;
+    Values;
+    Newline;
     //The tokens below are not represented in the 2.5 Python.asdl
     GenFor;
     GenIf;
@@ -329,11 +332,12 @@ augassign : PLUSEQUAL
           ;
 
 //print_stmt: 'print' ( [ test (',' test)* [','] ] | '>>' test [ (',' test)+ [','] ] )
+//XXX: we need to capture the presence/absence of a trailing comma for print (yuck)
 print_stmt : 'print'
              ( testlist
              | RIGHTSHIFT testlist
              )?
-          -> ^(Print RIGHTSHIFT? testlist?)
+          -> ^(Print ^(Dest RIGHTSHIFT)? ^(Values testlist)?)
            ;
 
 //del_stmt: 'del' exprlist
@@ -652,9 +656,13 @@ exprlist : (expr COMMA) => expr (options {k=2;}: COMMA expr)* (COMMA)? -> ^(Tupl
          ;
 
 //testlist: test (',' test)* [',']
-testlist : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple ^(Elts test+))
-         | test
-         ;
+//XXX: newline is only used by print - is there a better way?
+testlist returns [Token newline]
+    : (test COMMA) => test (options {k=2;}: COMMA test)* (trailcomma=COMMA)? {
+        $newline=$trailcomma;
+    } -> ^(Tuple ^(Elts test+))
+    | test {$newline = null;}
+    ;
 
 //XXX:
 //testlist_safe: test [(',' test)+ [',']]

@@ -10,6 +10,8 @@ be handy when comparing Jython's implementation vs CPython.
 """
 
 import _ast
+import os
+import glob
 
 def lispify_ast(node):
     return tuple(lispify_ast2(node))
@@ -35,44 +37,87 @@ def lispify_field(field, child):
         else:
             yield node
 
-
-if __name__ == '__main__':
-    import sys
+def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_success=False,):
     from pprint import pprint
     from popen2 import popen2
     from StringIO import StringIO
     from difflib import Differ
 
-    code_path = sys.argv[1]
-    jy_exe = "jython"
-    if len(sys.argv) > 2:
-        jy_exe = sys.argv[2]
-    ast = compile(open(code_path).read(), code_path, "exec", _ast.PyCF_ONLY_AST)
-    lispified = lispify_ast(ast)
-    sio = StringIO()
-    pprint(lispified, stream=sio)
+    if os.path.isdir(code_path):
+        pyfiles = glob.glob("%s/**.py" % code_path)
+    else:
+        pyfiles = [code_path]
 
-    fin, fout = popen2("%s jastlib.py %s" % (jy_exe, code_path))
+    for pyfile in pyfiles:
+        ast = compile(open(pyfile).read(), pyfile, "exec", _ast.PyCF_ONLY_AST)
+        lispified = lispify_ast(ast)
+        sio = StringIO()
+        pprint(lispified, stream=sio)
 
-    sio.seek(0)
-    pstr = sio.readlines()
-    jstr = fin.readlines()
+        fin, fout = popen2("%s jastlib.py %s" % (jy_exe, pyfile))
 
-    differs = False
-    diffstr = []
-    diff = Differ()
-    results = diff.compare(pstr, jstr)
-    for d in results:
-        diffstr.append(d)
-        if d[0] in ['+', '-']:
-            differs = True
+        sio.seek(0)
+        pstr = sio.readlines()
+        jstr = fin.readlines()
 
-    if differs:
-        print "---------- ouput -------------"
-        print "py: %s" % sio.getvalue()
-        print "jy: %s" % "".join(jstr)
-        print "---------- DIFF -------------"
-        print "".join(diffstr)
+        differs = False
+        diffstr = []
+        diff = Differ()
+        results = diff.compare(pstr, jstr)
+        for d in results:
+            diffstr.append(d)
+            if d[0] in ['+', '-']:
+                differs = True
 
-    #ast2 = compile(open(code_path).read(), code_path, "exec", _ast.PyCF_ONLY_AST)
-    #assert(lispified == lispify_ast(ast2))
+        if print_success and not differs:
+            print "SUCCESS: %s" % pyfile
+
+        if print_fail and differs:
+            print "FAIL: %s" % pyfile
+
+        if print_diff and differs:
+            print "---------- ouput -------------"
+            print "py: %s" % sio.getvalue()
+            print "jy: %s" % "".join(jstr)
+            print "---------- DIFF -------------"
+            print "".join(diffstr)
+
+if __name__ == '__main__':
+    import sys
+    import getopt
+
+    usage = """\
+Usage: python %s [-j jython_exe_name] [-s -f -d] code_path
+       where -s = print success messages
+             -f = print failure messages
+             -d = don't print diffs on failure
+       if codepath is a file test it, if codepath is a directory
+             test all .py files in and below that directory.
+""" % sys.argv[0]
+
+    jy_exe = 'jython'
+    print_diff = True
+    print_fail = False
+    print_success = False
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'j:sfdh')
+    except:
+        print usage
+        sys.exit(1)
+    for o, v in opts:
+        if o == '-h':
+            print usage
+            sys.exit(0)
+        if o == '-j' and v != '':
+            jy_exe = v
+        if o == '-s':
+            print_success = True
+        if o == '-f':
+            print_fail = True
+        if o == '-d':
+            print_diff = False
+    if len(args) < 1 or len(args) > 7:
+        print usage
+        sys.exit(1)
+
+    main(args[0], jy_exe, print_diff, print_fail, print_success)

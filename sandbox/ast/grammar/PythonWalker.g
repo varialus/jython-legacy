@@ -39,6 +39,7 @@ import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.Import;
+import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
@@ -454,7 +455,37 @@ augassign returns [int op]
     ;
 
 print_stmt
-    : ^(Print RIGHTSHIFT? test[expr_contextType.Load]?) {
+    : ^(Print (^(Dest RIGHTSHIFT))? (^(Values test[expr_contextType.Load]))?) {
+        Print p;
+        exprType[] values;
+
+        exprType dest = null;
+        boolean hasdest = false;
+
+        //FIXME: just assuming newline for now.
+        boolean newline = true;
+
+        if ($Dest != null) {
+            hasdest = true;
+        }
+        if ($Values != null) {
+            if ($test.etype instanceof Tuple) {
+                Tuple t = (Tuple)$test.etype;
+                if (hasdest) {
+                    dest = t.elts[0];
+                    values = new exprType[t.elts.length - 1];
+                    System.arraycopy(t.elts, 1, values, 0, values.length);
+                } else {
+                    values = t.elts;
+                }
+            } else {
+                values  = new exprType[]{$test.etype};
+            }
+        } else {
+            values = new exprType[0];
+        }
+        p = new Print($Print, dest, values, newline);
+        $stmts::statements.add(p);
     }
     ;
 
@@ -540,18 +571,26 @@ import_stmt
         aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
         $stmts::statements.add(new Import($Import, n));
     }
-    | ^(ImportFrom dotted_name ^(Import STAR))
-    | ^(ImportFrom dotted_name ^(Import import_as_name+))
+    | ^(ImportFrom dotted_name ^(Import STAR)) {
+        //XXX here
+        aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
+        $stmts::statements.add(new ImportFrom($Import, $dotted_name.result, new aliasType[]{new aliasType($STAR, "*", null)}, 0));
+    }
+    | ^(ImportFrom dotted_name ^(Import import_as_name[nms]+)) {
+        //XXX here
+        aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
+        $stmts::statements.add(new ImportFrom($Import, $dotted_name.result, n, 0));
+    }
     ;
 
-import_as_name
+import_as_name[List nms]
     : ^(Alias name=NAME (^(Asname asname=NAME))?) {
         String as = null;
         if ($Asname != null) {
             as = $asname.text;
         }
         aliasType a = new aliasType($Alias, $name.text, as);
-        //nms.add(a);
+        nms.add(a);
     }
     ;
 
@@ -561,13 +600,27 @@ dotted_as_name [List nms]
         if ($Asname != null) {
             as = $NAME.text;
         }
-        aliasType a = new aliasType($Alias, $dotted_name.text, as);
+        aliasType a = new aliasType($Alias, $dotted_name.result, as);
         nms.add(a);
     }
     ;
 
-dotted_name
-    : start=NAME (DOT NAME)*
+dotted_name returns [String result]
+@init {
+    StringBuffer buf = new StringBuffer();
+}
+    : NAME dot_name[buf]* {
+        $result = $NAME.text + buf.toString();
+        debug("matched dotted_name " + $result);
+    }
+    ;
+
+dot_name [StringBuffer buf]
+    : DOT NAME {
+        buf.append(".");
+        buf.append($NAME.text);
+        debug("matched dot_name " + buf);
+    }
     ;
 
 global_stmt
