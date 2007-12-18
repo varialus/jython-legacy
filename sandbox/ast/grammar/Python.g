@@ -187,8 +187,28 @@ import org.python.antlr.PythonTree;
             System.out.println(message);
         }
     }
+
+    /**
+     * Overridden to throw an exception on a mismatched token (see p. 252)
+     */    
+    protected void mismatch(IntStream input, int ttype, BitSet follow) throws RecognitionException {
+        throw new MismatchedTokenException(ttype, input);
+    }
+
+    /**
+     * Overridden to throw an exception on a mismatched token (see p. 252)
+     */    
+    public void recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
+        throw e;
+    }
 }
 
+// really throw recognition errors (see p. 252)
+@rulecatch {
+    catch (RecognitionException e) {
+        throw e;
+    }
+} 
 
 @lexer::header { 
 package org.python.antlr;
