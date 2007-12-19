@@ -36,6 +36,15 @@ public class PythonTreeWalker {
 		parser.setTreeAdaptor(pyadaptor);
 		try {
 			PythonParser.file_input_return r = parser.file_input();
+			if (parser.hasErrors()) {
+				// handle errors swallowed by antlr recovery
+				String errors = parser.getErrors().toString();
+				if (isTolerant()) {
+					System.err.println(errors);
+				} else {
+					throw new RuntimeException(errors);
+				}
+			}
 			if (args.length > 1) {
 				System.out.println(((Tree) r.tree).toStringTree());
 			}
