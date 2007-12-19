@@ -407,7 +407,7 @@ expr_stmt
     }
     ;
 
-call_expr
+call_expr returns [exprType etype]
     : ^(Call (^(Args arglist))? test[expr_contextType.Load]) {
         Call c;
         if ($Args == null) {
@@ -420,7 +420,7 @@ call_expr
             keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
             c = new Call($Call, $test.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
         }
-        $stmts::statements.add(new Expr($Call, c));
+        $etype = c;
     }
     ;
 
@@ -455,15 +455,17 @@ augassign returns [int op]
     ;
 
 print_stmt
-    : ^(Print (^(Dest RIGHTSHIFT))? (^(Values test[expr_contextType.Load]))?) {
+    : ^(Print (^(Dest RIGHTSHIFT))? (^(Values test[expr_contextType.Load]))? (Newline)?) {
         Print p;
         exprType[] values;
 
         exprType dest = null;
         boolean hasdest = false;
 
-        //FIXME: just assuming newline for now.
-        boolean newline = true;
+        boolean newline = false;
+        if ($Newline != null) {
+            newline = true;
+        }
 
         if ($Dest != null) {
             hasdest = true;
@@ -783,8 +785,8 @@ test[int ctype] returns [exprType etype]
     | ^(UAdd test[ctype])
     | ^(USub test[ctype])
     | ^(Invert test[ctype])
+    | call_expr {$etype = $call_expr.etype;}
     | lambdef
-    | call_expr
     ;
 
 comp_op returns [int op]
