@@ -25,6 +25,7 @@ import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
+import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
@@ -313,7 +314,7 @@ varargslist returns [argumentsType args]
 
 defparameter[List params, List defaults]
     : NAME (ASSIGN test[expr_contextType.Load] )? {
-        params.add(new Name($NAME, $NAME.text, org.python.antlr.ast.Name.Param));
+        params.add(new Name($NAME, $NAME.text, expr_contextType.Param));
         if ($ASSIGN != null) {
             defaults.add($test.etype);
         }
@@ -439,7 +440,7 @@ target[List etypes]
     }
     ;
 
-augassign returns [int op]
+augassign returns [operatorType op]
     : PLUSEQUAL {$op = operatorType.Add;}
     | MINUSEQUAL {$op = operatorType.Sub;}
     | STAREQUAL {$op = operatorType.Mult;}
@@ -725,7 +726,7 @@ try_stmt
     ;
 
 except_clause[List handlers]
-    : ^(ExceptHandler (^(Type type=test[expr_contextType.Load]))? (^(Name name=test[expr_contextType.Load]))? ^(Body stmts)) {
+    : ^(ExceptHandler 'except' (^(Type type=test[expr_contextType.Load]))? (^(Name name=test[expr_contextType.Store]))? ^(Body stmts)) {
         stmtType[] b;
         if ($stmts.start != null) {
             b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
@@ -753,13 +754,13 @@ with_var
     ;
 
 //FIXME: lots of placeholders
-test[int ctype] returns [exprType etype]
+test[expr_contextType ctype] returns [exprType etype]
     : ^('and' test[ctype] test[ctype])
     | ^('or' test[ctype] test[ctype])
     | ^('not' test[ctype])
     | ^(comp_op left=test[ctype] targs=test[ctype]) {
         exprType[] targets = new exprType[1];
-        int[] ops = new int[1];
+        cmpopType[] ops = new cmpopType[1];
         ops[0] = $comp_op.op;
         targets[0] = $targs.etype;
         $etype = new Compare($comp_op.start, $left.etype, ops, targets);
@@ -772,14 +773,14 @@ test[int ctype] returns [exprType etype]
     }
     | ^(PLUS test[ctype] test[ctype])
     | ^(MINUS left=test[ctype] right=test[ctype]) {}
-    | ^(AMPER test[ctype] test[ctype])
+    | ^(AMPER left=test[ctype] right=test[ctype])
     | ^(VBAR test[ctype] test[ctype])
     | ^(CIRCUMFLEX test[ctype] test[ctype])
     | ^(LEFTSHIFT test[ctype] test[ctype])
     | ^(RIGHTSHIFT test[ctype] test[ctype])
     | ^(STAR test[ctype] test[ctype])
     | ^(SLASH test[ctype] test[ctype])
-    | ^(PERCENT test[ctype] test[ctype])
+    | ^(PERCENT left=test[ctype] right=test[ctype]) {$etype = new BinOp($left.start, left.etype, operatorType.Mod, right.etype);}
     | ^(DOUBLESLASH test[ctype] test[ctype])
     | ^(DOUBLESTAR test[ctype] test[ctype])
     | ^(UAdd test[ctype])
@@ -789,7 +790,7 @@ test[int ctype] returns [exprType etype]
     | lambdef
     ;
 
-comp_op returns [int op]
+comp_op returns [cmpopType op]
     : LESS {$op = cmpopType.Lt;}
     | GREATER {$op = cmpopType.Gt;}
     | EQUAL {$op = cmpopType.Eq;}
@@ -805,7 +806,7 @@ comp_op returns [int op]
 
 //I *think* only sequences need to collect test rules in the walker since
 //testlist in the parser either results in one test or a tuple.
-elts[int ctype] returns [List etypes]
+elts[expr_contextType ctype] returns [List etypes]
 scope {
     List elements;
 }
@@ -818,14 +819,14 @@ scope {
     }
     ;
 
-elt[int ctype]
+elt[expr_contextType ctype]
     : test[ctype] {
         $elts::elements.add($test.etype);
     }
     ;
 
 //FIXME: lots of placeholders
-atom[int ctype] returns [exprType etype]
+atom[expr_contextType ctype] returns [exprType etype]
     : ^(Tuple (^(Elts elts[ctype]))?) {
         debug("matched Tuple");
         exprType[] e;

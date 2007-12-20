@@ -367,7 +367,7 @@ print_stmt : 'print'
                            -> ^(Print ^(Values $t1))
              | RIGHTSHIFT t2=testlist -> {$t2.newline}? ^(Print ^(Dest RIGHTSHIFT) ^(Values testlist) ^(Newline))
                                       -> ^(Print ^(Dest RIGHTSHIFT) ^(Values testlist))
-             | -> Print
+             | -> ^(Print ^(Newline))
              )
            ;
 
@@ -526,7 +526,9 @@ with_var: ('as' | NAME) expr
 
 //except_clause: 'except' [test [',' test]]
 except_clause : 'except' (t1=test (COMMA t2=test)?)? COLON suite
-             -> ^(ExceptHandler ^(Type $t1)? ^(Name $t2)? ^(Body suite))
+             //Note: passing the 'except' keyword on so we can pass the same offset
+             //      as CPython.
+             -> ^(ExceptHandler 'except' ^(Type $t1)? ^(Name $t2)? ^(Body suite))
               ;
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT

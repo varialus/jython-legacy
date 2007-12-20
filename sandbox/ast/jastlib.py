@@ -13,9 +13,6 @@ import org.python.antlr.Main as parser
 
 from types import ArrayType
 
-contexts = {0:("0Store"),1:tuple(["Load"]),2:tuple(["Store"]),3:["3Store"],4:["4Store"],5:["5Store"],6:tuple(["Param"])}
-#ops = {0:("Store"),1:tuple(["Eq"]),2:tuple(["Sub"]),3:["3Store"],4:["4Store"],5:["5Store"],6:tuple(["Param"])}
-
 def lispify_ast(node):
     return tuple(lispify_ast2(node))
 
@@ -43,10 +40,12 @@ def lispify_field(field, child):
         if isinstance(node, AST):
             yield lispify_ast(node)
         else:
-            if fname == "ctx":
-                yield contexts[node]
-            #if fname == "ops":
+            if fname in ("ctx", "ops", "op"):
+                yield tuple([str(node)])
+            #elif fname == "ops":
             #    yield ops[node]
+            #elif fname == "op":
+            #    yield op[node]
             elif fname == "n":
                 yield int(node)
             else:

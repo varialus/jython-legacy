@@ -139,18 +139,18 @@ class JavaVisitor(EmitVisitor):
 
     def simple_sum(self, sum, name, depth):
         self.open("%sType" % name, refersToPythonTree=0)
-        self.emit("public interface %(name)sType {" % locals(), depth)
+        self.emit("public enum %(name)sType {" % locals(), depth)
+        self.emit("UNDEFINED,", depth + 1)
         for i in range(len(sum.types)):
             type = sum.types[i]
-            self.emit("public static final int %s = %d;" % (type.name, i+1),
-                                                    depth + 1)
-        self.emit("", 0)
-        self.emit("public static final String[] %sTypeNames = new String[] {" % 
-                    name, depth+1)
-        self.emit('"<undef>",', depth+2)
-        for type in sum.types:
-            self.emit('"%s",' % type.name, depth+2)
-        self.emit("};", depth+1)
+            self.emit("%s," % type.name, depth + 1)
+        #self.emit("", 0)
+        #self.emit("public static final String[] %sTypeNames = new String[] {" % 
+        #            name, depth+1)
+        #self.emit('"<undef>",', depth+2)
+        #for type in sum.types:
+        #    self.emit('"%s",' % type.name, depth+2)
+        #self.emit("};", depth+1)
         self.emit("}", depth)
         self.close()
    
@@ -200,12 +200,12 @@ class JavaVisitor(EmitVisitor):
         for f in cons.fields:
             if f.typedef and f.typedef.simple:
                 enums.append("%sType" % f.type)
-        if enums:
-            s = "implements %s " % ", ".join(enums)
-        else:
-            s = ""
-        self.emit("public class %s extends %sType %s{" %
-                    (cons.name, name, s), depth)
+        #if enums:
+        #    s = "implements %s " % ", ".join(enums)
+        #else:
+        #    s = ""
+        self.emit("public class %s extends %sType {" %
+                    (cons.name, name), depth)
         for f in cons.fields:
             self.visit(f, depth + 1)
         self.emit("", depth)
@@ -227,8 +227,12 @@ class JavaVisitor(EmitVisitor):
         for f in fields:
             self.emit("this.%s = %s;" % (f.name, f.name), depth+1)
             fparg = self.fieldDef(f)
-            #For now ignoring int and String -- will want to wrap in a PythonTree later I think.
-            if f.seq and not fparg.startswith("int") and not fparg.startswith("String"):
+            #if field.typedef and field.typedef.simple:
+            not_simple = True
+            if f.typedef is not None and f.typedef.simple:
+                not_simple = False
+            #For now ignoring String -- will want to revisit
+            if f.seq and  not_simple and not fparg.startswith("String"):
                 self.emit("for(int i%(name)s=0;i%(name)s<%(name)s.length;i%(name)s++) {" % {"name":f.name}, depth+1)
                 self.emit("addChild(%s[i%s]);" % (f.name, f.name), depth+2)
                 self.emit("}", depth+1)
@@ -317,10 +321,10 @@ class JavaVisitor(EmitVisitor):
 
     def fieldDef(self, field):
         jtype = str(field.type)
-        if field.typedef and field.typedef.simple:
-            jtype = 'int'
-        else:
-            jtype = self.bltinnames.get(jtype, jtype + 'Type')
+        #if field.typedef and field.typedef.simple:
+        #    jtype = 'int'
+        #else:
+        jtype = self.bltinnames.get(jtype, jtype + 'Type')
         name = field.name
         seq = field.seq and "[]" or ""
         return "%(jtype)s%(seq)s %(name)s" % locals()
