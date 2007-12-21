@@ -58,6 +58,7 @@ import org.python.antlr.ast.Yield;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 } 
@@ -455,6 +456,22 @@ augassign returns [operatorType op]
     | DOUBLESLASHEQUAL {$op = operatorType.FloorDiv;}
     ;
 
+binop returns [operatorType op]
+    : PLUS {$op = operatorType.Add;}
+    | MINUS {$op = operatorType.Sub;}
+    | STAR {$op = operatorType.Mult;}
+    | SLASH {$op = operatorType.Div;}
+    | PERCENT {$op = operatorType.Mod;}
+    | AMPER {$op = operatorType.BitAnd;}
+    | VBAR {$op = operatorType.BitOr;}
+    | CIRCUMFLEX {$op = operatorType.BitXor;}
+    | LEFTSHIFT {$op = operatorType.LShift;}
+    | RIGHTSHIFT {$op = operatorType.RShift;}
+    | DOUBLESTAR {$op = operatorType.Pow;}
+    | DOUBLESLASH {$op = operatorType.FloorDiv;}
+    ;
+
+
 print_stmt
     : ^(Print (^(Dest RIGHTSHIFT))? (^(Values test[expr_contextType.Load]))? (Newline)?) {
         Print p;
@@ -667,18 +684,37 @@ assert_stmt
     ;
 
 if_stmt
-    : ^(If test[expr_contextType.Load] body=stmts elif_clause* (^(OrElse orelse=stmts))?) {
-        List o = null;
+@init {
+    List elifs = new ArrayList();
+}
+
+    : ^(If test[expr_contextType.Load] body=stmts elif_clause[elifs]* (^(OrElse orelse=stmts))?) {
+        stmtType[] o;
         if ($OrElse != null) {
-            o = $orelse.stypes;
+            o = (stmtType[])$orelse.stypes.toArray(new stmtType[$orelse.stypes.size()]);
+        } else {
+            o = new stmtType[0];
         }
-        If i = makeIf($If, $test.etype, $body.stypes, o);
+        stmtType[] b = (stmtType[])$body.stypes.toArray(new stmtType[$body.stypes.size()]);
+        ListIterator iter = elifs.listIterator(elifs.size());
+        while (iter.hasPrevious()) {
+            If elif = (If)iter.previous();
+            elif.orelse = o;
+            o = new stmtType[]{elif};
+        }
+        If i = new If($If, $test.etype, b, o);
         $stmts::statements.add(i);
     }
     ;
 
-elif_clause
-    : ^(Elif test[expr_contextType.Load] stmts)
+elif_clause[List elifs]
+    : ^(Elif test[expr_contextType.Load] stmts) {
+        debug("matched elif");
+        stmtType[] b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
+        //the stmtType[0] is intended to be replaced in the iterator of the if_stmt rule.
+        //there is probably a better way to do this.
+        elifs.add(new If($Elif, $test.etype, b, new stmtType[0]));
+    }
     ;
 
 while_stmt
@@ -771,18 +807,10 @@ test[expr_contextType ctype] returns [exprType etype]
         debug("***" + $atom.etype);
         $etype = $atom.etype;
     }
-    | ^(PLUS test[ctype] test[ctype])
-    | ^(MINUS left=test[ctype] right=test[ctype]) {}
-    | ^(AMPER left=test[ctype] right=test[ctype])
-    | ^(VBAR test[ctype] test[ctype])
-    | ^(CIRCUMFLEX test[ctype] test[ctype])
-    | ^(LEFTSHIFT test[ctype] test[ctype])
-    | ^(RIGHTSHIFT test[ctype] test[ctype])
-    | ^(STAR test[ctype] test[ctype])
-    | ^(SLASH test[ctype] test[ctype])
-    | ^(PERCENT left=test[ctype] right=test[ctype]) {$etype = new BinOp($left.start, left.etype, operatorType.Mod, right.etype);}
-    | ^(DOUBLESLASH test[ctype] test[ctype])
-    | ^(DOUBLESTAR test[ctype] test[ctype])
+    | ^(binop left=test[ctype] right=test[ctype]) {
+        debug("BinOp matched");
+        $etype = new BinOp($left.start, left.etype, $binop.op, right.etype);
+    }
     | ^(UAdd test[ctype])
     | ^(USub test[ctype])
     | ^(Invert test[ctype])

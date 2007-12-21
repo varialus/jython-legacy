@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """lispify_ast - returns a tuple representation of the AST
 
 Uses 2.5's _ast, not other AST implementations in CPython, since these
