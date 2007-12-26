@@ -150,7 +150,7 @@ public class StartScriptGenerator {
      */
     private String getWindowsJythonTemplate() {
         StringBuffer buffer = getWindowsHeaderTemplate();
-        buffer.append("\"{2}\\bin\\java.exe\" -Dpython.home=\"{3}\" -classpath \"{3}\\" + JYTHON_JAR
+        buffer.append("\"{2}\\bin\\java.exe\" -Dpython.home=\"{3}\" -Dpython.executable=\"%0\" -classpath \"{3}\\" + JYTHON_JAR
                 + ";%CLASSPATH%\" org.python.util.jython %ARGS%" + WIN_CR_LF);
         return buffer.toString();
     }
@@ -198,7 +198,7 @@ public class StartScriptGenerator {
         StringBuffer buffer = getUnixHeaderTemplate();
         buffer.append("CP=\"{3}/" + JYTHON_JAR + "\"\n");
         buffer.append("if [ ! -z \"$CLASSPATH\" ]\nthen\n  CP=$CP:$CLASSPATH\nfi\n");
-        buffer.append("\"{2}/bin/java\" -Dpython.home=\"{3}\" -classpath \"$CP\" org.python.util.jython \"$@\"\n");
+        buffer.append("\"{2}/bin/java\" -Dpython.home=\"{3}\" -Dpython.executable=\"$0\" -classpath \"$CP\" org.python.util.jython \"$@\"\n");
         return buffer.toString();
     }
 
