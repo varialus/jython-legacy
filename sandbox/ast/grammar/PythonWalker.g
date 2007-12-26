@@ -13,6 +13,7 @@ package org.python.antlr;
 //import org.python.core.CompilerFlags;
 import org.python.antlr.ast.aliasType;
 import org.python.antlr.ast.argumentsType;
+import org.python.antlr.ast.boolopType;
 import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.excepthandlerType;
 import org.python.antlr.ast.exprType;
@@ -26,6 +27,7 @@ import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.BinOp;
+import org.python.antlr.ast.BoolOp;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
@@ -791,8 +793,89 @@ with_var
 
 //FIXME: lots of placeholders
 test[expr_contextType ctype] returns [exprType etype]
-    : ^('and' test[ctype] test[ctype])
-    | ^('or' test[ctype] test[ctype])
+    : ^(AND left=test[ctype] right=test[ctype]) {
+        List values = new ArrayList();
+        boolean leftIsAnd = false;
+        boolean rightIsAnd = false;
+        BoolOp leftB = null;
+        BoolOp rightB = null;
+        if ($left.start.getType() == AND) {
+            leftIsAnd = true;
+            leftB = (BoolOp)$left.etype;
+        }
+        if ($right.start.getType() == AND) {
+            rightIsAnd = true;
+            rightB = (BoolOp)$right.etype;
+        }
+        exprType[] e;
+        if (leftIsAnd && rightIsAnd) {
+            debug("matched And + L + R");
+            int lenL = leftB.values.length;
+            int lenR = rightB.values.length;
+            e = new exprType[lenL + lenR];
+            System.arraycopy(leftB.values, 0, e, 0, lenL - 1);
+            System.arraycopy(rightB.values, 0, e, lenL - 1, lenL + lenR);
+        } else if (leftIsAnd) {
+            debug("matched And + L");
+            e = new exprType[leftB.values.length + 1];
+            System.arraycopy(leftB.values, 0, e, 0, leftB.values.length);
+            e[e.length - 1] = $right.etype;
+        } else if (rightIsAnd) {
+            debug("matched And + R");
+            e = new exprType[rightB.values.length + 1];
+            System.arraycopy(rightB.values, 0, e, 0, rightB.values.length);
+            e[e.length - 1] = $left.etype;
+        } else {
+            debug("matched And");
+            e = new exprType[2];
+            e[0] = $left.etype;
+            e[1] = $right.etype;
+        }
+        //XXX: could re-use BoolOps discarded above in many cases.
+        $etype = new BoolOp($AND, boolopType.And, e);
+    }
+    | ^(OR left=test[ctype] right=test[ctype]) {
+        //XXX: AND and OR could be factored into one method.
+        List values = new ArrayList();
+        boolean leftIsOr = false;
+        boolean rightIsOr = false;
+        BoolOp leftB = null;
+        BoolOp rightB = null;
+        if ($left.start.getType() == OR) {
+            leftIsOr = true;
+            leftB = (BoolOp)$left.etype;
+        }
+        if ($right.start.getType() == OR) {
+            rightIsOr = true;
+            rightB = (BoolOp)$right.etype;
+        }
+        exprType[] e;
+        if (leftIsOr && rightIsOr) {
+            debug("matched Or + L + R");
+            int lenL = leftB.values.length;
+            int lenR = rightB.values.length;
+            e = new exprType[lenL + lenR];
+            System.arraycopy(leftB.values, 0, e, 0, lenL - 1);
+            System.arraycopy(rightB.values, 0, e, lenL - 1, lenL + lenR);
+        } else if (leftIsOr) {
+            debug("matched Or + L");
+            e = new exprType[leftB.values.length + 1];
+            System.arraycopy(leftB.values, 0, e, 0, leftB.values.length);
+            e[e.length - 1] = $right.etype;
+        } else if (rightIsOr) {
+            debug("matched Or + R");
+            e = new exprType[rightB.values.length + 1];
+            System.arraycopy(rightB.values, 0, e, 0, rightB.values.length);
+            e[e.length - 1] = $left.etype;
+        } else {
+            debug("matched Or");
+            e = new exprType[2];
+            e[0] = $left.etype;
+            e[1] = $right.etype;
+        }
+        //XXX: could re-use BoolOps discarded above in many cases.
+        $etype = new BoolOp($OR, boolopType.Or, e);
+    }
     | ^('not' test[ctype])
     | ^(comp_op left=test[ctype] targs=test[ctype]) {
         exprType[] targets = new exprType[1];
