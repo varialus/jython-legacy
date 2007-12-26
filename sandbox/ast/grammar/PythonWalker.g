@@ -14,6 +14,7 @@ package org.python.antlr;
 import org.python.antlr.ast.aliasType;
 import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.boolopType;
+import org.python.antlr.ast.comprehensionType;
 import org.python.antlr.ast.cmpopType;
 import org.python.antlr.ast.excepthandlerType;
 import org.python.antlr.ast.exprType;
@@ -43,6 +44,7 @@ import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
+import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
@@ -958,7 +960,10 @@ atom[expr_contextType ctype] returns [exprType etype]
         }
         $etype = new org.python.antlr.ast.List($List, e, ctype);
     }
-    | ^(ListComp list_for) {}
+    | ^(ListComp test[ctype] list_for) {
+        debug("matched ListComp");
+        $etype = new ListComp($ListComp, $test.etype, new comprehensionType[]{$list_for.gen});
+    }
     | ^(GenExpFor gen_for) {}
     | ^(Dict test[ctype]*) {}
     | ^(Repr test[ctype]*) {}
@@ -1091,7 +1096,13 @@ list_iter: list_for
     | list_if
     ;
 
-list_for: ^(ListFor ^(Target test[expr_contextType.Load]+) ^(Iter test[expr_contextType.Load]+) (^(Ifs list_iter))?)
+list_for returns [comprehensionType gen]
+    :
+    ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Store]) (^(Ifs list_iter))?) {
+        debug("matched list_for");
+        //XXX: Not collecting from Ifs yet.
+        $gen = new comprehensionType($ListFor, $targ.etype, $iter.etype, new exprType[0]);
+    }
     ;
 
 list_if: ^(ListIf ^(Target test[expr_contextType.Load]) (Ifs list_iter)?)

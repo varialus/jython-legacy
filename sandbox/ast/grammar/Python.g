@@ -630,7 +630,11 @@ atom : LPAREN
        | -> ^(Tuple)
        )
        RPAREN
-     | LBRACK (listmaker)? RBRACK -> ^(List ^(Elts listmaker)?)
+     | LBRACK
+       (listmaker -> listmaker
+       | -> ^(List)
+       )
+       RBRACK
      | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
      | NAME {debug("parsed NAME");} -> ^(Name NAME)
@@ -643,8 +647,8 @@ atom : LPAREN
 
 //listmaker: test ( list_for | (',' test)* [','] )
 listmaker : test 
-            ( list_for -> ^(ListComp list_for)
-            | (options {greedy=true;}:COMMA test)* -> test+
+            ( list_for -> ^(ListComp test list_for)
+            | (options {greedy=true;}:COMMA test)* -> ^(List ^(Elts test+))
             ) (COMMA)?
           ;
 
