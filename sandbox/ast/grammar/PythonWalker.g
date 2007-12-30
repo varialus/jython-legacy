@@ -965,7 +965,24 @@ atom[expr_contextType ctype] returns [exprType etype]
         $etype = new ListComp($ListComp, $test.etype, new comprehensionType[]{$list_for.gen});
     }
     | ^(GenExpFor gen_for) {}
-    | ^(Dict test[ctype]*) {}
+    | ^(Dict (^(Elts elts[ctype]))?) {
+        exprType[] keys;
+        exprType[] values;
+        if ($Elts != null) {
+            int size = $elts.etypes.size() / 2;
+            keys = new exprType[size];
+            values = new exprType[size];
+            for(int i=0;i<size;i++) {
+                keys[i] = (exprType)$elts.etypes.get(i*2);
+                values[i] = (exprType)$elts.etypes.get(i*2+1);
+            }
+        } else {
+            keys = new exprType[0];
+            values = new exprType[0];
+        }
+        $etype = new Dict($Dict, keys, values);
+ 
+    }
     | ^(Repr test[ctype]*) {}
     | ^(Name NAME) {
         debug("matched Name " + $NAME.text);

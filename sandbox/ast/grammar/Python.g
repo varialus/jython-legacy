@@ -622,7 +622,11 @@ factor : PLUS factor -> ^(UAdd factor)
 power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
       ;
 
-//atom: '(' [testlist] ')' | '[' [listmaker] ']' | '{' [dictmaker] '}' | '`' testlist1 '`' | NAME | NUMBER | STRING+
+//atom: ('(' [yield_expr|testlist_gexp] ')' |
+//       '[' [listmaker] ']' |
+//       '{' [dictmaker] '}' |
+//       '`' testlist1 '`' |
+//       NAME | NUMBER | STRING+)
 atom : LPAREN 
        //XXX: calling all of these "Tuple" is almost certainly incorrect.
        ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
@@ -635,7 +639,7 @@ atom : LPAREN
        | -> ^(List)
        )
        RBRACK
-     | LCURLY (dictmaker)? RCURLY -> ^(Dict dictmaker?)
+     | LCURLY (dictmaker)? RCURLY -> ^(Dict ^(Elts dictmaker)?)
      | BACKQUOTE testlist BACKQUOTE -> ^(Repr testlist)
      | NAME {debug("parsed NAME");} -> ^(Name NAME)
      | INT -> ^(Num INT)
