@@ -971,9 +971,9 @@ atom[expr_contextType ctype] returns [exprType etype]
         debug("matched Name " + $NAME.text);
         $etype = new Name($NAME, $NAME.text, ctype);
     }
-    | ^(DOT NAME test[ctype]) {
+    | ^(DOT NAME test[expr_contextType.Load]) {
         debug("matched DOT in atom: " + $test.etype + "###" + $NAME.text);
-        $etype = new Attribute($DOT, $test.etype, $NAME.text, expr_contextType.Load);
+        $etype = new Attribute($DOT, $test.etype, $NAME.text, ctype);
     }
     | ^(SubscriptList subscriptlist test[ctype])
     | ^(Num INT) {$etype = makeNum($INT);}
