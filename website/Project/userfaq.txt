@@ -160,9 +160,8 @@ Python, an instance's methods live in the instance's class's dictionary,
 so dir(someJavaObject.__class__) would return a list of the method names
 (although only for the direct class, not for any base classes).
 
-Why can't I execute a 'protected' or 'private' Java instance method or
-access a 'protected' or 'private' attribute in a Java package?
----------------------------------------------------------------------------------------------------------------------------
+Why can't I execute a 'protected' or 'private' Java instance method or access a 'protected' or 'private' attribute in a Java package?
+-------------------------------------------------------------------------------------------------------------------------------------
 By default, as in Java, these methods are protected from external
 access.  Access to all Java fields and methods can be enabled with the
 python.security.respectJavaAccessibility registry setting::

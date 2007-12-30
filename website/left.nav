@@ -2,24 +2,21 @@ section  | About
 menupageitem     | Welcome            | ../Project/index.html
 menupageitem     | License            | ../Project/license.html
 menupageitem     | Installation       | ../Project/installation.html
-menupageitem     | Old Website        | ../Jython21.html
 menupageitem     | FAQ                | ../Project/userfaq.html
 menupageitem     | News               | ../Project/news.html
 menupageitem     | History            | ../Project/history.html
 menupageitem     | Download           | ../Project/download.html
 menupageitem     | User Guide         | ../Project/userguide.html
+menupageitem     | Old Website        | ../Jython21.html
 #menupageitem    | Books and Articles | ../Project/books_articles.html
 #menupageitem    | CPython comparison | ../Project/differences.html
-menupageitem     | Related Projects   | ../Project/related.html
 section  | Community
 menupageitem     | Wiki     | http://wiki.python.org/jython/
 menupageitem     | Reporting Bugs     | ../Project/bugs.html
 menupageitem     | Mailing Lists      | http://sourceforge.net/mail/?group_id=12867
 menupageitem     | Developer FAQ      | ../Project/devfaq.html
-menupageitem     | Developer Guide    | ../Project/devguide.html
+menupageitem     | Developer Guide    | http://wiki.python.org/jython/JythonDeveloperGuide
 menupageitem     | Jython Roadmap    | ../Project/roadmap.html
-#menupageitem     | JEP Index          | ../jeps/jep-0000.html
-#menupageitem    | To Do List         | ../Project/todo.html
 menupageitem     | Contributors       | ../Project/contributors.html
 section  | 
 raw      | <div style="height:1em"></div>

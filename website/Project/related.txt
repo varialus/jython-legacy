@@ -1,6 +1,0 @@
-* Python_ project
-* PyPy_ project
-
-.. _Python: http://www.python.org
-.. _PyPy: http://www.pypy.org
-

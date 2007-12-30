@@ -6,8 +6,11 @@ Contributors
 Active Commiters
 ----------------
 
+* James Baker
 * Charlie Groves
 * Otmar Humbel
+* Tobias Ivarsson
+* Philip Jenvey
 * Alan Kennedy
 * Samuele Pedroni
 * Frank Wierzbicki

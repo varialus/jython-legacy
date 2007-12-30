@@ -617,8 +617,9 @@ called in order to explictly choose a non-empty version.
 Embedding Jython
 ----------------
 
-There are two options for embedding Jython in a Java
-application.  You can make a real Java class out of a Python class, and then call it from your Java code, as previously described, or you can use the PythonInterpreter object 
+There are two options for embedding Jython in a Java application.  You can make
+a real Java class out of a Python class, and then call it from your Java code,
+as previously described, or you can use the PythonInterpreter object 
 
 Information on the PythonInterpreter can be found in the JavaDoc documentation for `org.python.util.PythonInterpreter`_.
 
@@ -629,9 +630,9 @@ The python program:
 
 	import sys
 	print sys
-	a=42
+	a = 42
 	print a
-	x=2+2
+	x = 2 + 2
 	print "x:",x
 
 
@@ -639,30 +640,63 @@ The python program:
 The java code required to execute the python program:
 ::
 
+    import org.python.core.PyException;
+    import org.python.core.PyInteger;
+    import org.python.core.PyObject;
     import org.python.util.PythonInterpreter;
-    import org.python.core.*;
 
     public class SimpleEmbedded {
-        public static void main(String []args)
-            throws PyException
-        {
-            PythonInterpreter interp =
-                new PythonInterpreter();
 
-            System.out.println("Hello, brave new world");
+        public static void main(String[] args) throws PyException {
+            PythonInterpreter interp = new PythonInterpreter();
             interp.exec("import sys");
             interp.exec("print sys");
-
             interp.set("a", new PyInteger(42));
             interp.exec("print a");
             interp.exec("x = 2+2");
             PyObject x = interp.get("x");
+            System.out.println("x: " + x);
+        }
+    }
+    
+Using JSR 223
+=============
 
-            System.out.println("x: "+x);
-            System.out.println("Goodbye, cruel world");
+JSR 223, Scripting for the Java language, added the javax.script pacakge to
+Java 6.  It allows multiple scripting languages to be used through the same API
+as long as the language provides a script engine.  The `scripting project`_
+contains such an engine for Jython.  It can be used to embed Jython in your
+application alongside many other languages that have script engines such as JRuby or Groovy.
+
+The usage of PythonInterpreter above translates to the following using JSR 223:
+::
+
+    import javax.script.ScriptEngine;
+    import javax.script.ScriptEngineManager;
+    import javax.script.ScriptException;
+
+    public class JSR223 {
+
+        public static void main(String[] args) throws ScriptException {
+            ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
+            engine.eval("import sys");
+            engine.eval("print sys");
+            engine.put("a", 42);
+            engine.eval("print a");
+            engine.eval("x = 2 + 2");
+            Object x = engine.get("x");
+            System.out.println("x: " + x);
         }
     }
 
+To use JSR 223 with Jython, `download the engine`_ and add it to your classpath
+along with Jython.  Then use code like the above to create and use an engine.
+One difference between embedding with JSR 223 and using PythonInterpreter
+directly is that the scripting engine manages its own PySystemState per thread
+so it can always set the classloader to the thread's context classloader.  This
+means if you want to do anything Jython specific to PySystemState, like adding
+to sys.path or setting sys.stdin and sys.stdout, you should do it after
+creating the ScriptEngine.
 
 ---------------------------------------------------
 Java Reload (experimental) simple Support - JReload
@@ -1406,3 +1440,5 @@ Example session
 .. _Jython-users mailing list: http://lists.sourceforge.net/lists/listinfo/jython-users
 .. _org.python.util.PythonInterpreter: http://www.jython.org/docs/javadoc/org/python/util/PythonInterpreter.html
 .. _jythonc: jythonc.html
+.. _`scripting project`: https://scripting.dev.java.net/
+.. _`download the engine`: https://scripting.dev.java.net/servlets/ProjectDocumentList
