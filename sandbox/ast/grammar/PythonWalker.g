@@ -1098,7 +1098,7 @@ list_iter: list_for
 
 list_for returns [comprehensionType gen]
     :
-    ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Store]) (^(Ifs list_iter))?) {
+    ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs list_iter))?) {
         debug("matched list_for");
         //XXX: Not collecting from Ifs yet.
         $gen = new comprehensionType($ListFor, $targ.etype, $iter.etype, new exprType[0]);
