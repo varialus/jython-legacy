@@ -42,12 +42,9 @@ def lispify_field(field, child):
         else:
             if fname in ("ctx", "ops", "op"):
                 yield tuple([str(node)])
-            #elif fname == "ops":
-            #    yield ops[node]
-            #elif fname == "op":
-            #    yield op[node]
             elif fname == "n":
-                yield int(node)
+                #assuming n is BigInteger -- valid for now.
+                yield node.intValue()
             else:
                 yield node
 

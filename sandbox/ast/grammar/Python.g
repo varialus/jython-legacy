@@ -140,8 +140,9 @@ tokens {
     Target;
     Targets;
     Value;
-    Start;
-    End;
+    Lower;
+    Upper;
+    Step;
     SliceOp;
     UnaryOp;
     UAdd;
@@ -551,7 +552,7 @@ and_test : not_test (AND^ not_test)*
          ;
 
 //not_test: 'not' not_test | comparison
-not_test : 'not'^ not_test
+not_test : NOT^ not_test
          | comparison
          ;
 
@@ -574,9 +575,9 @@ comp_op : LESS
         | ALT_NOTEQUAL
         | NOTEQUAL
         | 'in'
-        | 'not' 'in' -> NotIn
+        | NOT 'in' -> NotIn
         | 'is'
-        | 'is' 'not' -> IsNot
+        | 'is' NOT -> IsNot
         ;
 
 //expr: xor_expr ('|' xor_expr)*
@@ -683,12 +684,12 @@ subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
 
 //subscript: '.' '.' '.' | test | [test] ':' [test] [sliceop]
 subscript : DOT DOT DOT -> Ellipsis
-          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Start $t1) ^(End $t2)? ^(SliceOp sliceop)?)
-          | COLON (test)? (sliceop)? -> ^(Subscript ^(End test)? ^(SliceOp sliceop)?)
+          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper $t2)? ^(Step sliceop)?)
+          | COLON (test)? (sliceop)? -> ^(Subscript ^(Upper test)? ^(Step sliceop)?)
           ;
 
 //sliceop: ':' [test]
-sliceop : COLON (test)? -> test?
+sliceop : COLON (test)? -> ^(SliceOp test)?
         ;
 
 //exprlist: expr (',' expr)* [',']
@@ -878,6 +879,8 @@ AT : '@' ;
 AND : 'and' ;
 
 OR : 'or' ;
+
+NOT : 'not' ;
 
 FLOAT
     :    '.' DIGITS (Exponent)?

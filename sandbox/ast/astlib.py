@@ -38,7 +38,7 @@ def lispify_field(field, child):
         else:
             yield node
 
-def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_success=False,):
+def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_success=False, print_diff_lines=False):
     from pprint import pprint
     from popen2 import popen2
     from StringIO import StringIO
@@ -63,18 +63,23 @@ def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_su
 
         differs = False
         diffstr = []
+        difflines = 0
         diff = Differ()
         results = diff.compare(pstr, jstr)
         for d in results:
             diffstr.append(d)
             if d[0] in ['+', '-']:
                 differs = True
+                difflines += 1
 
         if print_success and not differs:
             print "SUCCESS: %s" % pyfile
 
         if print_fail and differs:
             print "FAIL: %s" % pyfile
+
+        if print_diff_lines:
+            print "%s diff lines in %s" % (difflines, pyfile)
 
         if print_diff and differs:
             print "---------- ouput -------------"
@@ -88,9 +93,10 @@ if __name__ == '__main__':
     import getopt
 
     usage = """\
-Usage: python %s [-j jython_exe_name] [-s -f -d] code_path
+Usage: python %s [-j jython_exe_name] [-s -f -d -n] code_path
        where -s = print success messages
              -f = print failure messages
+             -n = print number of diff lines
              -d = don't print diffs on failure
        if codepath is a file test it, if codepath is a directory
              test all .py files in and below that directory.
@@ -98,10 +104,11 @@ Usage: python %s [-j jython_exe_name] [-s -f -d] code_path
 
     jy_exe = 'jython'
     print_diff = True
+    print_diff_lines = False
     print_fail = False
     print_success = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'j:sfdh')
+        opts, args = getopt.getopt(sys.argv[1:], 'j:sfdhn')
     except:
         print usage
         sys.exit(1)
@@ -117,8 +124,10 @@ Usage: python %s [-j jython_exe_name] [-s -f -d] code_path
             print_fail = True
         if o == '-d':
             print_diff = False
+        if o == '-n':
+            print_diff_lines = True
     if len(args) < 1 or len(args) > 7:
         print usage
         sys.exit(1)
 
-    main(args[0], jy_exe, print_diff, print_fail, print_success)
+    main(args[0], jy_exe, print_diff, print_fail, print_success, print_diff_lines)

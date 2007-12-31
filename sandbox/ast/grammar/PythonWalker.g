@@ -22,7 +22,9 @@ import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.keywordType;
 import org.python.antlr.ast.modType;
 import org.python.antlr.ast.operatorType;
+import org.python.antlr.ast.sliceType;
 import org.python.antlr.ast.stmtType;
+import org.python.antlr.ast.unaryopType;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
@@ -42,12 +44,15 @@ import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
+import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
+import org.python.antlr.ast.Slice;
+import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.TryExcept;
 import org.python.antlr.ast.TryFinally;
 import org.python.antlr.ast.Tuple;
@@ -56,9 +61,11 @@ import org.python.antlr.ast.Print;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
+import org.python.antlr.ast.UnaryOp;
 import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -190,7 +197,7 @@ import java.util.Set;
 
 
     Num makeNum(PythonTree t) {
-        debug("Num matched");
+        debug("Num matched " + t.getText());
         String s = t.getText();
         int radix = 10;
         if (s.startsWith("0x") || s.startsWith("0X")) {
@@ -201,25 +208,25 @@ import java.util.Set;
         }
         if (s.endsWith("L") || s.endsWith("l")) {
             s = s.substring(0, s.length()-1);
-            //return new Num(t, Py.newLong(new java.math.BigInteger(s, radix)));
-            return new Num(t, new java.math.BigInteger(s, radix));
+            //return new Num(t, Py.newLong(new BigInteger(s, radix)));
+            return new Num(t, new BigInteger(s, radix));
         }
         int ndigits = s.length();
         int i=0;
         while (i < ndigits && s.charAt(i) == '0')
             i++;
         if ((ndigits - i) > 11) {
-            //return new Num(t, Py.newLong(new java.math.BigInteger(s, radix)));
-            return new Num(t, new java.math.BigInteger(s, radix));
+            //return new Num(t, Py.newLong(new BigInteger(s, radix)));
+            return new Num(t, new BigInteger(s, radix));
         }
 
         long l = Long.valueOf(s, radix).longValue();
         if (l > 0xffffffffl || (radix == 10 && l > Integer.MAX_VALUE)) {
-            //return new Num(t, Py.newLong(new java.math.BigInteger(s, radix)));
-            return new Num(t, new java.math.BigInteger(s, radix));
+            //return new Num(t, Py.newLong(new BigInteger(s, radix)));
+            return new Num(t, new BigInteger(s, radix));
         }
         //return new Num(t, Py.newInteger((int) l));
-        return new Num(t, new Long(l));
+        return new Num(t, BigInteger.valueOf(l));
     }
 
     private stmtType makeTryExcept(PythonTree t, List body, List handlers, List orelse, List finBody) {
@@ -284,6 +291,17 @@ import java.util.Set;
         }
         stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
         return new For(t, target, iter, b, o);
+    }
+    
+    //FIXME: only handling Num for now.
+    private exprType negate(exprType o) {
+        if (o instanceof Num) {
+            Num num = (Num)o;
+            BigInteger b = (BigInteger)num.n;
+            num.n = b.negate();
+            return num;
+        }
+        return o;
     }
 }
 
@@ -395,6 +413,7 @@ stmt //combines simple_stmt and compound_stmt from Python.g
 
 expr_stmt
     : test[expr_contextType.Load] {
+        debug("matched expr_stmt:test " + $test.etype);
         $stmts::statements.add(new Expr($test.start, $test.etype));
     }
     | ^(augassign targ=test[expr_contextType.Store] value=test[expr_contextType.Load]) {
@@ -878,7 +897,10 @@ test[expr_contextType ctype] returns [exprType etype]
         //XXX: could re-use BoolOps discarded above in many cases.
         $etype = new BoolOp($OR, boolopType.Or, e);
     }
-    | ^('not' test[ctype])
+    | ^(NOT test[ctype]) {
+        $etype = new UnaryOp($NOT, unaryopType.Not, $test.etype);
+        $etype = $test.etype;
+    }
     | ^(comp_op left=test[ctype] targs=test[ctype]) {
         exprType[] targets = new exprType[1];
         cmpopType[] ops = new cmpopType[1];
@@ -896,10 +918,9 @@ test[expr_contextType ctype] returns [exprType etype]
         debug("BinOp matched");
         $etype = new BinOp($left.start, left.etype, $binop.op, right.etype);
     }
-    | ^(UAdd test[ctype])
-    | ^(USub test[ctype])
-    | ^(Invert test[ctype])
-    | call_expr {$etype = $call_expr.etype;}
+    | call_expr {
+        $etype = $call_expr.etype;
+    }
     | lambdef
     ;
 
@@ -992,13 +1013,37 @@ atom[expr_contextType ctype] returns [exprType etype]
         debug("matched DOT in atom: " + $test.etype + "###" + $NAME.text);
         $etype = new Attribute($DOT, $test.etype, $NAME.text, ctype);
     }
-    | ^(SubscriptList subscriptlist test[ctype])
-    | ^(Num INT) {$etype = makeNum($INT);}
+    | ^(SubscriptList subscriptlist test[expr_contextType.Load]) {
+        //XXX: only handling one subscript for now.
+        sliceType s;
+        if ($subscriptlist.sltypes.size() == 0) {
+            s = null;
+        } else {
+            s = (sliceType)$subscriptlist.sltypes.get(0);
+        }
+        $etype = new Subscript($SubscriptList, $test.etype, s, ctype);
+    }
+    | ^(Num INT) {
+        $etype = makeNum($INT);
+        debug("makeNum output: " + $etype);
+    }
     | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
     | ^(Num FLOAT)
     | ^(Num COMPLEX)
     | stringlist {
         $etype = new Str($stringlist.start, extractStrings($stringlist.strings));
+    }
+    | ^(USub test[ctype]) {
+        debug("USub matched " + $test.etype);
+        //FIXME: need to actually negate this
+        $etype = negate($test.etype);
+    }
+    | ^(UAdd test[ctype]) {
+        $etype = $test.etype;
+    }
+    | ^(Invert test[ctype]) {
+        //FIXME: need to actually invert this
+        $etype = $test.etype;
     }
     ;
 
@@ -1016,12 +1061,41 @@ string[List strs]
 lambdef: ^(Lambda varargslist? ^(Body test[expr_contextType.Load]))
        ;
 
-subscriptlist
-    :   subscript+
+subscriptlist returns [List sltypes]
+@init {
+    List subs = new ArrayList();
+}
+    :   subscript[subs]+ {
+        $sltypes = subs;
+    }
     ;
 
-subscript : Ellipsis
-          | ^(Subscript (^(Start test[expr_contextType.Load]))? (^(End test[expr_contextType.Load]))? (^(SliceOp test[expr_contextType.Load]?))?)
+subscript [List subs]
+    : Ellipsis
+    | ^(Subscript (^(Lower start=test[expr_contextType.Load]))?
+          (^(Upper end=test[expr_contextType.Load]))? (^(Step (^(SliceOp op=test[expr_contextType.Load]))?))?) {
+              exprType s = null;
+              exprType e = null;
+              exprType o = null;
+              if ($Lower != null) {
+                  s = $start.etype;
+              }
+              if ($Upper != null) {
+                  e = $end.etype;
+              }
+              if ($Step != null) {
+                  if ($SliceOp != null) {
+                      o = $op.etype;
+                  }
+              }
+
+              if (o != null || e != null) {
+                 subs.add(new Slice($Subscript, s, e, o));
+              }
+              else if (s != null) {
+                 subs.add(new Index($Subscript, s));
+              }
+          }
           ;
 
 classdef
