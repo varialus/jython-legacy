@@ -897,10 +897,6 @@ test[expr_contextType ctype] returns [exprType etype]
         //XXX: could re-use BoolOps discarded above in many cases.
         $etype = new BoolOp($OR, boolopType.Or, e);
     }
-    | ^(NOT test[ctype]) {
-        $etype = new UnaryOp($NOT, unaryopType.Not, $test.etype);
-        $etype = $test.etype;
-    }
     | ^(comp_op left=test[ctype] targs=test[ctype]) {
         exprType[] targets = new exprType[1];
         cmpopType[] ops = new cmpopType[1];
@@ -1044,6 +1040,9 @@ atom[expr_contextType ctype] returns [exprType etype]
     | ^(Invert test[ctype]) {
         //FIXME: need to actually invert this
         $etype = $test.etype;
+    }
+    | ^(NOT test[ctype]) {
+        $etype = new UnaryOp($NOT, unaryopType.Not, $test.etype);
     }
     ;
 
