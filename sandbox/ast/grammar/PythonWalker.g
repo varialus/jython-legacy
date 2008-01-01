@@ -47,6 +47,7 @@ import org.python.antlr.ast.If;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
+import org.python.antlr.ast.Lambda;
 import org.python.antlr.ast.ListComp;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
@@ -178,7 +179,7 @@ import java.util.Set;
         }
 
         if (raw) {
-            return s.substring(quotes+start+1, s.length()-quotes);
+            return s.substring(quotes+start, s.length()-quotes);
         } else {
             StringBuffer sb = new StringBuffer(s.length());
             char[] ca = s.toCharArray();
@@ -917,7 +918,9 @@ test[expr_contextType ctype] returns [exprType etype]
     | call_expr {
         $etype = $call_expr.etype;
     }
-    | lambdef
+    | lambdef {
+        $etype = $lambdef.etype;
+    }
     ;
 
 comp_op returns [cmpopType op]
@@ -1057,8 +1060,12 @@ string[List strs]
     : STRING {strs.add($STRING.text);}
     ;
 
-lambdef: ^(Lambda varargslist? ^(Body test[expr_contextType.Load]))
-       ;
+lambdef returns [exprType etype]
+    : ^(Lambda varargslist? ^(Body test[expr_contextType.Load])) {
+        $etype = new Lambda($Lambda, $varargslist.args, $test.etype);
+
+    }
+    ;
 
 subscriptlist returns [List sltypes]
 @init {
@@ -1072,7 +1079,8 @@ subscriptlist returns [List sltypes]
 subscript [List subs]
     : Ellipsis
     | ^(Subscript (^(Lower start=test[expr_contextType.Load]))?
-          (^(Upper end=test[expr_contextType.Load]))? (^(Step (^(SliceOp op=test[expr_contextType.Load]))?))?) {
+          (^(Upper COLON (^(UpperOp end=test[expr_contextType.Load]))?))? (^(Step (^(StepOp op=test[expr_contextType.Load]))?))?) {
+              boolean isSlice = false;
               exprType s = null;
               exprType e = null;
               exprType o = null;
@@ -1080,18 +1088,22 @@ subscript [List subs]
                   s = $start.etype;
               }
               if ($Upper != null) {
-                  e = $end.etype;
+                  isSlice = true;
+                  if ($UpperOp != null) {
+                      e = $end.etype;
+                  }
               }
               if ($Step != null) {
-                  if ($SliceOp != null) {
+                  isSlice = true;
+                  if ($StepOp != null) {
                       o = $op.etype;
                   }
               }
 
-              if (o != null || e != null) {
+              if (isSlice) {
                  subs.add(new Slice($Subscript, s, e, o));
               }
-              else if (s != null) {
+              else {
                  subs.add(new Index($Subscript, s));
               }
           }

@@ -143,7 +143,6 @@ tokens {
     Lower;
     Upper;
     Step;
-    SliceOp;
     UnaryOp;
     UAdd;
     USub;
@@ -167,6 +166,9 @@ tokens {
     Values;
     Newline;
     //The tokens below are not represented in the 2.5 Python.asdl
+    StepOp;
+    UpperOp;
+
     GenFor;
     GenIf;
     ListFor;
@@ -373,8 +375,8 @@ print_stmt : 'print'
            ;
 
 //del_stmt: 'del' exprlist
-del_stmt : 'del' exprlist
-        -> ^(Delete exprlist)
+del_stmt : 'del' exprlist2
+        -> ^(Delete exprlist2)
          ;
 
 //pass_stmt: 'pass'
@@ -684,18 +686,24 @@ subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
 
 //subscript: '.' '.' '.' | test | [test] ':' [test] [sliceop]
 subscript : DOT DOT DOT -> Ellipsis
-          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper $t2)? ^(Step sliceop)?)
-          | COLON (test)? (sliceop)? -> ^(Subscript ^(Upper test)? ^(Step sliceop)?)
+          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? ^(Step sliceop)?)
+          | COLON (test)? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? ^(Step sliceop)?)
           ;
 
 //sliceop: ':' [test]
-sliceop : COLON (test)? -> ^(SliceOp test)?
+sliceop : COLON (test)? -> ^(StepOp test)?
         ;
 
 //exprlist: expr (',' expr)* [',']
 exprlist : (expr COMMA) => expr (options {k=2;}: COMMA expr)* (COMMA)? -> ^(Tuple ^(Elts expr+))
          | expr
          ;
+
+//XXX: I'm hoping I can get rid of this -- but for now I need an exprlist that does not produce tuples
+//     at least for del_stmt
+exprlist2 : expr (options {k=2;}: COMMA expr)* (COMMA)?
+         -> expr+
+          ;
 
 //testlist: test (',' test)* [',']
 //XXX: newline is only used by print - is there a better way?
