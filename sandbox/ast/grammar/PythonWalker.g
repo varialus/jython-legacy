@@ -196,8 +196,18 @@ import java.util.Set;
         return str.substring(start, end);
     }
 
+    Num makeFloat(PythonTree t) {
+        debug("makeFloat matched " + t.getText());
+        return new Num(t, Double.valueOf(t.getText()));
+    }
 
-    Num makeNum(PythonTree t) {
+    Num makeComplex(PythonTree t) {
+        String s = t.getText();
+        s = s.substring(0, s.length() - 1);
+        return new Num(t, Double.valueOf(s));
+    }
+
+    Num makeInt(PythonTree t) {
         debug("Num matched " + t.getText());
         String s = t.getText();
         int radix = 10;
@@ -294,12 +304,14 @@ import java.util.Set;
         return new For(t, target, iter, b, o);
     }
     
-    //FIXME: only handling Num for now.
+    //FIXME: only handling Num + BigInteger for now.
     private exprType negate(exprType o) {
         if (o instanceof Num) {
             Num num = (Num)o;
-            BigInteger b = (BigInteger)num.n;
-            num.n = b.negate();
+            if (num.n instanceof BigInteger) {
+                BigInteger b = (BigInteger)num.n;
+                num.n = b.negate();
+            }
             return num;
         }
         return o;
@@ -1023,12 +1035,15 @@ atom[expr_contextType ctype] returns [exprType etype]
         $etype = new Subscript($SubscriptList, $test.etype, s, ctype);
     }
     | ^(Num INT) {
-        $etype = makeNum($INT);
-        debug("makeNum output: " + $etype);
+        $etype = makeInt($INT);
+        debug("makeInt output: " + $etype);
     }
-    | ^(Num LONGINT) {$etype = makeNum($LONGINT);}
-    | ^(Num FLOAT)
-    | ^(Num COMPLEX)
+    | ^(Num LONGINT) {$etype = makeInt($LONGINT);}
+    | ^(Num FLOAT) {
+        $etype = makeFloat($FLOAT);
+        debug("float matched" + $etype);
+    }
+    | ^(Num COMPLEX) {$etype = makeComplex($COMPLEX);}
     | stringlist {
         $etype = new Str($stringlist.start, extractStrings($stringlist.strings));
     }
