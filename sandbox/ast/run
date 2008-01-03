@@ -1,2 +1,2 @@
-java -classpath lib/antlr-3.0.1.jar:build org.python.antlr.Main $*
+java -classpath lib/jython.jar:lib/antlr-3.0.1.jar:build org.python.antlr.Main $*
 #ng org.python.antlr.Main $*
