@@ -102,6 +102,7 @@ tokens {
     List;
     Dict;
     If;
+    IfExp;
     OrElse;
     Elif;
     While; 
@@ -137,6 +138,7 @@ tokens {
     BinOp;
     Subscript;
     SubscriptList;
+    Index;
     Target;
     Targets;
     Value;
@@ -687,8 +689,9 @@ subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
 
 //subscript: '.' '.' '.' | test | [test] ':' [test] [sliceop]
 subscript : DOT DOT DOT -> Ellipsis
-          | t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? ^(Step sliceop)?)
-          | COLON (test)? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? ^(Step sliceop)?)
+          | (test COLON) => t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? ^(Step sliceop)?)
+          | (COLON) => COLON (test)? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? ^(Step sliceop)?)
+          | test -> ^(Index test)
           ;
 
 //sliceop: ':' [test]

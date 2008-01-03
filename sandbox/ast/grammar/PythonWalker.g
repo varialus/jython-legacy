@@ -296,7 +296,7 @@ import java.util.Set;
     }
     
     //FIXME: just calling __neg__ for now - can be more efficient.
-    private exprType negate(exprType o) {
+    private exprType negate(PythonTree t, exprType o) {
         if (o instanceof Num) {
             Num num = (Num)o;
             if (num.n instanceof PyObject) {
@@ -304,7 +304,7 @@ import java.util.Set;
             }
             return num;
         }
-        return o;
+        return new UnaryOp(t, unaryopType.USub, o);
     }
 }
 
@@ -1054,7 +1054,7 @@ atom[expr_contextType ctype] returns [exprType etype]
     | ^(USub test[ctype]) {
         debug("USub matched " + $test.etype);
         //FIXME: need to actually negate this
-        $etype = negate($test.etype);
+        $etype = negate($USub, $test.etype);
     }
     | ^(UAdd test[ctype]) {
         $etype = $test.etype;
@@ -1092,6 +1092,23 @@ subscriptlist returns [List sltypes]
 }
     :   subscript[subs]+ {
         $sltypes = subs;
+    }
+    |   index[subs]+ {
+        exprType e;
+        if (subs.size() > 1) {
+            exprType[] es = (exprType[])subs.toArray(new exprType[subs.size()]);
+            e = new Tuple($index.start, es, expr_contextType.Load);
+        } else {
+            e = (exprType)subs.get(0);
+        }
+        $sltypes = new ArrayList();
+        $sltypes.add(new Index($index.start, e));
+    }
+    ;
+
+index [List subs]
+    : ^(Index test[expr_contextType.Load]) {
+        subs.add($test.etype);
     }
     ;
 
@@ -1213,8 +1230,11 @@ keyword[List kws]
     }
     ;
 
-list_iter: list_for
-    | list_if
+list_iter returns [exprType etype]
+    : list_for
+    | list_if {
+        $etype = $list_if.etype;
+    }
     ;
 
 list_for returns [comprehensionType gen]
@@ -1222,11 +1242,20 @@ list_for returns [comprehensionType gen]
     ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs list_iter))?) {
         debug("matched list_for");
         //XXX: Not collecting from Ifs yet.
-        $gen = new comprehensionType($ListFor, $targ.etype, $iter.etype, new exprType[0]);
+        exprType[] e;
+        if ($Ifs != null && $list_iter.etype != null) {
+            e = new exprType[]{$list_iter.etype};
+        } else {
+            e = new exprType[0];
+        }
+        $gen = new comprehensionType($ListFor, $targ.etype, $iter.etype, e);
     }
     ;
 
-list_if: ^(ListIf ^(Target test[expr_contextType.Load]) (Ifs list_iter)?)
+list_if returns [exprType etype]
+    : ^(ListIf ^(Target test[expr_contextType.Load]) (Ifs list_iter)?) {
+        $etype = $test.etype;
+    }
     ;
 
 gen_iter: gen_for
