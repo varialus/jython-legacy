@@ -8,9 +8,9 @@ options {
 @header { 
 package org.python.antlr;
 
-//import org.python.core.Py;
-//import org.python.core.PyString;
-//import org.python.core.CompilerFlags;
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.antlr.ast.aliasType;
 import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.boolopType;
@@ -186,25 +186,20 @@ import java.util.Set;
             int n = ca.length-quotes;
             int i=quotes+start;
             int last_i=i;
-            //return PyString.decode_UnicodeEscape(s, i, n, "strict", ustring);
-            return decode_UnicodeEscape(s, i, n, "strict", ustring);
+            return PyString.decode_UnicodeEscape(s, i, n, "strict", ustring);
+            //return decode_UnicodeEscape(s, i, n, "strict", ustring);
         }
-    }
-
-    //FIXME: placeholder until I re-integrate with Jython.
-    public static String decode_UnicodeEscape(String str, int start, int end, String errors, boolean unicode) {
-        return str.substring(start, end);
     }
 
     Num makeFloat(PythonTree t) {
         debug("makeFloat matched " + t.getText());
-        return new Num(t, Double.valueOf(t.getText()));
+        return new Num(t, Py.newFloat(Double.valueOf(t.getText())));
     }
 
     Num makeComplex(PythonTree t) {
         String s = t.getText();
         s = s.substring(0, s.length() - 1);
-        return new Num(t, Double.valueOf(s));
+        return new Num(t, Py.newImaginary(Double.valueOf(s)));
     }
 
     Num makeInt(PythonTree t) {
@@ -219,25 +214,21 @@ import java.util.Set;
         }
         if (s.endsWith("L") || s.endsWith("l")) {
             s = s.substring(0, s.length()-1);
-            //return new Num(t, Py.newLong(new BigInteger(s, radix)));
-            return new Num(t, new BigInteger(s, radix));
+            return new Num(t, Py.newLong(new BigInteger(s, radix)));
         }
         int ndigits = s.length();
         int i=0;
         while (i < ndigits && s.charAt(i) == '0')
             i++;
         if ((ndigits - i) > 11) {
-            //return new Num(t, Py.newLong(new BigInteger(s, radix)));
-            return new Num(t, new BigInteger(s, radix));
+            return new Num(t, Py.newLong(new BigInteger(s, radix)));
         }
 
         long l = Long.valueOf(s, radix).longValue();
         if (l > 0xffffffffl || (radix == 10 && l > Integer.MAX_VALUE)) {
-            //return new Num(t, Py.newLong(new BigInteger(s, radix)));
-            return new Num(t, new BigInteger(s, radix));
+            return new Num(t, Py.newLong(new BigInteger(s, radix)));
         }
-        //return new Num(t, Py.newInteger((int) l));
-        return new Num(t, BigInteger.valueOf(l));
+        return new Num(t, Py.newInteger((int) l));
     }
 
     private stmtType makeTryExcept(PythonTree t, List body, List handlers, List orelse, List finBody) {
@@ -304,13 +295,12 @@ import java.util.Set;
         return new For(t, target, iter, b, o);
     }
     
-    //FIXME: only handling Num + BigInteger for now.
+    //FIXME: just calling __neg__ for now - can be more efficient.
     private exprType negate(exprType o) {
         if (o instanceof Num) {
             Num num = (Num)o;
-            if (num.n instanceof BigInteger) {
-                BigInteger b = (BigInteger)num.n;
-                num.n = b.negate();
+            if (num.n instanceof PyObject) {
+                num.n = ((PyObject)num.n).__neg__();
             }
             return num;
         }
@@ -369,13 +359,11 @@ decorators returns [List etypes]
 decorator [List decs]
     : ^(Decorator dotted_attr (^(Call arglist))?) {
         if ($Call == null) {
-            debug("not call site!");
             decs.add($dotted_attr.etype);
         } else {
             exprType[] args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
             keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
             Call c = new Call($Call, $dotted_attr.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
-            debug("call site!");
             decs.add(c);
         }
     }
@@ -911,11 +899,27 @@ test[expr_contextType ctype] returns [exprType etype]
         $etype = new BoolOp($OR, boolopType.Or, e);
     }
     | ^(comp_op left=test[ctype] targs=test[ctype]) {
-        exprType[] targets = new exprType[1];
-        cmpopType[] ops = new cmpopType[1];
-        ops[0] = $comp_op.op;
-        targets[0] = $targs.etype;
-        $etype = new Compare($comp_op.start, $left.etype, ops, targets);
+        exprType[] comparators;
+        cmpopType[] ops;
+        exprType val;
+        //XXX: does right need to be checked for Compare?
+        if ($left.etype instanceof Compare) {
+            Compare c = (Compare)$left.etype;
+            comparators = new exprType[c.comparators.length + 1];
+            ops = new cmpopType[c.ops.length + 1];
+            System.arraycopy(c.ops, 0, ops, 0, c.ops.length);
+            System.arraycopy(c.comparators, 0, comparators, 0, c.comparators.length);
+            comparators[c.comparators.length] = $targs.etype;
+            ops[c.ops.length] = $comp_op.op;
+            val = c.left;
+        } else {
+            comparators = new exprType[1];
+            ops = new cmpopType[1];
+            ops[0] = $comp_op.op;
+            comparators[0] = $targs.etype;
+            val = $left.etype;
+        }
+        $etype = new Compare($comp_op.start, val, ops, comparators);
         debug("COMP_OP: " + $comp_op.start);
     }
     | atom[ctype] {

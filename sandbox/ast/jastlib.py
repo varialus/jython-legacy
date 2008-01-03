@@ -48,7 +48,7 @@ def lispify_field(field, child):
                 try:
                     if isinstance(node, BigInteger):
                         yield node.intValue()
-                    elif isinstance(node, float):
+                    else:
                         yield node
                 except Exception, why:
                     print "error processing n: %s" % why

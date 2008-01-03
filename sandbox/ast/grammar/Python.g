@@ -633,7 +633,7 @@ power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
 atom : LPAREN 
        //XXX: calling all of these "Tuple" is almost certainly incorrect.
        ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
-       | testlist_gexp {debug("parsed testlist_gexp");} -> ^(Tuple ^(Elts testlist_gexp))
+       | testlist_gexp {debug("parsed testlist_gexp");} -> testlist_gexp
        | -> ^(Tuple)
        )
        RPAREN
@@ -660,11 +660,12 @@ listmaker : test
           ;
 
 //testlist_gexp: test ( gen_for | (',' test)* [','] )
-testlist_gexp : test ( gen_for -> ^(GenExpFor gen_for)
-                     | (options {k=2;}: COMMA test)* -> test+
-                     )
-                     (COMMA)?
-              ;
+testlist_gexp
+    : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple ^(Elts test+))
+    | test ( gen_for -> ^(GenExpFor gen_for)
+            | -> test
+            )
+    ;
 
 //FIXME: switched to or_test for now which allows simple lambdas to work - but
 //      this prevents nested lambdas. see test_scope.py for examples that fail.

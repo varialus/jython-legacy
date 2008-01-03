@@ -12,7 +12,7 @@ be handy when comparing Jython's implementation vs CPython.
 
 import _ast
 import os
-import glob
+import globwalk
 
 def lispify_ast(node):
     return tuple(lispify_ast2(node))
@@ -45,7 +45,7 @@ def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_su
     from difflib import Differ
 
     if os.path.isdir(code_path):
-        pyfiles = glob.glob("%s/**.py" % code_path)
+        pyfiles = globwalk.GlobDirectoryWalker(code_path, "*.py")
     else:
         pyfiles = [code_path]
 
