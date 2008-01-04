@@ -156,7 +156,7 @@ tokens {
     Decorator;
     Decorators;
     With;
-    GenExpFor;
+    GeneratorExp;
     Id;
     Iter;
     Ifs;
@@ -369,13 +369,29 @@ augassign : PLUSEQUAL
 
 //print_stmt: 'print' ( [ test (',' test)* [','] ] | '>>' test [ (',' test)+ [','] ] )
 print_stmt : 'print'
-             ( t1=testlist -> {$t1.newline}? ^(Print ^(Values $t1) ^(Newline))
+             ( t1=printlist -> {$t1.newline}? ^(Print ^(Values $t1) ^(Newline))
                            -> ^(Print ^(Values $t1))
-             | RIGHTSHIFT t2=testlist -> {$t2.newline}? ^(Print ^(Dest RIGHTSHIFT) ^(Values testlist) ^(Newline))
-                                      -> ^(Print ^(Dest RIGHTSHIFT) ^(Values testlist))
+             | RIGHTSHIFT t2=printlist -> {$t2.newline}? ^(Print ^(Dest RIGHTSHIFT) ^(Values $t2) ^(Newline))
+                                      -> ^(Print ^(Dest RIGHTSHIFT) ^(Values $t2))
              | -> ^(Print ^(Newline))
              )
            ;
+
+//testlist: test (',' test)* [',']
+//XXX: newline is only used by print - is there a better way?
+printlist returns [boolean newline]
+    : (test COMMA) => test (options {k=2;}: COMMA test)* (trailcomma=COMMA)?
+    { if ($trailcomma == null) {
+          $newline = true;
+      } else {
+          $newline = false;
+      }
+    }
+   -> ^(Elts test+)
+    | test {$newline = true;}
+   -> ^(Elts test)
+    ;
+
 
 //del_stmt: 'del' exprlist
 del_stmt : 'del' exprlist2
@@ -665,7 +681,7 @@ listmaker : test
 //testlist_gexp: test ( gen_for | (',' test)* [','] )
 testlist_gexp
     : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple ^(Elts test+))
-    | test ( gen_for -> ^(GenExpFor gen_for)
+    | test ( gen_for -> ^(GeneratorExp test gen_for)
             | -> test
             )
     ;
@@ -782,12 +798,12 @@ gen_iter: gen_for
 
 //gen_for: 'for' exprlist 'in' or_test [gen_iter]
 gen_for: 'for' exprlist 'in' or_test gen_iter?
-      -> ^(GenFor ^(Target exprlist) ^(Iter gen_iter)?)
+      -> ^(GenFor ^(Target exprlist) ^(Iter or_test) ^(Ifs gen_iter)?)
        ;
 
 //gen_if: 'if' old_test [gen_iter]
 gen_if: 'if' test gen_iter?
-     -> ^(GenIf ^(Target test) ^(Iter gen_iter)?)
+     -> ^(GenIf ^(Target test) ^(Ifs gen_iter)?)
       ;
 
 //yield_expr: 'yield' [testlist]

@@ -42,6 +42,7 @@ import org.python.antlr.ast.Exec;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.GeneratorExp;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
 import org.python.antlr.ast.Index;
@@ -60,6 +61,7 @@ import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
 import org.python.antlr.ast.Raise;
+import org.python.antlr.ast.Repr;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.UnaryOp;
@@ -454,7 +456,6 @@ call_expr returns [exprType etype]
             c = new Call($Call, $test.etype, new exprType[0], new keywordType[0], null, null);
             debug("Matched Call site no args");
         } else {
-            debug($arglist.text + "!!!!" + $test.text);
             debug("Matched Call w/ args");
             exprType[] args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
             keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
@@ -511,7 +512,7 @@ binop returns [operatorType op]
 
 
 print_stmt
-    : ^(Print (^(Dest RIGHTSHIFT))? (^(Values test[expr_contextType.Load]))? (Newline)?) {
+    : ^(Print (^(Dest RIGHTSHIFT))? (^(Values ^(Elts elts[expr_contextType.Load])))? (Newline)?) {
         Print p;
         exprType[] values;
 
@@ -527,17 +528,13 @@ print_stmt
             hasdest = true;
         }
         if ($Values != null) {
-            if ($test.etype instanceof Tuple) {
-                Tuple t = (Tuple)$test.etype;
-                if (hasdest) {
-                    dest = t.elts[0];
-                    values = new exprType[t.elts.length - 1];
-                    System.arraycopy(t.elts, 1, values, 0, values.length);
-                } else {
-                    values = t.elts;
-                }
+            exprType[] t = (exprType[])$elts.etypes.toArray(new exprType[$elts.etypes.size()]);
+            if (hasdest) {
+                dest = t[0];
+                values = new exprType[t.length - 1];
+                System.arraycopy(t, 1, values, 0, values.length);
             } else {
-                values  = new exprType[]{$test.etype};
+                values = t;
             }
         } else {
             values = new exprType[0];
@@ -1014,7 +1011,10 @@ atom[expr_contextType ctype] returns [exprType etype]
         debug("matched ListComp");
         $etype = new ListComp($ListComp, $test.etype, new comprehensionType[]{$list_for.gen});
     }
-    | ^(GenExpFor gen_for) {}
+    | ^(GeneratorExp test[ctype] gen_for) {
+        debug("matched GeneratorExp");
+        $etype = new GeneratorExp($GeneratorExp, $test.etype, new comprehensionType[]{$gen_for.gen});
+    }
     | ^(Dict (^(Elts elts[ctype]))?) {
         exprType[] keys;
         exprType[] values;
@@ -1033,7 +1033,9 @@ atom[expr_contextType ctype] returns [exprType etype]
         $etype = new Dict($Dict, keys, values);
  
     }
-    | ^(Repr test[ctype]*) {}
+    | ^(Repr test[ctype]*) {
+        $etype = new Repr($Repr, $test.etype);
+    }
     | ^(Name NAME) {
         debug("matched Name " + $NAME.text);
         $etype = new Name($NAME, $NAME.text, ctype);
@@ -1237,8 +1239,9 @@ argument[List arguments]
     : ^(Arg test[expr_contextType.Load]) {
         arguments.add($test.etype);
     }
-    | ^(GenFor test[expr_contextType.Load] gen_for)
-        //arguments.add($test.etype));
+    | ^(GenFor test[expr_contextType.Load] gen_for) {
+        arguments.add(new GeneratorExp($GenFor, $test.etype, new comprehensionType[]{$gen_for.gen}));
+    }
     ;
 
 keyword[List kws]
@@ -1258,7 +1261,6 @@ list_for returns [comprehensionType gen]
     :
     ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs list_iter))?) {
         debug("matched list_for");
-        //XXX: Not collecting from Ifs yet.
         exprType[] e;
         if ($Ifs != null && $list_iter.etype != null) {
             e = new exprType[]{$list_iter.etype};
@@ -1275,13 +1277,29 @@ list_if returns [exprType etype]
     }
     ;
 
-gen_iter: gen_for
-        | gen_if
-        ;
+gen_iter returns [exprType etype]
+    : gen_for
+    | gen_if {
+        $etype = $gen_if.etype;
+    }
+    ;
 
-gen_for: ^(GenFor ^(Target test[expr_contextType.Load]+) (^(Iter gen_iter))?)
-       ;
+gen_for returns [comprehensionType gen]
+    : ^(GenFor ^(Target targ=test[expr_contextType.Store]+) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs gen_iter))?) {
+        debug("matched gen_for");
+        exprType[] e;
+        if ($Ifs != null && $gen_iter.etype != null) {
+            e = new exprType[]{$gen_iter.etype};
+        } else {
+            e = new exprType[0];
+        }
+        $gen = new comprehensionType($GenFor, $targ.etype, $iter.etype, e);
+    }
+    ;
 
-gen_if: ^(GenIf ^(Target test[expr_contextType.Load]) (^(Iter gen_iter))?)
-      ;
+gen_if returns [exprType etype]
+    : ^(GenIf ^(Target test[expr_contextType.Load]) (^(Iter gen_iter))?) {
+        $etype = $test.etype;
+    }
+    ;
 
