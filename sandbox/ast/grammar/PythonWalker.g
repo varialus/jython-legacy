@@ -339,13 +339,27 @@ varargslist returns [argumentsType args]
     ;
 
 defparameter[List params, List defaults]
+@init {
+    List nms = new ArrayList();
+}
     : NAME (ASSIGN test[expr_contextType.Load] )? {
         params.add(new Name($NAME, $NAME.text, expr_contextType.Param));
         if ($ASSIGN != null) {
             defaults.add($test.etype);
         }
     }
+    | ^(FpList fplist_name[nms]+) {
+        Name[] n = (Name[])nms.toArray(new Name[nms.size()]);
+        params.add(new Tuple($fplist_name.start, n, expr_contextType.Store));
+    }
     ;
+
+fplist_name[List nms]
+    : NAME {
+        nms.add(new Name($NAME, $NAME.text, expr_contextType.Store));
+    }
+    ;
+
 
 decorators returns [List etypes]
 @init {
@@ -1081,8 +1095,11 @@ string[List strs]
 
 lambdef returns [exprType etype]
     : ^(Lambda varargslist? ^(Body test[expr_contextType.Load])) {
-        $etype = new Lambda($Lambda, $varargslist.args, $test.etype);
-
+        argumentsType a = $varargslist.args;
+        if (a == null) {
+            a = new argumentsType($Lambda, new exprType[0], null, null, new exprType[0]);
+        }
+        $etype = new Lambda($Lambda, a, $test.etype);
     }
     ;
 

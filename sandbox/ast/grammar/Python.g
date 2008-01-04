@@ -168,6 +168,7 @@ tokens {
     Values;
     Newline;
     //The tokens below are not represented in the 2.5 Python.asdl
+    FpList;
     StepOp;
     UpperOp;
 
@@ -297,7 +298,7 @@ defparameter : fpdef (ASSIGN test)?
 
 //fpdef: NAME | '(' fplist ')'
 fpdef : NAME
-      | LPAREN! fplist RPAREN!
+      | LPAREN fplist RPAREN -> ^(FpList fplist)
       ;
 
 //fplist: fpdef (',' fpdef)* [',']
