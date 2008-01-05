@@ -70,6 +70,7 @@ import org.python.antlr.ast.Yield;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -1007,14 +1008,7 @@ atom[expr_contextType ctype] returns [exprType etype]
         }
         $etype = new org.python.antlr.ast.List($List, e, ctype);
     }
-    | ^(ListComp test[ctype] list_for) {
-        debug("matched ListComp");
-        $etype = new ListComp($ListComp, $test.etype, new comprehensionType[]{$list_for.gen});
-    }
-    | ^(GeneratorExp test[ctype] gen_for) {
-        debug("matched GeneratorExp");
-        $etype = new GeneratorExp($GeneratorExp, $test.etype, new comprehensionType[]{$gen_for.gen});
-    }
+    | comprehension[ctype] {$etype = $comprehension.etype;}
     | ^(Dict (^(Elts elts[ctype]))?) {
         exprType[] keys;
         exprType[] values;
@@ -1073,14 +1067,32 @@ atom[expr_contextType ctype] returns [exprType etype]
         $etype = negate($USub, $test.etype);
     }
     | ^(UAdd test[ctype]) {
-        $etype = $test.etype;
+        $etype = new UnaryOp($UAdd, unaryopType.UAdd, $test.etype);
     }
     | ^(Invert test[ctype]) {
         //FIXME: need to actually invert this
-        $etype = $test.etype;
+        $etype = new UnaryOp($Invert, unaryopType.Invert, $test.etype);
     }
     | ^(NOT test[ctype]) {
         $etype = new UnaryOp($NOT, unaryopType.Not, $test.etype);
+    }
+    ;
+
+comprehension[expr_contextType ctype] returns [exprType etype]
+@init {
+    List gens = new ArrayList();
+}
+    : ^(ListComp test[ctype] list_for[gens]) {
+        debug("matched ListComp");
+        Collections.reverse(gens);
+        comprehensionType[] c = (comprehensionType[])gens.toArray(new comprehensionType[gens.size()]);
+        $etype = new ListComp($ListComp, $test.etype, c);
+    }
+    | ^(GeneratorExp test[ctype] gen_for[gens]) {
+        debug("matched GeneratorExp");
+        Collections.reverse(gens);
+        comprehensionType[] c = (comprehensionType[])gens.toArray(new comprehensionType[gens.size()]);
+        $etype = new GeneratorExp($GeneratorExp, $test.etype, c);
     }
     ;
 
@@ -1236,11 +1248,16 @@ arglist returns [List args, List keywords, exprType starargs, exprType kwargs]
     ;
 
 argument[List arguments]
+@init {
+    List gens = new ArrayList();
+}
     : ^(Arg test[expr_contextType.Load]) {
         arguments.add($test.etype);
     }
-    | ^(GenFor test[expr_contextType.Load] gen_for) {
-        arguments.add(new GeneratorExp($GenFor, $test.etype, new comprehensionType[]{$gen_for.gen}));
+    | ^(GenFor test[expr_contextType.Load] gen_for[gens]) {
+        Collections.reverse(gens);
+        comprehensionType[] c = (comprehensionType[])gens.toArray(new comprehensionType[gens.size()]);
+        arguments.add(new GeneratorExp($GenFor, $test.etype, c));
     }
     ;
 
@@ -1250,16 +1267,16 @@ keyword[List kws]
     }
     ;
 
-list_iter returns [exprType etype]
-    : list_for
-    | list_if {
+list_iter [List gens] returns [exprType etype]
+    : list_for[gens]
+    | list_if[gens] {
         $etype = $list_if.etype;
     }
     ;
 
-list_for returns [comprehensionType gen]
+list_for [List gens]
     :
-    ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs list_iter))?) {
+    ^(ListFor ^(Target targ=test[expr_contextType.Store]) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs list_iter[gens]))?) {
         debug("matched list_for");
         exprType[] e;
         if ($Ifs != null && $list_iter.etype != null) {
@@ -1267,25 +1284,25 @@ list_for returns [comprehensionType gen]
         } else {
             e = new exprType[0];
         }
-        $gen = new comprehensionType($ListFor, $targ.etype, $iter.etype, e);
+        gens.add(new comprehensionType($ListFor, $targ.etype, $iter.etype, e));
     }
     ;
 
-list_if returns [exprType etype]
-    : ^(ListIf ^(Target test[expr_contextType.Load]) (Ifs list_iter)?) {
+list_if[List gens] returns [exprType etype]
+    : ^(ListIf ^(Target test[expr_contextType.Load]) (Ifs list_iter[gens])?) {
         $etype = $test.etype;
     }
     ;
 
-gen_iter returns [exprType etype]
-    : gen_for
-    | gen_if {
+gen_iter [List gens] returns [exprType etype]
+    : gen_for[gens]
+    | gen_if[gens] {
         $etype = $gen_if.etype;
     }
     ;
 
-gen_for returns [comprehensionType gen]
-    : ^(GenFor ^(Target targ=test[expr_contextType.Store]+) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs gen_iter))?) {
+gen_for [List gens]
+    : ^(GenFor ^(Target targ=test[expr_contextType.Store]+) ^(Iter iter=test[expr_contextType.Load]) (^(Ifs gen_iter[gens]))?) {
         debug("matched gen_for");
         exprType[] e;
         if ($Ifs != null && $gen_iter.etype != null) {
@@ -1293,12 +1310,12 @@ gen_for returns [comprehensionType gen]
         } else {
             e = new exprType[0];
         }
-        $gen = new comprehensionType($GenFor, $targ.etype, $iter.etype, e);
+        gens.add(new comprehensionType($GenFor, $targ.etype, $iter.etype, e));
     }
     ;
 
-gen_if returns [exprType etype]
-    : ^(GenIf ^(Target test[expr_contextType.Load]) (^(Iter gen_iter))?) {
+gen_if[List gens] returns [exprType etype]
+    : ^(GenIf ^(Target test[expr_contextType.Load]) (^(Iter gen_iter[gens]))?) {
         $etype = $test.etype;
     }
     ;
