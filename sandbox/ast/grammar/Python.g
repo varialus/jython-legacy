@@ -558,9 +558,12 @@ suite : simple_stmt
       | NEWLINE! INDENT (stmt)+ DEDENT
       ;
 
-//FIXME: looks like this one is going to be tough.
 //test: or_test ['if' or_test 'else' test] | lambdef
-test: or_test //('if' test 'else' test)?
+test: o1=or_test
+    ( ('if' or_test 'else') => 'if' o2=or_test 'else' test
+      -> ^(IfExp ^(Test $o2) ^(Body $o1) ^(OrElse test))
+    | -> or_test
+    )
     | lambdef {debug("parsed lambdef");}
     ;
 

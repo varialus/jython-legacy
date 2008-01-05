@@ -36,7 +36,11 @@ def lispify_field(field, child):
         if isinstance(node, _ast.AST):
             yield lispify_ast(node)
         else:
-            yield node
+            if isinstance(node, float):
+                #stringify floats so they match Java's float representation better
+                yield str(node)
+            else:
+                yield node
 
 def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_success=False, print_diff_lines=False):
     from pprint import pprint

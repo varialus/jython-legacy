@@ -13,8 +13,6 @@ import org.python.antlr.Main as parser
 
 from types import ArrayType
 
-from java.math import BigInteger
-
 def lispify_ast(node):
     return tuple(lispify_ast2(node))
 
@@ -46,12 +44,13 @@ def lispify_field(field, child):
                 yield tuple([str(node)])
             elif fname == "n":
                 try:
-                    if isinstance(node, BigInteger):
-                        yield node.intValue()
+                    if isinstance(node, float):
+                        yield str(node)
                     else:
                         yield node
                 except Exception, why:
-                    print "error processing n: %s" % why
+                    print "crap: %s" % why
+                    
             else:
                 yield node
 

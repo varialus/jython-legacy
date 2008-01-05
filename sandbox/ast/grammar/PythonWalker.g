@@ -45,6 +45,7 @@ import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.GeneratorExp;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
+import org.python.antlr.ast.IfExp;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
@@ -65,6 +66,7 @@ import org.python.antlr.ast.Repr;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.UnaryOp;
+import org.python.antlr.ast.With;
 import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
 
@@ -818,11 +820,18 @@ except_clause[List handlers]
     ;
 
 with_stmt
-    : ^(With test[expr_contextType.Load] with_var? ^(Body stmts))
+    : ^(With test[expr_contextType.Load] with_var? ^(Body stmts)) {
+        stmtType[] b = (stmtType[])$stmts.stypes.toArray(new stmtType[$stmts.stypes.size()]);
+        $stmts::statements.add(new With($With, $test.etype, $with_var.etype, b));
+    }
     ;
 
-with_var
-    : ('as' | NAME) test[expr_contextType.Load]
+//FIXME: how would NAME be used?  I can't find any examples of this usage, but this is what
+//       CPython's Grammar/Grammar file specifies...
+with_var returns [exprType etype]
+    : ('as' | NAME) test[expr_contextType.Store] {
+        $etype = $test.etype;
+    }
     ;
 
 //FIXME: lots of placeholders
@@ -948,6 +957,9 @@ test[expr_contextType ctype] returns [exprType etype]
     }
     | lambdef {
         $etype = $lambdef.etype;
+    }
+    | ^(IfExp ^(Test t1=test[ctype]) ^(Body t2=test[ctype]) ^(OrElse t3=test[ctype])) {
+        $etype = new IfExp($IfExp, $t1.etype, $t2.etype, $t3.etype);
     }
     ;
 
