@@ -284,25 +284,27 @@ varargslist : defparameter (options {greedy=true;}:COMMA defparameter)*
                   ( STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?
                   | DOUBLESTAR kwargs=NAME
                   )?
-              )?
+              )? {debug("parsed varargslist");}
            -> ^(Args defparameter+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
-            | STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?
+            | STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?{debug("parsed varargslist STARARGS");}
            -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
-            | DOUBLESTAR kwargs=NAME
+            | DOUBLESTAR kwargs=NAME {debug("parsed varargslist KWS");}
            -> ^(KWArgs $kwargs)
             ;
 
 //not in CPython's Grammar file
-defparameter : fpdef (ASSIGN test)?
+defparameter : fpdef (ASSIGN test)? {debug("parsed defparameter");}
              ;
 
 //fpdef: NAME | '(' fplist ')'
-fpdef : NAME
-      | LPAREN fplist RPAREN -> ^(FpList fplist)
+fpdef : NAME {debug("parsed fpdef NAME");}
+      | LPAREN fplist RPAREN {debug("parsed fpdef:fplist");}
+     -> ^(FpList fplist)
       ;
 
 //fplist: fpdef (',' fpdef)* [',']
 fplist : fpdef (options {greedy=true;}:COMMA fpdef)* (COMMA)?
+       {debug("parsed fplist");}
       -> fpdef+
        ;
 
@@ -332,7 +334,7 @@ small_stmt : expr_stmt
 expr_stmt : lhs=testlist
             ( (augassign yield_expr -> ^(augassign $lhs yield_expr))
             | (augassign rhs=testlist -> ^(augassign $lhs $rhs))
-            | ((assigns) -> ^(Assign ^(Target $lhs) assigns))
+            | ((assigns) {debug("matched assigns");} -> ^(Assign ^(Target $lhs) assigns))
             | -> $lhs
             )
           ;
