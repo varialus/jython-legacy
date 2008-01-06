@@ -19,3 +19,33 @@ run - runs grammar and walker on a file (note add any second param to get a
       print of the trees) - empty output means a successful walk.
 spark.py - copied from CPython -- used by asdl
 
+known bugs:
+* lambda is not working very well.  Currently it uses or_test just so it can
+barely work but this prevents nested lambdas.  One problem is the syntactic
+predicate in testlist -- it binds too tightly to commas so lambdas like:
+  lambda x,y=1: x + y
+fail thinking that x=1 is an assignment statement.
+* unicode: I am not currently creating PyUnicode for unicode objects (so
+u'' in python ends up looking like ''.  Also many of the representations
+use lowercase where jython uses upercase.
+* float representation: there are differences in float representation like
+exponentials use lowercase in cpython but upper in jython -- also the 
+number of diplayed digits vary.
+* the lexer is dropping ^L currently -- betting that's wrong.
+* lexing:
+   def blah():foo \
+
+fails -- this shows up in many of the plat_* files with names like IN.py.
+It looks like the lexer is absorbing too many end-of-lines.
+
+* parens - parens do not always work the way they should - one example:
+
+(a <= a) is True
+
+incorrectly rolls up as if the statment had been:
+
+a <= a is True
+
+* some string lexing is wrong, for example:
+''' antlr thinks this has 4 end apos \''''
+
