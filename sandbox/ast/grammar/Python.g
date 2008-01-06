@@ -732,17 +732,10 @@ exprlist2 : expr (options {k=2;}: COMMA expr)* (COMMA)?
           ;
 
 //testlist: test (',' test)* [',']
-//XXX: newline is only used by print - is there a better way?
-testlist returns [boolean newline]
+testlist
     : (test COMMA) => test (options {k=2;}: COMMA test)* (trailcomma=COMMA)?
-    { if ($trailcomma == null) {
-          $newline = true;
-      } else {
-          $newline = false;
-      }
-    }
    -> ^(Tuple ^(Elts test+))
-    | test {$newline = true;}
+    | test
     ;
 
 //XXX:
