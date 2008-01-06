@@ -344,27 +344,42 @@ varargslist returns [argumentsType args]
     ;
 
 defparameter[List params, List defaults]
-@init {
-    List nms = new ArrayList();
-}
-    : NAME (ASSIGN test[expr_contextType.Load] )? {
-        params.add(new Name($NAME, $NAME.text, expr_contextType.Param));
+    : fpdef[expr_contextType.Param, null] (ASSIGN test[expr_contextType.Load])? {
+        params.add($fpdef.etype);
         if ($ASSIGN != null) {
             defaults.add($test.etype);
         }
     }
-    | ^(FpList fplist_name[nms]+) {
-        Name[] n = (Name[])nms.toArray(new Name[nms.size()]);
-        params.add(new Tuple($fplist_name.start, n, expr_contextType.Store));
-    }
     ;
 
-fplist_name[List nms]
+fpdef [expr_contextType ctype, List nms] returns [exprType etype]
     : NAME {
-        nms.add(new Name($NAME, $NAME.text, expr_contextType.Store));
+        exprType e = new Name($NAME, $NAME.text, ctype);
+        if (nms == null) {
+            $etype = e;
+        } else {
+            nms.add(e);
+        }
+    }
+    | ^(FpList fplist) {
+        exprType[] e = (exprType[])$fplist.etypes.toArray(new exprType[$fplist.etypes.size()]);
+        Tuple t = new Tuple($fplist.start, e, expr_contextType.Store);
+        if (nms == null) {
+            $etype = t;
+        } else {
+            nms.add(t);
+        }
     }
     ;
 
+fplist returns [List etypes]
+@init {
+    List nms = new ArrayList();
+}
+    : fpdef[expr_contextType.Store, nms]+ {
+        $etypes = nms;
+    }
+    ;
 
 decorators returns [List etypes]
 @init {
