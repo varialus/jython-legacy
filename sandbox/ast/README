@@ -9,12 +9,11 @@ astlip.py - adapted from Jim Baker's ast -> s-expression utility
 build.xml - ant file for building the project
 crawl - runs only the grammar on a file (note add any second param to get a
         print of the tree) - empty output means a successful walk.
-fails - a list of release25 files that fail - slightly outdated
+fails - a runner for release25 files that fail
 globwalk.py - a recursive globber used by astlib.py
 jastlib.py - adapted from astlib.py to produce a reasonable s-expression
              from jython parsing with antlr
-regr - a list of release25 files that should succeed - slightly outdated 
-       I think there are two new failures I think due to __neg__ on negate
+regr - a runner for release25 files that should succeed
 run - runs grammar and walker on a file (note add any second param to get a
       print of the trees) - empty output means a successful walk.
 spark.py - copied from CPython -- used by asdl
