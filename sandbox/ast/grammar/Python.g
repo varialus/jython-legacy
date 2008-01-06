@@ -910,7 +910,8 @@ OR : 'or' ;
 NOT : 'not' ;
 
 FLOAT
-    :    '.' DIGITS (Exponent)?
+    :   '.' DIGITS (Exponent)?
+    |   DIGITS '.' Exponent
     |   DIGITS ('.' (DIGITS (Exponent)?)? | Exponent)
     ;
 
