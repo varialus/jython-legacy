@@ -886,7 +886,7 @@ echo Lib/test/t
 ./run $RELEASE25/Lib/test/test_cgi.py
 ./run $RELEASE25/Lib/test/test_charmapcodec.py
 ./run $RELEASE25/Lib/test/test_cl.py
-./run $RELEASE25/Lib/test/test_class.py
+##./run $RELEASE25/Lib/test/test_class.py
 ./run $RELEASE25/Lib/test/test_cmath.py
 ./run $RELEASE25/Lib/test/test_cmd_line.py
 ./run $RELEASE25/Lib/test/test_code.py
@@ -908,7 +908,7 @@ echo Lib/test/t
 ./run $RELEASE25/Lib/test/test_colorsys.py
 ./run $RELEASE25/Lib/test/test_commands.py
 ./run $RELEASE25/Lib/test/test_compare.py
-./run $RELEASE25/Lib/test/test_compile.py
+##./run $RELEASE25/Lib/test/test_compile.py
 ./run $RELEASE25/Lib/test/test_compiler.py
 #./run $RELEASE25/Lib/test/test_complex.py
 #./run $RELEASE25/Lib/test/test_complex_args.py
@@ -985,7 +985,7 @@ echo Lib/test/t
 ./run $RELEASE25/Lib/test/test_hash.py
 ./run $RELEASE25/Lib/test/test_hashlib.py
 ./run $RELEASE25/Lib/test/test_heapq.py
-./run $RELEASE25/Lib/test/test_hexoct.py
+##./run $RELEASE25/Lib/test/test_hexoct.py
 ./run $RELEASE25/Lib/test/test_hmac.py
 ./run $RELEASE25/Lib/test/test_hotshot.py
 ./run $RELEASE25/Lib/test/test_htmllib.py
@@ -1027,7 +1027,7 @@ echo Lib/test/m
 ./run $RELEASE25/Lib/test/test_minidom.py
 ./run $RELEASE25/Lib/test/test_mmap.py
 ./run $RELEASE25/Lib/test/test_module.py
-./run $RELEASE25/Lib/test/test_multibytecodec.py
+##./run $RELEASE25/Lib/test/test_multibytecodec.py
 ./run $RELEASE25/Lib/test/test_multibytecodec_support.py
 ./run $RELEASE25/Lib/test/test_multifile.py
 ./run $RELEASE25/Lib/test/test_mutants.py

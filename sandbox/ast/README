@@ -20,6 +20,14 @@ run - runs grammar and walker on a file (note add any second param to get a
 spark.py - copied from CPython -- used by asdl
 
 known bugs:
+* The following files in release25 completely blow up astlib.py:
+      Lib/stringprep.py
+      Lib/test/test_pep263.py
+      Lib/test/bad_coding.py
+      Lib/test/bad_coding2.py
+      Lib/test/badsyntax_nocaret.py
+so I generally delete these files before running astlib.py on the whole 
+release25 Lib.
 * lambda is not working very well.  Currently it uses or_test just so it can
 barely work but this prevents nested lambdas.  One problem is the syntactic
 predicate in testlist -- it binds too tightly to commas so lambdas like:
