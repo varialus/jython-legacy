@@ -1,1 +1,0 @@
-java -classpath lib/antlr-3.0.1.jar:build org.python.antlr.Main $*
