@@ -748,7 +748,7 @@ dictmaker : test COLON test
           ;
 
 //classdef: 'class' NAME ['(' testlist ')'] ':' suite
-classdef: 'class' NAME (LPAREN testlist RPAREN)? COLON suite
+classdef: 'class' NAME (LPAREN testlist? RPAREN)? COLON suite
     -> ^(ClassDef ^(Name NAME) ^(Bases testlist)? ^(Body suite))
     ;
 

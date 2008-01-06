@@ -1,9 +1,5 @@
 RELEASE25='/Users/frank/src/python/release25-maint'
 
-echo $RELEASE25/Lib/_strptime.py
-./run $RELEASE25/Lib/_strptime.py
-echo $RELEASE25/Lib/compiler/pycodegen.py
-./run $RELEASE25/Lib/compiler/pycodegen.py
 echo $RELEASE25/Lib/idlelib/CodeContext.py
 ./run $RELEASE25/Lib/idlelib/CodeContext.py
 echo $RELEASE25/Lib/idlelib/FormatParagraph.py
