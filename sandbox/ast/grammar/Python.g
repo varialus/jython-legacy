@@ -379,8 +379,7 @@ print_stmt : 'print'
              )
            ;
 
-//testlist: test (',' test)* [',']
-//XXX: newline is only used by print - is there a better way?
+//not in CPython's Grammar file
 printlist returns [boolean newline]
     : (test COMMA) => test (options {k=2;}: COMMA test)* (trailcomma=COMMA)?
     { if ($trailcomma == null) {
@@ -968,15 +967,17 @@ CONTINUED_LINE
 /** Treat a sequence of blank lines as a single blank line.  If
  *  nested within a (..), {..}, or [..], then ignore newlines.
  *  If the first newline starts in column one, they are to be ignored.
+ *
+ *  Frank Wierzbicki added: Also ignore FORMFEEDS (\u000C).
  */
 NEWLINE
-    :   (('\r')? '\n' )+
+    :   (('\u000C')?('\r')? '\n' )+
         {if ( startPos==0 || implicitLineJoiningLevel>0 )
             $channel=HIDDEN;
         }
     ;
 
-WS    :    {startPos>0}?=> (' '|'\t')+ {$channel=HIDDEN;}
+WS  :    {startPos>0}?=> (' '|'\t'|'\u000C')+ {$channel=HIDDEN;}
     ;
     
 /** Grab everything before a real symbol.  Then if newline, kill it
@@ -1034,11 +1035,3 @@ COMMENT
     |    {startPos>0}?=> '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
     ;
 
-/* XXX: Just discarding form feeds -- Does python assign any meaning to formfeed?
-      Since most of these where in the email package, I bet they have meaning as part
-      of a string and are being used in email headers or some such.  If so I'll need
-      to move this to STRING.
-*/
-FORMFEED : '\u000C' {$channel=HIDDEN;}
-         ;
- 

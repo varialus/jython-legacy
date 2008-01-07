@@ -959,7 +959,7 @@ echo Lib/test/t
 ./run $RELEASE25/Lib/test/test_float.py
 ./run $RELEASE25/Lib/test/test_fnmatch.py
 ./run $RELEASE25/Lib/test/test_fork1.py
-#./run $RELEASE25/Lib/test/test_format.py
+./run $RELEASE25/Lib/test/test_format.py
 ./run $RELEASE25/Lib/test/test_fpformat.py
 ./run $RELEASE25/Lib/test/test_frozen.py
 ./run $RELEASE25/Lib/test/test_funcattrs.py
