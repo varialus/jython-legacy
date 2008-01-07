@@ -6,8 +6,6 @@ echo $RELEASE25/Lib/idlelib/FormatParagraph.py
 ./run $RELEASE25/Lib/idlelib/FormatParagraph.py
 echo $RELEASE25/Lib/idlelib/PyParse.py
 ./run $RELEASE25/Lib/idlelib/PyParse.py
-echo $RELEASE25/Lib/msilib/schema.py
-./run $RELEASE25/Lib/msilib/schema.py
 
 # Most of the problems in plat-* have to do with backslash followed by
 # newline after a one line function def.  This will take some lexer
@@ -57,8 +55,6 @@ echo ./run $RELEASE25/Lib/test/test_compile.py
 ./run ./run $RELEASE25/Lib/test/test_compile.py
 echo ./run $RELEASE25/Lib/test/test_hexoct.py
 ./run $RELEASE25/Lib/test/test_hexoct.py
-echo $RELEASE25/Lib/test/crashers/weakref_in_del.py
-./run $RELEASE25/Lib/test/crashers/weakref_in_del.py
 echo $RELEASE25/Lib/test/test_complex.py
 ./run $RELEASE25/Lib/test/test_complex.py
 echo $RELEASE25/Lib/test/test_complex_args.py

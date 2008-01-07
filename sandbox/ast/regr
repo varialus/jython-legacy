@@ -479,7 +479,7 @@ echo Lib/k
 ./run $RELEASE25/Lib/mimify.py
 ./run $RELEASE25/Lib/modulefinder.py
 ./run $RELEASE25/Lib/msilib/__init__.py
-#./run $RELEASE25/Lib/msilib/schema.py
+./run $RELEASE25/Lib/msilib/schema.py
 ./run $RELEASE25/Lib/msilib/sequence.py
 ./run $RELEASE25/Lib/msilib/text.py
 ./run $RELEASE25/Lib/multifile.py
@@ -822,7 +822,7 @@ echo Lib/t
 ./run $RELEASE25/Lib/test/crashers/nasty_eq_vs_dict.py
 ./run $RELEASE25/Lib/test/crashers/recursion_limit_too_high.py
 ./run $RELEASE25/Lib/test/crashers/recursive_call.py
-#./run $RELEASE25/Lib/test/crashers/weakref_in_del.py
+./run $RELEASE25/Lib/test/crashers/weakref_in_del.py
 ./run $RELEASE25/Lib/test/doctest_aliases.py
 ./run $RELEASE25/Lib/test/double_const.py
 echo Lib/test/f

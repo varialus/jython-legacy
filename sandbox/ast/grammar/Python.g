@@ -83,6 +83,7 @@ tokens {
     Msg;
     Import;
     ImportFrom;
+    Level;
     Name;
     Body;
     ClassDef;
@@ -451,11 +452,11 @@ import_name : 'import' dotted_as_names
 //              'import' ('*' | '(' import_as_names ')' | import_as_names))
 import_from: 'from' (DOT* dotted_name | DOT+) 'import'
               (STAR
-             -> ^(ImportFrom dotted_name ^(Import STAR))
+             -> ^(ImportFrom ^(Level DOT*)? ^(Name dotted_name)? ^(Import STAR))
               | import_as_names
-             -> ^(ImportFrom dotted_name ^(Import import_as_names))
+             -> ^(ImportFrom ^(Level DOT*)? ^(Name dotted_name)? ^(Import import_as_names))
               | LPAREN import_as_names RPAREN
-             -> ^(ImportFrom dotted_name ^(Import import_as_names))
+             -> ^(ImportFrom ^(Level DOT*)? ^(Name dotted_name)? ^(Import import_as_names))
               )
            ;
 

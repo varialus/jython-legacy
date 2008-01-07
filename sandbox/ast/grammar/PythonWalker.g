@@ -644,16 +644,45 @@ import_stmt
         aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
         $stmts::statements.add(new Import($Import, n));
     }
-    | ^(ImportFrom dotted_name ^(Import STAR)) {
-        //XXX here
+    | ^(ImportFrom (^(Level dots))? (^(Name dotted_name))? ^(Import STAR)) {
+        String name = "";
+        if ($Name != null) {
+            name = $dotted_name.result;
+        }
+        int level = 0;
+        if ($Level != null) {
+            level = $dots.level;
+        }
         aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
-        $stmts::statements.add(new ImportFrom($Import, $dotted_name.result, new aliasType[]{new aliasType($STAR, "*", null)}, 0));
+        $stmts::statements.add(new ImportFrom($Import, name, new aliasType[]{new aliasType($STAR, "*", null)}, level));
     }
-    | ^(ImportFrom dotted_name ^(Import import_as_name[nms]+)) {
-        //XXX here
+    | ^(ImportFrom (^(Level dots))? (^(Name dotted_name))? ^(Import import_as_name[nms]+)) {
+        String name = "";
+        if ($Name != null) {
+            name = $dotted_name.result;
+        }
+        int level = 0;
+        if ($Level != null) {
+            level = $dots.level;
+        }
         aliasType[] n = (aliasType[])nms.toArray(new aliasType[nms.size()]);
-        $stmts::statements.add(new ImportFrom($Import, $dotted_name.result, n, 0));
+        $stmts::statements.add(new ImportFrom($Import, name, n, level));
     }
+    ;
+
+
+//XXX: surely there is a simler way to count these dots.
+dots returns [int level]
+@init {
+    StringBuffer buf = new StringBuffer();
+}
+    : dot[buf]+ {
+        $level = buf.length();
+    }
+    ;
+
+dot[StringBuffer buf]
+    : DOT{buf.append(".");}
     ;
 
 import_as_name[List nms]
