@@ -341,13 +341,24 @@ expr_stmt : lhs=testlist
           ;
 
 //not in CPython's Grammar file
-assigns : assign_testlist+
-        | assign_yield+
-        ;
+assigns
+    @after {
+        PythonTree pt = ((PythonTree)$assigns.tree);
+        int children = pt.getChildCount();
+        if (children == 1) {
+            pt.token = new CommonToken(Value, "Value");
+        } else {
+            PythonTree c = (PythonTree)pt.getChild(children - 1);
+            c.token = new CommonToken(Value, "Value");
+        }
+    }
+    : assign_testlist+
+    | assign_yield+
+    ;
 
 //not in CPython's Grammar file
-assign_testlist : (ASSIGN testlist ASSIGN) => ASSIGN testlist -> ^(Target testlist)
-       | ASSIGN testlist -> ^(Value testlist)
+assign_testlist
+       : ASSIGN testlist -> ^(Target testlist)
        ;
 
 //not in CPython's Grammar file
@@ -447,7 +458,6 @@ import_name : 'import' dotted_as_names
            -> ^(Import dotted_as_names)
             ;
 
-//XXX: needs work?
 //import_from: ('from' ('.'* dotted_name | '.'+)
 //              'import' ('*' | '(' import_as_names ')' | import_as_names))
 import_from: 'from' (DOT* dotted_name | DOT+) 'import'
@@ -655,7 +665,6 @@ power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
 //       '`' testlist1 '`' |
 //       NAME | NUMBER | STRING+)
 atom : LPAREN 
-       //XXX: calling all of these "Tuple" is almost certainly incorrect.
        ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
        | testlist_gexp {debug("parsed testlist_gexp");} -> testlist_gexp
        | -> ^(Tuple)
@@ -685,17 +694,16 @@ listmaker : test
 
 //testlist_gexp: test ( gen_for | (',' test)* [','] )
 testlist_gexp
-    : (test COMMA) => test (options {k=2;}: COMMA test)* (COMMA)? -> ^(Tuple ^(Elts test+))
-    | test ( gen_for -> ^(GeneratorExp test gen_for)
-            | -> test
-            )
+    : test ( ((options {k=2;}: c1=COMMA test)* (c2=COMMA)? -> { $c1 != null || $c2 != null }? ^(Tuple ^(Elts test+))
+                                                           -> test
+             )
+           | ( gen_for -> ^(GeneratorExp test gen_for))
+           )
     ;
 
-//FIXME: switched to or_test for now which allows simple lambdas to work - but
-//      this prevents nested lambdas. see test_scope.py for examples that fail.
 //lambdef: 'lambda' [varargslist] ':' test
-lambdef: 'lambda' (varargslist)? COLON or_test {debug("parsed lambda");}
-      -> ^(Lambda varargslist? ^(Body or_test))
+lambdef: 'lambda' (varargslist)? COLON test {debug("parsed lambda");}
+      -> ^(Lambda varargslist? ^(Body test))
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
@@ -733,9 +741,9 @@ exprlist2 : expr (options {k=2;}: COMMA expr)* (COMMA)?
 
 //testlist: test (',' test)* [',']
 testlist
-    : (test COMMA) => test (options {k=2;}: COMMA test)* (trailcomma=COMMA)?
-   -> ^(Tuple ^(Elts test+))
-    | test
+    : test (options {k=2;}: c1=COMMA test)* (c2=COMMA)?
+     -> { $c1 != null || $c2 != null }? ^(Tuple ^(Elts test+))
+     -> test
     ;
 
 //XXX:
