@@ -2,13 +2,18 @@ import opcode, re
 
 from org.python.newcompiler.pyasm import BytecodeVisitor as Visitor,\
     Operator, CodeFlags as Flags
-from org.python.newcompiler.asm import OffsetTracer
+#from org.python.newcompiler.asm import OffsetTracer
 from org.python.core.BytecodeLoader import makeCode
 from org.objectweb import asm
 from org.objectweb.asm import Type, Opcodes as Op
 from org.objectweb.asm.commons import GeneratorAdapter, Method,\
     TableSwitchGenerator
-from org.objectweb.asm.tree import analysis
+try:
+    from org.objectweb.asm.tree import analysis
+except:
+    __analysis__ = False
+else:
+    __analysis__ = True
 from org.python import core
 
 from jarray import array
@@ -206,32 +211,35 @@ class ClassKeeper(object):
         self.generateSupport(mainName)
         self.cv.visitEnd()
         byteArray = self.__cw.toByteArray()
-        cn = asm.tree.ClassNode()
-        ## add this line to verify the generated java bytecode
-        #asm.ClassReader(byteArray).accept(cn, 0)
 
-        error = False
+        if __analysis__:
+            cn = asm.tree.ClassNode()
+            ## add this line to verify the generated java bytecode
+            #asm.ClassReader(byteArray).accept(cn, 0)
 
-        # Choose the level of error checking in the bytecode verification
-        #analyzer = analysis.Analyzer(analysis.BasicInterpreter())
-        analyzer = analysis.Analyzer(analysis.BasicVerifier())
-        #### These don't seem to work
-        ###analyzer = analysis.Analyzer(analysis.SimpleVerifier())
-        ###analyzer = analysis.Analyzer(analysis.SourceInterpreter())
-        for m in cn.methods:
-            # analyze the bytecode of each method and output the bytecode,
-            # with offsets, when an error is detected.
-            try:
-                analyzer.analyze(self.__name, m)
-            except analysis.AnalyzerException, ae:
-                print 'Error in "%s %s": %s' % (m.name, m.desc, ae)
-                mp = OffsetTracer.createTMV(len(str(m.instructions.size())))
-                m.accept(mp)
-                getattr(mp,'print')( stdout )
-                stdout.flush()
-                error = True
-        if error:
-            raise RuntimeError, "An error occured, see output"
+            # Choose the level of error checking in the bytecode verification
+            #analyzer = analysis.Analyzer(analysis.BasicInterpreter())
+            analyzer = analysis.Analyzer(analysis.BasicVerifier())
+            #### These don't seem to work
+            ###analyzer = analysis.Analyzer(analysis.SimpleVerifier())
+            ###analyzer = analysis.Analyzer(analysis.SourceInterpreter())
+
+            # Verify each method of the bytecode
+            error = False
+            for m in cn.methods:
+                # analyze the bytecode of each method and output the bytecode,
+                # with offsets, when an error is detected.
+                try:
+                    analyzer.analyze(self.__name, m)
+                except analysis.AnalyzerException, ae:
+                    print 'Error in "%s %s": %s' % (m.name, m.desc, ae)
+                    mp = OffsetTracer.createTMV(len(str(m.instructions.size())))
+                    m.accept(mp)
+                    getattr(mp,'print')( stdout )
+                    stdout.flush()
+                    error = True
+            if error:
+                raise RuntimeError, "An error occured, see output"
         
         return makeCode(self.__name, byteArray, self.__filename)
 
@@ -732,9 +740,14 @@ class ASMVisitor(Visitor):
                      Operator.CONVERT:  '__repr__',}
     def visitUnaryOperator(self, operator):
         """value -- (op value)"""
+        # The signature for the __repr__ method is more specific
+        if operator == Operator.CONVERT:
+            rType = "PyString"
+        else:
+            rType = "PyObject"
         self.asm.invokeVirtual(pyObjectType, Method.getMethod(
-                "org.python.core.PyObject %s ()" %
-                self.unaryOperator[operator]))
+                "org.python.core.%s %s ()" %
+                (rType, self.unaryOperator[operator])))
 
     compareOperator = {Operator.LESS_THAN: '_lt',
                        Operator.LESS_THAN_OR_EQUAL: '_le',

@@ -1,0 +1,21 @@
+<project name="pyasm" default="pyasm-copy" basedir=".">
+
+  <property file="${basedir}/build.properties"/>
+  <property name="dist.dir" value="${jython.dir}/dist"/>
+  
+  <target name="jython">
+    <ant dir="${jython.dir}" target="developer-build" inheritAll="false"/>
+  </target>
+
+  <target name="pyasm-copy" depends="jython">
+    <copy todir="${dist.dir}/Lib" preservelastmodified="true" overwrite="true">
+      <fileset dir="${basedir}">
+	<include name="marshal.py"/>
+	<include name="pyasm.py"/>
+	<include name="opcode.py"/>
+	<include name="pycimport.py"/>
+      </fileset>
+    </copy>
+  </target>
+
+</project>
