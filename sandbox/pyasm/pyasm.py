@@ -376,7 +376,7 @@ class ClassKeeper(object):
             elif isinstance(value, long):
                 self.clinit.push(str(value))
                 self.clinit.invokeStatic(pyType, Method.getMethod(
-                        "org.python.core.PyObject newLong (String)"))
+                        "org.python.core.PyLong newLong (String)"))
             elif type(value) in self.__constantFactory:
                 self.clinit.push(value)
                 self.clinit.invokeStatic(
