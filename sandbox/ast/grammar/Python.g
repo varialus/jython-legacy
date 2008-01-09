@@ -719,13 +719,13 @@ subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
 
 //subscript: '.' '.' '.' | test | [test] ':' [test] [sliceop]
 subscript : DOT DOT DOT -> Ellipsis
-          | (test COLON) => t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? ^(Step sliceop)?)
-          | (COLON) => COLON (test)? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? ^(Step sliceop)?)
+          | (test COLON) => t1=test (COLON (t2=test)? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? sliceop?)
+          | (COLON) => COLON (test)? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? sliceop?)
           | test -> ^(Index test)
           ;
 
 //sliceop: ':' [test]
-sliceop : COLON (test)? -> ^(StepOp test)?
+sliceop : COLON (test)? -> ^(Step COLON ^(StepOp test)?)
         ;
 
 //exprlist: expr (',' expr)* [',']

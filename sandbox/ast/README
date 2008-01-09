@@ -27,11 +27,6 @@ known bugs:
       Lib/test/badsyntax_nocaret.py
 so I generally delete these files before running astlib.py on the whole 
 release25 Lib.
-* lambda is not working very well.  Currently it uses or_test just so it can
-barely work but this prevents nested lambdas.  One problem is the syntactic
-predicate in testlist -- it binds too tightly to commas so lambdas like:
-  lambda x,y=1: x + y
-fail thinking that x=1 is an assignment statement.
 * unicode: I am not currently creating PyUnicode for unicode objects (so
 u'' in python ends up looking like ''.  Also many of the representations
 use lowercase where jython uses upercase.
@@ -54,5 +49,5 @@ incorrectly rolls up as if the statment had been:
 a <= a is True
 
 * some string lexing is wrong, for example:
-''' antlr thinks this has 4 end apos \''''
+''' antlr thinks this has 4 end apos and blows up \''''
 

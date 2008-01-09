@@ -38,8 +38,10 @@ import org.python.antlr.ast.Compare;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Dict;
+import org.python.antlr.ast.Ellipsis;
 import org.python.antlr.ast.Exec;
 import org.python.antlr.ast.Expr;
+import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.GeneratorExp;
@@ -1097,10 +1099,30 @@ atom[expr_contextType ctype] returns [exprType etype]
     | ^(SubscriptList subscriptlist test[expr_contextType.Load]) {
         //XXX: only handling one subscript for now.
         sliceType s;
-        if ($subscriptlist.sltypes.size() == 0) {
+        List sltypes = $subscriptlist.sltypes;
+        if (sltypes.size() == 0) {
             s = null;
+        } else if (sltypes.size() == 1){
+            s = (sliceType)sltypes.get(0);
         } else {
-            s = (sliceType)$subscriptlist.sltypes.get(0);
+            sliceType[] st;
+            //FIXME: here I am using ClassCastException to decide if sltypes is populated with Index
+            //       only.  Clearly this is not the best way to do this but it's late. Somebody do
+            //       something better please :) -- (hopefully a note to self)
+            try {
+                Iterator iter = sltypes.iterator();
+                List etypes = new ArrayList();
+                while (iter.hasNext()) {
+                    Index i = (Index)iter.next();
+                    etypes.add(i.value);
+                }
+                exprType[] es = (exprType[])etypes.toArray(new exprType[etypes.size()]);
+                exprType t = new Tuple($SubscriptList, es, expr_contextType.Load);
+                s = new Index($SubscriptList, t);
+            } catch (ClassCastException cc) {
+                st = (sliceType[])sltypes.toArray(new sliceType[sltypes.size()]);
+                s = new ExtSlice($SubscriptList, st);
+            }
         }
         $etype = new Subscript($SubscriptList, $test.etype, s, ctype);
     }
@@ -1180,29 +1202,17 @@ subscriptlist returns [List sltypes]
     :   subscript[subs]+ {
         $sltypes = subs;
     }
-    |   index[subs]+ {
-        exprType e;
-        if (subs.size() > 1) {
-            exprType[] es = (exprType[])subs.toArray(new exprType[subs.size()]);
-            e = new Tuple($index.start, es, expr_contextType.Load);
-        } else {
-            e = (exprType)subs.get(0);
-        }
-        $sltypes = new ArrayList();
-        $sltypes.add(new Index($index.start, e));
-    }
-    ;
-
-index [List subs]
-    : ^(Index test[expr_contextType.Load]) {
-        subs.add($test.etype);
-    }
     ;
 
 subscript [List subs]
-    : Ellipsis
+    : Ellipsis {
+        subs.add(new Ellipsis($Ellipsis));
+    }
+    | ^(Index test[expr_contextType.Load]) {
+        subs.add(new Index($Index, $test.etype));
+    }
     | ^(Subscript (^(Lower start=test[expr_contextType.Load]))?
-          (^(Upper COLON (^(UpperOp end=test[expr_contextType.Load]))?))? (^(Step (^(StepOp op=test[expr_contextType.Load]))?))?) {
+          (^(Upper COLON (^(UpperOp end=test[expr_contextType.Load]))?))? (^(Step COLON (^(StepOp op=test[expr_contextType.Load]))?))?) {
               boolean isSlice = false;
               exprType s = null;
               exprType e = null;
@@ -1220,6 +1230,8 @@ subscript [List subs]
                   isSlice = true;
                   if ($StepOp != null) {
                       o = $op.etype;
+                  } else {
+                      o = new Name($Step, "None", expr_contextType.Load);
                   }
               }
 
