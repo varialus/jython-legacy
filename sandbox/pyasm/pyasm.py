@@ -1419,13 +1419,7 @@ class ASMVisitor(Visitor):
 
     def visitRaiseVarargs(self, count):
         """(object, )*count -- """
-        # if there is content on the stack: reverse it
-        if count == 2:
-            self.asm.swap()
-        elif count == 3:
-            self.asm.swap()
-            self.rot()
-        elif count < 0 or count > 3:
+        if count < 0 or count > 3:
             raise TypeError("RAISE_VARARGS accepts only arguments in range(4)")
             self.rot(count)
         self.asm.invokeStatic(pyType, Method.getMethod(
