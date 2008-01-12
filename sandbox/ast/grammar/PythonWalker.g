@@ -881,18 +881,18 @@ with_var returns [exprType etype]
     ;
 
 //FIXME: lots of placeholders
-test[expr_contextType ctype] returns [exprType etype]
+test[expr_contextType ctype] returns [exprType etype, boolean parens]
     : ^(AND left=test[ctype] right=test[ctype]) {
         List values = new ArrayList();
         boolean leftIsAnd = false;
         boolean rightIsAnd = false;
         BoolOp leftB = null;
         BoolOp rightB = null;
-        if ($left.start.getType() == AND) {
+        if (! $left.parens && $left.start.getType() == AND) {
             leftIsAnd = true;
             leftB = (BoolOp)$left.etype;
         }
-        if ($right.start.getType() == AND) {
+        if (! $right.parens && $right.start.getType() == AND) {
             rightIsAnd = true;
             rightB = (BoolOp)$right.etype;
         }
@@ -986,8 +986,9 @@ test[expr_contextType ctype] returns [exprType etype]
             comparators[0] = $targs.etype;
             val = $left.etype;
         }
+        $parens = $left.parens;
         $etype = new Compare($comp_op.start, val, ops, comparators);
-        debug("COMP_OP: " + $comp_op.start);
+        debug("COMP_OP: " + $comp_op.start + ":::" + $etype + ":::" + $parens);
     }
     | atom[ctype] {
         debug("matched atom");
@@ -1007,7 +1008,7 @@ test[expr_contextType ctype] returns [exprType etype]
     | ^(IfExp ^(Test t1=test[ctype]) ^(Body t2=test[ctype]) ^(OrElse t3=test[ctype])) {
         $etype = new IfExp($IfExp, $t1.etype, $t2.etype, $t3.etype);
     }
-    ;
+;
 
 comp_op returns [cmpopType op]
     : LESS {$op = cmpopType.Lt;}
@@ -1045,7 +1046,7 @@ elt[expr_contextType ctype]
     ;
 
 //FIXME: lots of placeholders
-atom[expr_contextType ctype] returns [exprType etype]
+atom[expr_contextType ctype] returns [exprType etype, boolean parens]
     : ^(Tuple (^(Elts elts[ctype]))?) {
         debug("matched Tuple");
         exprType[] e;
@@ -1153,6 +1154,11 @@ atom[expr_contextType ctype] returns [exprType etype]
     }
     | ^(NOT test[ctype]) {
         $etype = new UnaryOp($NOT, unaryopType.Not, $test.etype);
+    }
+    | ^(Parens test[ctype]) {
+        debug("PARENS! " + $test.etype);
+        $etype = $test.etype;
+        $parens = true;
     }
     ;
 

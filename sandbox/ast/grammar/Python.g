@@ -178,6 +178,7 @@ tokens {
     ListFor;
     ListIf;
     FinalBody;
+    Parens;
 }
 
 @header { 
@@ -666,7 +667,7 @@ power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
 //       NAME | NUMBER | STRING+)
 atom : LPAREN 
        ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
-       | testlist_gexp {debug("parsed testlist_gexp");} -> testlist_gexp
+       | testlist_gexp {debug("parsed testlist_gexp");} -> ^(Parens testlist_gexp)
        | -> ^(Tuple)
        )
        RPAREN
