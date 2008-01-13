@@ -68,6 +68,7 @@ import org.python.antlr.ast.Repr;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.UnaryOp;
+import org.python.antlr.ast.Unicode;
 import org.python.antlr.ast.With;
 import org.python.antlr.ast.While;
 import org.python.antlr.ast.Yield;
@@ -154,16 +155,38 @@ import java.util.Set;
         return new argumentsType(t, p, s, k, d);
     }
 
-    String extractStrings(List s) {
+    class StringPair {
+        private String s;
+        private boolean unicode;
+
+        StringPair(String s, boolean unicode) {
+            this.s = s;
+            this.unicode = unicode;
+        }
+        String getString() {
+            return s;
+        }
+        
+        boolean isUnicode() {
+            return unicode;
+        }
+    }
+
+    StringPair extractStrings(List s) {
+        boolean ustring = false;
         StringBuffer sb = new StringBuffer();
         Iterator iter = s.iterator();
         while (iter.hasNext()) {
-            sb.append(extractString((String)iter.next()));
+            StringPair sp = extractString((String)iter.next());
+            if (sp.isUnicode()) {
+                ustring = true;
+            }
+            sb.append(sp.getString());
         }
-        return sb.toString();
+        return new StringPair(sb.toString(), ustring);
     }
 
-    String extractString(String s) {
+    StringPair extractString(String s) {
         char quoteChar = s.charAt(0);
         int start=0;
         boolean ustring = false;
@@ -186,14 +209,14 @@ import java.util.Set;
         }
 
         if (raw) {
-            return s.substring(quotes+start, s.length()-quotes);
+            return new StringPair(s.substring(quotes+start, s.length()-quotes), ustring);
         } else {
             StringBuffer sb = new StringBuffer(s.length());
             char[] ca = s.toCharArray();
             int n = ca.length-quotes;
             int i=quotes+start;
             int last_i=i;
-            return PyString.decode_UnicodeEscape(s, i, n, "strict", ustring);
+            return new StringPair(PyString.decode_UnicodeEscape(s, i, n, "strict", ustring), ustring);
             //return decode_UnicodeEscape(s, i, n, "strict", ustring);
         }
     }
@@ -970,7 +993,7 @@ test[expr_contextType ctype] returns [exprType etype, boolean parens]
         cmpopType[] ops;
         exprType val;
         //XXX: does right need to be checked for Compare?
-        if ($left.etype instanceof Compare) {
+        if (! $left.parens && $left.etype instanceof Compare) {
             Compare c = (Compare)$left.etype;
             comparators = new exprType[c.comparators.length + 1];
             ops = new cmpopType[c.ops.length + 1];
@@ -986,13 +1009,13 @@ test[expr_contextType ctype] returns [exprType etype, boolean parens]
             comparators[0] = $targs.etype;
             val = $left.etype;
         }
-        $parens = $left.parens;
         $etype = new Compare($comp_op.start, val, ops, comparators);
         debug("COMP_OP: " + $comp_op.start + ":::" + $etype + ":::" + $parens);
     }
     | atom[ctype] {
         debug("matched atom");
         debug("***" + $atom.etype);
+        $parens = $atom.parens;
         $etype = $atom.etype;
     }
     | ^(binop left=test[ctype] right=test[ctype]) {
@@ -1138,7 +1161,12 @@ atom[expr_contextType ctype] returns [exprType etype, boolean parens]
     }
     | ^(Num COMPLEX) {$etype = makeComplex($COMPLEX);}
     | stringlist {
-        $etype = new Str($stringlist.start, extractStrings($stringlist.strings));
+        StringPair sp = extractStrings($stringlist.strings);
+        if (sp.isUnicode()) {
+            $etype = new Unicode($stringlist.start, sp.getString());
+        } else {
+            $etype = new Str($stringlist.start, sp.getString());
+        }
     }
     | ^(USub test[ctype]) {
         debug("USub matched " + $test.etype);
@@ -1157,8 +1185,8 @@ atom[expr_contextType ctype] returns [exprType etype, boolean parens]
     }
     | ^(Parens test[ctype]) {
         debug("PARENS! " + $test.etype);
-        $etype = $test.etype;
         $parens = true;
+        $etype = $test.etype;
     }
     ;
 
