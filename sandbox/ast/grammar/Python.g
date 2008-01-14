@@ -666,7 +666,7 @@ power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
 //       '`' testlist1 '`' |
 //       NAME | NUMBER | STRING+)
 atom : LPAREN 
-       ( yield_expr    -> ^(Tuple ^(Elts yield_expr))
+       ( yield_expr    -> ^(Parens yield_expr)
        | testlist_gexp {debug("parsed testlist_gexp");} -> ^(Parens testlist_gexp)
        | -> ^(Tuple)
        )

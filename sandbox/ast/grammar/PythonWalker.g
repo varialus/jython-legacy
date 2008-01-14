@@ -606,7 +606,6 @@ flow_stmt
     | continue_stmt
     | return_stmt
     | raise_stmt
-    | yield_stmt
     ;
 
 break_stmt
@@ -631,14 +630,13 @@ return_stmt
     }
     ;
 
-yield_stmt
+yield_expr returns [exprType etype]
     : ^(Yield (^(Value test[expr_contextType.Load]))?) {
         exprType v = null;
         if ($Value != null) {
             v = $test.etype; 
         }
-        Yield y = new Yield($Yield, v);
-        $stmts::statements.add(new Expr($Yield, y));
+        $etype = new Yield($Yield, v);
     }
     ;
 
@@ -1031,7 +1029,10 @@ test[expr_contextType ctype] returns [exprType etype, boolean parens]
     | ^(IfExp ^(Test t1=test[ctype]) ^(Body t2=test[ctype]) ^(OrElse t3=test[ctype])) {
         $etype = new IfExp($IfExp, $t1.etype, $t2.etype, $t3.etype);
     }
-;
+    | yield_expr {
+        $etype = $yield_expr.etype;
+    }
+    ;
 
 comp_op returns [cmpopType op]
     : LESS {$op = cmpopType.Lt;}
