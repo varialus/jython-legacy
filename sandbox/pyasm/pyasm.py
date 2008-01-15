@@ -482,12 +482,12 @@ class ExceptBlock(HandlerBlock):
     nestingStackSize = property(lambda self: self.stackSize - 3)
     def end(self):
         """stack is: ... exc_traceback exc_value exc_type"""
-        self.asm.dupX2()
-        self.asm.pop()
-        self.asm.swap()
-        self.asm.invokeStatic(pyType, Method.getMethod(
-                "org.python.core.PyException makeException (%s)" % ", ".join([
-                    "org.python.core.PyObject"]*3)))
+        #self.asm.dupX2()
+        #self.asm.pop()
+        #self.asm.swap()
+        #self.asm.invokeStatic(pyType, Method.getMethod(
+        #        "org.python.core.PyException makeException (%s)" % ", ".join([
+        #            "org.python.core.PyObject"]*3)))
         self.asm.throwException()
         HandlerBlock.end(self)
 
@@ -762,11 +762,11 @@ class ASMVisitor(Visitor):
     def visitCompareOperator(self, operator):
         """element, element -- bool"""
         if operator == Operator.EXCEPTION_MATCH:
-            self.asm.swap()
-            self.asm.invokeStatic(pyType, Method.getMethod(
-                    "org.python.core.PyException makeException (%s)"%", ".join(
-                        ['org.python.core.PyObject'])))
-            self.asm.swap()
+            #self.asm.swap()
+            #self.asm.invokeStatic(pyType, Method.getMethod(
+            #        "org.python.core.PyException makeException (%s)"%", ".join(
+            #            ['org.python.core.PyObject'])))
+            #self.asm.swap()
             self.asm.invokeStatic(pyType, Method.getMethod(
                     "boolean matchException (%s)" % ", ".join(
                         ['org.python.core.PyException',
@@ -1420,8 +1420,7 @@ class ASMVisitor(Visitor):
     def visitRaiseVarargs(self, count):
         """(object, )*count -- """
         if count < 0 or count > 3:
-            raise TypeError("RAISE_VARARGS accepts only arguments in range(4)")
-            self.rot(count)
+            raise TypeError("RAISE_VARARGS only accepts arguments in range(4)")
         self.asm.invokeStatic(pyType, Method.getMethod(
                 "org.python.core.PyException makeException (%s)" % ", ".join(
                     ["org.python.core.PyObject"]*count)))
@@ -1520,7 +1519,7 @@ class ASMVisitor(Visitor):
             self.asm.getField(pyExceptionType, "value", pyObjectType)
             exception.load()
             exception.end()
-            self.asm.getField(pyExceptionType, "type", pyObjectType)
+            #self.asm.getField(pyExceptionType, "type", pyObjectType)
         self.scheduleCode(startExcept, code)
         self.asm.visitLabel(start)
 

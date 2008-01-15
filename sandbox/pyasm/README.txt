@@ -6,12 +6,13 @@ Table of Contents
 
  1. What does it do?
     1.1 What it does not do
- 2. Useing PyASM
- 3. The parts of PyASM
- 4. How PyASM works
- 5. Mappings from Python Bytecode to Java Bytecode
-    5.1 Explanation of python and java bytecode features, and their differences
- 6. Future extensions
+ 2. Installation
+ 3. Useing PyASM
+ 4. The parts of PyASM
+ 5. How PyASM works
+ 6. Mappings from Python Bytecode to Java Bytecode
+    6.1 Explanation of python and java bytecode features, and their differences
+ 7. Future extensions
 
 
  1. What does it do?
@@ -29,7 +30,22 @@ library this is used to convert Python bytecode to Java bytecode.
    subclassing PyFunctionTable.
 
 
- 2. Useing PyASM
+ 2. Installation
+ ===============
+
+PyASM is at the moment a separate component from Jython and therefore needs to
+be installed into Jython. This is done with the included ant script
+(build.xml). The default target of this ant script builds Jython and copies
+the required files from pyasm to the Jython Lib directory. In order for the
+ant script to find your Jython working directory the path needs to be
+specified in the file 'build.properties', as the variable 'jython.dir'.
+
+Please note that rebuilding Jython with the standard Jython building procedure
+after installing PyASM might overwrite some of the installed PyASM-files. At
+the moment this is know to happen to the file 'marshal.py'.
+
+
+ 3. Useing PyASM
  ===============
 
 PyASM operates on python bytecode, and therefore depends on the C
@@ -49,28 +65,28 @@ Example use of test.py:
 $ jython test.py <your_python_file_here>.py
 
 
- 3. The parts of PyASM
+ 4. The parts of PyASM
  =====================
 
 TODO
 
 
- 4. How PyASM works
+ 5. How PyASM works
  ==================
 
 TODO
 
 
- 5. Mappings from Python Bytecode to Java Bytecode
+ 6. Mappings from Python Bytecode to Java Bytecode
  =================================================
 
- 5.1 Explanation of python and java bytecode features, and their differences
+ 6.1 Explanation of python and java bytecode features, and their differences
  ---------------------------------------------------------------------------
  
 TODO
 
 
- 6. Future extensions
+ 7. Future extensions
  ====================
 
 TODO
