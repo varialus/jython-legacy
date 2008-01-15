@@ -965,7 +965,7 @@ New example.Version ::
 Database connectivity in Jython
 -------------------------------
 
-The zxJDBC package provides a nearly 100% Python DB API 2.0 compliant
+The zxJDBC package provides a nearly 100% Python `DB API 2.0`_ compliant
 interface for database connectivity in Jython. It is implemented entirely
 in Java and makes use of the JDBC API. This means any database capable
 of being accessed through JDBC, either directly or using the JDBC-ODBC
@@ -1442,3 +1442,4 @@ Example session
 .. _jythonc: jythonc.html
 .. _`scripting project`: https://scripting.dev.java.net/
 .. _`download the engine`: https://scripting.dev.java.net/servlets/ProjectDocumentList
+.. _`DB API 2.0`: http://www.python.org/dev/peps/pep-0249/
