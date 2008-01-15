@@ -47,13 +47,24 @@ def lispify_field(field, child, parent):
             elif fname == "n":
                 try:
                     if isinstance(node, float):
-                        yield str(node)
+                        if .0001 < node < 10000:
+                            yield "%5.5f" % node
+                        else:
+                            s = "%.5e" % node
+                            #jython puts an extra zero in exponent when it has less than three digits.
+                            s = s.replace('e+0', 'e+')
+                            yield s.replace('e-0', 'e-')
                     else:
                         yield node
                 except Exception, why:
-                    print "crap: %s" % why
-            elif fname == "s" and parent.__class__.__name__ == 'org.python.antlr.ast.Unicode':
-                yield unicode(node)
+                    print "error parsing 'n': %s" % why
+            elif fname == "s":
+                s = node.replace('\b', 'BACKSPACE')
+                s = s.replace('\f', 'FORMFEED')
+                if parent.__class__.__name__ == 'org.python.antlr.ast.Unicode':
+                    yield unicode(s)
+                else:
+                    yield s
             else:
                 yield node
 

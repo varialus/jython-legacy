@@ -36,19 +36,30 @@ def lispify_field(field, child):
         if isinstance(node, _ast.AST):
             yield lispify_ast(node)
         else:
-            if isinstance(node, float):
-                #stringify floats so they match Java's float representation better
-                yield str(node)
+            if isinstance(node, str):
+                #CPython and Jython represent \b and \f differently.
+                s = node.replace('\b', 'BACKSPACE')
+                s = s.replace('\f', 'FORMFEED')
+                yield s
+            elif isinstance(node, float):
+                #XXX: stringify floats so they match Java's float representation better
+                #This may mask problems for very small numbers.
+                if .0001 < node < 10000:
+                    yield "%5.5f" % node
+                else:
+                    yield "%.5e" % node
             else:
                 yield node
 
-def main(code_path, jy_exe="jython", print_diff=True, print_fail=False, print_success=False, print_diff_lines=False):
+def main(code_path, jy_exe="jython", testfile=False, print_diff=True, print_fail=False, print_success=False, print_diff_lines=False):
     from pprint import pprint
     from popen2 import popen2
     from StringIO import StringIO
     from difflib import Differ
 
-    if os.path.isdir(code_path):
+    if testfile:
+        pyfiles = [f.rstrip() for f in file(code_path)]
+    elif os.path.isdir(code_path):
         pyfiles = globwalk.GlobDirectoryWalker(code_path, "*.py")
     else:
         pyfiles = [code_path]
@@ -97,22 +108,25 @@ if __name__ == '__main__':
     import getopt
 
     usage = """\
-Usage: python %s [-j jython_exe_name] [-s -f -d -n] code_path
+Usage: python %s [-j jython_exe_name] [-t testfile] [-s -f -d -n] code_path
        where -s = print success messages
              -f = print failure messages
              -n = print number of diff lines
              -d = don't print diffs on failure
-       if codepath is a file test it, if codepath is a directory
+             -t = treat codepath as a file containing a list of filenames to test
+             -j jython_exe_name = runs jython with jython_exe_name
+       unless -t is specified, if codepath is a file test it, if codepath is a directory
              test all .py files in and below that directory.
 """ % sys.argv[0]
 
+    testfile = False
     jy_exe = 'jython'
     print_diff = True
     print_diff_lines = False
     print_fail = False
     print_success = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'j:sfdhn')
+        opts, args = getopt.getopt(sys.argv[1:], 'j:tsfdhn')
     except:
         print usage
         sys.exit(1)
@@ -122,6 +136,8 @@ Usage: python %s [-j jython_exe_name] [-s -f -d -n] code_path
             sys.exit(0)
         if o == '-j' and v != '':
             jy_exe = v
+        if o == '-t':
+            testfile = True
         if o == '-s':
             print_success = True
         if o == '-f':
@@ -134,4 +150,4 @@ Usage: python %s [-j jython_exe_name] [-s -f -d -n] code_path
         print usage
         sys.exit(1)
 
-    main(args[0], jy_exe, print_diff, print_fail, print_success, print_diff_lines)
+    main(args[0], jy_exe, testfile, print_diff, print_fail, print_success, print_diff_lines)
