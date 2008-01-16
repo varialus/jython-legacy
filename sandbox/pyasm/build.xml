@@ -2,6 +2,7 @@
 
   <property file="${basedir}/build.properties"/>
   <property name="dist.dir" value="${jython.dir}/dist"/>
+  <property name="script.file" value="${jython.dir}/jython"/>
   
   <target name="jython">
     <ant dir="${jython.dir}" target="developer-build" inheritAll="false"/>
@@ -16,6 +17,37 @@
 	<include name="pycimport.py"/>
       </fileset>
     </copy>
+  </target>
+
+  <target name="script">
+    <echo file="${script.file}">#!/bin/sh
+EXE=$0
+while [ -L "$EXE" ]; do
+    EXE=`readlink $EXE`
+done
+BASE=`dirname $EXE`
+JVMFLAGS="-server -Dpython.home=$BASE/dist/ -Dpython.executable=$0 $JVMFLAGS"
+###JVMFLAGS="$JVMFLAGS -Djava.security.policy=${BASE}security.policy"
+#JVMFLAGS="$JVMFLAGS -Dcom.sun.management.jmxremote"
+REQ=$BASE/extlibs/asm-3.1.jar
+REQ=$REQ:$BASE/extlibs/asm-commons-3.1.jar
+REQ=$REQ:$BASE/extlibs/asm-util-3.1.jar
+REQ=$REQ:$BASE/extlibs/junit-3.8.2.jar
+REQ=$REQ:$BASE/build/exposed/
+REQ=$REQ:$BASE/build/classes/
+if [ "$CLASSPATH" = "" ]; then
+    CLASSPATH=.
+fi
+if [ "$JAVA_HOME" != "" ]; then
+    JAVA=$JAVA_HOME/bin/java
+else
+    JAVA=java
+fi
+CLASSPATH=$CLASSPATH:$REQ
+
+$JAVA -classpath $CLASSPATH $JVMFLAGS org.python.util.jython "$@"
+</echo>
+    <chmod file="${script.file}" perm="a+rx"/>
   </target>
 
 </project>

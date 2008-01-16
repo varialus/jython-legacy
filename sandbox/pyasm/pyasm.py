@@ -2,7 +2,7 @@ import opcode, re
 
 from org.python.newcompiler.pyasm import BytecodeVisitor as Visitor,\
     Operator, CodeFlags as Flags
-#from org.python.newcompiler.asm import OffsetTracer
+from org.python.newcompiler.asm import OffsetTracer
 from org.python.core.BytecodeLoader import makeCode
 from org.objectweb import asm
 from org.objectweb.asm import Type, Opcodes as Op
@@ -122,9 +122,9 @@ class ClassKeeper(object):
         self.cv = self.__cw
         if __debugging__:
             ## add this line to get a printout of the generated java bytecode
-            self.cv = asm.util.TraceClassVisitor(self.cv, stdout)
+            #self.cv = asm.util.TraceClassVisitor(self.cv, stdout)
             ## add this line to get a printout of the java bytecode with offsets
-            #self.cv = OffsetTracer(self.cv, stdout)
+            self.cv = OffsetTracer(self.cv, stdout)
             ## add this line to verify that the code generation is well behaved
             #self.cv = asm.util.CheckClassAdapter(self.cv)
         self.cv.visit(Op.V1_4, Op.ACC_PUBLIC, name, None,
@@ -427,6 +427,8 @@ class ForBlock(Block):
     def __init__(self, asm):
         Block.__init__(self, asm, 1)
     def exit(self, hasState=None):
+        if hasState:
+            self.asm.swap()
         self.asm.pop() # pop the iterator from the stack.
         return Block.exit(self, hasState)
 
@@ -1435,7 +1437,7 @@ class ASMVisitor(Visitor):
         for i in xrange(len(self.__blocks) -1,-1,-1):
             block = self.__blocks[i]
             if not in_try_block:
-                jumps = block.exit() or jumps
+                jumps = block.exit(True) or jumps
             if isinstance(block, TryExceptBlock):
                 in_try_block = True
         self.loadFrame()

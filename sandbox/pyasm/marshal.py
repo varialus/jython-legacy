@@ -55,6 +55,11 @@ mappings = dict(
     TYPE_FROZENSET  	= ('>', frozenset),
     )
 
+class Mappings(object):
+    def __getattr__(self, attr):
+        return mappings[attr][0]
+map = Mappings()
+
 class Marshaller:
     
     dispatch = {}
@@ -82,18 +87,18 @@ class Marshaller:
 	write(chr((x>> 8) & 0xff))
 
     def dump_none(self, x):
-	self.f.write(TYPE_NONE)
+	self.f.write(map.TYPE_NONE)
     dispatch[NoneType] = dump_none
 
     def dump_bool(self, x):
         if x:
-            self.f.write(TYPE_TRUE)
+            self.f.write(map.TYPE_TRUE)
         else:
-            self.f.write(TYPE_FALSE)
+            self.f.write(map.TYPE_FALSE)
     dispatch[BooleanType] = dump_bool
 
     def dump_ellipsis(self, x):
-	self.f.write(TYPE_ELLIPSIS)
+	self.f.write(map.TYPE_ELLIPSIS)
     try:
 	dispatch[EllipsisType] = dump_ellipsis
     except NameError:
@@ -102,15 +107,15 @@ class Marshaller:
     def dump_int(self, x):
 	y = x>>31
 	if y and y != -1:
-	    self.f.write(TYPE_INT64)
+	    self.f.write(map.TYPE_INT64)
 	    self.w_long64(x)
 	else:
-	    self.f.write(TYPE_INT)
+	    self.f.write(map.TYPE_INT)
 	    self.w_long(x)
     dispatch[IntType] = dump_int
 
     def dump_long(self, x):
-	self.f.write(TYPE_LONG)
+	self.f.write(map.TYPE_LONG)
 	sign = 1
 	if x < 0:
 	    sign = -1
@@ -126,7 +131,7 @@ class Marshaller:
 
     def dump_float(self, x):
 	write = self.f.write
-	write(TYPE_FLOAT)
+	write(map.TYPE_FLOAT)
 	s = `x`
 	write(chr(len(s)))
 	write(s)
@@ -134,7 +139,7 @@ class Marshaller:
 
     def dump_complex(self, x):
 	write = self.f.write
-	write(TYPE_COMPLEX)
+	write(map.TYPE_COMPLEX)
 	s = `x.real`
 	write(chr(len(s)))
 	write(s)
@@ -147,35 +152,35 @@ class Marshaller:
 	pass
 
     def dump_string(self, x):
-	self.f.write(TYPE_STRING)
+	self.f.write(map.TYPE_STRING)
 	self.w_long(len(x))
 	self.f.write(x)
     dispatch[StringType] = dump_string
 
     def dump_tuple(self, x):
-	self.f.write(TYPE_TUPLE)
+	self.f.write(map.TYPE_TUPLE)
 	self.w_long(len(x))
 	for item in x:
 	    self.dump(item)
     dispatch[TupleType] = dump_tuple
 
     def dump_list(self, x):
-	self.f.write(TYPE_LIST)
+	self.f.write(map.TYPE_LIST)
 	self.w_long(len(x))
 	for item in x:
 	    self.dump(item)
     dispatch[ListType] = dump_list
 
     def dump_dict(self, x):
-	self.f.write(TYPE_DICT)
+	self.f.write(map.TYPE_DICT)
 	for key, value in x.items():
 	    self.dump(key)
 	    self.dump(value)
-	self.f.write(TYPE_NULL)
+	self.f.write(map.TYPE_NULL)
     dispatch[DictionaryType] = dump_dict
 
     def dump_code(self, x):
-	self.f.write(TYPE_CODE)
+	self.f.write(map.TYPE_CODE)
 	self.w_short(x.co_argcount)
 	self.w_short(x.co_nlocals)
 	self.w_short(x.co_stacksize)
