@@ -959,11 +959,21 @@ NAME:    ( 'a' .. 'z' | 'A' .. 'Z' | '_')
  */
 STRING
     :   ('r'|'u'|'ur')?
-        (   '\'\'\'' (options {greedy=false;}:.)* '\'\'\''
-        |   '"""' (options {greedy=false;}:.)* '"""'
+        (   '\'\'\'' (options {greedy=false;}:TRIAPOS)* '\'\'\''
+        |   '"""' (options {greedy=false;}:TRIQUOTE)* '"""'
         |   '"' (ESC|~('\\'|'\n'|'"'))* '"'
         |   '\'' (ESC|~('\\'|'\n'|'\''))* '\''
         )
+    ;
+
+fragment
+TRIQUOTE
+    : '"'? '"'? (ESC|~('\\'|'"'))+
+    ;
+
+fragment
+TRIAPOS
+    : '\''? '\''? (ESC|~('\\'|'\''))+
     ;
 
 fragment
