@@ -262,8 +262,10 @@ decorators: decorator+
           ;
 
 //decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
-decorator: AT dotted_attr (LPAREN arglist? RPAREN)? NEWLINE
-        -> ^(Decorator dotted_attr ^(Call arglist)?)
+decorator: AT dotted_attr 
+           ( (LPAREN arglist? RPAREN) -> ^(Decorator dotted_attr ^(Call ^(Args arglist)?))
+           | -> ^(Decorator dotted_attr)
+           ) NEWLINE
          ;
 
 dotted_attr

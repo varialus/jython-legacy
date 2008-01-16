@@ -325,7 +325,8 @@ import java.util.Set;
         return new For(t, target, iter, b, o);
     }
     
-    //FIXME: just calling __neg__ for now - can be more efficient.
+    //FIXME: just calling __neg__ for now - can be better.  Also does not parse expressions like
+    //       --2 correctly (should give ^(USub -2) but gives 2).
     private exprType negate(PythonTree t, exprType o) {
         if (o instanceof Num) {
             Num num = (Num)o;
@@ -416,13 +417,24 @@ decorators returns [List etypes]
     ;
 
 decorator [List decs]
-    : ^(Decorator dotted_attr (^(Call arglist))?) {
+    : ^(Decorator dotted_attr (^(Call (^(Args arglist))?))?) {
         if ($Call == null) {
             decs.add($dotted_attr.etype);
         } else {
-            exprType[] args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
-            keywordType[] keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
-            Call c = new Call($Call, $dotted_attr.etype, args, keywords, $arglist.starargs, $arglist.kwargs);
+            exprType[] args;
+            keywordType[] keywords;
+            exprType starargs = null;
+            exprType kwargs = null;
+            if ($Args != null) {
+                args = (exprType[])$arglist.args.toArray(new exprType[$arglist.args.size()]);
+                keywords = (keywordType[])$arglist.keywords.toArray(new keywordType[$arglist.keywords.size()]);
+                starargs = $arglist.starargs;
+                kwargs = $arglist.kwargs;
+            } else {
+                args = new exprType[0];
+                keywords = new keywordType[0];
+            }
+            Call c = new Call($Call, $dotted_attr.etype, args, keywords, starargs, kwargs);
             decs.add(c);
         }
     }
@@ -1171,14 +1183,12 @@ atom[expr_contextType ctype] returns [exprType etype, boolean parens]
     }
     | ^(USub test[ctype]) {
         debug("USub matched " + $test.etype);
-        //FIXME: need to actually negate this
         $etype = negate($USub, $test.etype);
     }
     | ^(UAdd test[ctype]) {
         $etype = new UnaryOp($UAdd, unaryopType.UAdd, $test.etype);
     }
     | ^(Invert test[ctype]) {
-        //FIXME: need to actually invert this
         $etype = new UnaryOp($Invert, unaryopType.Invert, $test.etype);
     }
     | ^(NOT test[ctype]) {
@@ -1418,7 +1428,7 @@ gen_for [List gens]
     ;
 
 gen_if[List gens] returns [exprType etype]
-    : ^(GenIf ^(Target test[expr_contextType.Load]) (^(Iter gen_iter[gens]))?) {
+    : ^(GenIf ^(Target test[expr_contextType.Load]) (^(Ifs gen_iter[gens]))?) {
         $etype = $test.etype;
     }
     ;
