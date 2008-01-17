@@ -966,11 +966,13 @@ STRING
         )
     ;
 
+/** the two '"'? cause a warning -- is there a way to avoid that? */
 fragment
 TRIQUOTE
     : '"'? '"'? (ESC|~('\\'|'"'))+
     ;
 
+/** the two '\''? cause a warning -- is there a way to avoid that? */
 fragment
 TRIAPOS
     : '\''? '\''? (ESC|~('\\'|'\''))+
@@ -981,9 +983,15 @@ ESC
     :    '\\' .
     ;
 
-/** Consume a newline and any whitespace at start of next line */
+/** Consume a newline and any whitespace at start of next line
+ *  unless the next line contains only white space, in that case
+ *  emit a newline.
+ */
 CONTINUED_LINE
-    :    '\\' ('\r')? '\n' (' '|'\t')* { $channel=HIDDEN; }
+    :    '\\' ('\r')? '\n' (' '|'\t')*  { $channel=HIDDEN; }
+         ( nl=NEWLINE {emit(new ClassicToken(NEWLINE,nl.getText()));}
+         |
+         )
     ;
 
 /** Treat a sequence of blank lines as a single blank line.  If

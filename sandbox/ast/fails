@@ -1,76 +1,16 @@
 RELEASE25='/Users/frank/src/python/release25-maint'
 
-echo $RELEASE25/Lib/idlelib/CodeContext.py
-./run $RELEASE25/Lib/idlelib/CodeContext.py
-echo $RELEASE25/Lib/idlelib/FormatParagraph.py
-./run $RELEASE25/Lib/idlelib/FormatParagraph.py
-echo $RELEASE25/Lib/idlelib/PyParse.py
-./run $RELEASE25/Lib/idlelib/PyParse.py
-
-# Most of the problems in plat-* have to do with backslash followed by
-# newline after a one line function def.  This will take some lexer
-# work to fix
-echo $RELEASE25/Lib/plat-atheos/IN.py
-./run $RELEASE25/Lib/plat-atheos/IN.py
-echo $RELEASE25/Lib/plat-atheos/TYPES.py
-./run $RELEASE25/Lib/plat-atheos/TYPES.py
-echo $RELEASE25/Lib/plat-darwin/IN.py
-./run $RELEASE25/Lib/plat-darwin/IN.py
-echo $RELEASE25/Lib/plat-freebsd4/IN.py
-./run $RELEASE25/Lib/plat-freebsd4/IN.py
-echo $RELEASE25/Lib/plat-freebsd5/IN.py
-./run $RELEASE25/Lib/plat-freebsd5/IN.py
-echo $RELEASE25/Lib/plat-freebsd6/IN.py
-./run $RELEASE25/Lib/plat-freebsd6/IN.py
-echo $RELEASE25/Lib/plat-freebsd7/IN.py
-./run $RELEASE25/Lib/plat-freebsd7/IN.py
-echo $RELEASE25/Lib/plat-irix6/FILE.py
-./run $RELEASE25/Lib/plat-irix6/FILE.py
-echo $RELEASE25/Lib/plat-irix6/IN.py
-./run $RELEASE25/Lib/plat-irix6/IN.py
-echo $RELEASE25/Lib/plat-linux2/IN.py
-./run $RELEASE25/Lib/plat-linux2/IN.py
-echo $RELEASE25/Lib/plat-linux2/TYPES.py
-./run $RELEASE25/Lib/plat-linux2/TYPES.py
 echo $RELEASE25/Lib/plat-mac/aetools.py
 ./run $RELEASE25/Lib/plat-mac/aetools.py
 echo $RELEASE25/Lib/plat-mac/lib-scriptpackages/StdSuites/AppleScript_Suite.py
 ./run $RELEASE25/Lib/plat-mac/lib-scriptpackages/StdSuites/AppleScript_Suite.py
-echo $RELEASE25/Lib/plat-sunos5/IN.py
-./run $RELEASE25/Lib/plat-sunos5/IN.py
 echo $RELEASE25/Lib/plat-sunos5/STROPTS.py
 ./run $RELEASE25/Lib/plat-sunos5/STROPTS.py
-echo $RELEASE25/Lib/plat-sunos5/TYPES.py
-./run $RELEASE25/Lib/plat-sunos5/TYPES.py
-echo $RELEASE25/Lib/plat-unixware7/IN.py
-./run $RELEASE25/Lib/plat-unixware7/IN.py
-
-echo $RELEASE25/Lib/pydoc.py
-./run $RELEASE25/Lib/pydoc.py
-echo ./run $RELEASE25/Lib/test/test_class.py
-./run $RELEASE25/Lib/test/test_class.py
 echo $RELEASE25/Lib/test/bad_coding2.py
 ./run $RELEASE25/Lib/test/bad_coding2.py
-echo ./run $RELEASE25/Lib/test/test_compile.py
-./run ./run $RELEASE25/Lib/test/test_compile.py
 echo ./run $RELEASE25/Lib/test/test_hexoct.py
 ./run $RELEASE25/Lib/test/test_hexoct.py
-echo $RELEASE25/Lib/test/test_complex.py
-./run $RELEASE25/Lib/test/test_complex.py
-echo $RELEASE25/Lib/test/test_complex_args.py
-./run $RELEASE25/Lib/test/test_complex_args.py
-
-# test_decimal fails on default args in lambda expression
-echo $RELEASE25/Lib/test/test_decimal.py
-./run $RELEASE25/Lib/test/test_decimal.py
-
-echo $RELEASE25/Lib/test/test_doctest.py
-./run $RELEASE25/Lib/test/test_doctest.py
 echo $RELEASE25/Lib/test/test_grammar.py
 ./run $RELEASE25/Lib/test/test_grammar.py
 echo ./run $RELEASE25/Lib/test/test_multibytecodec.py
 ./run $RELEASE25/Lib/test/test_multibytecodec.py
-echo /users/frank/src/python/release25-maint/lib/test/test_mailbox.py
-./run /users/frank/src/python/release25-maint/lib/test/test_mailbox.py
-echo $RELEASE25/Lib/test/test_scope.py
-./run $RELEASE25/Lib/test/test_scope.py
