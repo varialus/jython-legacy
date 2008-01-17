@@ -1,4 +1,4 @@
-<project name="grammar" default="compile">
+<project name="grammar" default="all">
 
     <path id="main.classpath">
         <fileset dir="lib">
@@ -7,66 +7,58 @@
         <pathelement path="build" />
     </path>
 
-    <target name="init" depends="clean">
-        <mkdir dir="build/gensrc/org/python/antlr"/>
+    <target name="init">
+        <mkdir dir="build/gensrc/org/python/antlr/ast"/>
     </target>
 
-    <target name="test">
+    <target name="antlr_gen" depends="init">
         <java classname="org.antlr.Tool">
+            <arg value="-fo"/>
+            <arg path="build/gensrc/org/python/antlr"/>
+            <arg value="-lib"/>
+            <arg path="build/gensrc/org/python/antlr"/>
+            <arg file="grammar/Python.g"/>
+            <arg file="grammar/PythonWalker.g"/>
             <classpath refid="main.classpath"/>
         </java>
-    </target>
- 
-    <target name="translate" depends="init">
-        <java classname="org.antlr.Tool">
-            <arg value="grammar25/Python.g"/>
-            <arg value="-o"/>
-            <arg value="build/gensrc/org/python/antlr"/>
-            <classpath refid="main.classpath"/>
-        </java>
-
-        <copy todir="." preservelastmodified="true">
-            <fileset dir="build/gensrc/org/python/antlr/grammar25">
+        
+        <!-- copy the .tokens to /grammar, for usage in ANTLRWorks -->
+        <copy todir="grammar" preservelastmodified="true">
+            <fileset dir="build/gensrc/org/python/antlr">
                 <include name="Python.tokens" />
             </fileset>
         </copy>
 
-        <java classname="org.antlr.Tool">
-            <arg value="grammar25/PythonWalker.g"/>
-            <arg value="-o"/>
-            <arg value="build/gensrc/org/python/antlr"/>
-            <classpath refid="main.classpath"/>
-        </java>
     </target>
     
-    <target name="compile" depends="translate">
+    <target name="compile" depends="init">
         <javac destdir="build" debug="true"
                 deprecation="false" optimize="false" failonerror="true">
             <src path="src"/>
-            <exclude name="org/python/antlr/*"/>
-            <classpath refid="main.classpath"/>
-            <classpath location="build"/>
-        </javac>
-
-        <javac destdir="build" debug="true"
-                deprecation="false" optimize="false" failonerror="true">
             <src path="build/gensrc"/>
             <classpath refid="main.classpath"/>
             <classpath location="build"/>
         </javac>
 
-        <javac destdir="build" debug="true"
-                deprecation="false" optimize="false" failonerror="true">
-            <src path="src"/>
-            <classpath refid="main.classpath"/>
-            <classpath location="build"/>
-        </javac>
+    </target>
 
-
+    <target name="asdl_gen" depends="init">
+        <apply
+            verbose="true"
+            executable="python">
+            <arg value="./asdl_antlr.py" />
+            <fileset dir="." includes="Python.asdl"/>
+        </apply>
     </target>
 
     <target name="clean">
         <delete dir="build"/>
     </target>
+
+    <target name="antlr" depends="antlr_gen, compile"/>
+    <target name="asdl" depends="asdl_gen, compile"/>
+
+    <target name="all" depends="clean, asdl_gen, antlr_gen, compile"/>
+
 </project>
 
