@@ -1,16 +1,25 @@
 RELEASE25='/Users/frank/src/python/release25-maint'
 
+#'as' becomes a reserved word in 2.6 -- so I probably don't need to care about the next three
 echo $RELEASE25/Lib/plat-mac/aetools.py
 ./run $RELEASE25/Lib/plat-mac/aetools.py
 echo $RELEASE25/Lib/plat-mac/lib-scriptpackages/StdSuites/AppleScript_Suite.py
 ./run $RELEASE25/Lib/plat-mac/lib-scriptpackages/StdSuites/AppleScript_Suite.py
 echo $RELEASE25/Lib/plat-sunos5/STROPTS.py
 ./run $RELEASE25/Lib/plat-sunos5/STROPTS.py
+
+#I think this is invalid python.
 echo $RELEASE25/Lib/test/bad_coding2.py
 ./run $RELEASE25/Lib/test/bad_coding2.py
+
+#problem with __neg__
 echo ./run $RELEASE25/Lib/test/test_hexoct.py
 ./run $RELEASE25/Lib/test/test_hexoct.py
+
+#problem with __neg__
 echo $RELEASE25/Lib/test/test_grammar.py
 ./run $RELEASE25/Lib/test/test_grammar.py
+
+#'\N' causes an NPE in jython's PyString.decode_UnicodeEscape
 echo ./run $RELEASE25/Lib/test/test_multibytecodec.py
 ./run $RELEASE25/Lib/test/test_multibytecodec.py
