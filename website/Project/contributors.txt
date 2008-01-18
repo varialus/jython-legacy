@@ -29,11 +29,12 @@ Emeritus Committers
 * Brian Zimmer
 
 ------------------
-Other Contributors
+Contributors
 ------------------
 
 * Jim Althoff
 * Bernhard Bablok
+* Rajesh Battala
 * Michael Becke
 * Robert W. Bill
 * Randolph Brown
@@ -43,6 +44,8 @@ Other Contributors
 * Matt Conway
 * Charles Duffy
 * dsyer
+* Jonathan Feinberg
+* Byron Foster
 * Nathan Franzen
 * Tim Hochberg
 * Kent Johnson
@@ -53,6 +56,7 @@ Other Contributors
 * leouser
 * Noel (Nick) Lockwood
 * Harry Mantakos
+* Mehendran T
 * Drew Morrissey
 * Cyrille Morvan
 * John Mudd
