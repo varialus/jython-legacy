@@ -18,7 +18,6 @@
             <arg value="-lib"/>
             <arg path="build/gensrc/org/python/antlr"/>
             <arg file="grammar/Python.g"/>
-            <arg file="grammar/PythonWalker.g"/>
             <classpath refid="main.classpath"/>
         </java>
         
@@ -42,23 +41,13 @@
 
     </target>
 
-    <target name="asdl_gen" depends="init">
-        <apply
-            verbose="true"
-            executable="python">
-            <arg value="./asdl_antlr.py" />
-            <fileset dir="." includes="Python.asdl"/>
-        </apply>
-    </target>
-
     <target name="clean">
         <delete dir="build"/>
     </target>
-
+    
     <target name="antlr" depends="antlr_gen, compile"/>
-    <target name="asdl" depends="asdl_gen, compile"/>
 
-    <target name="all" depends="clean, asdl_gen, antlr_gen, compile"/>
+    <target name="all" depends="clean, antlr_gen, compile"/>
 
 </project>
 
