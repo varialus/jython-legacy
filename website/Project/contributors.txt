@@ -61,6 +61,7 @@ Contributors
 * Cyrille Morvan
 * John Mudd
 * Rodrigo B. de Oliveira
+* Benjamin Peterson
 * Tony Plate
 * Josselin PUJO
 * Steffen Ries
