@@ -33,6 +33,7 @@ Contributors
 ------------------
 
 * Jim Althoff
+* Jens Abraham
 * Bernhard Bablok
 * Rajesh Battala
 * Michael Becke
