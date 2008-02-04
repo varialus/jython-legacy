@@ -36,7 +36,7 @@ def lispify_field(field, child):
         if isinstance(node, _ast.AST):
             yield lispify_ast(node)
         else:
-            if isinstance(node, str):
+            if isinstance(node, (str, unicode)):
                 #CPython and Jython represent \b and \f differently.
                 s = node.replace('\b', 'BACKSPACE')
                 s = s.replace('\f', 'FORMFEED')

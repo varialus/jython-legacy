@@ -365,9 +365,9 @@ assign_testlist
        ;
 
 //not in CPython's Grammar file
-assign_yield : (ASSIGN yield_expr ASSIGN) => ASSIGN yield_expr -> ^(Target yield_expr)
-       | ASSIGN yield_expr -> ^(Value yield_expr)
-       ;
+assign_yield
+    : ASSIGN yield_expr -> ^(Value yield_expr)
+    ;
 
 //augassign: '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//='
 augassign : PLUSEQUAL
@@ -473,19 +473,20 @@ import_from: 'from' (DOT* dotted_name | DOT+) 'import'
               )
            ;
 
+//import_as_names: import_as_name (',' import_as_name)* [',']
+import_as_names : import_as_name (COMMA! import_as_name)* (COMMA!)?
+                ;
+
 //import_as_name: NAME [('as' | NAME) NAME]
 import_as_name : name=NAME ('as' asname=NAME)?
               -> ^(Alias $name ^(Asname $asname)?)
                ;
 
+//XXX: when does Grammar match "dotted_name NAME NAME"?
 //dotted_as_name: dotted_name [('as' | NAME) NAME]
 dotted_as_name : dotted_name ('as' asname=NAME)?
               -> ^(Alias dotted_name ^(Asname NAME)?)
                ;
-
-//import_as_names: import_as_name (',' import_as_name)* [',']
-import_as_names : import_as_name (COMMA! import_as_name)* (COMMA!)?
-                ;
 
 //dotted_as_names: dotted_as_name (',' dotted_as_name)*
 dotted_as_names : dotted_as_name (COMMA! dotted_as_name)*
@@ -635,14 +636,6 @@ and_expr : shift_expr (AMPER^ shift_expr)*
 shift_expr : arith_expr ((LEFTSHIFT^|RIGHTSHIFT^) arith_expr)*
            ;
 
-//arith_expr : lhs=term 
-//             ( ((PLUS) term)+ -> ^(PLUS $lhs term+)
-//             | ((MINUS) term)+ -> ^(MINUS $lhs term+)
-//             | -> ^(Expr $lhs)
-//             )
-//           ;
-
-
 //arith_expr: term (('+'|'-') term)*
 arith_expr: term ((PLUS^|MINUS^) term)*
 	;
@@ -758,7 +751,7 @@ dictmaker : test COLON test
          -> test+
           ;
 
-//classdef: 'class' NAME ['(' testlist ')'] ':' suite
+//classdef: 'class' NAME ['(' [testlist] ')'] ':' suite
 classdef: 'class' NAME (LPAREN testlist? RPAREN)? COLON suite
     -> ^(ClassDef ^(Name NAME) ^(Bases testlist)? ^(Body suite))
     ;
@@ -777,7 +770,7 @@ arglist : argument (COMMA argument)*
        -> ^(KWArgs $kwargs)
         ;
 
-//argument: [test '='] test	// Really [keyword '='] test
+//argument: test [gen_for] | test '=' test  # Really [keyword '='] test
 argument : t1=test
          ( (ASSIGN t2=test) -> ^(Keyword ^(Arg $t1) ^(Value $t2)?)
          | gen_for -> ^(GenFor $t1 gen_for)
