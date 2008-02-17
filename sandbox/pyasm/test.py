@@ -23,9 +23,9 @@ if os.name == 'java': # Jython side
     if __name__ == '__main__': # invoked as a script
         import sys
         action = 'print'
-        if len(sys.argv) == 1:
+        if len(sys.argv) == 1:# If test.py is run with no arguments, check all the files
             action = 'check'
-            files = ['tests/%s.py' % f for f in os.listdir('expected_output')]
+            files = ['tests/%s.py' % f for f in os.listdir('expected_output') if not f == '.svn']
         elif sys.argv[1] == '--store':
             action = 'store'
             del sys.argv[1]
