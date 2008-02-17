@@ -1,0 +1,6 @@
+else-block
+done
+pass: 1
+except-block
+done
+fail: integer division or modulo by zero

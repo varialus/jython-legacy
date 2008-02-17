@@ -1,0 +1,139 @@
+exceptions.ArithmeticError
+exceptions.AssertionError
+exceptions.AttributeError
+exceptions.DeprecationWarning
+exceptions.EOFError
+Ellipsis
+exceptions.EnvironmentError
+exceptions.Exception
+False
+exceptions.FloatingPointError
+exceptions.FutureWarning
+exceptions.GeneratorExit
+exceptions.IOError
+exceptions.ImportError
+exceptions.IndentationError
+exceptions.IndexError
+exceptions.KeyError
+exceptions.KeyboardInterrupt
+exceptions.LookupError
+exceptions.MemoryError
+exceptions.NameError
+None
+NotImplemented
+exceptions.NotImplementedError
+exceptions.OSError
+exceptions.OverflowError
+exceptions.PendingDeprecationWarning
+exceptions.ReferenceError
+exceptions.RuntimeError
+exceptions.RuntimeWarning
+exceptions.StandardError
+exceptions.StopIteration
+exceptions.SyntaxError
+exceptions.SyntaxWarning
+exceptions.SystemError
+exceptions.SystemExit
+exceptions.TabError
+True
+exceptions.TypeError
+exceptions.UnboundLocalError
+exceptions.UnicodeDecodeError
+exceptions.UnicodeEncodeError
+exceptions.UnicodeError
+exceptions.UnicodeTranslateError
+exceptions.UserWarning
+exceptions.ValueError
+exceptions.Warning
+exceptions.ZeroDivisionError
+1
+None
+<built-in function __import__>
+__main__
+<built-in function abs>
+<built-in function apply>
+<type 'basestring'>
+<type 'bool'>
+<built-in function callable>
+<built-in function chr>
+<type 'classmethod'>
+<built-in function cmp>
+<built-in function coerce>
+<built-in function compile>
+<type 'complex'>
+Copyright (c) 2000-2007, Jython Developers
+All rights reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 2000 The Apache Software Foundation.  All rights
+reserved.
+
+Copyright (c) 1995-2000 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved.
+
+
+Jython is maintained by the Jython developers (www.jython.org).
+<built-in function delattr>
+<type 'dict'>
+<built-in function dir>
+<built-in function divmod>
+<type 'enumerate'>
+<built-in function eval>
+<built-in function execfile>
+Use Ctrl-D (i.e. EOF) to exit.
+<type 'file'>
+<built-in function filter>
+<type 'float'>
+<type 'ImmutableSet'>
+<built-in function getattr>
+<built-in function globals>
+<built-in function hasattr>
+<built-in function hash>
+<built-in function hex>
+<built-in function id>
+<built-in function input>
+<type 'int'>
+<built-in function intern>
+<built-in function isinstance>
+<built-in function issubclass>
+<built-in function iter>
+<built-in function len>
+See http://www.pythonlabs.com/products/python2.0/license.html
+<type 'list'>
+<built-in function locals>
+<type 'long'>
+<built-in function map>
+<built-in function max>
+<built-in function min>
+<type 'object'>
+<built-in function oct>
+<type 'file'>
+<built-in function ord>
+<built-in function pow>
+<type 'property'>
+Use Ctrl-D (i.e. EOF) to exit.
+<built-in function range>
+<built-in function raw_input>
+<built-in function reduce>
+<built-in function reload>
+<built-in function repr>
+<built-in function round>
+<type 'Set'>
+<built-in function setattr>
+<type 'slice'>
+<type 'staticmethod'>
+<type 'str'>
+<built-in function sum>
+<type 'super'>
+<type 'tuple'>
+<type 'type'>
+<built-in function unichr>
+<type 'unicode'>
+<built-in function vars>
+<built-in function xrange>
+<built-in function zip>

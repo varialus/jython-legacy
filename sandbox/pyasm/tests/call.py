@@ -1,5 +1,5 @@
 def a(b,c):
-    None
+    print b, c
 
 a(1,c=2)
 a(*[1,2])

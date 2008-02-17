@@ -1,0 +1,2 @@
+pass: 1
+fail: integer division or modulo by zero

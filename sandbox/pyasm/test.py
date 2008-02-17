@@ -22,11 +22,54 @@ if os.name == 'java': # Jython side
 
     if __name__ == '__main__': # invoked as a script
         import sys
-        filename = sys.argv[1]
-        file = open(filename) # open file
-        code = cpythonCompile(file.read(), filename) # compile file
-        vars = dict(__name__='__main__', __file__=filename, __doc__=None)
-        exec code in vars # execute compiled file
+        action = 'print'
+        if len(sys.argv) == 1:
+            action = 'check'
+            files = ['tests/%s.py' % f for f in os.listdir('expected_output')]
+        elif sys.argv[1] == '--store':
+            action = 'store'
+            del sys.argv[1]
+        elif sys.argv[1] == '--check':
+            action = 'check'
+            del sys.argv[1]
+        if not files:
+            files = sys.argv[1:]
+        for filename in files:
+            file = open(filename) # open file
+            code = cpythonCompile(file.read(), filename) # compile file
+            vars = dict(__name__='__main__', __file__=filename, __doc__=None)
+            import StringIO
+            out = StringIO.StringIO()
+            regularout = sys.stdout
+            regularerr = sys.stderr
+            sys.stdout = out
+            sys.stderr = out
+            try:
+                exec code in vars # execute compiled file
+            except Exception, e:
+                print e.__class__
+                print e
+            sys.stdout = regularout
+            sys.stderr = regularerr
+            outfile = 'expected_output/%s' % filename.replace('.py', '').replace('tests/', '')
+            cur = out.getvalue()
+            
+            if action == 'print':
+                print cur
+            elif action == 'store':
+                store = open(outfile, 'w')
+                store.write(cur)
+                store.close()
+            else:
+                prior = open(outfile).read()
+                print 'Checking', filename
+                if not prior == cur:
+                    print 'Expected'
+                    print '=========='
+                    print prior
+                    print 'Current'
+                    print '=========='
+                    print cur
 
 elif __name__ == '__main__': # CPython side
     filename = sys.argv[1]

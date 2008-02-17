@@ -1,6 +1,7 @@
 def f():
     for e in __name__:
         try:
+            print e
             return
         except:
             pass

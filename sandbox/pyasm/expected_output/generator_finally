@@ -1,0 +1,9 @@
+g.next(): 0
+g.send(14): 14
+1
+g.throw(...): EXCEPTION:  FEL
+2
+g.next(): None
+3
+g.close(): done
+None
