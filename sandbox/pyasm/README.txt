@@ -7,7 +7,7 @@ Table of Contents
  1. What does it do?
     1.1 What it does not do
  2. Installation
- 3. Useing PyASM
+ 3. Using PyASM
  4. The parts of PyASM
  5. How PyASM works
  6. Mappings from Python Bytecode to Java Bytecode
@@ -45,7 +45,7 @@ after installing PyASM might overwrite some of the installed PyASM-files. At
 the moment this is know to happen to the file 'marshal.py'.
 
 
- 3. Useing PyASM
+ 3. Using PyASM
  ===============
 
 PyASM operates on python bytecode, and therefore depends on the C

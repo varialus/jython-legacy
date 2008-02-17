@@ -4,9 +4,9 @@ from org.python.newcompiler.pyasm import BytecodeVisitor as Visitor,\
     Operator, CodeFlags as Flags
 from org.python.newcompiler.asm import OffsetTracer
 from org.python.core.BytecodeLoader import makeCode
-from org.objectweb import asm
-from org.objectweb.asm import Type, Opcodes as Op
-from org.objectweb.asm.commons import GeneratorAdapter, Method,\
+from org.python.objectweb import asm
+from org.python.objectweb.asm import Type, Opcodes as Op
+from org.python.objectweb.asm.commons import GeneratorAdapter, Method,\
     TableSwitchGenerator
 try:
     from org.objectweb.asm.tree import analysis
@@ -295,14 +295,14 @@ class ClassKeeper(object):
         ():            ("EmptyTuple",    pyTupleType),
         "":            ("EmptyString",   pyStringType),
         }
-    __compositTypes = {
+    __compositeTypes = {
         tuple:     pyTupleType,
         list:      pyListType,
         dict:      pyDictType,
         set:       pyTupleType,
         frozenset: pyTupleType,
         }
-    __compositConstructor = Method.getMethod(
+    __compositeConstructor = Method.getMethod(
         "void <init> (org.python.core.PyObject[])")
     __setConstructor = Method.getMethod(
         "void <init> (org.python.core.PyObject)")
@@ -340,11 +340,11 @@ class ClassKeeper(object):
             if reallyContains(self.constants, value):
                 raise ValueError("Constant %s:%s slipped through!" %
                                  (name,value))
-            if type(value) in self.__compositTypes:
+            if type(value) in self.__compositeTypes:
                 if isinstance(value, (set,frozenset)):
                     self.clinit.newInstance(getType(type(value)))
                     self.clinit.dup()
-                self.clinit.newInstance(self.__compositTypes[type(value)])
+                self.clinit.newInstance(self.__compositeTypes[type(value)])
                 self.clinit.dup()
                 self.clinit.push(java.lang.Integer(len(value)))
                 self.clinit.newArray(pyObjectType)
@@ -360,8 +360,8 @@ class ClassKeeper(object):
                     self.clinit.arrayStore(pyObjectType) # store
                     i += 1
                 self.clinit.invokeConstructor(
-                    self.__compositTypes[type(value)],
-                    self.__compositConstructor)
+                    self.__compositeTypes[type(value)],
+                    self.__compositeConstructor)
                 if isinstance(value, (set,frozenset)):
                     self.clinit.invokeConstructor(getType(type(value)),
                                                   self.__setConstructor)
@@ -1479,8 +1479,8 @@ class ASMVisitor(Visitor):
     def tryCatchBlock(self, start, end, handle, excType):
         # the try/catch-blocks needs to be reversed to assert pythons
         # behaviour for nested try-blocks, this is done by storing them
-        # when a try/catch-block is encounterd and emmiting them in reversed
-        # order when the end of the code is encounterd.
+        # when a try/catch-block is encountered and emiting them in reversed
+        # order when the end of the code is encountered.
         catch = TryCatch(start, end, handle, excType)
         self.__tryBlocks.append(catch)
         return catch
@@ -1810,7 +1810,7 @@ class ASMVisitor(Visitor):
     
     def visitEnd(self):
         """ --DONE"""
-        # emmit stored try/catch-blocks
+        # emit stored try/catch-blocks
         while self.__tryBlocks:
             self.__tryBlocks.pop().accept( self.asm )
         init = self.__class.init
@@ -1831,7 +1831,7 @@ class ASMVisitor(Visitor):
         #               self.__code.getName() + "$co_consts",
         #               getArrayType(core.PyObject))
 
-        # emmit code that creates the code object
+        # emit code that creates the code object
         argcount = self.__argcount
         if self.__flags & Flags.CO_VARARGS:
             argcount += 1
