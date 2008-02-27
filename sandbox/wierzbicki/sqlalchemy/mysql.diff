@@ -1,19 +1,188 @@
-Index: mysql.py
+Index: sqlalchemy/databases/mysql.py
 ===================================================================
---- mysql.py	(revision 2938)
-+++ mysql.py	(working copy)
-@@ -953,45 +953,19 @@
-         ansisql.ANSIDialect.__init__(self, default_paramstyle='format', **kwargs)
+--- sqlalchemy/databases/mysql.py	(revision 4198)
++++ sqlalchemy/databases/mysql.py	(working copy)
+@@ -1,158 +1,3 @@
+-# mysql.py
+-# Copyright (C) 2005, 2006, 2007, 2008 Michael Bayer mike_mp@zzzcomputing.com
+-#
+-# This module is part of SQLAlchemy and is released under
+-# the MIT License: http://www.opensource.org/licenses/mit-license.php
+-
+-"""Support for the MySQL database.
+-
+-SQLAlchemy supports 6 major MySQL versions: 3.23, 4.0, 4.1, 5.0, 5.1 and 6.0,
+-with capablities increasing with more modern servers.
+-
+-Versions 4.1 and higher support the basic SQL functionality that SQLAlchemy
+-uses in the ORM and SQL expressions.  These versions pass the applicable
+-tests in the suite 100%.  No heroic measures are taken to work around major
+-missing SQL features- if your server version does not support sub-selects, for
+-example, they won't work in SQLAlchemy either.
+-
+-Currently, the only DB-API driver supported is `MySQL-Python` (also referred to
+-as `MySQLdb`).  Either 1.2.1 or 1.2.2 are recommended.  The alpha, beta and
+-gamma releases of 1.2.1 and 1.2.2 should be avoided.  Support for Jython and
+-IronPython is planned.
+-
+-=====================================  ===============
+-Feature                                Minimum Version
+-=====================================  ===============
+-sqlalchemy.orm                         4.1.1
+-Table Reflection                       3.23.x
+-DDL Generation                         4.1.1
+-utf8/Full Unicode Connections          4.1.1
+-Transactions                           3.23.15
+-Two-Phase Transactions                 5.0.3
+-Nested Transactions                    5.0.3
+-=====================================  ===============
+-
+-See the official MySQL documentation for detailed information about features
+-supported in any given server release.
+-
+-Many MySQL server installations default to a ``latin1`` encoding for client
+-connections.  All data sent through the connection will be converted
+-into ``latin1``, even if you have ``utf8`` or another character set on your
+-tables and columns.  With versions 4.1 and higher, you can change the
+-connection character set either through server configuration or by passing
+-the  ``charset`` parameter to  ``create_engine``.  The ``charset`` option is
+-passed through to MySQL-Python and has the side-effect of also enabling
+-``use_unicode`` in the driver by default.  For regular encoded strings, also
+-pass ``use_unicode=0`` in the connection arguments.
+-
+-Most MySQL server installations have a default table type of `MyISAM`, a
+-non-transactional table type.  During a transaction, non-transactional
+-storage engines do not participate and continue to store table changes in
+-autocommit mode.  For fully atomic transactions, all participating tables
+-must use a transactional engine such as `InnoDB`, `Falcon`, `SolidDB`,
+-`PBXT`, etc.  Storage engines can be elected when creating tables in
+-SQLAlchemy by supplying a ``mysql_engine='whatever'`` to the ``Table``
+-constructor.  Any MySQL table creation option can be specified in this syntax.
+-
+-Not all MySQL storage engines support foreign keys.  For `MyISAM` and similar
+-engines, the information loaded by table reflection will not include foreign
+-keys.  For these tables, you may supply ``ForeignKeyConstraints`` at reflection
+-time::
+-
+-  Table('mytable', metadata, autoload=True,
+-        ForeignKeyConstraint(['other_id'], ['othertable.other_id']))
+-
+-When creating tables, SQLAlchemy will automatically set AUTO_INCREMENT on an
+-integer primary key column::
+-
+-  >>> t = Table('mytable', metadata,
+-  ...   Column('mytable_id', Integer, primary_key=True))
+-  >>> t.create()
+-  CREATE TABLE mytable (
+-          id INTEGER NOT NULL AUTO_INCREMENT,
+-          PRIMARY KEY (id)
+-  )
+-
+-You can disable this behavior by supplying ``autoincrement=False`` in addition.
+-This can also be used to enable auto-increment on a secondary column in a
+-multi-column key for some storage engines::
+-
+-  Table('mytable', metadata,
+-        Column('gid', Integer, primary_key=True, autoincrement=False),
+-        Column('id', Integer, primary_key=True))
+-
+-MySQL SQL modes are supported.  Modes that enable ``ANSI_QUOTES`` (such as
+-``ANSI``) require an engine option to modify SQLAlchemy's quoting style.
+-When using an ANSI-quoting mode, supply ``use_ansiquotes=True`` when
+-creating your ``Engine``::
+-
+-  create_engine('mysql://localhost/test', use_ansiquotes=True)
+-
+-This is an engine-wide option and is not toggleable on a per-connection basis.
+-SQLAlchemy does not presume to ``SET sql_mode`` for you with this option.
+-For the best performance, set the quoting style server-wide in ``my.cnf`` or
+-by supplying ``--sql-mode`` to ``mysqld``.  You can also use a ``Pool`` hook
+-to issue a ``SET SESSION sql_mode='...'`` on connect to configure each
+-connection.
+-
+-If you do not specify 'use_ansiquotes', the regular MySQL quoting style is
+-used by default.  Table reflection operations will query the server 
+-
+-If you do issue a 'SET sql_mode' through SQLAlchemy, the dialect must be
+-updated if the quoting style is changed.  Again, this change will affect all
+-connections::
+-
+-  connection.execute('SET sql_mode="ansi"')
+-  connection.dialect.use_ansiquotes = True
+-
+-For normal SQLAlchemy usage, loading this module is unnescesary.  It will be
+-loaded on-demand when a MySQL connection is needed.  The generic column types
+-like ``String`` and ``Integer`` will automatically be adapted to the optimal
+-matching MySQL column type.
+-
+-But if you would like to use one of the MySQL-specific or enhanced column
+-types when creating tables with your ``Table`` definitions, then you will
+-need to import them from this module::
+-
+-  from sqlalchemy.databases import mysql
+-
+-  Table('mytable', metadata,
+-        Column('id', Integer, primary_key=True),
+-        Column('ittybittyblob', mysql.MSTinyBlob),
+-        Column('biggy', mysql.MSBigInteger(unsigned=True)))
+-
+-All standard MySQL column types are supported.  The OpenGIS types are
+-available for use via table reflection but have no special support or
+-mapping to Python classes.  If you're using these types and have opinions
+-about how OpenGIS can be smartly integrated into SQLAlchemy please join
+-the mailing list!
+-
+-Many of the MySQL SQL extensions are handled through SQLAlchemy's generic
+-function and operator support::
+-
+-  table.select(table.c.password==func.md5('plaintext'))
+-  table.select(table.c.username.op('regexp')('^[a-d]'))
+-
+-And of course any valid statement can be executed as a string rather than
+-through the SQL expression language.
+-
+-Some limited support for MySQL extensions to SQL expressions is currently
+-available.
+-
+-  * SELECT pragma::
+-
+-      select(..., prefixes=['HIGH_PRIORITY', 'SQL_SMALL_RESULT'])
+-
+-  * UPDATE with LIMIT::
+-
+-      update(..., mysql_limit=10)
+-
+-If you have problems that seem server related, first check that you are
+-using the most recent stable MySQL-Python package available.  The Database
+-Notes page on the wiki at http://www.sqlalchemy.org is a good resource for
+-timely information affecting MySQL in SQLAlchemy.
+-"""
+-
+ import datetime, inspect, re, sys
+ from array import array as _array
+ 
+@@ -1417,7 +1262,7 @@
+         default.DefaultDialect.__init__(self, **kwargs)
  
      def dbapi(cls):
 -        import MySQLdb as mysql
 +        import com.ziclix.python.sql.zxJDBC as mysql
          return mysql
      dbapi = classmethod(dbapi)
-     
-     def create_connect_args(self, url):
-         opts = url.translate_connect_args(['host', 'db', 'user', 'passwd', 'port'])
--        opts.update(url.query)
+ 
+@@ -1426,40 +1271,13 @@
+                                           password='passwd')
+         opts.update(url.query)
+ 
+-        util.coerce_kw_type(opts, 'compress', bool)
+-        util.coerce_kw_type(opts, 'connect_timeout', int)
+-        util.coerce_kw_type(opts, 'client_flag', int)
+-        util.coerce_kw_type(opts, 'local_infile', int)
+-        # Note: using either of the below will cause all strings to be returned
+-        # as Unicode, both in raw SQL operations and with column types like
+-        # String and MSString.
+-        util.coerce_kw_type(opts, 'use_unicode', bool)
+-        util.coerce_kw_type(opts, 'charset', str)
 +        if opts.get('host') == None:
 +            opts['host'] = 'localhost'
 +        if opts.get('port') == None:
@@ -21,26 +190,19 @@ Index: mysql.py
 +        args = ['jdbc:mysql://%(host)s:%(port)s/%(db)s' % opts, opts['user'], opts['passwd'], 'org.gjt.mm.mysql.Driver']
 +        return [args, {}]
  
--        util.coerce_kw_type(opts, 'compress', bool)
--        util.coerce_kw_type(opts, 'connect_timeout', int)
--        util.coerce_kw_type(opts, 'client_flag', int)
--        util.coerce_kw_type(opts, 'local_infile', int)
--        # note: these two could break SA Unicode type
--        util.coerce_kw_type(opts, 'use_unicode', bool)   
--        util.coerce_kw_type(opts, 'charset', str)
--        # TODO: cursorclass and conv:  support via query string or punt?
--        
--        # ssl
+-        # Rich values 'cursorclass' and 'conv' are not supported via
+-        # query string.
+-
 -        ssl = {}
 -        for key in ['ssl_ca', 'ssl_key', 'ssl_cert', 'ssl_capath', 'ssl_cipher']:
 -            if key in opts:
 -                ssl[key[4:]] = opts[key]
 -                util.coerce_kw_type(ssl, key[4:], str)
 -                del opts[key]
--        if len(ssl):
+-        if ssl:
 -            opts['ssl'] = ssl
--        
--        # FOUND_ROWS must be set in CLIENT_FLAGS for to enable
+-
+-        # FOUND_ROWS must be set in CLIENT_FLAGS to enable
 -        # supports_sane_rowcount.
 -        client_flag = opts.get('client_flag', 0)
 -        if self.dbapi is not None:
@@ -52,41 +214,293 @@ Index: mysql.py
 -            opts['client_flag'] = client_flag
 -        return [[], opts]
 -
-     def create_execution_context(self, *args, **kwargs):
-         return MySQLExecutionContext(self, *args, **kwargs)
+     def create_execution_context(self, connection, **kwargs):
+         return MySQLExecutionContext(self, connection, **kwargs)
  
-@@ -1083,8 +1057,7 @@
-             table.metadata.tables[table.name]= table
+@@ -1475,37 +1293,16 @@
+         return True
+ 
+     def do_execute(self, cursor, statement, parameters, context=None):
+-        cursor.execute(statement, parameters)
++        cursor.execute(statement, [x for x in parameters])
+ 
+     def do_commit(self, connection):
+         """Execute a COMMIT."""
++        connection.commit()
+ 
+-        # COMMIT/ROLLBACK were introduced in 3.23.15.
+-        # Yes, we have at least one user who has to talk to these old versions!
+-        #
+-        # Ignore commit/rollback if support isn't present, otherwise even basic
+-        # operations via autocommit fail.
+-        try:
+-            connection.commit()
+-        except:
+-            if self._server_version_info(connection) < (3, 23, 15):
+-                args = sys.exc_info()[1].args
+-                if args and args[0] == 1064:
+-                    return
+-            raise
+-
+     def do_rollback(self, connection):
+         """Execute a ROLLBACK."""
++        connection.rollback()
+ 
+-        try:
+-            connection.rollback()
+-        except:
+-            if self._server_version_info(connection) < (3, 23, 15):
+-                args = sys.exc_info()[1].args
+-                if args and args[0] == 1064:
+-                    return
+-            raise
+-
+     def do_begin_twophase(self, connection, xid):
+         connection.execute("XA BEGIN %s", xid)
+ 
+@@ -1551,11 +1348,11 @@
+     def table_names(self, connection, schema):
+         """Return a Unicode SHOW TABLES from a given schema."""
+ 
+-        charset = self._detect_charset(connection)
++        #charset = self._detect_charset(connection)
+         self._autoset_identifier_style(connection)
+         rp = connection.execute("SHOW TABLES FROM %s" %
+             self.identifier_preparer.quote_identifier(schema))
+-        return [row[0] for row in _compat_fetchall(rp, charset=charset)]
++        return [row[0] for row in rp.fetchall()]
+ 
+     def has_table(self, connection, table_name, schema=None):
+         # SHOW TABLE STATUS LIKE and SHOW TABLES LIKE do not function properly
+@@ -1582,72 +1379,21 @@
+                 rs.close()
+                 return have
+             except exceptions.SQLError, e:
+-                if e.orig.args[0] == 1146:
+-                    return False
+-                raise
++                return False
+         finally:
+             if rs:
+                 rs.close()
+ 
+-    def server_version_info(self, connection):
+-        """A tuple of the database server version.
+-
+-        Formats the remote server version as a tuple of version values,
+-        e.g. ``(5, 0, 44)``.  If there are strings in the version number
+-        they will be in the tuple too, so don't count on these all being
+-        ``int`` values.
+-
+-        This is a fast check that does not require a round trip.  It is also
+-        cached per-Connection.
+-        """
+-
+-        try:
+-            return connection.info['_mysql_server_version_info']
+-        except KeyError:
+-            version = connection.info['_mysql_server_version_info'] = \
+-              self._server_version_info(connection.connection.connection)
+-            return version
+-
+-    def _server_version_info(self, dbapi_con):
+-        """Convert a MySQL-python server_info string into a tuple."""
+-
+-        version = []
+-        r = re.compile('[.\-]')
+-        for n in r.split(dbapi_con.get_server_info()):
+-            try:
+-                version.append(int(n))
+-            except ValueError:
+-                version.append(n)
+-        return tuple(version)
+-
+-    # @deprecated
+-    def get_version_info(self, connectable):
+-        """A tuple of the database server version.
+-
+-        Deprecated, use ``server_version_info()``.
+-        """
+-
+-        if isinstance(connectable, engine_base.Engine):
+-            connectable = connectable.contextual_connect()
+-
+-        return self.server_version_info(connectable)
+-    get_version_info = util.deprecated(get_version_info)
+-
+     def reflecttable(self, connection, table, include_columns):
+         """Load column definitions from the server."""
+ 
+-        charset = self._detect_charset(connection)
++        charset = None ###self._detect_charset(connection)
+         self._autoset_identifier_style(connection)
  
          try:
--            rp = connection.execute("describe " + self._escape_table_name(table),
--                                   {})
-+            rp = connection.execute("describe " + self._escape_table_name(table))
-         except:
-             raise exceptions.NoSuchTableError(table.fullname)
+             reflector = self.reflector
+         except AttributeError:
+             preparer = self.identifier_preparer
+-            if (self.server_version_info(connection) < (4, 1) and
+-                self.use_ansiquotes):
+-                # ANSI_QUOTES doesn't affect SHOW CREATE TABLE on < 4.1
+-                preparer = MySQLIdentifierPreparer(self)
+-
+             self.reflector = reflector = MySQLSchemaReflector(preparer)
  
-@@ -1093,7 +1066,7 @@
-                    (row[0], row[1], row[2] == 'YES', row[3] == 'PRI', row[4])
+         sql = self._show_create_table(connection, table, charset)
+@@ -1656,116 +1402,9 @@
+             columns = self._describe_table(connection, table, charset)
+             sql = reflector._describe_to_create(table, columns)
  
-             # leave column names as unicode
--            name = name.decode(decode_from)
-+            ###name = name.decode(decode_from)
+-        self._adjust_casing(connection, table, charset)
+-
+         return reflector.reflect(connection, table, sql, charset,
+                                  only=include_columns)
  
-             match = re.match(r'(\w+)(\(.*?\))?\s*(\w+)?\s*(\w+)?', type)
-             col_type = match.group(1)
-@@ -1128,13 +1101,13 @@
-                                                    nullable=nullable,
-                                                    )))
+-    def _adjust_casing(self, connection, table, charset=None):
+-        """Adjust Table name to the server case sensitivity, if needed."""
+-
+-        if charset is None:
+-            charset = self._detect_charset(connection)
+-
+-        casing = self._detect_casing(connection, charset)
+-
+-        # For winxx database hosts.  TODO: is this really needed?
+-        if casing == 1 and table.name != table.name.lower():
+-            table.name = table.name.lower()
+-            lc_alias = schema._get_table_key(table.name, table.schema)
+-            table.metadata.tables[lc_alias] = table
+-
+-
+-    def _detect_charset(self, connection):
+-        """Sniff out the character set in use for connection results."""
+-
+-        # Allow user override, won't sniff if force_charset is set.
+-        if 'force_charset' in connection.info:
+-            return connection.info['force_charset']
+-
+-        # Note: MySQL-python 1.2.1c7 seems to ignore changes made
+-        # on a connection via set_character_set()
+-        if self.server_version_info(connection) < (4, 1, 0):
+-            try:
+-                return connection.connection.character_set_name()
+-            except AttributeError:
+-                # < 1.2.1 final MySQL-python drivers have no charset support.
+-                # a query is needed.
+-                pass
+-
+-        # Prefer 'character_set_results' for the current connection over the
+-        # value in the driver.  SET NAMES or individual variable SETs will
+-        # change the charset without updating the driver's view of the world.
+-        #
+-        # If it's decided that issuing that sort of SQL leaves you SOL, then
+-        # this can prefer the driver value.
+-        rs = connection.execute("SHOW VARIABLES LIKE 'character_set%%'")
+-        opts = dict([(row[0], row[1]) for row in _compat_fetchall(rs)])
+-
+-        if 'character_set_results' in opts:
+-            return opts['character_set_results']
+-        try:
+-            return connection.connection.character_set_name()
+-        except AttributeError:
+-            # Still no charset on < 1.2.1 final...
+-            if 'character_set' in opts:
+-                return opts['character_set']
+-            else:
+-                util.warn(
+-                    "Could not detect the connection character set with this "
+-                    "combination of MySQL server and MySQL-python. "
+-                    "MySQL-python >= 1.2.2 is recommended.  Assuming latin1.")
+-                return 'latin1'
+-
+-    def _detect_casing(self, connection, charset=None):
+-        """Sniff out identifier case sensitivity.
+-
+-        Cached per-connection. This value can not change without a server
+-        restart.
+-        """
+-
+-        # http://dev.mysql.com/doc/refman/5.0/en/name-case-sensitivity.html
+-
+-        try:
+-            return connection.info['lower_case_table_names']
+-        except KeyError:
+-            row = _compat_fetchone(connection.execute(
+-                    "SHOW VARIABLES LIKE 'lower_case_table_names'"),
+-                                   charset=charset)
+-            if not row:
+-                cs = 0
+-            else:
+-                # 4.0.15 returns OFF or ON according to [ticket:489]
+-                # 3.23 doesn't, 4.0.27 doesn't..
+-                if row[1] == 'OFF':
+-                    cs = 0
+-                elif row[1] == 'ON':
+-                    cs = 1
+-                else:
+-                    cs = int(row[1])
+-                row.close()
+-            connection.info['lower_case_table_names'] = cs
+-            return cs
+-
+-    def _detect_collations(self, connection, charset=None):
+-        """Pull the active COLLATIONS list from the server.
+-
+-        Cached per-connection.
+-        """
+-
+-        try:
+-            return connection.info['collations']
+-        except KeyError:
+-            collations = {}
+-            if self.server_version_info(connection) < (4, 1, 0):
+-                pass
+-            else:
+-                rs = connection.execute('SHOW COLLATION')
+-                for row in _compat_fetchall(rs, charset):
+-                    collations[row[0]] = row[1]
+-            connection.info['collations'] = collations
+-            return collations
+-
+     def use_ansiquotes(self, useansi):
+         self._use_ansiquotes = useansi
+         if useansi:
+@@ -1794,10 +1433,9 @@
  
--        tabletype = self.moretableinfo(connection, table, decode_from)
-+        tabletype = self.moretableinfo(connection, table)###, decode_from)
-         table.kwargs['mysql_engine'] = tabletype
+         if self.use_ansiquotes is not None:
+             return
++        #rs = connection.execute("SHOW VARIABLES LIKE 'sql_mode'")
  
-     def moretableinfo(self, connection, table, charset=None):
-         """SHOW CREATE TABLE to get foreign key/table options."""
- 
--        rp = connection.execute("SHOW CREATE TABLE " + self._escape_table_name(table), {})
-+        rp = connection.execute("SHOW CREATE TABLE " + self._escape_table_name(table))###, {})
-         row = _compat_fetch(rp, one=True, charset=charset)
+-        row = _compat_fetchone(
+-            connection.execute("SHOW VARIABLES LIKE 'sql_mode'",
+-                               charset=charset))
++        row = False###rs.fetchone()
          if not row:
-             raise exceptions.NoSuchTableError(table.fullname)
+             mode = ''
+         else:
+@@ -1826,7 +1464,7 @@
+                     raise exceptions.NoSuchTableError(full_name)
+                 else:
+                     raise
+-            row = _compat_fetchone(rp, charset=charset)
++            row = rp.fetchone()
+             if not row:
+                 raise exceptions.NoSuchTableError(full_name)
+             return row[1].strip()
+@@ -1853,7 +1491,7 @@
+                     raise exceptions.NoSuchTableError(full_name)
+                 else:
+                     raise
+-            rows = _compat_fetchall(rp, charset=charset)
++            rows = rp.fetchone()
+         finally:
+             if rp:
+                 rp.close()
+@@ -2680,7 +2318,7 @@
+ def _compat_fetchone(rp, charset=None):
+     """Proxy a result row to smooth over MySQL-Python driver inconsistencies."""
+ 
+-    return _MySQLPythonRowProxy(rp.fetchone(), charset)
++    return _MySQLPythonRowProxy(rp.fetchone())
+ 
+ def _pr_compile(regex, cleanup=None):
+     """Prepare a 2-tuple of compiled regex and callable."""
