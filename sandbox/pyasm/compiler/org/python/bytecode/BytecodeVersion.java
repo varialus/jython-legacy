@@ -3,8 +3,6 @@ package org.python.bytecode;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.python.newcompiler.pbc.Context;
-
 /**
  * This enum represents the different versions of Python byte code with corresponding magic numbers
  * and available opcodes.
@@ -58,7 +56,7 @@ public enum BytecodeVersion {
     Python_2_5a0__ast(62081),
     /** with statement */
     Python_2_5a0__with(62091),
-    /** changed {@link PythonOpCode#WITH_CLEANUP} opcode */
+    /** changed {@link BytecodeInstruction#WITH_CLEANUP} opcode */
     Python_2_5a0__with_changed(62092),
     /** fix of wrong code for <code>for x, in ...</code> */
     Python_2_5b3__fix1(62101),
@@ -71,14 +69,14 @@ public enum BytecodeVersion {
     /** fix of wrong code for <code>for x, in ...</code> in listcomp/genexp */
     Python_2_5c2(62131),
     // Python 2.6
-    /** peephole optimizations and STORE_MAP opcode */
+    /** peephole optimizations and {@link BytecodeInstruction#STORE_MAP} opcode */
     Python_2_6a0(62151),
     // Python 3.0
     /** Python 3000, initial branch */
     Python_3000(3000),
-    /** removed {@link PythonOpCode#UNARY_CONVERT} */
+    /** removed {@link BytecodeInstruction#UNARY_CONVERT} */
     Python_3000__remove_convert(3010),
-    /** added {@link PythonOpCode#BUILD_SET} */
+    /** added {@link BytecodeInstruction#BUILD_SET} */
     Python_3000__build_set(3020),
     /** added keyword-only parameters */
     Python_3000__keyword_only(3030),
@@ -121,7 +119,8 @@ public enum BytecodeVersion {
     }
 
     /**
-     * Get the {@link BytecodeInstruction} object of the specified opcode in this {@link Context}.
+     * Get the {@link BytecodeInstruction} object of the specified opcode in this
+     * {@link BytecodeVersion}.
      * 
      * @param opCode
      *            The opcode to get the {@link BytecodeInstruction} for.

@@ -464,6 +464,18 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         }
     },
     /**
+     * Store a key and value pair in a dictionary. Pops the key and value while leaving the dictionary on the stack.
+     * 
+     * Stack: elementA, elementB, elementC -> elementX
+     * 
+     * Side effect: elementX[elementY] = elementZ
+     * 
+     * TODO: mapping from A,B,C to X,Y,Z
+     */
+    STORE_MAP(54,false, BytecodeVersion.Python_2_6a0,null){
+        
+    },
+    /**
      * Add the top stack element to the second stack element in-place.
      * 
      * Stack: element1, element2 -> element2 + element1
