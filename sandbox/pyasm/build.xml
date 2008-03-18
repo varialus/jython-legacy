@@ -10,6 +10,10 @@
   <property name="jdk.source.version" value="1.5"/>
   <property name="agent.class" value="org.python.javaagent.DeferringAgent"/>
 
+  <path id="jython.class.path">
+  	<pathelement location="${jython.dir}/build/classes"/>
+  </path>
+
   <target name="all" depends="pyasm-copy,agent,script"/>
 
   <target name="jython">
@@ -33,6 +37,7 @@
            source="${jdk.source.version}" target="${jdk.target.version}"> 
       <src path="${agent.dir}"/>
       <src path="${compiler.dir}"/>
+      <classpath refid="jython.class.path" />
    </javac>
   </target>
 
