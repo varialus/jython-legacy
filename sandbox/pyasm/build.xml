@@ -3,7 +3,15 @@
   <property file="${basedir}/build.properties"/>
   <property name="dist.dir" value="${jython.dir}/dist"/>
   <property name="script.file" value="${jython.dir}/jython"/>
-  
+  <property name="agent.dir" value="${basedir}/agent"/>
+  <property name="compiler.dir" value="${basedir}/compiler"/>
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="jdk.target.version" value="1.5"/>
+  <property name="jdk.source.version" value="1.5"/>
+  <property name="agent.class" value="org.python.javaagent.DeferringAgent"/>
+
+  <target name="all" depends="pyasm-copy,agent,script"/>
+
   <target name="jython">
     <ant dir="${jython.dir}" target="developer-build" inheritAll="false"/>
   </target>
@@ -19,6 +27,39 @@
     </copy>
   </target>
 
+  <target name="compile">
+    <mkdir dir="${build.dir}"/>
+    <javac destdir="${build.dir}"
+           source="${jdk.source.version}" target="${jdk.target.version}"> 
+      <src path="${agent.dir}"/>
+      <src path="${compiler.dir}"/>
+   </javac>
+  </target>
+
+  <target name="agent" depends="compile">
+    <jar destfile="${dist.dir}/agent.jar" update="true">
+      <fileset dir="${build.dir}">
+	<include name="org/python/javaagent/**" />
+      </fileset>
+      <manifest>
+	<!-- Instrumentation agent, for a more dynamic newcompiler -->
+	<attribute name="Premain-Class" value="${agent.class}" />
+	<attribute name="Can-Redefine-Classes" value="true" />
+	<!-- Java 6 stuff, more powerful agents -->
+	<attribute name="Agent-Class" value="${agent.class}" />
+	<attribute name="Can-Retransform-Classes" value="true" />
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="compiler" depends="compile">
+    <jar destfile="${dist.dir}/compiler.jar" update="true">
+      <fileset dir="${build.dir}">
+	<exclude name="org/python/javaagent/**" />
+      </fileset>
+    </jar>
+  </target>
+
   <target name="script">
     <echo file="${script.file}">#!/bin/sh
 EXE=$0
@@ -26,15 +67,20 @@ while [ -L "$EXE" ]; do
     EXE=`readlink $EXE`
 done
 BASE=`dirname $EXE`
+AGENT=$BASE/dist/agent.jar
 JVMFLAGS="-server -Dpython.home=$BASE/dist/ -Dpython.executable=$0 $JVMFLAGS"
+if [ -e $AGENT ]; then
+      JVMFLAGS="$JVMFLAGS -javaagent:$AGENT"
+fi
 ###JVMFLAGS="$JVMFLAGS -Djava.security.policy=${BASE}security.policy"
 #JVMFLAGS="$JVMFLAGS -Dcom.sun.management.jmxremote"
 REQ=$BASE/extlibs/asm-3.1.jar
+REQ=$REQ:$BASE/build/jarjar.jar
 REQ=$REQ:$BASE/extlibs/asm-commons-3.1.jar
 REQ=$REQ:$BASE/extlibs/asm-util-3.1.jar
 REQ=$REQ:$BASE/extlibs/junit-3.8.2.jar
-REQ=$REQ:$BASE/build/exposed/
-REQ=$REQ:$BASE/build/classes/
+REQ=$REQ:$BASE/extlibs/jython-engine.jar
+REQ=$REQ:$BASE/dist/jython.jar
 if [ "$CLASSPATH" = "" ]; then
     CLASSPATH=.
 fi

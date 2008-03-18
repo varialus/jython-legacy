@@ -10,9 +10,12 @@ from StringIO import StringIO
 import string
 import struct
 from types import *#NoneType, EllipsisType, CodeType
-from org.python.newcompiler.pyasm import CodeReader
-from org.python.newcompiler.pyasm.util import PythonDis
-from pyasm import ASMVisitor as CodeVisitor
+#from org.python.newcompiler.pyasm import CodeReader
+#from org.python.newcompiler.pyasm.util import PythonDis
+#from pyasm import ASMVisitor as CodeVisitor
+from org.python.bytecode import CharReader, BytecodeVersion, LineNumberBuilder,\
+    ConstantStore, ReferenceResolver, BytecodeInfo
+from newcompiler import Tracer
 from jarray import array
 from java.io import PrintWriter
 from java.lang.System import out
@@ -21,6 +24,41 @@ try:
     import new
 except ImportError:
     new = None
+
+class _Reader(CharReader):
+    def __init__(self, data):
+        self.index = 0
+        self.data = data
+    def hasData(self):
+        return self.index < len(self.data)
+    def read(self):
+        res = self.data[self.index]
+        self.index += 1
+        return res
+
+class _Constants(ConstantStore):
+    def __init__(self, names, varnames, cellvars, freevars, constants):
+        self.__names = names
+        self.__varnames = varnames
+        self.__cellvars = cellvars
+        self.__freevars = freevars
+        self.__constants = constants
+
+    def getName(self, index):
+        return self.__names[index]
+
+    def getVariableName(self, index):
+        return self.__varnames[index]
+
+    def getClosureName(self, index):
+        if index < len(self.__cellvars):
+            return self.__cellvars[index]
+        else:
+            return self.__freevars[index - len(self.__cellvars)]
+
+    def getConstant(self, index):
+        return self.__constants[index]
+
 
 def byteArray(string):
     return array(list(string),'c')
@@ -205,7 +243,7 @@ class NULL:
 class Unmarshaller:
 
     def __init__(self, f, magic=None):
-        self.magic = magic
+        self.version = BytecodeVersion.getVersion(magic)
         self.strings = []
         self.__visitor = None
 	self.f = f
@@ -356,44 +394,29 @@ class Unmarshaller:
     
 
     def load_code(self):
-        lastVisitor = self.__visitor
-        visitor= _visitor= self.__visitor= CodeVisitor(self.magic, lastVisitor)
-        if __debugging__: visitor = PythonDis(visitor, stdout, True)
-        try:
-            argcount = self.read_long()
-            nlocals = self.read_long()
-            stacksize = self.read_long()
-            flags = self.read_long()
-            code = self.load()
-            constants = self.load()
-            names = self.load()
-            varnames = self.load()
-            freevars = self.load()
-            cellvars = self.load()
-            filename = self.load()
-            name = self.load()
-            firstlineno = self.read_long()
-            lnotab = self.load()
+        argcount = self.read_long()
+        nlocals = self.read_long()
+        stacksize = self.read_long()
+        flags = self.read_long()
+        code = self.load()
+        constants = self.load()
+        names = self.load()
+        varnames = self.load()
+        freevars = self.load()
+        cellvars = self.load()
+        filename = self.load()
+        name = self.load()
+        firstlineno = self.read_long()
+        lnotab = self.load()
 
-            visitor.visitCode(
-                argcount,
-                nlocals,
-                stacksize,
-                flags,
-                constants,
-                names,
-                varnames,
-                freevars,
-                cellvars,
-                filename,
-                name,
-                firstlineno,)
-            CodeReader(byteArray(code), firstlineno,
-                       byteArray(lnotab)).accept(visitor)
-            
-            return _visitor.getCode()
-        finally:
-            self.__visitor = lastVisitor
+        store = _Constants(names, varnames, cellvars, freevars, constants)
+        lines = LineNumberBuilder(firstlineno, lnotab)
+        info = BytecodeInfo(name, filename, argcount, nlocals, stacksize, flags)
+
+        resolver = ReferenceResolver(self.version, store, _Reader(code), lines)
+        tracer = Tracer(info)
+        resolver.accept(tracer)
+        return tracer.reference
 
     def load_unicode(self):
         size = self.read_long()

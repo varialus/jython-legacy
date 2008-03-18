@@ -1,4 +1,4 @@
-import opcode, re
+#import opcode, re
 
 from org.python.newcompiler.pyasm import BytecodeVisitor as Visitor,\
     Operator, CodeFlags as Flags
