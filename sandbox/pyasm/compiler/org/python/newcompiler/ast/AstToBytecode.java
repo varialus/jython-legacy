@@ -225,10 +225,10 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
     private void buildContext(modType node) throws Exception {
         context = node.accept(new ContextBuilder());
     }
-    
+
     private void sendResumeTable() {
-        if(currentEnvironment.isReenterable()) {
-        compiler.visitResumeTable(new Label(), currentEnvironment.getEntryPoints());
+        if (currentEnvironment.isReenterable()) {
+            compiler.visitResumeTable(new Label(), currentEnvironment.getEntryPoints());
         }
     }
 

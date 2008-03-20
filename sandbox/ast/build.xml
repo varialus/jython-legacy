@@ -12,7 +12,7 @@
     </target>
 
     <target name="antlr_gen" depends="init">
-        <java classname="org.antlr.Tool">
+        <java classname="org.antlr.Tool" failonerror="true">
             <arg value="-fo"/>
             <arg path="build/gensrc/org/python/antlr"/>
             <arg value="-lib"/>

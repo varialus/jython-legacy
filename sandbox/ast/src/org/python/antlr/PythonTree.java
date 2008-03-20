@@ -9,6 +9,8 @@ import java.io.IOException;
 
 import org.antlr.runtime.RecognitionException;
 
+import org.python.antlr.ast.VisitorIF;
+
 public class PythonTree extends CommonTree {
 
     public PythonTree(Token token) {
@@ -20,33 +22,41 @@ public class PythonTree extends CommonTree {
     }
 
     public String toString() {
-		if ( isNil() ) {
-			return "None";
-		}
-		return token.getText();
-	}
+        if (isNil()) {
+            return "None";
+        }
+        return token.getText();
+    }
 
     public String toStringTree() {
-		if ( children==null || children.size()==0 ) {
-            //System.out.println("Where are my children?  -- asks " + token.getText());
-			return this.toString();
-		}
-		StringBuffer buf = new StringBuffer();
-		if ( !isNil() ) {
-			buf.append("(");
-			buf.append(this.toString());
-			buf.append(' ');
-		}
-		for (int i = 0; children!=null && i < children.size(); i++) {
-			BaseTree t = (BaseTree) children.get(i);
-			if ( i>0 ) {
-				buf.append(' ');
-			}
-			buf.append(t.toStringTree());
-		}
-		if ( !isNil() ) {
-			buf.append(")");
-		}
-		return buf.toString();
-	}
+        if (children == null || children.size() == 0) {
+            // System.out.println("Where are my children? -- asks " + token.getText());
+            return this.toString();
+        }
+        StringBuffer buf = new StringBuffer();
+        if (!isNil()) {
+            buf.append("(");
+            buf.append(this.toString());
+            buf.append(' ');
+        }
+        for (int i = 0; children != null && i < children.size(); i++) {
+            BaseTree t = (BaseTree)children.get(i);
+            if (i > 0) {
+                buf.append(' ');
+            }
+            buf.append(t.toStringTree());
+        }
+        if (!isNil()) {
+            buf.append(")");
+        }
+        return buf.toString();
+    }
+
+    public <R> R accept(VisitorIF<R> visitor) throws Exception {
+        throw new RuntimeException("Unexpected node: " + this);
+    }
+    
+    public void traverse(VisitorIF visitor) throws Exception {
+        throw new RuntimeException("Cannot traverse node: " + this);
+    }
 }

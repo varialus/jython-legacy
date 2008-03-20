@@ -1,4 +1,4 @@
-<project name="pyasm" default="pyasm-copy" basedir=".">
+<project name="newcompiler" default="all" basedir=".">
 
   <property file="${basedir}/build.properties"/>
   <property name="dist.dir" value="${jython.dir}/dist"/>
@@ -9,39 +9,80 @@
   <property name="jdk.target.version" value="1.5"/>
   <property name="jdk.source.version" value="1.5"/>
   <property name="agent.class" value="org.python.javaagent.DeferringAgent"/>
-
+  
   <path id="jython.class.path">
-  	<pathelement location="${jython.dir}/build/classes"/>
+    <pathelement location="${jython.dir}/build/classes"/>
+  </path>
+
+  <path id="ast.class.path">
+    <pathelement location="${ast.dir}/build"/>
   </path>
 
   <path id="antlr.runtime.path">
     <pathelement path="${jython.dir}/extlibs/antlr-runtime-3.0.1.jar"/>
   </path>
 
-  <target name="all" depends="pyasm-copy,agent,script"/>
+  <target name="all" depends="compiler,pyasm-copy,script"/>
 
+  <target name="clean">
+    <delete dir="build"/>
+  </target>
+
+  <target name="clean-all" depends="clean">
+    <ant dir="${ast.dir}" target="clean" inheritAll="false"/>
+    <ant dir="${jython.dir}" target="clean" inheritAll="false"/>
+  </target>    
+  
   <target name="jython">
     <ant dir="${jython.dir}" target="developer-build" inheritAll="false"/>
+  </target>
+
+  <target name="ast">
+    <echo>WARNING!!!
+      The ast build.xml has been known to fail on a few platforms,
+      manual build might be required. In that case, use this
+      build.xml file to figure out the dependancies. On the
+      platforms where the ast build fails it can be executed with:
+      .../sandbox/ast $ ant
+      [Generates all sources, then fails silently]
+      .../sandbox/ast $ ant compile
+      [Compiles the ast sources]
+      
+      After that you will need to remove or comment out the line
+      after this echo in this build file (the one that references
+      the ast/build.xml), so that this build will not try to re-
+      -build the ast.
+    </echo>
+    <ant dir="${ast.dir}" target="all" inheritAll="false"/>
+    <jar destfile="${dist.dir}/antlr-ast.jar" update="true">
+      <fileset dir="${ast.dir}/build">
+	<include name="org/python/antlr/**"/>
+      </fileset>
+    </jar>
   </target>
 
   <target name="pyasm-copy" depends="jython">
     <copy todir="${dist.dir}/Lib" preservelastmodified="true" overwrite="true">
       <fileset dir="${basedir}">
+	<include name="newcompiler.py"/>
 	<include name="marshal.py"/>
+	<include name="adapter.py"/>
 	<include name="pyasm.py"/>
 	<include name="opcode.py"/>
+	<include name="astimport.py"/>
 	<include name="pycimport.py"/>
       </fileset>
     </copy>
   </target>
 
-  <target name="compile">
+  <target name="compile" depends="ast,jython">
     <mkdir dir="${build.dir}"/>
     <javac destdir="${build.dir}"
            source="${jdk.source.version}" target="${jdk.target.version}"> 
       <src path="${agent.dir}"/>
       <src path="${compiler.dir}"/>
-      <classpath refid="jython.class.path" />
+      <classpath refid="jython.class.path"/>
+      <classpath refid="ast.class.path"/>
       <classpath refid="antlr.runtime.path" />
    </javac>
   </target>
@@ -49,15 +90,15 @@
   <target name="agent" depends="compile">
     <jar destfile="${dist.dir}/agent.jar" update="true">
       <fileset dir="${build.dir}">
-	<include name="org/python/javaagent/**" />
+	<include name="org/python/javaagent/**"/>
       </fileset>
       <manifest>
 	<!-- Instrumentation agent, for a more dynamic newcompiler -->
-	<attribute name="Premain-Class" value="${agent.class}" />
-	<attribute name="Can-Redefine-Classes" value="true" />
+	<attribute name="Premain-Class" value="${agent.class}"/>
+	<attribute name="Can-Redefine-Classes" value="true"/>
 	<!-- Java 6 stuff, more powerful agents -->
-	<attribute name="Agent-Class" value="${agent.class}" />
-	<attribute name="Can-Retransform-Classes" value="true" />
+	<attribute name="Agent-Class" value="${agent.class}"/>
+	<attribute name="Can-Retransform-Classes" value="true"/>
       </manifest>
     </jar>
   </target>
@@ -65,7 +106,7 @@
   <target name="compiler" depends="compile">
     <jar destfile="${dist.dir}/compiler.jar" update="true">
       <fileset dir="${build.dir}">
-	<exclude name="org/python/javaagent/**" />
+	<exclude name="org/python/javaagent/**"/>
       </fileset>
     </jar>
   </target>
@@ -77,6 +118,8 @@ while [ -L "$EXE" ]; do
     EXE=`readlink $EXE`
 done
 BASE=`dirname $EXE`
+ANTLR_AST=$BASE/dist/antlr-ast.jar
+COMPILER=$BASE/dist/compiler.jar
 AGENT=$BASE/dist/agent.jar
 JVMFLAGS="-server -Dpython.home=$BASE/dist/ -Dpython.executable=$0 $JVMFLAGS"
 if [ -e $AGENT ]; then
@@ -90,9 +133,16 @@ REQ=$REQ:$BASE/extlibs/asm-commons-3.1.jar
 REQ=$REQ:$BASE/extlibs/asm-util-3.1.jar
 REQ=$REQ:$BASE/extlibs/junit-3.8.2.jar
 REQ=$REQ:$BASE/extlibs/jython-engine.jar
+REQ=$REQ:$BASE/extlibs/antlr-runtime-3.0.1.jar
 REQ=$REQ:$BASE/dist/jython.jar
 if [ "$CLASSPATH" = "" ]; then
     CLASSPATH=.
+fi
+if [ -e $ANTLR_AST ]; then
+      CLASSPATH=$CLASSPATH:$ANTLR_AST
+fi
+if [ -e $COMPILER ]; then
+      CLASSPATH=$CLASSPATH:$COMPILER      
 fi
 if [ "$JAVA_HOME" != "" ]; then
     JAVA=$JAVA_HOME/bin/java
