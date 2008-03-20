@@ -8,7 +8,6 @@ public class ClassEnvironment extends AbstractEnvironment {
         super(parent);
     }
 
-    @Override
     public void addParameter(String name) {
         error(EnvironmentError.CANNOT_HAVE_PARAMETERS);
     }

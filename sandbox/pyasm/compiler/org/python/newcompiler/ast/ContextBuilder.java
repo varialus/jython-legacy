@@ -49,12 +49,10 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
 
     private int resumePoint = 0;
 
-    @Override
     public EnvironmentInfo getEnvironment(PythonTree tree) {
         return environmentMap.get(tree);
     }
 
-    @Override
     public YieldPoint getYieldPoint(exprType node) {
         return resumeTable.get(node);
     }
@@ -65,7 +63,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         resumeTable.put(node, new YieldPoint(label, resumePoint++));
     }
 
-    @Override
     public EnvironmentHolder visitClassDef(ClassDef node) throws Exception {
         // Class name
         currentEnvironment.addAssignment(node.name);
@@ -90,7 +87,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitFunctionDef(FunctionDef node) throws Exception {
         // Function name
         currentEnvironment.addAssignment(node.name);
@@ -136,7 +132,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitLambda(Lambda node) throws Exception {
         // Argument defaults
         if (node.args != null && node.args.defaults != null) {
@@ -172,7 +167,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitGeneratorExp(GeneratorExp node) throws Exception {
         for (comprehensionType comp : node.generators) {
             comp.iter.accept(this);
@@ -199,13 +193,11 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitExec(Exec node) throws Exception {
         currentEnvironment.markHasExec();
         return super.visitExec(node);
     }
 
-    @Override
     public EnvironmentHolder visitGlobal(Global node) throws Exception {
         for (String name : node.names) {
             currentEnvironment.markAsGlobal(name);
@@ -213,7 +205,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitName(Name node) throws Exception {
         switch(node.ctx){
             case AugLoad:
@@ -241,7 +232,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitImport(Import node) throws Exception {
         for (aliasType alias : node.names) {
             String[] names = alias.name.split(".");
@@ -251,7 +241,6 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitImportFrom(ImportFrom node) throws Exception {
         if (node.module.equals(Future.signature)) {
             if (node.names != null && node.names.length != 0) {
@@ -273,34 +262,29 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
         return unhandled_node(node);
     }
 
-    @Override
     public EnvironmentHolder visitYield(Yield node) throws Exception {
         addYieldPoint(node);
         return super.visitYield(node);
     }
 
-    @Override
     public EnvironmentHolder visitInteractive(Interactive node) throws Exception {
         assertTopLevel("Interactive");
         environmentMap.put(node, (EnvironmentInfo)currentEnvironment);
         return super.visitInteractive(node);
     }
 
-    @Override
     public EnvironmentHolder visitModule(Module node) throws Exception {
         assertTopLevel("Module");
         environmentMap.put(node, (EnvironmentInfo)currentEnvironment);
         return super.visitModule(node);
     }
 
-    @Override
     public EnvironmentHolder visitExpression(Expression node) throws Exception {
         assertTopLevel("Expression");
         environmentMap.put(node, (EnvironmentInfo)currentEnvironment);
         return super.visitExpression(node);
     }
 
-    @Override
     public EnvironmentHolder visitSuite(Suite node) throws Exception {
         assertTopLevel("Suite");
         environmentMap.put(node, (EnvironmentInfo)currentEnvironment);
@@ -314,12 +298,10 @@ public class ContextBuilder extends VisitorBase<EnvironmentHolder> implements En
     }
 
     // Generic ones
-    @Override
     public void traverse(PythonTree node) throws Exception {
         node.traverse(this);
     }
 
-    @Override
     protected EnvironmentHolder unhandled_node(PythonTree node) throws Exception {
         return this;
     }

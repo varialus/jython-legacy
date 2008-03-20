@@ -20,7 +20,6 @@ public class LineNumberBuilder implements LineNumberTable {
         }
     }
 
-    @Override
     public void visitInstruction(BytecodeVisitor visitor, int offset) {
         Integer lineNumber = table.get(offset);
         if(lineNumber != null) {

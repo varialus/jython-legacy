@@ -68,7 +68,6 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
             this.kind = JumpKind.REGULAR_JUMP;
         }
 
-        @Override
         public void accept(BytecodeVisitor visitor) {
             kind.jump(visitor, label);
         }
@@ -97,12 +96,10 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
         }
     }
 
-    @Override
     public boolean hasData() {
         return reader.hasData();
     }
 
-    @Override
     public char read() {
         pos++;
         return reader.read();
@@ -192,219 +189,182 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
         }
     }
 
-    @Override
     public void visitInstruction(Instruction instr) {
         instructions.put(pos, instr);
     }
 
-    @Override
     public void visitStop(Instruction stop) {
         visitInstruction(stop);
         reader = null;
         store = null;
     }
 
-    @Override
     public void visitYield() {
         YieldPoint yield = new YieldPoint(new Label(), ++resumePoint);
         resumeTable.add(yield);
         visitInstruction(yield);
     }
 
-    @Override
     public void visitAbsouteJump(int addr) {
         visitInstruction(new JumpInstruction(label(addr)));
     }
 
-    @Override
     public void visitJumpIfFalse(int delta) {
         visitInstruction(new JumpInstruction(relative(delta), false));
     }
 
-    @Override
     public void visitJumpIfTrue(int delta) {
         visitInstruction(new JumpInstruction(relative(delta), true));
     }
 
-    @Override
     public void visitRelativeJump(int delta) {
         visitInstruction(new JumpInstruction(relative(delta)));
     }
 
-    @Override
     public void visitContinue(int addr) {
         final Label label = label(addr);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitContinue(label);
             }
         });
     }
 
-    @Override
     public void visitDelete(final VariableContext context, int nameIndex) {
         final String name = lookup(context, nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitDelete(context, name);
             }
         });
     }
 
-    @Override
     public void visitDeleteAttribute(int nameIndex) {
         final String name = lookupName(nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitDeleteAttribute(name);
             }
         });
     }
 
-    @Override
     public void visitForIteration(int delta) {
         final Label label = relative(delta);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitForIteration(label);
             }
         });
     }
 
-    @Override
     public void visitImportFrom(int nameIndex) {
         final String name = lookupName(nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitImportFrom(name);
             }
         });
     }
 
-    @Override
     public void visitImportName(int nameIndex) {
         final String name = lookupName(nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitImportName(name);
             }
         });
     }
 
-    @Override
     public void visitLoad(final VariableContext context, int nameIndex) {
         final String name = lookup(context, nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitLoad(context, name);
             }
         });
     }
 
-    @Override
     public void visitLoadAttribute(int nameIndex) {
         final String name = lookupName(nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitLoadAttribute(name);
             }
         });
     }
 
-    @Override
     public void visitLoadClosure(int nameIndex) {
         final String name = lookup(VariableContext.CLOSURE, nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitLoadClosure(name);
             }
         });
     }
 
-    @Override
     public void visitLoadConstant(int constIndex) {
         final PyObject constant = lookupConstant(constIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitLoadConstant(constant);
             }
         });
     }
 
-    @Override
     public void visitSetupExcept(int delta) {
         final Label label = relative(delta);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitSetupExcept(label);
             }
         });
     }
 
-    @Override
     public void visitSetupFinally(int delta) {
         final Label label = relative(delta);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitSetupFinally(label);
             }
         });
     }
 
-    @Override
     public void visitSetupLoop(int delta) {
         final Label label = relative(delta);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitSetupLoop(label);
             }
         });
     }
 
-    @Override
     public void visitStore(final VariableContext context, int nameIndex) {
         final String name = lookup(context, nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitStore(context, name);
             }
         });
     }
 
-    @Override
     public void visitStoreAttribute(int nameIndex) {
         final String name = lookupName(nameIndex);
         visitInstruction(new Instruction() {
 
-            @Override
             public void accept(BytecodeVisitor visitor) {
                 visitor.visitStoreAttribute(name);
             }

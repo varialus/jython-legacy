@@ -15,7 +15,6 @@ public class YieldPoint implements Instruction {
         this.index = index;
     }
 
-    @Override
     public void accept(BytecodeVisitor visitor) {
         visitor.visitYield(index, label);
     }

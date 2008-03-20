@@ -56,46 +56,38 @@ abstract class AbstractEnvironment implements Environment, EnvironmentInfo, Code
         }
     }
 
-    @Override
     public void markHasExec() {
         flags.add(CompilerFlag.HAVE_EXEC);
     }
 
-    @Override
     public GlobalEnvironment getGlobalEnvironment() {
         return parent.getGlobalEnvironment();
     }
 
-    @Override
     public void addAssignment(String name) {
         if (!(globals.contains(name) || nonlocals.contains(name))) {
             locals.add(name);
         }
     }
 
-    @Override
     public void addReference(String name) {
         if (!(globals.contains(name) || enclosing.contains(name))) {
             locals.add(name);
         }
     }
     
-    @Override
     public void addEntryPoint(Label entry) {
         error(EnvironmentError.ILLEGAL_GENERATOR);
     }
     
-    @Override
     public boolean isReenterable() {
         return false;
     }
     
-    @Override
     public Iterable<Label> getEntryPoints() {
         throw new NotImplementedException();
     }
     
-    @Override
     public void markAsGlobal(String name) {
         if (nonlocals.contains(name)) {
             error(EnvironmentError.BOTH_NONLOCAL_AND_GLOBAL);
@@ -107,7 +99,6 @@ abstract class AbstractEnvironment implements Environment, EnvironmentInfo, Code
         }
     }
 
-    @Override
     public void markAsNonlocal(String name) {
         if (globals.contains(name)) {
             error(EnvironmentError.BOTH_NONLOCAL_AND_GLOBAL);
@@ -118,7 +109,6 @@ abstract class AbstractEnvironment implements Environment, EnvironmentInfo, Code
         }
     }
 
-    @Override
     public void addFuture(String feature) throws Exception {
         error(EnvironmentError.FUTURE_OUT_OF_CONTEXT);
     }
@@ -133,19 +123,16 @@ abstract class AbstractEnvironment implements Environment, EnvironmentInfo, Code
     }
 
     // EnvironmentInfo
-    @Override
     public VariableContext getVariableContextFor(String id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public Iterable<String> closureVariables() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public Set<CompilerFlag> getCompilerFlags() {
         return Collections.unmodifiableSet(flags);
     }

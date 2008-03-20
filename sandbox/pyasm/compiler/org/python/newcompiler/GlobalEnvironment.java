@@ -15,7 +15,6 @@ public class GlobalEnvironment extends AbstractEnvironment {
         return this;
     }
 
-    @Override
     public void addParameter(String name) {
         error(EnvironmentError.CANNOT_HAVE_PARAMETERS);
     }

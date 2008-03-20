@@ -33,27 +33,22 @@ public class BytecodeInfo implements CodeInfo {
         this.flags = CompilerFlag.parseFlags(flags);
     }
 
-    @Override
     public int getArgumentCount() {
         return argcount;
     }
 
-    @Override
     public String getFilename() {
         return filename;
     }
 
-    @Override
     public int getLocalsCount() {
         return nlocals;
     }
 
-    @Override
     public int getMaxStackSize() {
         return stacksize;
     }
 
-    @Override
     public String getName() {
         return name;
     }

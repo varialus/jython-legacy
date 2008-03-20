@@ -152,7 +152,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private static final CompileAction printResult = new CompileAction() {
 
-        @Override
         public boolean perform(BytecodeVisitor compiler) {
             compiler.visitPrintExpression();
             return false;
@@ -161,7 +160,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private static final CompileAction popResult = new CompileAction() {
 
-        @Override
         public boolean perform(BytecodeVisitor compiler) {
             compiler.visitPop();
             return false;
@@ -170,7 +168,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private static final CompileAction returnResult = new CompileAction() {
 
-        @Override
         public boolean perform(BytecodeVisitor compiler) {
             compiler.visitReturn();
             return true;
@@ -179,7 +176,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private static final CompileAction returnNone = new CompileAction() {
 
-        @Override
         public boolean perform(BytecodeVisitor compiler) {
             compiler.visitLoadConstant(Py.None);
             compiler.visitReturn();
@@ -189,7 +185,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private static final ConditionalAction jumpIfTrue = new ConditionalAction() {
 
-        @Override
         public void perform(BytecodeVisitor compiler, Label dest) {
             compiler.visitJumpIfTrue(dest);
         }
@@ -197,7 +192,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private static final ConditionalAction jumpIfFalse = new ConditionalAction() {
 
-        @Override
         public void perform(BytecodeVisitor compiler, Label dest) {
             compiler.visitJumpIfTrue(dest);
         }
@@ -239,7 +233,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
     }
 
     // Top level items
-    @Override
     public BytecodeBundle visitModule(Module node) throws Exception {
         buildContext(node);
         EnvironmentInfo oldEnvironment = currentEnvironment;
@@ -259,7 +252,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitExpression(Expression node) throws Exception {
         buildContext(node);
         EnvironmentInfo oldEnvironment = currentEnvironment;
@@ -277,7 +269,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitInteractive(Interactive node) throws Exception {
         buildContext(node);
         EnvironmentInfo oldEnvironment = currentEnvironment;
@@ -297,14 +288,12 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitSuite(Suite node) throws Exception {
         throw new RuntimeException("Hit a Suite element, what is this for?");
         // return bundle;
     }
 
     // Scoping items
-    @Override
     public BytecodeBundle visitClassDef(ClassDef node) throws Exception {
         CompileAction old_action = expr_action;
         expr_action = popResult;
@@ -349,7 +338,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitFunctionDef(FunctionDef node) throws Exception {
         CompileAction old_action = expr_action;
         expr_action = popResult;
@@ -405,7 +393,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitLambda(Lambda node) throws Exception {
         CompileAction old_action = expr_action;
         expr_action = popResult;
@@ -443,7 +430,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitGeneratorExp(GeneratorExp node) throws Exception {
         // FIXME: the semantics of this is quite hard, it is broken at the moment
         CompileAction old_action = expr_action;
@@ -506,7 +492,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
     }
 
     // Receives special treatment depending on context
-    @Override
     public BytecodeBundle visitExpr(Expr node) throws Exception {
         node.value.accept(this);
         lastStatementWasReturn = expr_action.perform(compiler);
@@ -514,7 +499,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
     }
 
     // The rest of the stuff :)
-    @Override
     public BytecodeBundle visitAssert(Assert node) throws Exception {
         Label ok = new Label();
         node.test.accept(this);
@@ -533,7 +517,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitAssign(Assign node) throws Exception {
         node.value.accept(this);
         int lastPos = node.targets.length - 1;
@@ -547,7 +530,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitAttribute(Attribute node) throws Exception {
         node.value.accept(this);
         switch(node.ctx){
@@ -572,7 +554,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitAugAssign(AugAssign node) throws Exception {
         if (node.target instanceof Attribute) {
             Attribute attrib = (Attribute)node.target;
@@ -605,7 +586,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitBinOp(BinOp node) throws Exception {
         node.left.accept(this);
         node.right.accept(this);
@@ -613,7 +593,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitBoolOp(BoolOp node) throws Exception {
         ConditionalAction jump;
         switch(node.op){
@@ -638,14 +617,12 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitBreak(Break node) throws Exception {
         compiler.visitBreak();
         lastStatementWasReturn = false;
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitCall(Call node) throws Exception {
         node.func.accept(this);
         int argCount = 0, kwCount = 0;
@@ -671,7 +648,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitCompare(Compare node) throws Exception {
         if (node.comparators.length != node.ops.length) {
             // TODO: error!
@@ -703,13 +679,11 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitContinue(Continue node) throws Exception {
         compiler.visitContinue(nearestLoop);
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitDelete(Delete node) throws Exception {
         for (exprType target : node.targets) {
             target.accept(this);
@@ -718,7 +692,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitDict(Dict node) throws Exception {
         compiler.visitBuildMap(0);
         if (node.keys != null || node.values != null) {
@@ -736,13 +709,11 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitEllipsis(Ellipsis node) throws Exception {
         compiler.visitLoadConstant(Py.Ellipsis);
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitExec(Exec node) throws Exception {
         node.body.accept(this);
         if (node.globals != null) {
@@ -760,7 +731,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitExtSlice(ExtSlice node) throws Exception {
         for (sliceType slice : node.dims) {
             slice.accept(this);
@@ -769,26 +739,22 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitFor(For node) throws Exception {
         // TODO Auto-generated method stub
         lastStatementWasReturn = false;
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitListComp(ListComp node) throws Exception {
         // TODO Auto-generated method stub
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitGlobal(Global node) throws Exception {
         // This is a pragma, handled by the pre-parser.
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitIf(If node) throws Exception {
         ConditionalAction jump;
         exprType test;
@@ -820,7 +786,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitIfExp(IfExp node) throws Exception {
         node.test.accept(this);
         Label orelse = new Label();
@@ -836,27 +801,23 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitImport(Import node) throws Exception {
         // TODO Auto-generated method stub
         lastStatementWasReturn = false;
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitImportFrom(ImportFrom node) throws Exception {
         // TODO Auto-generated method stub
         lastStatementWasReturn = false;
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitIndex(Index node) throws Exception {
         node.value.accept(this);
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitList(List node) throws Exception {
         for (exprType value : node.elts) {
             value.accept(this);
@@ -865,13 +826,11 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitName(Name node) throws Exception {
         compiler.visitLoad(currentEnvironment.getVariableContextFor(node.id), node.id);
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitNum(Num node) throws Exception {
         PyObject num;
         if (node.n instanceof PyObject) {
@@ -889,13 +848,11 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitPass(Pass node) throws Exception {
         lastStatementWasReturn = false;
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitPrint(Print node) throws Exception {
         if (node.dest != null) {
             node.dest.accept(this);
@@ -931,7 +888,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitRaise(Raise node) throws Exception {
         int numArgs = 0;
         if (node.type != null) {
@@ -951,14 +907,12 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitRepr(Repr node) throws Exception {
         node.value.accept(this);
         compiler.visitUnaryOperator(UnaryOperator.CONVERT);
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitReturn(Return node) throws Exception {
         if (node.value != null) {
             node.value.accept(this);
@@ -970,7 +924,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitSlice(Slice node) throws Exception {
         if (node.lower != null) {
             node.lower.accept(this);
@@ -991,13 +944,11 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitStr(Str node) throws Exception {
         compiler.visitLoadConstant(new PyString(node.s));
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitSubscript(Subscript node) throws Exception {
         node.value.accept(this);
         if (node.slice instanceof Slice) {
@@ -1044,7 +995,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitTryExcept(TryExcept node) throws Exception {
         Label handle = new Label();
         Label after = new Label();
@@ -1107,7 +1057,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitTryFinally(TryFinally node) throws Exception {
         Label handle = new Label();
         compiler.visitSetupFinally(handle);
@@ -1125,7 +1074,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitTuple(Tuple node) throws Exception {
         // NOTE: opportunity for constant folding
         for (exprType expr : node.elts) {
@@ -1135,20 +1083,17 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitUnaryOp(UnaryOp node) throws Exception {
         node.operand.accept(this);
         compiler.visitUnaryOperator(unaryOperator(node.op));
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitUnicode(Unicode node) throws Exception {
         compiler.visitLoadConstant(new PyUnicode(node.s));
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitWhile(While node) throws Exception {
         Label start = new Label();
         Label end = new Label();
@@ -1175,7 +1120,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitWith(With node) throws Exception {
         node.context_expr.accept(this);
         CompilerVariable exitTicket = compiler.storeContextManagerExit();
@@ -1198,7 +1142,6 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         return bundle;
     }
 
-    @Override
     public BytecodeBundle visitYield(Yield node) throws Exception {
         if (node.value != null) {
             node.value.accept(this);

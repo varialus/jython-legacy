@@ -35,7 +35,6 @@ public class FunctionEnvironment extends AbstractEnvironment {
         parameters.add(name);
     }
 
-    @Override
     public void addParameter(String name) {
         if (parameters.add(name)) {
             locals.add(name);

@@ -967,7 +967,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitUnpackSequence(argument, false, 0);
                 }
@@ -998,7 +997,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
             final int before = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitUnpackSequence(before, true, after);
                 }
@@ -1076,7 +1074,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitDup(argument);
                 }
@@ -1120,7 +1117,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildTuple(argument);
                 }
@@ -1139,7 +1135,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildList(argument);
                 }
@@ -1157,7 +1152,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildMap(argument);
                 }
@@ -1173,7 +1167,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildSet(argument);
                 }
@@ -1215,7 +1208,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
             final ComparisonOperator operator = ComparisonOperator.values()[argument];
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitCompareOperator(operator);
                 }
@@ -1454,7 +1446,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitRaise(argument);
                 }
@@ -1476,7 +1467,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
             final int numKey = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitCall(false, false, numPos, numKey);
                 }
@@ -1495,7 +1485,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildFunction(false, argument);
                 }
@@ -1513,7 +1502,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildSlice(argument);
                 }
@@ -1534,7 +1522,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         protected void acceptRaw(RawBytecodeVisitor visitor, final int argument) {
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitBuildFunction(true, argument);
                 }
@@ -1596,7 +1583,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
             final int numKey = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitCall(true, false, numPos, numKey);
                 }
@@ -1618,7 +1604,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
             final int numKey = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitCall(false, true, numPos, numKey);
                 }
@@ -1640,7 +1625,6 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
             final int numKey = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
-                @Override
                 public void accept(BytecodeVisitor visitor) {
                     visitor.visitCall(true, true, numPos, numKey);
                 }
@@ -1704,12 +1688,10 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
         throw new RuntimeException("Unimplemented OpCode: " + this + " (arg=" + argument + ")");
     }
 
-    @Override
     public void acceptRaw(RawBytecodeVisitor visitor) {
         visitor.visitInstruction(this);
     }
 
-    @Override
     public void accept(BytecodeVisitor visitor) {
         throw new RuntimeException("Unimplemented OpCode: " + this + " (without argument)");
     }
