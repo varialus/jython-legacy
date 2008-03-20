@@ -14,6 +14,10 @@
   	<pathelement location="${jython.dir}/build/classes"/>
   </path>
 
+  <path id="antlr.runtime.path">
+    <pathelement path="${jython.dir}/extlibs/antlr-runtime-3.0.1.jar"/>
+  </path>
+
   <target name="all" depends="pyasm-copy,agent,script"/>
 
   <target name="jython">
@@ -38,6 +42,7 @@
       <src path="${agent.dir}"/>
       <src path="${compiler.dir}"/>
       <classpath refid="jython.class.path" />
+      <classpath refid="antlr.runtime.path" />
    </javac>
   </target>
 
