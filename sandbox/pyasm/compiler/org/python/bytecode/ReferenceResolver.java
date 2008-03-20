@@ -77,9 +77,19 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
 
     private int pos = 0;
 
+    private int lastPos = 0;
+
     private ConstantStore store;
 
     private LineNumberTable lnotab;
+
+    private final SortedMap<Integer, Instruction> instructions = new TreeMap<Integer, Instruction>();
+
+    private final Map<Integer, Label> labels = new HashMap<Integer, Label>();
+
+    private int resumePoint = 0;
+
+    private List<YieldPoint> resumeTable = new LinkedList<YieldPoint>();
 
     public ReferenceResolver(BytecodeVersion version,
                              ConstantStore store,
@@ -104,14 +114,6 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
         pos++;
         return reader.read();
     }
-
-    private final SortedMap<Integer, Instruction> instructions = new TreeMap<Integer, Instruction>();
-
-    private final Map<Integer, Label> labels = new HashMap<Integer, Label>();
-
-    private int resumePoint = 0;
-
-    private List<YieldPoint> resumeTable = new LinkedList<YieldPoint>();
 
     private Label label(int addr) {
         Label label = labels.get(addr);
@@ -180,17 +182,18 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
             });
         }
         for (Map.Entry<Integer, Instruction> mapping : instructions.entrySet()) {
+            lnotab.visitInstruction(visitor, mapping.getKey());
             Label label = labels.get(mapping.getKey());
             if (label != null) {
                 visitor.visitLabel(label);
             }
-            lnotab.visitInstruction(visitor, mapping.getKey());
             mapping.getValue().accept(visitor);
         }
     }
 
     public void visitInstruction(Instruction instr) {
-        instructions.put(pos, instr);
+        instructions.put(lastPos, instr);
+        lastPos = pos;
     }
 
     public void visitStop(Instruction stop) {

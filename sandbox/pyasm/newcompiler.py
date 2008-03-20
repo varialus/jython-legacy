@@ -35,6 +35,8 @@ def method(resType, name, *argTypes):
     return Method.getMethod("%s %s (%s)" % (
             resType.getDescriptor(), name, ",".join([
                     arg.getDescriptor() for arg in argTypes])))
+def constructor(*argTypes):
+    return method(voidType, "<init>", *argTypes)
 
 def stringArray(*lst):
     return array(lst,java.lang.String)
@@ -124,8 +126,8 @@ class CodeReference(object):
         return "CodeReference(%s)" % (self.__info,)
     def __getattr__(self,attr):
         def meth(*args):
-            print "pyasm.%s%s" % (attr,args)
-        return visit
+            print "%s.%s%s" % (self,attr,args)
+        return meth
 
 class PyAsmCompiler(BytecodeCompiler):
     def __init__(self, codeinfo):
@@ -247,6 +249,7 @@ class PyAsmCompiler(BytecodeCompiler):
         pass # TODO: implement this with good block management
     
     def visitBuildClass(self):
+        # TODO: something with newLocal, this needs to be prettier
         sequenceType = getType(core.PySequenceList)
         bases = self.newLocal(getArrayType(pyObjectType), "bases")
         dict = self.newLocal(pyObjectType, "dict")
@@ -266,36 +269,116 @@ class PyAsmCompiler(BytecodeCompiler):
 
     
     def visitBuildFunction(self, closure, numDefault):
-        pass
-    
-    def visitBuildList(self, size):
-        pass
-    
-    def visitBuildMap(self, zero):
-        pass
-    
-    def visitBuildSet(self, size):
-        pass
-    
-    def visitBuildSlice(self, numIndices):
-        pass
+        code = self.newTemp(pyCodeType)
+        code.store()
+        if closue:
+            cell = self.newTemp(pySequenceType)
+            cell.store()
+            init = constructor(pyObjectType,  # globals
+                               pyObjectArray, # defaults
+                               pyCodeType,    # code
+                               pyObjectArray) # closure_cells
+        else:
+            cell = None
+            init = constructor(pyObjectType,  # globals
+                               pyObjectArray, # defaults
+                               pyCodeType)    # code
+        self.newPopulatedArray(pyObjectType, numDefault)
+        default = self.newTemp(pyObjectArray)
+        default.store()
+        self.asm.newInstance(pyFunctionType)
+        self.asm.dup()
+        self.loadFrame()
+        self.asm.getField(pyFrameType, "f_globals", pyObjectType)
+        default.load(); default.end()
+        code.load(); code.end()
+        if closure:
+            cell.load(); cell.end()
+            self.asm.invokeVirtual(pySequenceType,
+                                   method(pyObjectType, "getArray"))
+        self.asm.invokeConstructor(pyFunctionType, init)
     
     def visitBuildTuple(self, size):
-        pass
+        self.buildSequence(pyTupleType, size)
+
+    def visitBuildList(self, size):
+        self.buildSequence(pyListType, size)
+    
+    def visitBuildSet(self, size):
+        self.buildSequence(pySetType, size)
+    
+    def visitBuildMap(self, zero):
+        assert zero == 0
+        self.asm.newInstance(pyDictType)
+        self.asm.dup()
+        self.asm.invokeConstructor(pyDictType, constructor())
+    
+    def visitBuildSlice(self, numIndices):
+        if numargs == 3:
+            pass
+        if numargs == 2:
+            self.push(None)
+        else:
+            raise TypeError("Can only build slices from 2 or 3 arguments.")
+        step = self.newTemp(pyObjectType)
+        step.store()
+        self.asm.newInstance(pySliceType)
+        self.asm.dup()
+        self.asm.dup2X2()
+        self.asm.pop()
+        self.asm.pop()
+        step.load(); step.end()
+        self.asm.invokeConstructor(pySliceType, constructor(*[pyObjectType]*3))
     
     def visitCall(self, varPos, varKey, numPos, numKey):
+        # FIXME: implement this
         pass
     
-    def visitContinue(self, destination):
+    def visitContinue(self, loopStart):
+        # FIXME: implement this with nice new block subsystem
+        pass
+    
+    def visitLoadConstant(self, constant):
+        pass
+    
+    def visitLoadClosure(self, variable):
+        self.loadFrame()
+        # todo getIndex
+    
+    def visitLoadLocals(self):
+        pass
+    
+    def visitLoad(self, context, name):
+        pass
+    
+    def visitStore(self, context, name):
         pass
     
     def visitDelete(self, context, name):
+        pass
+
+    def visitLoadAttribute(self, attr):
+        pass
+    
+    def visitStoreAttribute(self, attr):
         pass
     
     def visitDeleteAttribute(self, attr):
         pass
     
+    def visitLoadSlice(self, mode):
+        pass
+    
+    def visitStoreSlice(self, mode):
+        pass
+    
     def visitDeleteSlice(self, mode):
+        pass
+    
+    def visitLoadSubscript(self):
+        pass
+
+    def visitStoreSubscript(self):
         pass
     
     def visitDeleteSubscript(self):
@@ -339,28 +422,7 @@ class PyAsmCompiler(BytecodeCompiler):
     
     def visitListAppend(self):
         pass
-    
-    def visitLoad(self, context, name):
-        pass
-    
-    def visitLoadAttribute(self, attr):
-        pass
-    
-    def visitLoadClosure(self, variable):
-        pass
-    
-    def visitLoadConstant(self, constant):
-        pass
-    
-    def visitLoadLocals(self):
-        pass
-    
-    def visitLoadSlice(self, mode):
-        pass
-    
-    def visitLoadSubscript(self):
-        pass
-    
+        
     def visitNop(self):
         pass
     
@@ -404,18 +466,6 @@ class PyAsmCompiler(BytecodeCompiler):
         pass
     
     def visitSetupLoop(self, end):
-        pass
-    
-    def visitStore(self, context, name):
-        pass
-    
-    def visitStoreAttribute(self, attr):
-        pass
-    
-    def visitStoreSlice(self, mode):
-        pass
-    
-    def visitStoreSubscript(self):
         pass
     
     def visitUnpackSequence(self, before, hasStar, after):

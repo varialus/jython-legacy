@@ -1463,8 +1463,8 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
 
         @Override
         protected void acceptRaw(RawBytecodeVisitor visitor, int argument) {
-            final int numPos = argument >> 8;
-            final int numKey = argument % (1 << 8);
+            final int numKey = argument >> 8;
+            final int numPos = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
                 public void accept(BytecodeVisitor visitor) {
@@ -1579,8 +1579,8 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
 
         @Override
         protected void acceptRaw(RawBytecodeVisitor visitor, int argument) {
-            final int numPos = argument >> 8;
-            final int numKey = argument % (1 << 8);
+            final int numKey = argument >> 8;
+            final int numPos = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
                 public void accept(BytecodeVisitor visitor) {
@@ -1600,8 +1600,8 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
 
         @Override
         protected void acceptRaw(RawBytecodeVisitor visitor, int argument) {
-            final int numPos = argument >> 8;
-            final int numKey = argument % (1 << 8);
+            final int numKey = argument >> 8;
+            final int numPos = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
                 public void accept(BytecodeVisitor visitor) {
@@ -1621,8 +1621,8 @@ public enum BytecodeInstruction implements Instruction, RawInstruction {
 
         @Override
         protected void acceptRaw(RawBytecodeVisitor visitor, int argument) {
-            final int numPos = argument >> 8;
-            final int numKey = argument % (1 << 8);
+            final int numKey = argument >> 8;
+            final int numPos = argument % (1 << 8);
             visitor.visitInstruction(new Instruction() {
 
                 public void accept(BytecodeVisitor visitor) {

@@ -10,12 +10,12 @@ from StringIO import StringIO
 import string
 import struct
 from types import *#NoneType, EllipsisType, CodeType
-#from org.python.newcompiler.pyasm import CodeReader
-#from org.python.newcompiler.pyasm.util import PythonDis
-#from pyasm import ASMVisitor as CodeVisitor
 from org.python.bytecode import CharReader, BytecodeVersion, LineNumberBuilder,\
-    ConstantStore, ReferenceResolver, BytecodeInfo
-from newcompiler import Tracer
+    ReferenceResolver
+from org.python.newcompiler import CompilerFlag
+# change 'adapter' to 'newcompiler' when the newcompiler module replaces the
+# pyasm module.
+from adapter import Bundle, Constants, BytecodeInfo
 from jarray import array
 from java.io import PrintWriter
 from java.lang.System import out
@@ -35,30 +35,6 @@ class _Reader(CharReader):
         res = self.data[self.index]
         self.index += 1
         return res
-
-class _Constants(ConstantStore):
-    def __init__(self, names, varnames, cellvars, freevars, constants):
-        self.__names = names
-        self.__varnames = varnames
-        self.__cellvars = cellvars
-        self.__freevars = freevars
-        self.__constants = constants
-
-    def getName(self, index):
-        return self.__names[index]
-
-    def getVariableName(self, index):
-        return self.__varnames[index]
-
-    def getClosureName(self, index):
-        if index < len(self.__cellvars):
-            return self.__cellvars[index]
-        else:
-            return self.__freevars[index - len(self.__cellvars)]
-
-    def getConstant(self, index):
-        return self.__constants[index]
-
 
 def byteArray(string):
     return array(list(string),'c')
@@ -245,7 +221,7 @@ class Unmarshaller:
     def __init__(self, f, magic=None):
         self.version = BytecodeVersion.getVersion(magic)
         self.strings = []
-        self.__visitor = None
+        self.__bundle = None
 	self.f = f
 
     def load(self):
@@ -394,29 +370,47 @@ class Unmarshaller:
     
 
     def load_code(self):
-        argcount = self.read_long()
-        nlocals = self.read_long()
-        stacksize = self.read_long()
-        flags = self.read_long()
-        code = self.load()
-        constants = self.load()
-        names = self.load()
-        varnames = self.load()
-        freevars = self.load()
-        cellvars = self.load()
-        filename = self.load()
-        name = self.load()
-        firstlineno = self.read_long()
-        lnotab = self.load()
+        # FIXME: control flow in this function is ugly
+        # this is due to the marshal format of code objects,
+        # and the requirements of the old PBC compiler in the pyasm module,
+        # these are still enforeced upon us as long as we use the adapter mod.
+        oldBundle = self.__bundle
+        try:
+            if self.__bundle is None:
+                self.__bundle = Bundle()
+            bundle = self.__bundle
 
-        store = _Constants(names, varnames, cellvars, freevars, constants)
-        lines = LineNumberBuilder(firstlineno, lnotab)
-        info = BytecodeInfo(name, filename, argcount, nlocals, stacksize, flags)
+            store = Constants()
+            info = BytecodeInfo()
 
-        resolver = ReferenceResolver(self.version, store, _Reader(code), lines)
-        tracer = Tracer(info)
-        resolver.accept(tracer)
-        return tracer.reference
+            info._argcount = self.read_long()
+            info._nlocals = self.read_long()
+            info._stacksize = self.read_long()
+            flags = self.read_long()
+
+            compiler = bundle.compile("???SIGNATURE???", info,
+                                      CompilerFlag.parseFlags(flags), False)
+            code = self.load()
+            store.constants( self.load() )
+            store.names( self.load() )
+            store.varnames( self.load() )
+            store.freevars( self.load() )
+            store.cellvars( self.load() )
+            info._filename = self.load()
+            info._name = self.load()
+            firstlineno = self.read_long()
+            lnotab = self.load()
+
+            bundle._init()
+
+            lines = LineNumberBuilder(firstlineno, lnotab)
+            resolver = ReferenceResolver(self.version,store,_Reader(code),lines)
+
+            resolver.accept(compiler)
+
+            return bundle.loadHandle(None)
+        finally:
+            self.__bundle = oldBundle
 
     def load_unicode(self):
         size = self.read_long()

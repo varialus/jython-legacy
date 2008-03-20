@@ -10,6 +10,7 @@ public class LineNumberBuilder implements LineNumberTable {
     public LineNumberBuilder(int lineNumber, char[] lineNumberTable) {
         int bytecodeOffset = 0;
         this.table = new HashMap<Integer, Integer>();
+        table.put(bytecodeOffset, lineNumber);
         for (int i = 0; i < lineNumberTable.length;) {
             bytecodeOffset += lineNumberTable[i++];
             char lineInc = lineNumberTable[i++];

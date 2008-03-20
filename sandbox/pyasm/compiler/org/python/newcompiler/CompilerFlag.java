@@ -2,8 +2,6 @@ package org.python.newcompiler;
 
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -79,6 +77,16 @@ public enum CompilerFlag {
             }
         }
         return result;
+    }
+
+    public static int toBitFlags(Set<CompilerFlag> flags) {
+        int res = 0;
+        for (CompilerFlag flag : flags) {
+            if (flag.bitFlag != null) {
+                res = res | flag.bitFlag;
+            }
+        }
+        return res;
     }
 
     private boolean bitIn(int flags) {

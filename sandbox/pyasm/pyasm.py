@@ -10,6 +10,7 @@ from org.python.objectweb.asm.commons import GeneratorAdapter, Method,\
     TableSwitchGenerator
 try:
     from org.objectweb.asm.tree import analysis
+    from org.objectweb import asm as _asm
 except:
     __analysis__ = False
 else:
@@ -213,9 +214,9 @@ class ClassKeeper(object):
         byteArray = self.__cw.toByteArray()
 
         if __analysis__:
-            cn = asm.tree.ClassNode()
+            cn = _asm.tree.ClassNode()
             ## add this line to verify the generated java bytecode
-            #asm.ClassReader(byteArray).accept(cn, 0)
+            _asm.ClassReader(byteArray).accept(cn, 0)
 
             # Choose the level of error checking in the bytecode verification
             #analyzer = analysis.Analyzer(analysis.BasicInterpreter())
@@ -240,6 +241,8 @@ class ClassKeeper(object):
                     error = True
             if error:
                 raise RuntimeError, "An error occured, see output"
+            else:
+                print "Verification ok"
         
         return makeCode(self.__name, byteArray, self.__filename)
 
@@ -606,6 +609,7 @@ class ASMVisitor(Visitor):
         self.__labels = {}
         self.__codeSchedule = {}
         self.__tryBlocks = []
+        self.visitedLabels = set()
 
     def visitCode(self, argcount, nlocals, stacksize, flags, constants, names,
                   varnames, freevars, cellvars, filename, name, firstlineno):
@@ -616,9 +620,15 @@ class ASMVisitor(Visitor):
         self.__flags = flags         # long
         self.__constants = constants # (Py)Object[] - PyObject or coderef
         self.__names = names         # String[]
-        self.__varnames = list(varnames)   # String[]
-        self.__freevars = list(freevars)   # String[]
-        self.__cellvars = list(cellvars)   # String[]
+        if not isinstance(varnames, list):
+            varnames = list(varnames)   # String[]
+        self.__varnames = varnames
+        if not isinstance(freevars, list):
+            freevars = list(freevars)   # String[]
+        self.__freevars = freevars
+        if not isinstance(cellvars, list):
+            cellvars = list(cellvars)   # String[]
+        self.__cellvars = cellvars
         self.__filename = filename   # String
         self.__name = name           # String
         self.__firstlineno = firstlineno # long
@@ -657,7 +667,7 @@ class ASMVisitor(Visitor):
         a particular label.
         If code is None, this method returns a decorator..."""
         def addCode(code):
-            if label.visited:
+            if label in self.visitedLabels:
                 raise RuntimeError("The label '%s' has already been visited."
                                    " Cannot schedule code." % label)
             self.__codeSchedule.setdefault(label, []).append(code)
@@ -989,7 +999,7 @@ class ASMVisitor(Visitor):
         """ -- """
         # FIXME: in_try_block is a great patch by Nicholas Riley, but should
         # probably be refactored so that it is handeled in the block object.
-        in_try_block = False        
+        in_try_block = False
         for i in xrange(len(self.__blocks) -1,-1,-1):
             block = self.__blocks[i]
             if isinstance(block, LoopBlock):
@@ -1221,7 +1231,7 @@ class ASMVisitor(Visitor):
 
     def visitLabel(self, label):
         """ -- """
-        label.visited = True
+        self.visitedLabels.add(label)
         self.asm.visitLabel(self.label(label))
         for code in self.__codeSchedule.get(label,()):
             code()
