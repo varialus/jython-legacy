@@ -39,10 +39,10 @@ public interface RawBytecodeVisitor {
     void visitImportName(int nameIndex);
 
     void visitImportFrom(int nameIndex);
-    
+
     void visitInstruction(Instruction instruction);
 
     void visitContinue(int addr);
-    
+
     void visitYield();
 }

@@ -3,7 +3,7 @@ package org.python.bytecode;
 import org.python.core.PyObject;
 
 public interface BytecodeVisitor {
-    
+
     void visitLineNumber(int lineNumber);
 
     void visitStop();

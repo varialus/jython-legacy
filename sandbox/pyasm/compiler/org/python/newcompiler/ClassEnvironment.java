@@ -1,7 +1,5 @@
 package org.python.newcompiler;
 
-import org.python.bytecode.Label;
-
 public class ClassEnvironment extends AbstractEnvironment {
 
     public ClassEnvironment(Environment parent) {

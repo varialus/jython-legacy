@@ -1,19 +1,15 @@
 package org.python.newcompiler;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 
 import org.python.bytecode.Label;
 import org.python.bytecode.VariableContext;
 import org.python.newcompiler.EnvironmentError.EnvironmentProblem;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 abstract class AbstractEnvironment implements Environment, EnvironmentInfo, CodeInfo {
 
@@ -75,19 +71,19 @@ abstract class AbstractEnvironment implements Environment, EnvironmentInfo, Code
             locals.add(name);
         }
     }
-    
+
     public void addEntryPoint(Label entry) {
         error(EnvironmentError.ILLEGAL_GENERATOR);
     }
-    
+
     public boolean isReenterable() {
         return false;
     }
-    
+
     public Iterable<Label> getEntryPoints() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Only function environments have entry points.");
     }
-    
+
     public void markAsGlobal(String name) {
         if (nonlocals.contains(name)) {
             error(EnvironmentError.BOTH_NONLOCAL_AND_GLOBAL);

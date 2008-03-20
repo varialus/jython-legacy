@@ -1,15 +1,13 @@
 package org.python.newcompiler;
 
-import org.python.bytecode.Label;
-
 public class GlobalEnvironment extends AbstractEnvironment {
-    
+
     private boolean futureAllowed = true;
 
     public GlobalEnvironment() {
         super(null);
     }
-    
+
     @Override
     public GlobalEnvironment getGlobalEnvironment() {
         return this;
@@ -21,7 +19,7 @@ public class GlobalEnvironment extends AbstractEnvironment {
 
     @Override
     public void markAsGlobal(String name) {/* dropped */}
-    
+
     @Override
     public void addFuture(String feature) throws Exception {
         if (futureAllowed) {

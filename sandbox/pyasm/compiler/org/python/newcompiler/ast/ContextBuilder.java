@@ -3,8 +3,6 @@ package org.python.newcompiler.ast;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.ClassDef;

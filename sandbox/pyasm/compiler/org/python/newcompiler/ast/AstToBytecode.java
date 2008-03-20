@@ -2,6 +2,7 @@ package org.python.newcompiler.ast;
 
 import java.util.Stack;
 
+import org.python.antlr.PythonTree;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
@@ -222,6 +223,8 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
 
     private Label nearestLoop;
 
+    private int lastLineNumber = -1;
+
     private void buildContext(modType node) throws Exception {
         context = node.accept(new ContextBuilder());
     }
@@ -229,6 +232,13 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
     private void sendResumeTable() {
         if (currentEnvironment.isReenterable()) {
             compiler.visitResumeTable(new Label(), currentEnvironment.getEntryPoints());
+        }
+    }
+
+    private void putLineNumber(PythonTree node) {
+        int lnno = node.getLine();
+        if (lnno != lastLineNumber) {
+            compiler.visitLineNumber(lastLineNumber = lnno);
         }
     }
 
@@ -242,10 +252,12 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                                       (CodeInfo)currentEnvironment,
                                       CompilerFlag.module(currentEnvironment.getCompilerFlags()),
                                       true);
+            putLineNumber(node);
             for (stmtType statement : node.body) {
                 statement.accept(this);
             }
             returnNone.perform(compiler);
+            compiler.visitStop();
         } finally {
             currentEnvironment = oldEnvironment;
         }
@@ -261,8 +273,10 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                                       (CodeInfo)currentEnvironment,
                                       CompilerFlag.expression(currentEnvironment.getCompilerFlags()),
                                       false);
+            putLineNumber(node);
             node.body.accept(this);
             returnResult.perform(compiler);
+            compiler.visitStop();
         } finally {
             currentEnvironment = oldEnvironment;
         }
@@ -280,7 +294,9 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                                       (CodeInfo)currentEnvironment,
                                       CompilerFlag.interactive(currentEnvironment.getCompilerFlags()),
                                       false);
+            putLineNumber(node);
             returnNone.perform(compiler);
+            compiler.visitStop();
         } finally {
             expr_action = old_action;
             currentEnvironment = oldEnvironment;
@@ -289,8 +305,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
     }
 
     public BytecodeBundle visitSuite(Suite node) throws Exception {
-        throw new RuntimeException("Hit a Suite element, what is this for?");
-        // return bundle;
+        throw new RuntimeException("Hit a Suite element, this isn't supposed to be used in running code!");
     }
 
     // Scoping items
@@ -298,6 +313,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
         CompileAction old_action = expr_action;
         expr_action = popResult;
         try {
+            putLineNumber(node);
             // Load name
             compiler.visitLoadConstant(new PyString(node.name));
             // Load bases
@@ -319,6 +335,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
             compiler = compiler.constructClass(node.name,
                                                currentEnvironment.closureVariables(),
                                                currentEnvironment.getCompilerFlags());
+            putLineNumber(node);
             try {
                 // Compile body
                 for (stmtType statement : node.body) {
@@ -327,6 +344,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                 // Return the locals defined in the environment
                 compiler.visitLoadLocals();
                 compiler.visitReturn();
+                compiler.visitStop();
             } finally {
                 compiler = oldCompiler;
                 currentEnvironment = oldEnvironment;
@@ -377,6 +395,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                     if (!lastStatementWasReturn) {
                         returnNone.perform(compiler);
                     }
+                    compiler.visitStop();
                 } finally {
                     compiler = oldCompiler;
                 }
@@ -418,6 +437,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                     // Compile the expression in the body, and return the result of that expression
                     node.body.accept(this);
                     returnResult.perform(compiler);
+                    compiler.visitStop();
                 } finally {
                     compiler = oldCompiler;
                 }
@@ -478,6 +498,7 @@ public class AstToBytecode implements VisitorIF<BytecodeBundle> {
                     while (!endBlocks.isEmpty()) {
                         endBlocks.pop().perform(compiler);
                     }
+                    compiler.visitStop();
                 } finally {
                     compiler = oldCompiler;
                 }

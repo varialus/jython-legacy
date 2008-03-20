@@ -57,7 +57,11 @@ public enum CompilerFlag {
     /**
      * Compile the code block to store its locals in a dictionary.
      */
-    MUTABLE_DICT;
+    MUTABLE_DICT,
+    /**
+     * The code block uses names without qualified environment.
+     */
+    NAME_BASED_LOOKUP;
 
     private Integer bitFlag;
 

@@ -23,7 +23,7 @@ public class LineNumberBuilder implements LineNumberTable {
 
     public void visitInstruction(BytecodeVisitor visitor, int offset) {
         Integer lineNumber = table.get(offset);
-        if(lineNumber != null) {
+        if (lineNumber != null) {
             visitor.visitLineNumber(lineNumber);
         }
     }

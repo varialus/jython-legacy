@@ -11,7 +11,7 @@ public interface Environment {
     void addEntryPoint(Label entry);
 
     void markAsGlobal(String name);
-    
+
     void markAsNonlocal(String name);
 
     void addAssignment(String name);
@@ -19,9 +19,9 @@ public interface Environment {
     void addReference(String name);
 
     void addParameter(String name);
-    
+
     void addFuture(String feature) throws Exception;
-    
+
     GlobalEnvironment getGlobalEnvironment();
 
     Set<CompilerFlag> getCompilerFlags();

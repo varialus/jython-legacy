@@ -8,5 +8,8 @@ import org.python.newcompiler.CompilerFlag;
 
 public interface PythonBytecodeCompilingBundle extends BytecodeBundle {
 
-    BytecodeCompiler compile(String signature, CodeInfo info, Set<CompilerFlag> flags, boolean storeable);
+    BytecodeCompiler compile(String signature,
+                             CodeInfo info,
+                             Set<CompilerFlag> flags,
+                             boolean storeable);
 }
