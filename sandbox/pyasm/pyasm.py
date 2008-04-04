@@ -25,6 +25,7 @@ from java.lang.System import out
 stdout = PrintWriter(out)
 
 __debugging__ = False
+__dumping__ = False
 
 def reallyContains(dct, item):
     if item in dct:
@@ -212,6 +213,16 @@ class ClassKeeper(object):
         self.generateSupport(mainName)
         self.cv.visitEnd()
         byteArray = self.__cw.toByteArray()
+
+        if __dumping__:
+            from java.io import ByteArrayOutputStream
+            from java.io import FileOutputStream
+
+            baos = ByteArrayOutputStream(len(byteArray));
+            baos.write(byteArray, 0, len(byteArray));
+            fos = FileOutputStream("Debug.class");
+            baos.writeTo(fos)
+            fos.close()
 
         if __analysis__:
             cn = _asm.tree.ClassNode()
