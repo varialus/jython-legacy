@@ -70,6 +70,7 @@ Contributors
 * Aleks Totic
 * Alexey N. Solofnenko
 * Phil Surette
+* Keshav Upadhyaya
 * Dj Walker-Morgan
 * Greg Ward
 * Randy Jay Yarger
