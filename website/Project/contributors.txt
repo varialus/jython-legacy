@@ -81,6 +81,7 @@ Corporate Contributors
 
 * Corporation for National Research Initiatives
 * cryptix
+* Sun Microsystems
 
 ----
 Logo
