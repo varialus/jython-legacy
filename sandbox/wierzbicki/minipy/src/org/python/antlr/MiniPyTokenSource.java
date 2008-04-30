@@ -250,6 +250,10 @@ public class MiniPyTokenSource implements TokenSource {
 		return buf.toString();
 	}
 
+    public String getSourceName() {
+        return "XXX-need-real-name.py";
+    }
+
 }
 
 /* More example input / output pairs with code simplified to single chars
