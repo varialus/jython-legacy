@@ -384,7 +384,7 @@ ZMB = Country(code='ZMB', name='Zambia',continent=Africa, region='Eastern Africa
 ZMB.save() 
 WSM = Country(code='WSM', name='Samoa',continent=Oceania, region='Polynesia', surface_area=2831.00, indep_year=1962, population=180000, life_expectancy=69.2, gnp=141.00, gnp_old=157.00, local_name='Samoa', government_form='Parlementary Monarchy', head_of_state='Malietoa Tanumafili II',capital=None,code2='WS')
 WSM.save() 
-SMR = Country(code='SMR', name='San Marino',continent=Europe, region='Southern Europe', surface_area=61.00, indep_year=885, population=27000, life_expectancy=81.1, gnp=510.00, gnp_old=None, local_name='San Marino', government_form='Republic', head_of_state=None,capital=None,code2='SM')
+SMR = Country(code='SMR', name='San Marino',continent=Europe, region='Southern Europe', surface_area=61.00, indep_year=885, population=27000, life_expectancy=81.1, gnp=510.00, gnp_old=None, local_name='San Marino', government_form='Republic', head_of_state='',capital=None,code2='SM')
 SMR.save() 
 STP = Country(code='STP', name='Sao Tome and Principe',continent=Africa, region='Central Africa', surface_area=964.00, indep_year=1975, population=147000, life_expectancy=65.3, gnp=6.00, gnp_old=None, local_name='São Tomé e Príncipe', government_form='Republic', head_of_state='Miguel Trovoada',capital=None,code2='ST')
 STP.save() 

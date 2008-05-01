@@ -2,7 +2,6 @@ from django.db import models
 
 class Continent(models.Model):
     name = models.CharField(max_length=14, default='')
-    #enum('Asia','Europe','North America','Africa','Oceania','Antarctica','South America', default='Asia')
 
     def __unicode__(self):
         return self.name
@@ -16,14 +15,14 @@ class Country(models.Model):
     continent = models.ForeignKey(Continent)
     region = models.CharField(max_length=26, default='')
     surface_area = models.DecimalField(max_digits=10, decimal_places=2, default='0.00')
-    indep_year = models.IntegerField()
+    indep_year = models.IntegerField(null=True)
     population = models.IntegerField(default=0)
-    life_expectancy = models.DecimalField(max_digits=3, decimal_places=1)
+    life_expectancy = models.DecimalField(max_digits=3, decimal_places=1, null=True)
     gnp = models.DecimalField(max_digits=10, decimal_places=2)
     gnp_old = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     local_name = models.CharField(max_length=45, default='')
     government_form = models.CharField(max_length=45, default='')
-    head_of_state = models.CharField(max_length=60)
+    head_of_state = models.CharField(max_length=60, default='')
     capital = models.IntegerField(null=True)
     code2 = models.CharField(max_length=2, default='')
 
@@ -31,7 +30,27 @@ class Country(models.Model):
         return self.name
 
     class Admin:
-        pass
+        list_display = ('code',
+            'name',
+            'continent',
+            'region',
+            'surface_area',
+            'indep_year',
+            'population',
+            'life_expectancy',
+            'gnp',
+            'gnp_old',
+            'local_name',
+            'government_form',
+            'head_of_state',
+            'capital',
+            'code2',
+            )
+
+        search_fields = ('code',
+            'name',
+            )
+
 
 class City(models.Model):
     name = models.CharField(max_length=35, default='')
@@ -44,7 +63,16 @@ class City(models.Model):
         return self.name
 
     class Admin:
-        pass
+        list_display = ('name',
+                'country',
+                'district',
+                'population',
+                )
+        search_fields = ('name',
+                'country',
+                'district',
+                'population',
+                )
 
 
 class CountryLanguage(models.Model):
