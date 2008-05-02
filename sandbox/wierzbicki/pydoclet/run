@@ -1,1 +1,1 @@
-javadoc -docletpath build:lib/jython.jar -doclet org.python.util.pydoclet.PyDoclet -sourcepath src -subpackages org
+javadoc -docletpath build:../../../jython/dist/jython.jar -doclet org.python.util.pydoclet.PyDoclet -sourcepath src -subpackages org

@@ -1,7 +1,7 @@
 <project name="PyDoclet" default="compile">
 
     <path id="main.classpath">
-        <fileset dir="../../../../jython/dist">
+        <fileset dir="../../../jython/dist">
             <include name="jython.jar"/>
         </fileset>
         <pathelement path="build" />
