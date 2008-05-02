@@ -1,0 +1,29 @@
+<project name="PyDoclet" default="compile">
+
+    <path id="main.classpath">
+        <fileset dir="../../../../jython/dist">
+            <include name="jython.jar"/>
+        </fileset>
+        <pathelement path="build" />
+    </path>
+
+    <target name="init">
+        <mkdir dir="build"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac destdir="build" debug="true"
+                deprecation="false" optimize="false" failonerror="true">
+            <src path="src"/>
+            <classpath refid="main.classpath"/>
+        </javac>
+    </target>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+    
+    <target name="all" depends="clean, compile"/>
+
+</project>
+
