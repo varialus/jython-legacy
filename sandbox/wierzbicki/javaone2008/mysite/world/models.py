@@ -68,12 +68,14 @@ class City(models.Model):
                 'district',
                 'population',
                 )
-        search_fields = ('name',
-                'country',
-                'district',
-                'population',
+
+        list_filter = ('country',
                 )
 
+        search_fields = (
+                'name',
+                'district',
+                )
 
 class CountryLanguage(models.Model):
     #country_code = models.CharField(max_length=3, default='')
