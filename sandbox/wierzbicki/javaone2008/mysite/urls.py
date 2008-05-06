@@ -1,9 +1,6 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^mysite/', include('mysite.foo.urls')),
-
-    # Uncomment this for admin:
+     (r'^mysite/', include('mysite.world.urls')),
      (r'^admin/', include('django.contrib.admin.urls')),
 )
