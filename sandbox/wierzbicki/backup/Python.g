@@ -78,7 +78,6 @@ tokens {
     INDENT;
     DEDENT;
     
-    ModuleTok;
     Interactive;
     Expression;
     Test;
@@ -90,8 +89,8 @@ tokens {
     Body;
     ClassDef;
     Bases; 
-    FunctionDef;
-    Arguments;
+    FunctionDefTok;
+    ArgumentsTok;
     Args;
     Arg;
     Keyword;
@@ -191,11 +190,13 @@ import org.antlr.runtime.CommonToken;
 
 import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
+import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.modType;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
@@ -241,13 +242,41 @@ import java.util.Iterator;
         if (stmts != null) {
             List<stmtType> result = new ArrayList<stmtType>();
             for (int i=0; i<stmts.size(); i++) {
-                stmt_return s = (stmt_return)stmts.get(i);
-                result.add((stmtType)s.tree);
+                result.add((stmtType)stmts.get(i));
             }
             return (stmtType[])result.toArray(new stmtType[result.size()]);
         }
         return new stmtType[0];
     }
+
+    private exprType makeDottedAttr(Token nameToken, List attrs) {
+        exprType current = new Name(nameToken, nameToken.getText(), expr_contextType.Load);
+        for (int i=attrs.size() - 1; i > -1; i--) {
+            Token t = ((PythonTree)attrs.get(i)).token;
+            current = new Attribute(t, current, t.getText(),
+                expr_contextType.Load);
+        }
+        return current;
+    }
+
+    private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements, List decorators) {
+        argumentsType a;
+        debug("Matched FunctionDef");
+        if (args != null) {
+            a = args;
+        } else {
+            a = new argumentsType(t, new exprType[0], null, null, new exprType[0]); 
+        }
+        stmtType[] s = (stmtType[])funcStatements.toArray(new stmtType[funcStatements.size()]);
+        exprType[] d;
+        if (decorators != null) {
+            d = (exprType[])decorators.toArray(new exprType[decorators.size()]);
+        } else {
+            d = new exprType[0];
+        }
+        return new FunctionDef(t, nameToken.getText(), a, s, d);
+    }
+
 
     Object makeFloat(Token t) {
         debug("makeFloat matched " + t.getText());
@@ -416,7 +445,7 @@ catch (RecognitionException e) {
 
 @lexer::header { 
 package org.python.antlr;
-} 
+}
 
 @lexer::members {
 /** Handles context-sensitive lexing of implicit line joining such as
@@ -466,8 +495,10 @@ single_input : NEWLINE
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
 file_input returns [modType mod]
-    : (NEWLINE | s+=stmt)* {debug("parsed file_input");}
-   -> ^(ModuleTok<Module>[$file_input.start, makeStmts($s)])
+    : (NEWLINE | s+=stmt)+ {
+        $mod = new Module($file_input.start, makeStmts($s));
+    }
+    | { $mod = new Module($file_input.start, new stmtType[0]); }
     ;
 
 //eval_input: testlist NEWLINE* ENDMARKER
@@ -475,32 +506,44 @@ eval_input : (NEWLINE)* testlist[expr_contextType.Load] (NEWLINE)* -> ^(Expressi
            ;
 
 //decorators: decorator+
-decorators: decorator+
-          ;
+decorators returns [List etypes]
+    : d+=decorator+ {$etypes = $d;}
+    ;
 
 //decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
-decorator: AT dotted_attr 
-           ( (LPAREN arglist? RPAREN) -> ^(Decorator dotted_attr ^(Call ^(Args arglist)?))
-           | -> ^(Decorator dotted_attr)
-           ) NEWLINE
-         ;
+decorator returns [exprType etype]
+@after {
+   $decorator.tree = $etype;
+}
+    : AT dotted_attr 
+    //XXX: ignoring the arglist and Call generation right now.
+    ( (LPAREN arglist? RPAREN) { $etype = $dotted_attr.etype; }
+    // ^(Decorator dotted_attr ^(Call ^(Args arglist)?))
+    | { $etype = $dotted_attr.etype; }
+    ) NEWLINE
+    ;
 
-dotted_attr
-    : NAME (DOT^ NAME)*
+dotted_attr returns [exprType etype]
+    : n1=NAME
+      ( (DOT n2+=dotted_attr)+ { $etype = makeDottedAttr($n1, $n2); }
+      | { $etype = new Name($NAME, $NAME.text, expr_contextType.Load); }
+      )
     ;
 
 //funcdef: [decorators] 'def' NAME parameters ':' suite
-funcdef : decorators? 'def' NAME parameters COLON suite
-       -> ^(FunctionDef 'def' ^(NameTok NAME) parameters ^(Body suite) ^(Decorators decorators?))
+funcdef : decorators? tok='def' NAME parameters COLON suite
+       -> ^(FunctionDefTok<FunctionDef>[$tok, $NAME.text, $parameters.args, makeStmts($suite.stmts),
+            makeExprs($decorators.etypes)])
         ;
 
 //parameters: '(' [varargslist] ')'
-parameters : LPAREN 
-                 (varargslist -> ^(Arguments varargslist)
-                 | -> ^(Arguments)
-                 )
-             RPAREN
-           ;
+parameters returns [argumentsType args]
+    : LPAREN 
+      (varargslist -> ^(ArgumentsTok varargslist)
+      | {$args = new argumentsType($parameters.start, new exprType[0], null, null, new exprType[0]);}
+      )
+      RPAREN
+    ;
 
 //varargslist: (fpdef ['=' test] ',')* ('*' NAME [',' '**' NAME] | '**' NAME) | fpdef ['=' test] (',' fpdef ['=' test])* [',']
 varargslist : defparameter (options {greedy=true;}:COMMA defparameter)*
@@ -823,9 +866,10 @@ except_clause : 'except' (t1=test[expr_contextType.Load] (COMMA t2=test[expr_con
               ;
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
-suite : simple_stmt
-      | NEWLINE! INDENT (stmt)+ DEDENT
-      ;
+suite returns [List stmts]
+    : s+=simple_stmt {$stmts = $s;}
+    | NEWLINE! INDENT (s+=stmt)+ DEDENT {$stmts = $s;}
+    ;
 
 //test: or_test ['if' or_test 'else' test] | lambdef
 test[expr_contextType ect]
