@@ -108,15 +108,15 @@ tokens {
     OrElse;
     Elif;
     While; 
-    Pass;
-    Break;
-    Continue;
+    PassTok;
+    BreakTok;
+    ContinueTok;
     PrintTok;
     TryExcept;
     TryFinally;
     ExceptHandler;
     For;
-    Return;
+    ReturnTok;
     Yield;
     StrTok;
     NumTok;
@@ -192,7 +192,9 @@ import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.Attribute;
+import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Context;
+import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
@@ -201,7 +203,9 @@ import org.python.antlr.ast.modType;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
+import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
+import org.python.antlr.ast.Return;
 import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Str;
 import org.python.core.Py;
@@ -746,8 +750,8 @@ del_stmt : 'del' exprlist2
          ;
 
 //pass_stmt: 'pass'
-pass_stmt : 'pass'
-         -> ^(Pass 'pass')
+pass_stmt : tok='pass'
+         -> ^(PassTok<Pass>[$tok])
           ;
 
 //flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt
@@ -759,18 +763,18 @@ flow_stmt : break_stmt
           ;
 
 //break_stmt: 'break'
-break_stmt : 'break'
-          -> ^(Break 'break')
+break_stmt : tok='break'
+          -> ^(BreakTok<Break>[$tok])
            ;
 
 //continue_stmt: 'continue'
-continue_stmt : 'continue'
-             -> ^(Continue 'continue')
+continue_stmt : tok='continue'
+             -> ^(ContinueTok<Continue>[$tok])
               ;
 
 //return_stmt: 'return' [testlist]
-return_stmt : 'return' (testlist[expr_contextType.Load])?
-          -> ^(Return 'return' ^(Value testlist)?)
+return_stmt : tok='return' (testlist[expr_contextType.Load])?
+          -> ^(ReturnTok<Return>[$tok, (exprType)$testlist.tree])
             ;
 
 //yield_stmt: yield_expr
