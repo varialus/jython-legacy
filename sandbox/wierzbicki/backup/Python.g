@@ -231,7 +231,6 @@ import java.util.Iterator;
             for (int i=start; i<exprs.size(); i++) {
                 exprType e = (exprType)exprs.get(i);
                 result.add(e);
-                //result.add((exprType)s.tree);
             }
             return (exprType[])result.toArray(new exprType[result.size()]);
         }
@@ -276,6 +275,28 @@ import java.util.Iterator;
         }
         return new FunctionDef(t, nameToken.getText(), a, s, d);
     }
+
+    private argumentsType makeArgumentsType(Token t, List params, Token snameToken,
+        Token knameToken, List defaults) {
+        debug("Matched Arguments");
+
+        exprType[] p = (exprType[])params.toArray(new exprType[params.size()]);
+        exprType[] d = (exprType[])defaults.toArray(new exprType[defaults.size()]);
+        String s;
+        String k;
+        if (snameToken == null) {
+            s = null;
+        } else {
+            s = snameToken.getText();
+        }
+        if (knameToken == null) {
+            k = null;
+        } else {
+            k = knameToken.getText();
+        }
+        return new argumentsType(t, p, s, k, d);
+    }
+
 
 
     Object makeFloat(Token t) {
@@ -539,29 +560,46 @@ funcdef : decorators? tok='def' NAME parameters COLON suite
 //parameters: '(' [varargslist] ')'
 parameters returns [argumentsType args]
     : LPAREN 
-      (varargslist -> ^(ArgumentsTok varargslist)
+      (varargslist {$args = $varargslist.args;}
       | {$args = new argumentsType($parameters.start, new exprType[0], null, null, new exprType[0]);}
       )
       RPAREN
     ;
 
 //varargslist: (fpdef ['=' test] ',')* ('*' NAME [',' '**' NAME] | '**' NAME) | fpdef ['=' test] (',' fpdef ['=' test])* [',']
-varargslist : defparameter (options {greedy=true;}:COMMA defparameter)*
-              (COMMA
-                  ( STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?
-                  | DOUBLESTAR kwargs=NAME
-                  )?
-              )? {debug("parsed varargslist");}
-           -> ^(Args defparameter+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
-            | STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?{debug("parsed varargslist STARARGS");}
-           -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
-            | DOUBLESTAR kwargs=NAME {debug("parsed varargslist KWS");}
-           -> ^(KWArgs $kwargs)
-            ;
+varargslist returns [argumentsType args]
+@init {
+    List defaults = new ArrayList();
+}
+    : d+=defparameter[defaults] (options {greedy=true;}:COMMA d+=defparameter[defaults])*
+        (COMMA
+            ( STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?
+            | DOUBLESTAR kwargs=NAME
+            )?
+        )?
+        {$args = makeArgumentsType($varargslist.start, $d, $starargs, $kwargs, defaults);}
+        | STAR starargs=NAME (COMMA DOUBLESTAR kwargs=NAME)?{debug("parsed varargslist STARARGS");}
+        {$args = makeArgumentsType($varargslist.start, $d, $starargs, $kwargs, defaults);}
+        | DOUBLESTAR kwargs=NAME {debug("parsed varargslist KWS");}
+        {$args = makeArgumentsType($varargslist.start, $d, null, $kwargs, defaults);}
+        ;
 
 //not in CPython's Grammar file
-defparameter : fpdef[expr_contextType.Param] (ASSIGN test[expr_contextType.Load])? {debug("parsed defparameter");}
-             ;
+defparameter[List defaults] returns [exprType etype]
+@after {
+   $defparameter.tree = $etype;
+}
+    : fpdef[expr_contextType.Param] (ASSIGN test[expr_contextType.Load])? {
+        $etype = (exprType)$fpdef.tree;
+        if ($ASSIGN != null) {
+            defaults.add($test);
+        } else if (!defaults.isEmpty()) {
+            throw new ParseException(
+                "non-default argument follows default argument",
+                $fpdef.tree);
+        }
+    }
+;
 
 //fpdef: NAME | '(' fplist ')'
 fpdef[expr_contextType ctype] : NAME 
