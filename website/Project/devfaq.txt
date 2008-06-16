@@ -73,16 +73,19 @@ https://jython.svn.sourceforge.net/svnroot/jython/<path>
 
 with <path> representing the path to the project.
 
-The Subversion repository has many projects under it. Most people are probably interested in one of these three projects:
+The Subversion repository has many projects under it. Most people are probably interested in one of these four projects:
 
     * the trunk or HEAD (the current version under development)
-    * the latest release (plus bug fixes) of Jython (e.g. Jython 2.1)
+    * the experimental Jython 2.5 (ASM) branch
+    * the latest release (plus bug fixes) of Jython
     * the website source
 
-The three projects above can be checked out using the following <URL> paths, respectively:
+The projects above can be checked out using the following <URL> paths,
+respectively:
 
     * https://jython.svn.sourceforge.net/svnroot/jython/trunk/
-    * https://jython.svn.sourceforge.net/svnroot/jython/tags/Release_2_1
+    * https://jython.svn.sourceforge.net/svnroot/jython/branches/asm/
+    * https://jython.svn.sourceforge.net/svnroot/jython/branches/Release_2_2maint/
     * https://jython.svn.sourceforge.net/svnroot/jython/trunk/website/
 
 How do I update my working copy to be in sync with the repository?
@@ -252,9 +255,9 @@ Another option is to have 'patch' create backups of all files by using the -b co
 How to submit a patch?
 ======================
 
-Please consult the patch submission guidelines at http://www.python.org/patches/ .
+Please consult the patch submission guidelines at http://www.python.org/patches/.
 
-Submit the patch to the jython patch system on sourceforge at http://www.jython.org/patches
+Submit the patch to the Jython bug tracker at http://bugs.jython.org/.
 
 How to test a patch?
 ====================
