@@ -15,33 +15,34 @@ also processes special annotations in docstrings on methods in Python code to
 determine the static type information to expose when turning a dynmically typed
 Python method into a statically typed Java method.  
 
-**jythonc is unmaintained and will not be present in Jython-2.3**.  While
-jythonc handles all of the language features present in Jython 2.2, it doesn't
-support 2.3 features such as generators.  As such, it is not recommended that
-new Jython projects make use of jythonc.  It is only included in Jython-2.2 to
-support older users of jythonc and to allow access to a few features that are
-only provided by jythonc at the moment:
+**jythonc is unmaintained and will not be present in its current form
+in Jython 2.5**.  While jythonc handles all the language features of
+Python 2.2, it doesn't support Python 2.3 and later features such as
+generators.  As such, we cannot maintain the current jythonc going
+forward; however, Jython 2.5 will include a replacement (likely also
+called jythonc) which produces class files directly instead of
+generating Java source files.  The current jythonc is included in
+Jython 2.2.x to support existing users and for these features:
 
 1. Running in a JVM with a classloader that will not load dynamically created classes
 2. Declaring Java method signatures in Python code
 3. Loading Python classes dynamically from Java with Class.forName
 
-While all of these features are planned for Jython-2.3, they are currently only
-available from jythonc.  Most uses of the second feature, adding method
-declarations to docstrings, can be handled by declaring a Java interface to
-implement with a Python class.  Each method in the Python implementation takes
-the types of the Java method it implements.  Exposing the Python class as an
-instance of that type to Java code can be done as explained in `Accessing
-Jython from Java Without Using jythonc`_ and its followup, `Simple and
-Efficient Jython Object Factories`_. 
+Most uses of the second feature, adding method declarations to
+docstrings, can be handled by declaring a Java interface to implement
+with a Python class.  Each implementing Python method inherits its
+type signature from the corresponding method in the Java interface.
+Exposing the Python class as an instance of that type to Java code is
+explained in `Accessing Jython from Java Without Using jythonc`_ and
+its followup, `Simple and Efficient Jython Object Factories`_.
 
 --------------------------------------------
 Using jythonc
 --------------------------------------------
 
-A script called "jythonc" should have been installed in the Jython installation
-directory when you installed the package. If it was not, it can be invoked as
-follows: "jython Tools\jythonc\jythonc.py".
+A script called ``jythonc`` should have been installed in the Jython
+installation directory when you installed the package. If it was not,
+it can be invoked as follows: ``jython Tools\jythonc\jythonc.py``.
 
 The jythonc tool generates actual Java source code, and then invokes a
 Java compiler over this source code to create the .class files. Thus,
