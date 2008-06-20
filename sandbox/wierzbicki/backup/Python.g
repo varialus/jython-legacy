@@ -160,6 +160,7 @@ import org.python.antlr.PythonTree;
 import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
+import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
@@ -173,6 +174,7 @@ import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
+import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Str;
@@ -641,8 +643,8 @@ expr_stmt : ((testlist[expr_contextType.Load] (ASSIGN|augassign)) => lhs=testlis
             )
             ( (augassign yield_expr -> ^(augassign $lhs yield_expr))
             | (augassign rhs=testlist[expr_contextType.Load] -> ^(augassign $lhs $rhs))
-            | ((ASSIGN t+=testlist[expr_contextType.Store])+ -> ^(ASSIGN<Assign>[$ASSIGN, makeAssignTargets((exprType)$lhs.tree, $t), makeAssignValue($t)]))
-            //| ((ASSIGN yield_expr)+)
+            | ((at=ASSIGN t+=testlist[expr_contextType.Store])+ -> ^(AssignTok<Assign>[$at, makeAssignTargets((exprType)$lhs.tree, $t), makeAssignValue($t)]))
+            | ((ay=ASSIGN y+=yield_expr)+ -> ^(AssignTok<Assign>[$ay, makeAssignTargets((exprType)$lhs.tree, $y), makeAssignValue($y)]))
             | -> ExprTok<Expr>[$lhs.start, (exprType)$lhs.tree]
             )
           ;
@@ -929,7 +931,21 @@ scope {
 @init {
     $expr::ctype = ect;
 }
-
+@after {
+    if ($expr.tree instanceof BinOp) {
+        BinOp b = (BinOp)$expr.tree;
+        b.left = (exprType)b.getChild(0);
+        b.right = (exprType)b.getChild(1);
+        switch (b.getType()) {
+        case PLUS:
+            b.op = operatorType.Add;
+            break;
+        case MINUS:
+            b.op = operatorType.Sub;
+            break;
+        }
+    }
+}
     : xor_expr (VBAR^ xor_expr)*
     ;
 
@@ -946,7 +962,9 @@ shift_expr : arith_expr ((LEFTSHIFT^|RIGHTSHIFT^) arith_expr)*
            ;
 
 //arith_expr: term (('+'|'-') term)*
-arith_expr: term ((PLUS^|MINUS^) term)*
+
+arith_expr
+    :term ((PLUS<BinOp>^|MINUS<BinOp>^) term)*
     ;
 
 //term: factor (('*'|'/'|'%'|'//') factor)*
