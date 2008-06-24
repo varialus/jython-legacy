@@ -78,7 +78,7 @@ tokens {
     INDENT;
     DEDENT;
     
-    Module;
+    ModuleTok;
     Interactive;
     Expression;
     ExprTok;
@@ -187,6 +187,10 @@ import java.util.Iterator;
 } 
 
 @members {
+    //XXX: only used for single_input -- seems kludgy.
+    public boolean inSingle = false;
+    private boolean seenSingleOuterSuite = false;
+
     boolean debugOn = false;
 
     private void debug(String message) {
@@ -215,7 +219,12 @@ import java.util.Iterator;
         if (stmts != null) {
             List<stmtType> result = new ArrayList<stmtType>();
             for (int i=0; i<stmts.size(); i++) {
-                result.add((stmtType)stmts.get(i));
+                Object o = stmts.get(i);
+                if (o instanceof stmtType) {
+                    result.add((stmtType)stmts.get(i));
+                } else {
+                    result.add((stmtType)((stmt_return)o).tree);
+                }
             }
             return (stmtType[])result.toArray(new stmtType[result.size()]);
         }
@@ -330,7 +339,7 @@ import java.util.Iterator;
         }
 
         long l = Long.valueOf(s, radix).longValue();
-        if (l > 0xffffffffl || (radix == 10 && l > Integer.MAX_VALUE)) {
+        if (l > 0xffffffffl || (l > Integer.MAX_VALUE)) {
             return Py.newLong(new BigInteger(s, radix));
         }
         return Py.newInteger((int) l);
@@ -422,6 +431,14 @@ import java.util.Iterator;
         throw e;
     }
 
+	protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow)
+		throws RecognitionException
+	{
+        mismatch(input, ttype, follow);
+        return null;
+    }
+
+
     /**
      * A list holding the error message(s) encountered during parse.
      */
@@ -471,6 +488,8 @@ package org.python.antlr;
  *  a = [3,
  *       4]
  */
+//XXX: Hopefully we can remove inSingle when we get PyCF_DONT_IMPLY_DEDENT support.
+public boolean inSingle = false;
 int implicitLineJoiningLevel = 0;
 int startPos=-1;
 
@@ -503,20 +522,15 @@ int startPos=-1;
 }
 
 //single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
-//XXX: I don't know why, but in "compound_stmt NEWLINE"
-//     Jython chokes on the NEWLINE every time -- so I made
-//     it optional for now.
-single_input : NEWLINE
+single_input : NEWLINE -> ^(Interactive)
              | simple_stmt -> ^(Interactive simple_stmt)
-             | compound_stmt NEWLINE? -> ^(Interactive compound_stmt)
+             | compound_stmt NEWLINE -> ^(Interactive compound_stmt)
              ;
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
-file_input returns [modType mod]
-    : (NEWLINE | s+=stmt)+ {
-        $mod = new Module($file_input.start, makeStmts($s));
-    }
-    | { $mod = new Module($file_input.start, new stmtType[0]); }
+file_input
+    : (NEWLINE | s+=stmt)+ -> ^(ModuleTok<Module>[$file_input.start, makeStmts($s)])
+    | -> ^(ModuleTok<Module>[$file_input.start, new stmtType[0\]])
     ;
 
 //eval_input: testlist NEWLINE* ENDMARKER
@@ -1370,7 +1384,11 @@ CONTINUED_LINE
  *  Frank Wierzbicki added: Also ignore FORMFEEDS (\u000C).
  */
 NEWLINE
-    :   (('\u000C')?('\r')? '\n' )+
+    :   {inSingle}? => (('\u000C')?('\r')? '\n' )
+            {if (implicitLineJoiningLevel>0 )
+                $channel=HIDDEN;
+            }
+    |   (('\u000C')?('\r')? '\n' )+
         {if ( startPos==0 || implicitLineJoiningLevel>0 )
             $channel=HIDDEN;
         }
