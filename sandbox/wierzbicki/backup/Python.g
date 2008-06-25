@@ -220,7 +220,7 @@ import java.util.Iterator;
                 exprType e = (exprType)exprs.get(i);
                 result.add(e);
             }
-            return (exprType[])result.toArray(new exprType[result.size()]);
+            return result.toArray(new exprType[result.size()]);
         }
         return new exprType[0];
     }
@@ -313,6 +313,23 @@ import java.util.Iterator;
             k = knameToken.getText();
         }
         return new argumentsType(t, p, s, k, d);
+    }
+
+    exprType[] extractArgs(List args) {
+        if (args == null) {
+            return new exprType[0];
+        }
+        return (exprType[])args.toArray(new exprType[args.size()]);
+    }
+
+    keywordType[] makeKeywords(List args) {
+        List<keywordType> k = new ArrayList<keywordType>();
+        for(int i=0;i<args.size();i++) {
+            exprType[] e = (exprType[])args.get(i);
+            Name arg = (Name)e[0];
+            k.add(new keywordType(arg, arg.id, e[1]));
+        }
+        return k.toArray(new keywordType[k.size()]);
     }
 
     Object makeFloat(Token t) {
@@ -1064,7 +1081,7 @@ lambdef: LAMBDA (varargslist)? COLON test[expr_contextType.Load] {debug("parsed 
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer : LPAREN (arglist ->  ^(LPAREN<Call>[$LPAREN, null, new exprType[0\], new keywordType[0\], null, null])
+trailer : LPAREN (arglist ->  ^(LPAREN<Call>[$LPAREN, null, makeExprs($arglist.args), makeKeywords($arglist.keywords), $arglist.starargs, $arglist.kwargs])
                  | -> ^(LPAREN<Call>[$LPAREN, null, new exprType[0\], new keywordType[0\], null, null])
                  )
           RPAREN
@@ -1152,14 +1169,19 @@ classdef: CLASS NAME (LPAREN testlist[expr_contextType.Load]? RPAREN)? COLON sui
     ;
 
 //arglist: (argument ',')* (argument [',']| '*' test [',' '**' test] | '**' test)
-arglist returns [List args, exprType starargs, exprType kwargs]
-    : a+=argument (COMMA a+=argument)*
+arglist returns [List args, List keywords, exprType starargs, exprType kwargs]
+@init {
+    List arguments = new ArrayList();
+    List kws = new ArrayList();
+}
+    : argument[arguments, kws] (COMMA argument[arguments, kws])*
             ( COMMA
                 ( STAR s=test[expr_contextType.Load] (COMMA DOUBLESTAR k=test[expr_contextType.Load])?
                 | DOUBLESTAR k=test[expr_contextType.Load]
                 )?
             )? {
-            $args=$a;
+            $args=arguments;
+            $keywords=kws;
             $starargs=(exprType)$s.tree;
             $kwargs=(exprType)$k.tree;
         }
@@ -1173,14 +1195,13 @@ arglist returns [List args, exprType starargs, exprType kwargs]
         ;
 
 //argument: test [gen_for] | test '=' test  # Really [keyword '='] test
-argument returns [exprType arg, exprType value]
+argument[List arguments, List kws]
     : t1=test[expr_contextType.Load]
         ( (ASSIGN t2=test[expr_contextType.Load]) {
-            $arg=(exprType)$t1.tree;
-            $value=(exprType)$t2.tree;
+            $kws.add(new exprType[]{(exprType)$t1.tree, (exprType)$t2.tree});
         }
         | gen_for //FIXME
-        | {$arg=(exprType)$t1.tree;}
+        | {$arguments.add($t1.tree);}
         )
     ;
 
