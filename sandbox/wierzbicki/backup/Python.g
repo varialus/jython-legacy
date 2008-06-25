@@ -133,7 +133,7 @@ tokens {
     GeneratorExp;
     Ifs;
     Elts;
-    Call;
+    CallTok;
     Dest;
     Values;
     Newline;
@@ -162,12 +162,15 @@ import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Break;
+import org.python.antlr.ast.Call;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.Index;
+import org.python.antlr.ast.keywordType;
 import org.python.antlr.ast.modType;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
@@ -553,7 +556,7 @@ decorator returns [exprType etype]
     : AT dotted_attr 
     //XXX: ignoring the arglist and Call generation right now.
     ( (LPAREN arglist? RPAREN) { $etype = $dotted_attr.etype; }
-    // ^(Decorator dotted_attr ^(Call ^(Args arglist)?))
+    // ^(Decorator dotted_attr ^(CallTok ^(Args arglist)?))
     | { $etype = $dotted_attr.etype; }
     ) NEWLINE
     ;
@@ -993,8 +996,31 @@ factor : PLUS factor -> ^(UAdd PLUS factor)
        ;
 
 //power: atom trailer* ['**' factor]
-power : atom (trailer^)* (options {greedy=true;}:DOUBLESTAR^ factor)?
-      ;
+power returns [exprType etype]
+@after {
+    if ($etype != null) {
+        $power.tree = $etype;
+    }
+}
+    : atom (t+=trailer)* (options {greedy=true;}:DOUBLESTAR factor)? {
+        if ($t != null) {
+            exprType current = (exprType)$atom.tree;
+            for(int i = $t.size() - 1; i > -1; i--) {
+                Object o = $t.get(i);
+                //XXX: good place for an interface to avoid all of this instanceof
+                if (o instanceof Call) {
+                    Call c = (Call)o;
+                    c.func = current;
+                    current = c;
+                } else if (o instanceof Index) {
+                    Index c = (Index)o;
+                    c.value = current;
+                }
+                $etype = (exprType)o;
+            }
+        }
+    }
+    ;
 
 //atom: ('(' [yield_expr|testlist_gexp] ')' |
 //       '[' [listmaker] ']' |
@@ -1045,7 +1071,10 @@ lambdef: LAMBDA (varargslist)? COLON test[expr_contextType.Load] {debug("parsed 
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer : LPAREN (arglist)? RPAREN -> ^(Call ^(Args arglist)?)
+trailer : LPAREN (arglist -> ^(CallTok ^(Args arglist)?)
+                 | -> ^(LPAREN<Call>[$LPAREN, null, new exprType[0\], new keywordType[0\], null, null])
+                 )
+          RPAREN
         | LBRACK subscriptlist RBRACK -> ^(SubscriptList subscriptlist)
         | DOT^ NAME {debug("motched DOT^ NAME");}
         ;
@@ -1059,7 +1088,7 @@ subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
 subscript : DOT DOT DOT -> Ellipsis
           | (test[expr_contextType.Load] COLON) => t1=test[expr_contextType.Load] (COLON (t2=test[expr_contextType.Load])? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? sliceop?)
           | (COLON) => COLON (test[expr_contextType.Load])? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? sliceop?)
-          | test[expr_contextType.Load] -> ^(Index test)
+          | test[expr_contextType.Load] -> ^(Subscript<Index>[$test.start, (exprType)$test.tree])
           ;
 
 //sliceop: ':' [test]
