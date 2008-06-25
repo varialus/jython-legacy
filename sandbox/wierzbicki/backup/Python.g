@@ -117,7 +117,6 @@ tokens {
     ListComp;
     Repr;
     Subscript;
-    SubscriptList;
     Index;
     Target;
     Value;
@@ -168,6 +167,7 @@ import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
+import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.keywordType;
@@ -179,8 +179,11 @@ import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
 import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.Return;
+import org.python.antlr.ast.sliceType;
 import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Str;
+import org.python.antlr.ast.Subscript;
+import org.python.antlr.ast.Tuple;
 import org.python.core.Py;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
@@ -1012,12 +1015,13 @@ power returns [exprType etype]
                     Call c = (Call)o;
                     c.func = current;
                     current = c;
-                } else if (o instanceof Index) {
-                    Index c = (Index)o;
+                } else if (o instanceof Subscript) {
+                    Subscript c = (Subscript)o;
                     c.value = current;
+                    current = c;
                 }
-                $etype = (exprType)o;
             }
+            $etype = (exprType)current;
         }
     }
     ;
@@ -1075,14 +1079,45 @@ trailer : LPAREN (arglist -> ^(CallTok ^(Args arglist)?)
                  | -> ^(LPAREN<Call>[$LPAREN, null, new exprType[0\], new keywordType[0\], null, null])
                  )
           RPAREN
-        | LBRACK subscriptlist RBRACK -> ^(SubscriptList subscriptlist)
+        | LBRACK s=subscriptlist RBRACK -> $s
         | DOT^ NAME {debug("motched DOT^ NAME");}
         ;
 
 //subscriptlist: subscript (',' subscript)* [',']
-subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
-             -> subscript+
-              ;
+subscriptlist returns [exprType etype]
+@after {
+   $subscriptlist.tree = $etype;
+}
+    : sub+=subscript (options {greedy=true;}:COMMA sub+=subscript)* (COMMA)? {
+        sliceType s;
+        List sltypes = $sub;
+        if (sltypes.size() == 0) {
+            s = null;
+        } else if (sltypes.size() == 1){
+            s = (sliceType)sltypes.get(0);
+        } else {
+            sliceType[] st;
+            //FIXME: here I am using ClassCastException to decide if sltypes is populated with Index
+            //       only.  Clearly this is not the best way to do this but it's late. Somebody do
+            //       something better please :) -- (hopefully a note to self)
+            try {
+                Iterator iter = sltypes.iterator();
+                List etypes = new ArrayList();
+                while (iter.hasNext()) {
+                    Index i = (Index)iter.next();
+                    etypes.add(i.value);
+                }
+                exprType[] es = (exprType[])etypes.toArray(new exprType[etypes.size()]);
+                exprType t = new Tuple($subscriptlist.start, es, expr_contextType.Load);
+                s = new Index($subscriptlist.start, t);
+            } catch (ClassCastException cc) {
+                st = (sliceType[])sltypes.toArray(new sliceType[sltypes.size()]);
+                s = new ExtSlice($subscriptlist.start, st);
+            }
+        }
+        $etype = new Subscript($subscriptlist.start, null, s, $expr::ctype);
+    }
+    ;
 
 //subscript: '.' '.' '.' | test | [test] ':' [test] [sliceop]
 subscript : DOT DOT DOT -> Ellipsis
