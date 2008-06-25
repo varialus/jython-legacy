@@ -193,6 +193,10 @@ import java.util.Iterator;
 } 
 
 @members {
+    //If you want to use antlr's default error recovery mechanisms change this
+    //and the same one in the lexer to true.
+    public boolean antlrErrorHandling = false;
+
     //XXX: only used for single_input -- seems kludgy.
     public boolean inSingle = false;
     private boolean seenSingleOuterSuite = false;
@@ -430,57 +434,34 @@ import java.util.Iterator;
 
  
     protected void mismatch(IntStream input, int ttype, BitSet follow) throws RecognitionException {
-        throw new MismatchedTokenException(ttype, input);
-    }
-
-    protected void mismatch(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
-        throw e;
+        if (antlrErrorHandling) {
+            super.mismatch(input, ttype, follow);
+        } else {
+            throw new MismatchedTokenException(ttype, input);
+        }
     }
 
 	protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
 	{
+        if (antlrErrorHandling) {
+            return super.recoverFromMismatchedToken(input, ttype, follow);
+        }
         mismatch(input, ttype, follow);
         return null;
-    }
-
-
-    /**
-     * A list holding the error message(s) encountered during parse.
-     */
-    private List<String> _errors = new ArrayList<String>();
-
-    /**
-     * @return <code>true</code> if the parser collected one or more error messages,
-     *         <code>false</code> otherwise.
-     */
-    public boolean hasErrors() {
-      return getErrors().size() > 0;
-    }
-
-    /**
-     * @return A list of the error message(s) collected during parse.
-     */
-    public List<String> getErrors() {
-        return _errors;
-    }
-
-    /**
-     * Overridden to be able to collect error messages.
-     * <p>
-     * Since we do not want to lose the recovery mechanism and the verbose messages.
-     */
-    @Override
-    public void emitErrorMessage(String msg) {
-       super.emitErrorMessage(msg);
-       getErrors().add(msg);
     }
 
 }
 
 @rulecatch {
-catch (RecognitionException r) {
-    throw new ParseException(r);
+catch (RecognitionException re) {
+    if (antlrErrorHandling) {
+        reportError(re);
+        recover(input,re);
+    	retval.tree = (PythonTree)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+    } else {
+        throw new ParseException(re);
+    }
 }
 }
 
@@ -494,12 +475,20 @@ package org.python.antlr;
  *  a = [3,
  *       4]
  */
+
+//If you want to use antlr's default error recovery mechanisms change this
+//and the same one in the parser to true.
+public boolean antlrErrorHandling = false;
+
 //XXX: Hopefully we can remove inSingle when we get PyCF_DONT_IMPLY_DEDENT support.
 public boolean inSingle = false;
 int implicitLineJoiningLevel = 0;
 int startPos=-1;
 
     public Token nextToken() {
+        if (antlrErrorHandling) {
+            return super.nextToken();
+        }
         while (true) {
             state.token = null;
             state.channel = Token.DEFAULT_CHANNEL;
@@ -1075,7 +1064,7 @@ lambdef: LAMBDA (varargslist)? COLON test[expr_contextType.Load] {debug("parsed 
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer : LPAREN (arglist -> ^(CallTok ^(Args arglist)?)
+trailer : LPAREN (arglist ->  ^(LPAREN<Call>[$LPAREN, null, new exprType[0\], new keywordType[0\], null, null])
                  | -> ^(LPAREN<Call>[$LPAREN, null, new exprType[0\], new keywordType[0\], null, null])
                  )
           RPAREN
@@ -1163,26 +1152,37 @@ classdef: CLASS NAME (LPAREN testlist[expr_contextType.Load]? RPAREN)? COLON sui
     ;
 
 //arglist: (argument ',')* (argument [',']| '*' test [',' '**' test] | '**' test)
-arglist : argument (COMMA argument)*
-          ( COMMA
-            ( STAR starargs=test[expr_contextType.Load] (COMMA DOUBLESTAR kwargs=test[expr_contextType.Load])?
-            | DOUBLESTAR kwargs=test[expr_contextType.Load]
-            )?
-          )?
-       -> ^(Args argument+) ^(StarArgs $starargs)? ^(KWArgs $kwargs)?
-        |   STAR starargs=test[expr_contextType.Load] (COMMA DOUBLESTAR kwargs=test[expr_contextType.Load])?
-       -> ^(StarArgs $starargs) ^(KWArgs $kwargs)?
-        |   DOUBLESTAR kwargs=test[expr_contextType.Load]
-       -> ^(KWArgs $kwargs)
+arglist returns [List args, exprType starargs, exprType kwargs]
+    : a+=argument (COMMA a+=argument)*
+            ( COMMA
+                ( STAR s=test[expr_contextType.Load] (COMMA DOUBLESTAR k=test[expr_contextType.Load])?
+                | DOUBLESTAR k=test[expr_contextType.Load]
+                )?
+            )? {
+            $args=$a;
+            $starargs=(exprType)$s.tree;
+            $kwargs=(exprType)$k.tree;
+        }
+        |   STAR s=test[expr_contextType.Load] (COMMA DOUBLESTAR k=test[expr_contextType.Load])? {
+            $starargs=(exprType)$s.tree;
+            $kwargs=(exprType)$k.tree;
+        }
+        |   DOUBLESTAR k=test[expr_contextType.Load] {
+            $kwargs=(exprType)$k.tree;
+        }
         ;
 
 //argument: test [gen_for] | test '=' test  # Really [keyword '='] test
-argument : t1=test[expr_contextType.Load]
-         ( (ASSIGN t2=test[expr_contextType.Load]) -> ^(Keyword ^(Arg $t1) ^(Value $t2)?)
-         | gen_for -> ^(GenFor $t1 gen_for)
-         | -> ^(Arg $t1)
-         )
-         ;
+argument returns [exprType arg, exprType value]
+    : t1=test[expr_contextType.Load]
+        ( (ASSIGN t2=test[expr_contextType.Load]) {
+            $arg=(exprType)$t1.tree;
+            $value=(exprType)$t2.tree;
+        }
+        | gen_for //FIXME
+        | {$arg=(exprType)$t1.tree;}
+        )
+    ;
 
 //list_iter: list_for | list_if
 list_iter : list_for
