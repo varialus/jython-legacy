@@ -563,9 +563,12 @@ decorator returns [exprType etype]
    $decorator.tree = $etype;
 }
     : AT dotted_attr 
-    //XXX: ignoring the arglist and Call generation right now.
-    ( (LPAREN arglist? RPAREN) { $etype = $dotted_attr.etype; }
-    // ^(Decorator dotted_attr ^(CallTok ^(Args arglist)?))
+    ( LPAREN (arglist
+        {$etype = new Call($LPAREN, $dotted_attr.etype, makeExprs($arglist.args),
+                  makeKeywords($arglist.keywords), $arglist.starargs, $arglist.kwargs);}
+             | {$etype = $dotted_attr.etype;}
+             )
+      RPAREN
     | { $etype = $dotted_attr.etype; }
     ) NEWLINE
     ;
@@ -768,8 +771,10 @@ continue_stmt : CONTINUE
               ;
 
 //return_stmt: 'return' [testlist]
-return_stmt : RETURN (testlist[expr_contextType.Load])?
-          -> ^(RETURN ^(Value testlist)?)
+return_stmt : RETURN
+              (testlist[expr_contextType.Load] -> ^(RETURN<Return>[$RETURN, (exprType)$testlist.tree])
+              | -> ^(RETURN<Return>[$RETURN, null])
+              )
             ;
 
 //yield_stmt: yield_expr
