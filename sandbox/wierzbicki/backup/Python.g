@@ -97,7 +97,7 @@ tokens {
     KWArgs;
     AssignTok;
     AugAssign;
-    Tuple;
+    TupleTok;
     List;
     Dict;
     IfExp;
@@ -217,6 +217,7 @@ import java.util.Iterator;
         if (exprs != null) {
             List<exprType> result = new ArrayList<exprType>();
             for (int i=start; i<exprs.size(); i++) {
+                //System.out.println(exprs.get(i).getClass().getName());
                 exprType e = (exprType)exprs.get(i);
                 result.add(e);
             }
@@ -563,12 +564,14 @@ decorator returns [exprType etype]
    $decorator.tree = $etype;
 }
     : AT dotted_attr 
+    //XXX: ignoring the arglist and Call generation right now.
     ( LPAREN (arglist
         {$etype = new Call($LPAREN, $dotted_attr.etype, makeExprs($arglist.args),
                   makeKeywords($arglist.keywords), $arglist.starargs, $arglist.kwargs);}
              | {$etype = $dotted_attr.etype;}
              )
       RPAREN
+    // ^(Decorator dotted_attr ^(CallTok ^(Args arglist)?))
     | { $etype = $dotted_attr.etype; }
     ) NEWLINE
     ;
@@ -601,7 +604,7 @@ defparameter[List defaults] returns [exprType etype]
     : fpdef[expr_contextType.Param] (ASSIGN test[expr_contextType.Load])? {
         $etype = (exprType)$fpdef.tree;
         if ($ASSIGN != null) {
-            //defaults.add(test);
+            defaults.add($test.tree);
         } else if (!defaults.isEmpty()) {
             throw new ParseException(
                 "non-default argument follows default argument",
@@ -633,15 +636,15 @@ varargslist returns [argumentsType args]
 //fpdef: NAME | '(' fplist ')'
 fpdef[expr_contextType ctype] : NAME 
      -> ^(NameTok<Name>[$NAME, $NAME.text, ctype])
-      | LPAREN fplist RPAREN {debug("parsed fpdef:fplist");}
-     -> ^(FpList fplist)
+      | LPAREN fplist RPAREN
+     -> ^(LPAREN<Tuple>[$fplist.start, makeExprs($fplist.etypes), expr_contextType.Store])
       ;
 
 //fplist: fpdef (',' fpdef)* [',']
-fplist : fpdef[expr_contextType.Store] (options {greedy=true;}:COMMA fpdef[expr_contextType.Store])* (COMMA)?
-       {debug("parsed fplist");}
-      -> fpdef+
-       ;
+fplist returns [List etypes]
+    : f+=fpdef[expr_contextType.Store] (options {greedy=true;}:COMMA f+=fpdef[expr_contextType.Store])* (COMMA)?
+      {$etypes = $f;}
+    ;
 
 //stmt: simple_stmt | compound_stmt
 stmt : simple_stmt
@@ -1045,7 +1048,7 @@ power returns [exprType etype]
 atom : LPAREN 
        ( yield_expr    -> ^(Parens LPAREN yield_expr)
        | testlist_gexp {debug("parsed testlist_gexp");} -> ^(Parens LPAREN testlist_gexp)
-       | -> ^(Tuple)
+       | -> ^(TupleTok)
        )
        RPAREN
      | LBRACK
@@ -1073,7 +1076,7 @@ listmaker : test[expr_contextType.Load]
 
 //testlist_gexp: test ( gen_for | (',' test)* [','] )
 testlist_gexp
-    : test[expr_contextType.Load] ( ((options {k=2;}: c1=COMMA test[expr_contextType.Load])* (c2=COMMA)? -> { $c1 != null || $c2 != null }? ^(Tuple ^(Elts test+))
+    : test[expr_contextType.Load] ( ((options {k=2;}: c1=COMMA test[expr_contextType.Load])* (c2=COMMA)? -> { $c1 != null || $c2 != null }? ^(TupleTok ^(Elts test+))
                                                            -> test
              )
            | ( gen_for -> ^(GeneratorExp test gen_for))
@@ -1142,7 +1145,7 @@ sliceop : COLON (test[expr_contextType.Load])? -> ^(Step COLON ^(StepOp test)?)
         ;
 
 //exprlist: expr (',' expr)* [',']
-exprlist[expr_contextType ctype]: (expr[expr_contextType.Load] COMMA) => expr[ctype] (options {k=2;}: COMMA expr[ctype])* (COMMA)? -> ^(Tuple ^(Elts expr+))
+exprlist[expr_contextType ctype]: (expr[expr_contextType.Load] COMMA) => expr[ctype] (options {k=2;}: COMMA expr[ctype])* (COMMA)? -> ^(TupleTok ^(Elts expr+))
          | expr[ctype]
          ;
 
@@ -1154,8 +1157,8 @@ exprlist2 : expr[expr_contextType.Load] (options {k=2;}: COMMA expr[expr_context
 
 //testlist: test (',' test)* [',']
 testlist[expr_contextType ctype]
-    : test[ctype] (options {k=2;}: c1=COMMA test[ctype])* (c2=COMMA)?
-     -> { $c1 != null || $c2 != null }? ^(Tuple ^(Elts test+))
+    : t+=test[ctype] (options {k=2;}: c1=COMMA t+=test[ctype])* (c2=COMMA)?
+     -> { $c1 != null || $c2 != null }? ^(TupleTok<Tuple>[$testlist.start, makeExprs($t), ctype])
      -> test
     ;
 
