@@ -182,6 +182,7 @@ import org.python.antlr.ast.Name;
 import org.python.antlr.ast.Num;
 import org.python.antlr.ast.Pass;
 import org.python.antlr.ast.Print;
+import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.Return;
 import org.python.antlr.ast.sliceType;
@@ -842,7 +843,7 @@ yield_stmt : yield_expr
 
 //raise_stmt: 'raise' [test [',' test [',' test]]]
 raise_stmt: RAISE (t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load] (COMMA t3=test[expr_contextType.Load])?)?)?
-          -> ^(RAISE ^(Type $t1)? ^(Inst $t2)? ^(Tback $t3)?)
+          -> ^(RAISE<Raise>[$RAISE, (exprType)$t1.tree, (exprType)$t2.tree, (exprType)$t3.tree])
           ;
 
 //import_stmt: import_name | import_from
