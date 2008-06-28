@@ -158,6 +158,7 @@ import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.aliasType;
 import org.python.antlr.ast.argumentsType;
+import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.BinOp;
@@ -167,11 +168,13 @@ import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
+import org.python.antlr.ast.Exec;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.Global;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
@@ -256,6 +259,13 @@ import java.util.Iterator;
         return new exprType[0];
     }
 
+    private String[] makeNames(List names) {
+        List<String> s = new ArrayList<String>();
+        for(int i=0;i<names.size();i++) {
+            s.add(((Token)names.get(i)).getText());
+        }
+        return s.toArray(new String[s.size()]);
+    }
 
     private void throwGenExpNotSoleArg(PythonTree t) {
         throw new ParseException("Generator expression must be parenthesized if not sole argument", t);
@@ -912,18 +922,23 @@ dotted_name : NAME (DOT NAME)*
             ;
 
 //global_stmt: 'global' NAME (',' NAME)*
-global_stmt : GLOBAL NAME (COMMA NAME)*
-           -> ^(GLOBAL NAME+)
+global_stmt : GLOBAL n+=NAME (COMMA n+=NAME)*
+           -> ^(GLOBAL<Global>[$GLOBAL, makeNames($n)])
             ;
 
 //exec_stmt: 'exec' expr ['in' test [',' test]]
-exec_stmt : keyEXEC expr[expr_contextType.Load] ('in' t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)?
-         -> ^(keyEXEC expr ^(Globals $t1)? ^(Locals $t2)?)
-          ;
+exec_stmt returns [stmtType stype]
+@after {
+   $exec_stmt.tree = $stype;
+}
+    : keyEXEC expr[expr_contextType.Load] ('in' t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? {
+         $stype = new Exec($expr.start, (exprType)$expr.tree, (exprType)$t1.tree, (exprType)$t2.tree);
+    }
+    ;
 
 //assert_stmt: 'assert' test [',' test]
 assert_stmt : ASSERT t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?
-           -> ^(ASSERT ^(Test $t1) ^(Msg $t2)?)
+           -> ^(ASSERT<Assert>[$ASSERT, (exprType)$t1.tree, (exprType)$t2.tree])
             ;
 
 //compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | funcdef | classdef
