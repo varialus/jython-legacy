@@ -156,6 +156,7 @@ import org.antlr.runtime.CommonToken;
 
 import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
+import org.python.antlr.ast.aliasType;
 import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
@@ -171,6 +172,7 @@ import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FunctionDef;
+import org.python.antlr.ast.Import;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.keywordType;
 import org.python.antlr.ast.modType;
@@ -812,7 +814,7 @@ import_stmt : import_name
 
 //import_name: 'import' dotted_as_names
 import_name : IMPORT dotted_as_names
-           -> ^(IMPORT dotted_as_names)
+           -> ^(IMPORT<Import>[$IMPORT, $dotted_as_names.atypes])
             ;
 
 //import_from: ('from' ('.'* dotted_name | '.'+)
@@ -841,13 +843,22 @@ import_as_name : name=NAME (keyAS asname=NAME)?
 //       'as' to be a method name for Java integration).
 
 //dotted_as_name: dotted_name [('as' | NAME) NAME]
-dotted_as_name : dotted_name (keyAS asname=NAME)?
-              -> ^(Alias dotted_name ^(Asname NAME)?)
-               ;
+dotted_as_name returns [aliasType atype]
+@after {
+    $dotted_as_name.tree = $atype;
+}
+
+    : dotted_name (keyAS NAME)? {
+        $atype = new aliasType($NAME, $dotted_name.text, $NAME.text);
+    }
+    ;
 
 //dotted_as_names: dotted_as_name (',' dotted_as_name)*
-dotted_as_names : dotted_as_name (COMMA! dotted_as_name)*
-                ;
+dotted_as_names returns [aliasType[\] atypes]
+    : d+=dotted_as_name (COMMA! d+=dotted_as_name)* {
+        $atypes = (aliasType[])$d.toArray(new aliasType[$d.size()]);
+    }
+    ;
 //dotted_name: NAME ('.' NAME)*
 dotted_name : NAME (DOT NAME)*
             ;
