@@ -173,6 +173,7 @@ import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Import;
+import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.keywordType;
 import org.python.antlr.ast.modType;
@@ -211,6 +212,37 @@ import java.util.Iterator;
         if (debugOn) {
             System.out.println(message);
         }
+    }
+
+    private String makeFromText(List dots, String name) {
+        StringBuffer d = new StringBuffer();
+        if (dots != null) {
+            for (int i=0;i<dots.size();i++) {
+                d.append(".");
+            }
+        }
+        if (name != null) {
+            d.append(name);
+        }
+        return d.toString();
+    }
+
+    private int makeLevel(List lev) {
+        if (lev == null) {
+            return 0;
+        }
+        return lev.size();
+    }
+
+    private aliasType[] makeStarAlias(Token t) {
+        return new aliasType[]{new aliasType(t, "*", null)};
+    }
+
+    private aliasType[] makeAliases(aliasType[] atypes) {
+        if (atypes == null) {
+            return new aliasType[0];
+        }
+        return atypes;
     }
 
     private exprType[] makeBases(exprType etype) {
@@ -819,24 +851,32 @@ import_name : IMPORT dotted_as_names
 
 //import_from: ('from' ('.'* dotted_name | '.'+)
 //              'import' ('*' | '(' import_as_names ')' | import_as_names))
-import_from: FROM (DOT* dotted_name | DOT+) IMPORT 
+import_from: FROM (d+=DOT* dotted_name | d+=DOT+) IMPORT 
               (STAR
-             -> ^(FROM ^(Level DOT*)? ^(Value dotted_name)? ^(IMPORT STAR))
-              | import_as_names
-             -> ^(FROM ^(Level DOT*)? ^(Value dotted_name)? ^(IMPORT import_as_names))
-              | LPAREN import_as_names RPAREN
-             -> ^(FROM ^(Level DOT*)? ^(Value dotted_name)? ^(IMPORT import_as_names))
+             -> ^(FROM<ImportFrom>[$FROM, makeFromText($d, $dotted_name.text), makeStarAlias($STAR), makeLevel($d)])
+              | i1=import_as_names
+             -> ^(FROM<ImportFrom>[$FROM, makeFromText($d, $dotted_name.text), makeAliases($i1.atypes), makeLevel($d)])
+              | LPAREN i2=import_as_names RPAREN
+             -> ^(FROM<ImportFrom>[$FROM, makeFromText($d, $dotted_name.text), makeAliases($i2.atypes), makeLevel($d)])
               )
            ;
 
 //import_as_names: import_as_name (',' import_as_name)* [',']
-import_as_names : import_as_name (COMMA! import_as_name)* (COMMA!)?
-                ;
+import_as_names returns [aliasType[\] atypes]
+    : n+=import_as_name (COMMA! n+=import_as_name)* (COMMA!)? {
+        $atypes = (aliasType[])$n.toArray(new aliasType[$n.size()]);
+    }
+    ;
 
 //import_as_name: NAME [('as' | NAME) NAME]
-import_as_name : name=NAME (keyAS asname=NAME)?
-              -> ^(Alias $name ^(Asname $asname)?)
-               ;
+import_as_name returns [aliasType atype]
+@after {
+    $import_as_name.tree = $atype;
+}
+    : name=NAME (keyAS asname=NAME)? {
+        $atype = new aliasType($name, $name.text, $asname.text);
+    }
+    ;
 
 //XXX: when does CPython Grammar match "dotted_name NAME NAME"? This may be a big
 //       problem because of the keyAS rule, which matches NAME (needed to allow
@@ -859,6 +899,7 @@ dotted_as_names returns [aliasType[\] atypes]
         $atypes = (aliasType[])$d.toArray(new aliasType[$d.size()]);
     }
     ;
+
 //dotted_name: NAME ('.' NAME)*
 dotted_name : NAME (DOT NAME)*
             ;
