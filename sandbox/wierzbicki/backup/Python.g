@@ -98,7 +98,7 @@ tokens {
     AssignTok;
     AugAssign;
     TupleTok;
-    List;
+    ListTok;
     Dict;
     IfExp;
     TryExcept;
@@ -162,8 +162,10 @@ import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Call;
+import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
+import org.python.antlr.ast.Delete;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
@@ -209,6 +211,17 @@ import java.util.Iterator;
         }
     }
 
+    private exprType[] makeBases(exprType etype) {
+        if (etype != null) {
+            if (etype instanceof Tuple) {
+                return ((Tuple)etype).elts;
+            }
+            return new exprType[]{etype};
+        }
+        return new exprType[0];
+    }
+
+
     private exprType[] makeExprs(List exprs) {
         return makeExprs(exprs, 0);
     }
@@ -217,9 +230,12 @@ import java.util.Iterator;
         if (exprs != null) {
             List<exprType> result = new ArrayList<exprType>();
             for (int i=start; i<exprs.size(); i++) {
-                //System.out.println(exprs.get(i).getClass().getName());
-                exprType e = (exprType)exprs.get(i);
-                result.add(e);
+                Object o = exprs.get(i);
+                if (o instanceof exprType) {
+                    result.add((exprType)o);
+                } else if (o instanceof test_return) {
+                    result.add((exprType)((test_return)o).tree);
+                }
             }
             return result.toArray(new exprType[result.size()]);
         }
@@ -232,7 +248,7 @@ import java.util.Iterator;
             for (int i=0; i<stmts.size(); i++) {
                 Object o = stmts.get(i);
                 if (o instanceof stmtType) {
-                    result.add((stmtType)stmts.get(i));
+                    result.add((stmtType)o);
                 } else {
                     result.add((stmtType)((stmt_return)o).tree);
                 }
@@ -747,7 +763,7 @@ printlist2 returns [boolean newline, List elts]
 
 //del_stmt: 'del' exprlist
 del_stmt : DELETE exprlist2
-        -> ^(DELETE exprlist2)
+        -> ^(DELETE<Delete>[$DELETE, makeExprs($exprlist2.etypes)])
          ;
 
 //pass_stmt: 'pass'
@@ -1047,13 +1063,13 @@ power returns [exprType etype]
 //       NAME | NUMBER | STRING+)
 atom : LPAREN 
        ( yield_expr    -> ^(Parens LPAREN yield_expr)
-       | testlist_gexp {debug("parsed testlist_gexp");} -> ^(Parens LPAREN testlist_gexp)
-       | -> ^(TupleTok)
+       | testlist_gexp -> testlist_gexp
+       | -> ^(TupleTok<Tuple>[$LPAREN, new exprType[0\], $expr::ctype])
        )
        RPAREN
      | LBRACK
-       (listmaker -> ^(Brackets LBRACK listmaker)
-       | -> ^(Brackets LBRACK ^(List))
+       (listmaker -> listmaker
+       | -> ^(Brackets LBRACK ^(ListTok))
        )
        RBRACK
      | LCURLY (dictmaker)? RCURLY -> ^(Dict LCURLY ^(Elts dictmaker)?)
@@ -1068,19 +1084,28 @@ atom : LPAREN
      ;
 
 //listmaker: test ( list_for | (',' test)* [','] )
-listmaker : test[expr_contextType.Load] 
+listmaker returns [exprType etype]
+@after {
+   $listmaker.tree = $etype;
+}
+    : t+=test[expr_contextType.Load] 
             ( list_for -> ^(ListComp test list_for)
-            | (options {greedy=true;}:COMMA test[expr_contextType.Load])* -> ^(List ^(Elts test+))
+            | (options {greedy=true;}:COMMA t+=test[expr_contextType.Load])* {
+                $etype = new org.python.antlr.ast.List($listmaker.start, makeExprs($t), $expr::ctype);
+            }
             ) (COMMA)?
           ;
 
 //testlist_gexp: test ( gen_for | (',' test)* [','] )
 testlist_gexp
-    : test[expr_contextType.Load] ( ((options {k=2;}: c1=COMMA test[expr_contextType.Load])* (c2=COMMA)? -> { $c1 != null || $c2 != null }? ^(TupleTok ^(Elts test+))
-                                                           -> test
-             )
-           | ( gen_for -> ^(GeneratorExp test gen_for))
-           )
+    : t+=test[expr_contextType.Load]
+        ( ((options {k=2;}: c1=COMMA t+=test[expr_contextType.Load])* (c2=COMMA)?
+         -> { $c1 != null || $c2 != null }? ^(TupleTok<Tuple>[$testlist_gexp.start, makeExprs($t), $expr::ctype])
+         -> test
+          )
+        | ( gen_for -> ^(GeneratorExp test gen_for)
+          )
+        )
     ;
 
 //lambdef: 'lambda' [varargslist] ':' test
@@ -1145,21 +1170,30 @@ sliceop : COLON (test[expr_contextType.Load])? -> ^(Step COLON ^(StepOp test)?)
         ;
 
 //exprlist: expr (',' expr)* [',']
-exprlist[expr_contextType ctype]: (expr[expr_contextType.Load] COMMA) => expr[ctype] (options {k=2;}: COMMA expr[ctype])* (COMMA)? -> ^(TupleTok ^(Elts expr+))
-         | expr[ctype]
-         ;
+exprlist[expr_contextType ctype] returns [exprType etype]
+    : (expr[expr_contextType.Load] COMMA) => e+=expr[ctype] (options {k=2;}: COMMA e+=expr[ctype])* (COMMA)? {
+     $etype = new Tuple($exprlist.start, makeExprs($e), ctype);
+    }
+    | expr[ctype] {
+        $etype = (exprType)$expr.tree;
+    }
+    ;
 
 //XXX: I'm hoping I can get rid of this -- but for now I need an exprlist that does not produce tuples
 //     at least for del_stmt
-exprlist2 : expr[expr_contextType.Load] (options {k=2;}: COMMA expr[expr_contextType.Load])* (COMMA)?
-         -> expr+
-          ;
+exprlist2 returns [List etypes]
+    : e+=expr[expr_contextType.Load] (options {k=2;}: COMMA e+=expr[expr_contextType.Load])* (COMMA)?
+    {$etypes = $e;}
+    ;
 
 //testlist: test (',' test)* [',']
-testlist[expr_contextType ctype]
-    : t+=test[ctype] (options {k=2;}: c1=COMMA t+=test[ctype])* (c2=COMMA)?
-     -> { $c1 != null || $c2 != null }? ^(TupleTok<Tuple>[$testlist.start, makeExprs($t), ctype])
-     -> test
+testlist[expr_contextType ctype] returns [exprType etype]
+    : (test[expr_contextType.Load] COMMA) => t+=test[ctype] (options {k=2;}: c1=COMMA t+=test[ctype])* (c2=COMMA)? {
+          $etype = new Tuple($testlist.start, makeExprs($t), ctype);
+    }
+    | test[ctype] {
+          $etype = (exprType)$test.tree;
+    }
     ;
 
 //XXX:
@@ -1172,8 +1206,13 @@ dictmaker : test[expr_contextType.Load] COLON test[expr_contextType.Load]
           ;
 
 //classdef: 'class' NAME ['(' [testlist] ')'] ':' suite
-classdef: CLASS NAME (LPAREN testlist[expr_contextType.Load]? RPAREN)? COLON suite
-    -> ^(CLASS NAME ^(Bases testlist)? ^(Body suite))
+classdef returns [stmtType stype]
+@after {
+   $classdef.tree = $stype;
+}
+    :CLASS NAME (LPAREN testlist[expr_contextType.Load]? RPAREN)? COLON suite {
+        $stype = new ClassDef($CLASS, $NAME.getText(), makeBases($testlist.etype), makeStmts($suite.stmts));
+    }
     ;
 
 //arglist: (argument ',')* (argument [',']| '*' test [',' '**' test] | '**' test)
