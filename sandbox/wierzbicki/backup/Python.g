@@ -168,6 +168,7 @@ import org.python.antlr.ast.ClassDef;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
+import org.python.antlr.ast.excepthandlerType;
 import org.python.antlr.ast.Exec;
 import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
@@ -194,8 +195,11 @@ import org.python.antlr.ast.sliceType;
 import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Subscript;
+import org.python.antlr.ast.TryExcept;
+import org.python.antlr.ast.TryFinally;
 import org.python.antlr.ast.Tuple;
 import org.python.antlr.ast.While;
+import org.python.antlr.ast.With;
 import org.python.core.Py;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
@@ -345,6 +349,31 @@ import java.util.ListIterator;
         stmtType[] o = makeStmts(orelse);
         stmtType[] b = makeStmts(body);
         return new For(t, target, iter, b, o);
+    }
+
+    private stmtType makeTryExcept(Token t, List body, List handlers, List orelse, List finBody) {
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        excepthandlerType[] e = (excepthandlerType[])handlers.toArray(new excepthandlerType[handlers.size()]);
+        stmtType[] o;
+        if (orelse != null) {
+            o = (stmtType[])orelse.toArray(new stmtType[orelse.size()]);
+        } else {
+            o = new stmtType[0];
+        }
+ 
+        stmtType te = new TryExcept(t, b, e, o);
+        if (finBody == null) {
+            return te;
+        }
+        stmtType[] f = (stmtType[])finBody.toArray(new stmtType[finBody.size()]);
+        stmtType[] mainBody = new stmtType[]{te};
+        return new TryFinally(t, mainBody, f);
+    }
+
+    private TryFinally makeTryFinally(Token t,  List body, List finBody) {
+        stmtType[] b = (stmtType[])body.toArray(new stmtType[body.size()]);
+        stmtType[] f = (stmtType[])finBody.toArray(new stmtType[finBody.size()]);
+        return new TryFinally(t, b, f);
     }
  
     private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements, List decorators) {
@@ -1016,28 +1045,40 @@ for_stmt returns [stmtType stype]
 //           ['else' ':' suite]
 //           ['finally' ':' suite] |
 //           'finally' ':' suite))
-try_stmt : 'try' COLON trysuite=suite
-           ( (except_clause+ (ORELSE COLON elsesuite=suite)? (FINALLY COLON finalsuite=suite)?
-          -> ^(TryExcept 'try' ^(Body $trysuite) except_clause+ ^(ORELSE $elsesuite)? ^(FINALLY $finalsuite)?))
-           | (FINALLY COLON finalsuite=suite
-          -> ^(TryFinally 'try' ^(Body $trysuite) ^(FINALLY $finalsuite)))
-           )
-         ;
-
-//with_stmt: 'with' test [ with_var ] ':' suite
-with_stmt: WITH test[expr_contextType.Load] (with_var)? COLON suite
-        -> ^(WITH test with_var? ^(Body suite))
-         ;
-
-//with_var: ('as' | NAME) expr
-with_var: (keyAS | NAME) expr[expr_contextType.Load]
+try_stmt returns [stmtType stype]
+@after {
+   $try_stmt.tree = $stype;
+}
+    : TRY COLON trysuite=suite
+        ( e+=except_clause+ (ORELSE COLON elsesuite=suite)? (FINALLY COLON finalsuite=suite)? {
+            $stype = makeTryExcept($TRY, $trysuite.stmts, $e, $elsesuite.stmts, $finalsuite.stmts);
+        }
+        | FINALLY COLON finalsuite=suite {
+            $stype = makeTryFinally($TRY, $trysuite.stmts, $finalsuite.stmts);
+        }
+        )
         ;
 
+//with_stmt: 'with' test [ with_var ] ':' suite
+with_stmt returns [stmtType stype]
+@after {
+   $with_stmt.tree = $stype;
+}
+    :WITH test[expr_contextType.Load] (with_var)? COLON suite {
+        $stype = new With($WITH, (exprType)$test.tree, $with_var.etype, makeStmts($suite.stmts));
+    }
+    ;
+
+//with_var: ('as' | NAME) expr
+with_var returns [exprType etype]
+    : (keyAS | NAME) expr[expr_contextType.Load] {
+        $etype = (exprType)$expr.tree;
+    }
+    ;
+
 //except_clause: 'except' [test [',' test]]
-except_clause : 'except' (t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? COLON suite
-             //Note: passing the 'except' keyword on so we can pass the same offset
-             //      as CPython.
-             -> ^(ExceptHandler 'except' ^(Type $t1)? ^(Value $t2)? ^(Body suite))
+except_clause : EXCEPT (t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? COLON suite
+             -> ^(EXCEPT<excepthandlerType>[$EXCEPT, (exprType)$t1.tree, (exprType)$t2.tree, makeStmts($suite.stmts), $EXCEPT.getLine(), $EXCEPT.getCharPositionInLine()])
               ;
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
@@ -1452,6 +1493,8 @@ YIELD     : 'yield' ;
 ASSERT    : 'assert' ;
 FINALLY   : 'finally' ;
 DELETE    : 'del' ;
+EXCEPT    : 'except' ;
+TRY       : 'try' ;
 
 LPAREN    : '(' {implicitLineJoiningLevel++;} ;
 
