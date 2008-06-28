@@ -175,6 +175,7 @@ import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.ExtSlice;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
+import org.python.antlr.ast.If;
 import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
@@ -199,6 +200,7 @@ import org.python.core.PyUnicode;
 
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.ListIterator;
 } 
 
 @members {
@@ -289,6 +291,24 @@ import java.util.Iterator;
             return result.toArray(new exprType[result.size()]);
         }
         return new exprType[0];
+    }
+    
+    private stmtType[] makeElses(List elseSuite, List elifs) {
+        stmtType[] o;
+        if (elseSuite != null) {
+            o = makeStmts(elseSuite);
+        } else {
+            o = new stmtType[0];
+        }
+        if (elifs != null) {
+            ListIterator iter = elifs.listIterator(elifs.size());
+            while (iter.hasPrevious()) {
+                If elif = (If)iter.previous();
+                elif.orelse = o;
+                o = new stmtType[]{elif};
+            }
+        }
+        return o;
     }
 
     private stmtType[] makeStmts(List stmts) {
@@ -952,13 +972,13 @@ compound_stmt : if_stmt
               ;
 
 //if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
-if_stmt: IF test[expr_contextType.Load] COLON ifsuite=suite elif_clause*  (ORELSE COLON elsesuite=suite)?
-      -> ^(IF test $ifsuite elif_clause* ^(ORELSE $elsesuite)?)
+if_stmt: IF test[expr_contextType.Load] COLON ifsuite=suite elifs+=elif_clause*  (ORELSE COLON elsesuite=suite)?
+      -> ^(IF<If>[$IF, (exprType)$test.tree, makeStmts($ifsuite.stmts), makeElses($elsesuite.stmts, $elifs)])
        ;
 
 //not in CPython's Grammar file
 elif_clause : ELIF test[expr_contextType.Load] COLON suite
-           -> ^(ELIF test suite)
+           -> ^(ELIF<If>[$ELIF, (exprType)$test.tree, makeStmts($suite.stmts), new stmtType[0\]])
             ;
 
 //while_stmt: 'while' test ':' suite ['else' ':' suite]
