@@ -173,6 +173,7 @@ import org.python.antlr.ast.Expr;
 import org.python.antlr.ast.exprType;
 import org.python.antlr.ast.expr_contextType;
 import org.python.antlr.ast.ExtSlice;
+import org.python.antlr.ast.For;
 import org.python.antlr.ast.FunctionDef;
 import org.python.antlr.ast.Global;
 import org.python.antlr.ast.If;
@@ -194,6 +195,7 @@ import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Str;
 import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.Tuple;
+import org.python.antlr.ast.While;
 import org.python.core.Py;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
@@ -295,11 +297,7 @@ import java.util.ListIterator;
     
     private stmtType[] makeElses(List elseSuite, List elifs) {
         stmtType[] o;
-        if (elseSuite != null) {
-            o = makeStmts(elseSuite);
-        } else {
-            o = new stmtType[0];
-        }
+        o = makeStmts(elseSuite);
         if (elifs != null) {
             ListIterator iter = elifs.listIterator(elifs.size());
             while (iter.hasPrevious()) {
@@ -337,6 +335,18 @@ import java.util.ListIterator;
         return current;
     }
 
+    private While makeWhile(Token t, exprType test, List body, List orelse) {
+        stmtType[] o = makeStmts(orelse);
+        stmtType[] b = makeStmts(body);
+        return new While(t, test, b, o);
+    }
+
+    private For makeFor(Token t, exprType target, exprType iter, List body, List orelse) {
+        stmtType[] o = makeStmts(orelse);
+        stmtType[] b = makeStmts(body);
+        return new For(t, target, iter, b, o);
+    }
+ 
     private FunctionDef makeFunctionDef(PythonTree t, PythonTree nameToken, argumentsType args, List funcStatements, List decorators) {
         argumentsType a;
         debug("Matched FunctionDef");
@@ -982,14 +992,24 @@ elif_clause : ELIF test[expr_contextType.Load] COLON suite
             ;
 
 //while_stmt: 'while' test ':' suite ['else' ':' suite]
-while_stmt : WHILE test[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)?
-          -> ^(WHILE test ^(Body $s1) ^(ORELSE $s2)?)
-           ;
+while_stmt returns [stmtType stype]
+@after {
+   $while_stmt.tree = $stype;
+}
+    : WHILE test[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)? {
+        $stype = makeWhile($WHILE, (exprType)$test.tree, $s1.stmts, $s2.stmts);
+    }
+    ;
 
 //for_stmt: 'for' exprlist 'in' testlist ':' suite ['else' ':' suite]
-for_stmt : FOR exprlist[expr_contextType.Store] IN testlist[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)?
-        -> ^(FOR ^(Target exprlist) ^(IN testlist) ^(Body $s1) ^(ORELSE $s2)?)
-         ;
+for_stmt returns [stmtType stype]
+@after {
+   $for_stmt.tree = $stype;
+}
+    : FOR exprlist[expr_contextType.Store] IN testlist[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)? {
+        $stype = makeFor($FOR, $exprlist.etype, (exprType)$testlist.tree, $s2.stmts, $s2.stmts);
+    }
+    ;
 
 //try_stmt: ('try' ':' suite
 //           ((except_clause ':' suite)+
