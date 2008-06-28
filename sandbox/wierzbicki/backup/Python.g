@@ -256,6 +256,10 @@ import java.util.Iterator;
     }
 
 
+    private void throwGenExpNotSoleArg(PythonTree t) {
+        throw new ParseException("Generator expression must be parenthesized if not sole argument", t);
+    }
+
     private exprType[] makeExprs(List exprs) {
         return makeExprs(exprs, 0);
     }
@@ -686,6 +690,8 @@ varargslist returns [argumentsType args]
 //fpdef: NAME | '(' fplist ')'
 fpdef[expr_contextType ctype] : NAME 
      -> ^(NameTok<Name>[$NAME, $NAME.text, ctype])
+      | (LPAREN fpdef[expr_contextType.Load] COMMA) => LPAREN fplist RPAREN
+     -> fplist
       | LPAREN fplist RPAREN
      -> ^(LPAREN<Tuple>[$fplist.start, makeExprs($fplist.etypes), expr_contextType.Store])
       ;
