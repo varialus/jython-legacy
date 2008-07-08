@@ -1,0 +1,5 @@
+{% extends "admin/change_form.html" %}
+
+{% block form_top %}
+  <a href="http://maps.google.com/maps?f=q&hl=en&geocode=&q={{bound_field_sets.0.bound_field_lines.0.bound_fields.0.original.name}},+{{bound_field_sets.0.bound_field_lines.0.bound_fields.0.original.country.name}}&ie=UTF8&z=11&iwloc=addr">Map it!</a>
+{% endblock %}

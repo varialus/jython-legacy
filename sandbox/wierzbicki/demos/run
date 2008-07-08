@@ -1,0 +1,5 @@
+#!/bin/sh
+JYTHON_HOME=/Users/frank/test/jython-trunk/dist
+DJANGO_HOME=/Users/frank/src/django/trunk/
+JYTHON_JAVA_ARGS="-classpath $JYTHON_HOME/jython.jar:$CLASSPATH"
+$JAVA_HOME/bin/java $JYTHON_JAVA_ARGS -Dpython.path="$DJANGO_HOME" -Dpython.home="$JYTHON_HOME" org.python.util.jython "$@"
