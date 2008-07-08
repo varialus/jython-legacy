@@ -1,0 +1,9 @@
+{% if five_cities %}
+    <ul>
+    {% for c in five_cities %}
+        <li>{{ c.name }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No cities are available.</p>
+{% endif %}
