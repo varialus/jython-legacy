@@ -288,7 +288,7 @@ MUS = Country(code='MUS', name='Mauritius',continent=Africa, region='Eastern Afr
 MUS.save() 
 MYT = Country(code='MYT', name='Mayotte',continent=Africa, region='Eastern Africa', surface_area=373.00, indep_year=None, population=149000, life_expectancy=59.5, gnp=0.00, gnp_old=None, local_name='Mayotte', government_form='Territorial Collectivity of France', head_of_state='Jacques Chirac',capital=None,code2='YT')
 MYT.save() 
-MEX = Country(code='MEX', name='Mexico',continent=North_America, region='Central America', surface_area=1958201.00, indep_year=1810, population=98881000, life_expectancy=71.5, gnp=414972.00, gnp_old=401461.00, local_name='México', government_form='Federal Republic', head_of_state='Vicente Fox Quesada',capital=None,code2='MX')
+MEX = Country(code='MEX', name='Mexico',continent=North_America, region='Central America', surface_area=1958201.00, indep_year=1810, population=98881000, life_expectancy=71.5, gnp=414972.00, gnp_old=401461.00, local_name='Mexico', government_form='Federal Republic', head_of_state='Vicente Fox Quesada',capital=None,code2='MX')
 MEX.save() 
 FSM = Country(code='FSM', name='Micronesia, Federated States of',continent=Oceania, region='Micronesia', surface_area=702.00, indep_year=1990, population=119000, life_expectancy=68.6, gnp=212.00, gnp_old=None, local_name='Micronesia', government_form='Federal Republic', head_of_state='Leo A. Falcam',capital=None,code2='FM')
 FSM.save() 

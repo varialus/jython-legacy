@@ -66,7 +66,7 @@ class City(models.Model):
         list_display = ('name',
                 'country',
                 'district',
-                'population',
+                #'population',
                 )
 
         list_filter = ('country',
