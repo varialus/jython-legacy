@@ -77,7 +77,7 @@ options {
 tokens {
     INDENT;
     DEDENT;
-    
+
     ModuleTok;
     Interactive;
     Expression;
@@ -165,6 +165,9 @@ import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
+import org.python.antlr.ast.cmpopType;
+import org.python.antlr.ast.Compare;
+import org.python.antlr.ast.comprehensionType;
 import org.python.antlr.ast.Context;
 import org.python.antlr.ast.Continue;
 import org.python.antlr.ast.Delete;
@@ -182,6 +185,7 @@ import org.python.antlr.ast.Import;
 import org.python.antlr.ast.ImportFrom;
 import org.python.antlr.ast.Index;
 import org.python.antlr.ast.keywordType;
+import org.python.antlr.ast.Lambda;
 import org.python.antlr.ast.modType;
 import org.python.antlr.ast.Module;
 import org.python.antlr.ast.Name;
@@ -990,7 +994,7 @@ exec_stmt returns [stmtType stype]
 @after {
    $exec_stmt.tree = $stype;
 }
-    : keyEXEC expr[expr_contextType.Load] ('in' t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? {
+    : keyEXEC expr[expr_contextType.Load] (IN t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? {
          $stype = new Exec($expr.start, (exprType)$expr.tree, (exprType)$t1.tree, (exprType)$t2.tree);
     }
     ;
@@ -1111,7 +1115,23 @@ not_test[expr_contextType ctype] : NOT^ not_test[ctype]
          ;
 
 //comparison: expr (comp_op expr)*
-comparison[expr_contextType ctype]: expr[ctype] (comp_op^ expr[ctype])*
+comparison[expr_contextType ctype]
+@after {
+    if ($comparison.tree instanceof Compare) {
+        System.out.println("found Compare");
+        Compare c = (Compare)$comparison.tree;
+        //FIXME: Only handling the case of a single comparison.
+        c.left = (exprType)c.getChild(0);
+        System.out.println("c.left:" + c.left);
+        c.comparators =  new exprType[]{(exprType)c.getChild(1)};
+        switch (c.getType()) {
+        case IN:
+            c.ops = new cmpopType[]{cmpopType.In};
+            break;
+        }
+    }
+}
+    : expr[ctype] (IN<Compare>^ expr[ctype])*
     ;
 
 //comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
@@ -1122,8 +1142,8 @@ comp_op : LESS
         | LESSEQUAL
         | ALT_NOTEQUAL
         | NOTEQUAL
-        | 'in'
-        | NOT 'in' -> NotIn
+        | IN
+        | NOT IN -> NotIn
         | 'is'
         | 'is' NOT -> IsNot
         ;
@@ -1265,7 +1285,7 @@ testlist_gexp
 
 //lambdef: 'lambda' [varargslist] ':' test
 lambdef: LAMBDA (varargslist)? COLON test[expr_contextType.Load] {debug("parsed lambda");}
-      -> ^(LAMBDA varargslist? ^(Body test))
+      -> ^(LAMBDA<Lambda>[$LAMBDA, $varargslist.args, (exprType)$test.tree])
        ;
 
 //trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
@@ -1414,7 +1434,7 @@ list_iter : list_for
 
 //list_for: 'for' exprlist 'in' testlist_safe [list_iter]
 list_for : FOR exprlist[expr_contextType.Load] IN testlist[expr_contextType.Load] (list_iter)?
-        -> ^(ListFor ^(Target exprlist) ^(IN testlist) ^(Ifs list_iter)?)
+        -> ^(FOR<comprehensionType>[$FOR, $exprlist.etype, $testlist.etype, null])
          ;
 
 //list_if: 'if' test [list_iter]
