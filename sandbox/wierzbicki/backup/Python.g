@@ -214,15 +214,15 @@ import java.util.ListIterator;
 } 
 
 @members {
-    //If you want to use antlr's default error recovery mechanisms change this
-    //and the same one in the lexer to true.
-    public boolean antlrErrorHandling = false;
+    boolean debugOn = false;
 
-    //XXX: only used for single_input -- seems kludgy.
-    public boolean inSingle = false;
+    private ErrorHandler errorHandler;
+
     private boolean seenSingleOuterSuite = false;
 
-    boolean debugOn = false;
+    public void setErrorHandler(ErrorHandler eh) {
+        this.errorHandler = eh;
+    }
 
     private void debug(String message) {
         if (debugOn) {
@@ -409,8 +409,8 @@ import java.util.ListIterator;
     }
 
     private exprType makeAssignValue(List rhs) {
-        testlist_return r = (testlist_return)rhs.get(rhs.size() -1);
-        exprType value = (exprType)r.getTree();
+        exprType value = (exprType)rhs.get(rhs.size() -1);
+
         if (value instanceof Context) {
             //XXX: for Tuples, etc -- will need to recursively set to expr_contextType.Load.
             ((Context)value).setContext(expr_contextType.Load);
@@ -453,12 +453,15 @@ import java.util.ListIterator;
 
     keywordType[] makeKeywords(List args) {
         List<keywordType> k = new ArrayList<keywordType>();
-        for(int i=0;i<args.size();i++) {
-            exprType[] e = (exprType[])args.get(i);
-            Name arg = (Name)e[0];
-            k.add(new keywordType(arg, arg.id, e[1]));
+        if (args != null) {
+            for(int i=0;i<args.size();i++) {
+                exprType[] e = (exprType[])args.get(i);
+                Name arg = (Name)e[0];
+                k.add(new keywordType(arg, arg.id, e[1]));
+            }
+            return k.toArray(new keywordType[k.size()]);
         }
-        return k.toArray(new keywordType[k.size()]);
+        return new keywordType[0];
     }
 
     Object makeFloat(Token t) {
@@ -574,23 +577,22 @@ import java.util.ListIterator;
     }
 
     Token extractStringToken(List s) {
-        //XXX: really we want the *last* one.
-        return (Token)s.get(0);
+        return (Token)s.get(s.size() - 1);
     }
 
  
     protected void mismatch(IntStream input, int ttype, BitSet follow) throws RecognitionException {
-        if (antlrErrorHandling) {
+        if (errorHandler.isRecoverable()) {
             super.mismatch(input, ttype, follow);
         } else {
             throw new MismatchedTokenException(ttype, input);
         }
     }
 
-	protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow)
-		throws RecognitionException
-	{
-        if (antlrErrorHandling) {
+    protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow)
+        throws RecognitionException
+    {
+        if (errorHandler.isRecoverable()) {
             return super.recoverFromMismatchedToken(input, ttype, follow);
         }
         mismatch(input, ttype, follow);
@@ -601,13 +603,9 @@ import java.util.ListIterator;
 
 @rulecatch {
 catch (RecognitionException re) {
-    if (antlrErrorHandling) {
-        reportError(re);
-        recover(input,re);
-    	retval.tree = (PythonTree)adaptor.errorNode(input, retval.start, input.LT(-1), re);
-    } else {
-        throw new ParseException(re);
-    }
+    errorHandler.reportError(this, re);
+    errorHandler.recover(this, input,re);
+    retval.tree = (PythonTree)adaptor.errorNode(input, retval.start, input.LT(-1), re);
 }
 }
 
@@ -622,19 +620,23 @@ package org.python.antlr;
  *       4]
  */
 
-//If you want to use antlr's default error recovery mechanisms change this
-//and the same one in the parser to true.
-public boolean antlrErrorHandling = false;
+//If you want to use another error recovery mechanisms change this
+//and the same one in the parser.
+private ErrorHandler errorHandler;
 
-//XXX: Hopefully we can remove inSingle when we get PyCF_DONT_IMPLY_DEDENT support.
-public boolean inSingle = false;
 int implicitLineJoiningLevel = 0;
 int startPos=-1;
 
+    public void setErrorHandler(ErrorHandler eh) {
+        this.errorHandler = eh;
+    }
+
+    /** 
+     *  Taken directly from antlr's Lexer.java -- needs to be re-integrated every time
+     *  we upgrade from Antlr (need to consider a Lexer subclass, though the issue would
+     *  remain).
+     */
     public Token nextToken() {
-        if (antlrErrorHandling) {
-            return super.nextToken();
-        }
         while (true) {
             state.token = null;
             state.channel = Token.DEFAULT_CHANNEL;
@@ -654,16 +656,19 @@ int startPos=-1;
                     continue;
                 }
                 return state.token;
-            }
-            catch (RecognitionException re) {
-                throw new ParseException(re);
+            } catch (NoViableAltException nva) {
+                errorHandler.reportError(this, nva);
+                errorHandler.recover(this, nva); // throw out current char and try again
+            } catch (RecognitionException re) {
+                errorHandler.reportError(this, re);
+                // match() routine has already called recover()
             }
         }
     }
 }
 
 //single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
-single_input : NEWLINE -> ^(Interactive)
+single_input : NEWLINE? -> ^(Interactive)
              | simple_stmt -> ^(Interactive simple_stmt)
              | compound_stmt NEWLINE -> ^(Interactive compound_stmt)
              ;
@@ -684,6 +689,44 @@ dotted_attr returns [exprType etype]
       ( (DOT n2+=dotted_attr)+ { $etype = makeDottedAttr($n1, $n2); }
       | { $etype = new Name($NAME, $NAME.text, expr_contextType.Load); }
       )
+    ;
+
+//attr is here for Java  compatibility.  A Java foo.getIf() can be called from Jython as foo.if
+//     so we need to support any keyword as an attribute.
+
+attr
+    : NAME
+    | AND
+    | AS
+    | ASSERT
+    | BREAK
+    | CLASS
+    | CONTINUE
+    | DEF
+    | DELETE
+    | ELIF
+    | EXCEPT
+    | EXEC
+    | FINALLY
+    | FROM
+    | FOR
+    | GLOBAL
+    | IF
+    | IMPORT
+    | IN
+    | IS
+    | LAMBDA
+    | NOT
+    | OR
+    | ORELSE
+    | PASS
+    | PRINT
+    | RAISE
+    | RETURN
+    | TRY
+    | WHILE
+    | WITH
+    | YIELD
     ;
 
 //decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
@@ -953,22 +996,19 @@ import_as_name returns [aliasType atype]
 @after {
     $import_as_name.tree = $atype;
 }
-    : name=NAME (keyAS asname=NAME)? {
+    : name=NAME (AS asname=NAME)? {
         $atype = new aliasType($name, $name.text, $asname.text);
     }
     ;
 
-//XXX: when does CPython Grammar match "dotted_name NAME NAME"? This may be a big
-//       problem because of the keyAS rule, which matches NAME (needed to allow
-//       'as' to be a method name for Java integration).
-
+//XXX: when does CPython Grammar match "dotted_name NAME NAME"?
 //dotted_as_name: dotted_name [('as' | NAME) NAME]
 dotted_as_name returns [aliasType atype]
 @after {
     $dotted_as_name.tree = $atype;
 }
 
-    : dotted_name (keyAS NAME)? {
+    : dotted_name (AS NAME)? {
         $atype = new aliasType($NAME, $dotted_name.text, $NAME.text);
     }
     ;
@@ -981,7 +1021,7 @@ dotted_as_names returns [aliasType[\] atypes]
     ;
 
 //dotted_name: NAME ('.' NAME)*
-dotted_name : NAME (DOT NAME)*
+dotted_name : NAME (DOT attr)*
             ;
 
 //global_stmt: 'global' NAME (',' NAME)*
@@ -994,7 +1034,7 @@ exec_stmt returns [stmtType stype]
 @after {
    $exec_stmt.tree = $stype;
 }
-    : keyEXEC expr[expr_contextType.Load] (IN t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? {
+    : EXEC expr[expr_contextType.Load] (IN t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? {
          $stype = new Exec($expr.start, (exprType)$expr.tree, (exprType)$t1.tree, (exprType)$t2.tree);
     }
     ;
@@ -1075,7 +1115,7 @@ with_stmt returns [stmtType stype]
 
 //with_var: ('as' | NAME) expr
 with_var returns [exprType etype]
-    : (keyAS | NAME) expr[expr_contextType.Load] {
+    : (AS | NAME) expr[expr_contextType.Load] {
         $etype = (exprType)$expr.tree;
     }
     ;
@@ -1144,8 +1184,8 @@ comp_op : LESS
         | NOTEQUAL
         | IN
         | NOT IN -> NotIn
-        | 'is'
-        | 'is' NOT -> IsNot
+        | IS
+        | IS NOT -> IsNot
         ;
 
 //expr: xor_expr ('|' xor_expr)*
@@ -1254,7 +1294,7 @@ atom : LPAREN
      | LONGINT -> ^(NumTok<Num>[$LONGINT, makeInt($LONGINT)])
      | FLOAT -> ^(NumTok<Num>[$FLOAT, makeFloat($FLOAT)])
      | COMPLEX -> ^(NumTok<Num>[$COMPLEX, makeComplex($COMPLEX)])
-     | (S+=STRING)+ {debug("S+: " + $S);} 
+     | (S+=STRING)+ 
     -> ^(StrTok<Str>[extractStringToken($S), extractStrings($S)])
      ;
 
@@ -1294,7 +1334,7 @@ trailer : LPAREN (arglist ->  ^(LPAREN<Call>[$LPAREN, null, makeExprs($arglist.a
                  )
           RPAREN
         | LBRACK s=subscriptlist RBRACK -> $s
-        | DOT^ NAME {debug("motched DOT^ NAME");}
+        | DOT^ attr {debug("motched DOT^ NAME");}
         ;
 
 //subscriptlist: subscript (',' subscript)* [',']
@@ -1465,56 +1505,34 @@ yield_expr : YIELD testlist[expr_contextType.Load]?
 //XXX:
 //testlist1: test (',' test)*
 
-//These are all Python keywords that are not Java keywords
-//This means that Jython needs to support these as NAMEs
-//unlike CPython.  For now I have only done this for 'as'
-//and 'exec'.
-
-//keyAND    : {input.LT(1).getText().equals("and")}? NAME ;
-keyAS     : {input.LT(1).getText().equals("as")}? NAME ;
-//keyDEF    : {input.LT(1).getText().equals("def")}? NAME ;
-//keyDEL    : {input.LT(1).getText().equals("del")}? NAME ;
-//keyELIF   : {input.LT(1).getText().equals("elif")}? NAME ;
-//keyEXCEPT : {input.LT(1).getText().equals("except")}? NAME ;
-keyEXEC   : {input.LT(1).getText().equals("exec")}? NAME ;
-//keyFROM   : {input.LT(1).getText().equals("from")}? NAME ;
-//keyGLOBAL : {input.LT(1).getText().equals("global")}? NAME ;
-//keyIN     : {input.LT(1).getText().equals("in")}? NAME ;
-//keyIS     : {input.LT(1).getText().equals("is")}? NAME ;
-//keyLAMBDA : {input.LT(1).getText().equals("lambda")}? NAME ;
-//keyNOT    : {input.LT(1).getText().equals("not")}? NAME ;
-//keyOR     : {input.LT(1).getText().equals("or")}? NAME ;
-//keyPASS   : {input.LT(1).getText().equals("pass")}? NAME ;
-//keyPRINT  : {input.LT(1).getText().equals("print")}? NAME ;
-//keyRAISE  : {input.LT(1).getText().equals("raise")}? NAME ;
-//keyWITH   : {input.LT(1).getText().equals("with")}? NAME ;
-//keyYIELD  : {input.LT(1).getText().equals("yield")}? NAME ;
-
-DEF       : 'def' ;
-CLASS     : 'class' ;
-PRINT     : 'print' ;
+AS        : 'as' ;
+ASSERT    : 'assert' ;
 BREAK     : 'break' ;
+CLASS     : 'class' ;
 CONTINUE  : 'continue' ;
-RETURN    : 'return' ;
-RAISE     : 'raise' ;
-PASS      : 'pass'  ;
-IMPORT    : 'import' ;
+DEF       : 'def' ;
+DELETE    : 'del' ;
+ELIF      : 'elif' ;
+EXCEPT    : 'except' ;
+EXEC      : 'exec' ;
+FINALLY   : 'finally' ;
 FROM      : 'from' ;
 FOR       : 'for' ;
-ORELSE    : 'else' ;
-ELIF      : 'elif' ;
-IN        : 'in' ;
+GLOBAL    : 'global' ;
 IF        : 'if' ;
+IMPORT    : 'import' ;
+IN        : 'in' ;
+IS        : 'is' ;
+LAMBDA    : 'lambda' ;
+ORELSE    : 'else' ;
+PASS      : 'pass'  ;
+PRINT     : 'print' ;
+RAISE     : 'raise' ;
+RETURN    : 'return' ;
+TRY       : 'try' ;
 WHILE     : 'while' ;
 WITH      : 'with' ;
-LAMBDA    : 'lambda' ;
-GLOBAL    : 'global' ;
 YIELD     : 'yield' ;
-ASSERT    : 'assert' ;
-FINALLY   : 'finally' ;
-DELETE    : 'del' ;
-EXCEPT    : 'except' ;
-TRY       : 'try' ;
 
 LPAREN    : '(' {implicitLineJoiningLevel++;} ;
 
@@ -1655,7 +1673,12 @@ STRING
         |   '"""' (options {greedy=false;}:TRIQUOTE)* '"""'
         |   '"' (ESC|~('\\'|'\n'|'"'))* '"'
         |   '\'' (ESC|~('\\'|'\n'|'\''))* '\''
-        )
+        ) {
+           if (state.tokenStartLine != input.getLine()) {
+               state.tokenStartLine = input.getLine();
+               state.tokenStartCharPositionInLine = -2;
+           }
+        }
     ;
 
 /** the two '"'? cause a warning -- is there a way to avoid that? */
@@ -1681,7 +1704,7 @@ ESC
  */
 CONTINUED_LINE
     :    '\\' ('\r')? '\n' (' '|'\t')*  { $channel=HIDDEN; }
-         ( nl=NEWLINE {emit(new ClassicToken(NEWLINE,nl.getText()));}
+         ( nl=NEWLINE {emit(new CommonToken(NEWLINE,nl.getText()));}
          |
          )
     ;
@@ -1693,12 +1716,11 @@ CONTINUED_LINE
  *  Frank Wierzbicki added: Also ignore FORMFEEDS (\u000C).
  */
 NEWLINE
-    :   {inSingle}? => (('\u000C')?('\r')? '\n' )
-            {if (implicitLineJoiningLevel>0 )
-                $channel=HIDDEN;
-            }
-    |   (('\u000C')?('\r')? '\n' )+
-        {if ( startPos==0 || implicitLineJoiningLevel>0 )
+@init {
+    int newlines = 0;
+}
+    :   (('\u000C')?('\r')? '\n' {newlines++; } )+ {
+         if ( startPos==0 || implicitLineJoiningLevel>0 )
             $channel=HIDDEN;
         }
     ;
@@ -1715,24 +1737,42 @@ WS  :    {startPos>0}?=> (' '|'\t'|'\u000C')+ {$channel=HIDDEN;}
 LEADING_WS
 @init {
     int spaces = 0;
+    int newlines = 0;
 }
     :   {startPos==0}?=>
         (   {implicitLineJoiningLevel>0}? ( ' ' | '\t' )+ {$channel=HIDDEN;}
-           |    (     ' '  { spaces++; }
-            |    '\t' { spaces += 8; spaces -= (spaces \% 8); }
-               )+
-            {
-            // make a string of n spaces where n is column number - 1
-            char[] indentation = new char[spaces];
-            for (int i=0; i<spaces; i++) {
-                indentation[i] = ' ';
-            }
-            String s = new String(indentation);
-            emit(new ClassicToken(LEADING_WS,new String(indentation)));
-            }
-            // kill trailing newline if present and then ignore
-            ( ('\r')? '\n' {if (state.token!=null) state.token.setChannel(HIDDEN); else $channel=HIDDEN;})*
-           // {state.token.setChannel(99); }
+        |    (     ' '  { spaces++; }
+             |    '\t' { spaces += 8; spaces -= (spaces \% 8); }
+             )+
+             ( ('\r')? '\n' {newlines++; }
+             )* {
+                   if (input.LA(1) != -1) {
+                       // make a string of n spaces where n is column number - 1
+                       char[] indentation = new char[spaces];
+                       for (int i=0; i<spaces; i++) {
+                           indentation[i] = ' ';
+                       }
+                       CommonToken c = new CommonToken(LEADING_WS,new String(indentation));
+                       c.setLine(input.getLine());
+                       c.setCharPositionInLine(input.getCharPositionInLine());
+                       emit(c);
+                       // kill trailing newline if present and then ignore
+                       if (newlines != 0) {
+                           if (state.token!=null) {
+                               state.token.setChannel(HIDDEN);
+                           } else {
+                               $channel=HIDDEN;
+                           }
+                       }
+                   } else {
+                       // make a string of n newlines
+                       char[] nls = new char[newlines];
+                       for (int i=0; i<newlines; i++) {
+                           nls[i] = '\n';
+                       }
+                       emit(new CommonToken(NEWLINE,new String(nls)));
+                   }
+                }
         )
     ;
 
@@ -1758,6 +1798,6 @@ COMMENT
     $channel=HIDDEN;
 }
     :    {startPos==0}?=> (' '|'\t')* '#' (~'\n')* '\n'+
-    |    {startPos>0}?=> '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
+    |    '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
     ;
 
