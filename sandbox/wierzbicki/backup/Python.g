@@ -56,16 +56,13 @@
  *  REQUIRES ANTLR v3
  *
  *
- *  Baby step towards an antlr based Jython parser.
- *  Terence's Lexer is intact pretty much unchanged, the parser has
- *  been altered to produce an AST - the AST work started from tne newcompiler
- *  grammar from Jim Baker minus post-2.3 features.  The current parsing
- *  and compiling strategy looks like this:
+ *  Updated the original parser for Python 2.5 features. The parser has been
+ *  altered to produce an AST - the AST work started from tne newcompiler
+ *  grammar from Jim Baker.  The current parsing and compiling strategy looks
+ *  like this:
  *
  *  Python source->Python.g->simple antlr AST->PythonWalker.g->
  *  decorated AST (org/python/parser/ast/*)->CodeCompiler(ASM)->.class
- *
- *  for a very limited set of functionality.
  */
 
 grammar Python;
@@ -162,6 +159,8 @@ import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
 import org.python.antlr.ast.BinOp;
+import org.python.antlr.ast.BoolOp;
+import org.python.antlr.ast.boolopType;
 import org.python.antlr.ast.Break;
 import org.python.antlr.ast.Call;
 import org.python.antlr.ast.ClassDef;
@@ -195,6 +194,7 @@ import org.python.antlr.ast.Print;
 import org.python.antlr.ast.Raise;
 import org.python.antlr.ast.operatorType;
 import org.python.antlr.ast.Return;
+import org.python.antlr.ast.Slice;
 import org.python.antlr.ast.sliceType;
 import org.python.antlr.ast.stmtType;
 import org.python.antlr.ast.Str;
@@ -202,8 +202,11 @@ import org.python.antlr.ast.Subscript;
 import org.python.antlr.ast.TryExcept;
 import org.python.antlr.ast.TryFinally;
 import org.python.antlr.ast.Tuple;
+import org.python.antlr.ast.unaryopType;
+import org.python.antlr.ast.UnaryOp;
 import org.python.antlr.ast.While;
 import org.python.antlr.ast.With;
+import org.python.antlr.ast.Yield;
 import org.python.core.Py;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
@@ -272,12 +275,16 @@ package org.python.antlr;
  *       4]
  */
 
-//If you want to use another error recovery mechanisms change this
-//and the same one in the parser.
-private ErrorHandler errorHandler;
+//For use in partial parsing.
+public boolean eofWhileNested = false;
+public boolean partial = false;
 
 int implicitLineJoiningLevel = 0;
 int startPos=-1;
+
+//If you want to use another error recovery mechanisms change this
+//and the same one in the parser.
+private ErrorHandler errorHandler;
 
     public void setErrorHandler(ErrorHandler eh) {
         this.errorHandler = eh;
@@ -297,6 +304,9 @@ int startPos=-1;
             state.tokenStartLine = input.getLine();
             state.text = null;
             if ( input.LA(1)==CharStream.EOF ) {
+                if (implicitLineJoiningLevel > 0) {
+                    eofWhileNested = true;
+                }
                 return Token.EOF_TOKEN;
             }
             try {
@@ -320,9 +330,9 @@ int startPos=-1;
 }
 
 //single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
-single_input : NEWLINE? -> ^(Interactive)
-             | simple_stmt -> ^(Interactive simple_stmt)
-             | compound_stmt NEWLINE -> ^(Interactive compound_stmt)
+single_input : NEWLINE* EOF -> ^(Interactive)
+             | simple_stmt NEWLINE* EOF -> ^(Interactive simple_stmt)
+             | compound_stmt NEWLINE+ EOF -> ^(Interactive compound_stmt)
              ;
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
@@ -332,7 +342,7 @@ file_input
     ;
 
 //eval_input: testlist NEWLINE* ENDMARKER
-eval_input : (NEWLINE)* testlist[expr_contextType.Load] (NEWLINE)* -> ^(Expression testlist)
+eval_input : LEADING_WS? (NEWLINE)* testlist[expr_contextType.Load] (NEWLINE)* EOF -> ^(Expression testlist)
            ;
 
 //not in CPython's Grammar file
@@ -606,7 +616,7 @@ return_stmt : RETURN
             ;
 
 //yield_stmt: yield_expr
-yield_stmt : yield_expr
+yield_stmt : yield_expr -> ^(ExprTok<Expr>[$yield_expr.start, (exprType)$yield_expr.tree])
            ;
 
 //raise_stmt: 'raise' [test [',' test [',' test]]]
@@ -631,14 +641,14 @@ import_from: FROM (d+=DOT* dotted_name | d+=DOT+) IMPORT
              -> ^(FROM<ImportFrom>[$FROM, actions.makeFromText($d, $dotted_name.text), actions.makeStarAlias($STAR), actions.makeLevel($d)])
               | i1=import_as_names
              -> ^(FROM<ImportFrom>[$FROM, actions.makeFromText($d, $dotted_name.text), actions.makeAliases($i1.atypes), actions.makeLevel($d)])
-              | LPAREN i2=import_as_names RPAREN
+              | LPAREN i2=import_as_names COMMA? RPAREN
              -> ^(FROM<ImportFrom>[$FROM, actions.makeFromText($d, $dotted_name.text), actions.makeAliases($i2.atypes), actions.makeLevel($d)])
               )
            ;
 
 //import_as_names: import_as_name (',' import_as_name)* [',']
 import_as_names returns [aliasType[\] atypes]
-    : n+=import_as_name (COMMA! n+=import_as_name)* (COMMA!)? {
+    : n+=import_as_name (COMMA! n+=import_as_name)* {
         $atypes = (aliasType[])$n.toArray(new aliasType[$n.size()]);
     }
     ;
@@ -732,7 +742,7 @@ for_stmt returns [stmtType stype]
    $for_stmt.tree = $stype;
 }
     : FOR exprlist[expr_contextType.Store] IN testlist[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)? {
-        $stype = actions.makeFor($FOR, $exprlist.etype, (exprType)$testlist.tree, $s2.stmts, $s2.stmts);
+        $stype = actions.makeFor($FOR, $exprlist.etype, (exprType)$testlist.tree, $s1.stmts, $s2.stmts);
     }
     ;
 
@@ -779,42 +789,17 @@ except_clause : EXCEPT (t1=test[expr_contextType.Load] (COMMA t2=test[expr_conte
 
 //suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
 suite returns [List stmts]
-    : s+=simple_stmt {$stmts = $s;}
+    : ss+=simple_stmt {$stmts = $ss;}
     | NEWLINE! INDENT (s+=stmt)+ DEDENT {$stmts = $s;}
     ;
 
 //test: or_test ['if' or_test 'else' test] | lambdef
 test[expr_contextType ctype]
-    :o1=or_test[ctype]
-    ( (IF or_test[expr_contextType.Load] ORELSE) => IF o2=or_test[ctype] ORELSE test[expr_contextType.Load]
-      -> ^(IfExp ^(Test $o2) ^(Body $o1) ^(ORELSE test))
-    | -> or_test
-    )
-    | lambdef {debug("parsed lambdef");}
-    ;
-
-//or_test: and_test ('or' and_test)*
-or_test[expr_contextType ctype] : and_test[ctype] (OR^ and_test[ctype])*
-        ;
-
-//and_test: not_test ('and' not_test)*
-and_test[expr_contextType ctype] : not_test[ctype] (AND^ not_test[ctype])*
-         ;
-
-//not_test: 'not' not_test | comparison
-not_test[expr_contextType ctype] : NOT^ not_test[ctype]
-         | comparison[ctype]
-         ;
-
-//comparison: expr (comp_op expr)*
-comparison[expr_contextType ctype]
 @after {
-    if ($comparison.tree instanceof Compare) {
-        System.out.println("found Compare");
-        Compare c = (Compare)$comparison.tree;
+    if ($test.tree instanceof Compare) {
+        Compare c = (Compare)$test.tree;
         //FIXME: Only handling the case of a single comparison.
         c.left = (exprType)c.getChild(0);
-        System.out.println("c.left:" + c.left);
         c.comparators =  new exprType[]{(exprType)c.getChild(1)};
         switch (c.getType()) {
         case LESS:
@@ -853,8 +838,80 @@ comparison[expr_contextType ctype]
         default:
             c.ops = new cmpopType[]{cmpopType.UNDEFINED};
         }
+    } else if ($test.tree instanceof BoolOp) {
+        BoolOp b = (BoolOp)$test.tree;
+        List values = new ArrayList();
+
+        exprType left = (exprType)b.getChild(0);
+        exprType right = (exprType)b.getChild(1);
+
+        exprType[] e;
+        if (left.getType() == b.getType() && right.getType() == b.getType()) {
+            BoolOp leftB = (BoolOp)left;
+            BoolOp rightB = (BoolOp)right;
+            int lenL = leftB.values.length;
+            int lenR = rightB.values.length;
+            e = new exprType[lenL + lenR];
+            System.arraycopy(leftB.values, 0, e, 0, lenL - 1);
+            System.arraycopy(rightB.values, 0, e, lenL - 1, lenL + lenR);
+        } else if (left.getType() == b.getType()) {
+            BoolOp leftB = (BoolOp)left;
+            e = new exprType[leftB.values.length + 1];
+            System.arraycopy(leftB.values, 0, e, 0, leftB.values.length);
+            e[e.length - 1] = right;
+        } else if (right.getType() == b.getType()) {
+            BoolOp rightB = (BoolOp)right;
+            e = new exprType[rightB.values.length + 1];
+            System.arraycopy(rightB.values, 0, e, 0, rightB.values.length);
+            e[e.length - 1] = left;
+        } else {
+            e = new exprType[2];
+            e[0] = left;
+            e[1] = right;
+        }
+        b.values = e;
+        switch (b.getType()) {
+        case AND:
+            b.op = boolopType.And;
+            break;
+        case OR:
+            b.op = boolopType.Or;
+            break;
+        default:
+            b.op = boolopType.UNDEFINED;
+        }
     }
 }
+
+    :o1=or_test[ctype]
+    ( (IF or_test[expr_contextType.Load] ORELSE) => IF o2=or_test[ctype] ORELSE test[expr_contextType.Load]
+      -> ^(IfExp ^(Test $o2) ^(Body $o1) ^(ORELSE test))
+    | -> or_test
+    )
+    | lambdef {debug("parsed lambdef");}
+    ;
+
+//or_test: and_test ('or' and_test)*
+or_test[expr_contextType ctype] : and_test[ctype] (OR<BoolOp>^ and_test[ctype])*
+        ;
+
+//and_test: not_test ('and' not_test)*
+and_test[expr_contextType ctype] : not_test[ctype] (AND<BoolOp>^ not_test[ctype])*
+         ;
+
+//not_test: 'not' not_test | comparison
+not_test[expr_contextType ctype] returns [exprType etype]
+@after {
+    if ($etype != null) {
+        $not_test.tree = $etype;
+    }
+}
+    : NOT nt=not_test[ctype] {$etype = new UnaryOp($NOT, unaryopType.Not, (exprType)$nt.tree);}
+    | comparison[ctype]
+    ;
+
+//comparison: expr (comp_op expr)*
+comparison[expr_contextType ctype]
 //comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
     : expr[ctype] (LESS<Compare>^ expr[ctype]
                    |GREATER<Compare>^ expr[ctype]
@@ -904,22 +961,52 @@ scope {
         case MINUS:
             b.op = operatorType.Sub;
             break;
+        case STAR:
+            b.op = operatorType.Mult;
+            break;
+        case SLASH:
+            b.op = operatorType.Div;
+            break;
+        case PERCENT:
+            b.op = operatorType.Mod;
+            break;
+        case DOUBLESLASH:
+            b.op = operatorType.FloorDiv;
+            break;
+        case AMPER:
+            b.op = operatorType.BitAnd;
+            break;
+        case VBAR:
+            b.op = operatorType.BitOr;
+            break;
+        case CIRCUMFLEX:
+            b.op = operatorType.BitXor;
+            break;
+        case LEFTSHIFT:
+            b.op = operatorType.LShift;
+            break;
+        case RIGHTSHIFT:
+            b.op = operatorType.RShift;
+            break;
+        case DOUBLESTAR:
+            b.op = operatorType.Pow;
+            break;
         }
     }
 }
-    : xor_expr (VBAR^ xor_expr)*
+    : xor_expr (VBAR<BinOp>^ xor_expr)*
     ;
 
 //xor_expr: and_expr ('^' and_expr)*
-xor_expr : and_expr (CIRCUMFLEX^ and_expr)*
+xor_expr : and_expr (CIRCUMFLEX<BinOp>^ and_expr)*
          ;
 
 //and_expr: shift_expr ('&' shift_expr)*
-and_expr : shift_expr (AMPER^ shift_expr)*
+and_expr : shift_expr (AMPER<BinOp>^ shift_expr)*
          ;
 
 //shift_expr: arith_expr (('<<'|'>>') arith_expr)*
-shift_expr : arith_expr ((LEFTSHIFT^|RIGHTSHIFT^) arith_expr)*
+shift_expr : arith_expr ((LEFTSHIFT<BinOp>^|RIGHTSHIFT<BinOp>^) arith_expr)*
            ;
 
 //arith_expr: term (('+'|'-') term)*
@@ -929,15 +1016,19 @@ arith_expr
     ;
 
 //term: factor (('*'|'/'|'%'|'//') factor)*
-term : factor ((STAR^ | SLASH^ | PERCENT^ | DOUBLESLASH^ ) factor)*
+term : factor ((STAR<BinOp>^ | SLASH<BinOp>^ | PERCENT<BinOp>^ | DOUBLESLASH<BinOp>^ ) factor)*
      ;
 
 //factor: ('+'|'-'|'~') factor | power
-factor : PLUS factor -> ^(UAdd PLUS factor)
-       | MINUS factor -> ^(USub MINUS factor)
-       | TILDE factor -> ^(Invert TILDE factor)
-       | power
-       ;
+factor returns [exprType etype]
+@after {
+    $factor.tree = $etype;
+}
+    : PLUS p=factor {$etype = new UnaryOp($PLUS, unaryopType.UAdd, $p.etype);}
+    | MINUS m=factor {$etype = actions.negate($MINUS, $m.etype);}
+    | TILDE t=factor {$etype = new UnaryOp($TILDE, unaryopType.Invert, $t.etype);}
+    | power {$etype = (exprType)$power.tree;}
+    ;
 
 //power: atom trailer* ['**' factor]
 power returns [exprType etype]
@@ -949,8 +1040,12 @@ power returns [exprType etype]
     : atom (t+=trailer)* (options {greedy=true;}:DOUBLESTAR factor)? {
         if ($t != null) {
             exprType current = (exprType)$atom.tree;
-            for(int i = $t.size() - 1; i > -1; i--) {
+            //for(int i = $t.size() - 1; i > -1; i--) {
+            for(int i = 0; i < $t.size(); i++) {
                 Object o = $t.get(i);
+                if (current instanceof Context) {
+                    ((Context)current).setContext(expr_contextType.Load);
+                }
                 //XXX: good place for an interface to avoid all of this instanceof
                 if (o instanceof Call) {
                     Call c = (Call)o;
@@ -958,6 +1053,10 @@ power returns [exprType etype]
                     current = c;
                 } else if (o instanceof Subscript) {
                     Subscript c = (Subscript)o;
+                    c.value = current;
+                    current = c;
+                } else if (o instanceof Attribute) {
+                    Attribute c = (Attribute)o;
                     c.value = current;
                     current = c;
                 }
@@ -973,7 +1072,7 @@ power returns [exprType etype]
 //       '`' testlist1 '`' |
 //       NAME | NUMBER | STRING+)
 atom : LPAREN 
-       ( yield_expr    -> ^(Parens LPAREN yield_expr)
+       ( yield_expr    -> yield_expr
        | testlist_gexp -> testlist_gexp
        | -> ^(TupleTok<Tuple>[$LPAREN, new exprType[0\], $expr::ctype])
        )
@@ -1030,10 +1129,11 @@ trailer : LPAREN (arglist ->  ^(LPAREN<Call>[$LPAREN, null, actions.makeExprs($a
                  )
           RPAREN
         | LBRACK s=subscriptlist RBRACK -> $s
-        | DOT^ attr {debug("motched DOT^ NAME");}
+        | DOT attr -> ^(DOT<Attribute>[$DOT, null, $attr.text, expr_contextType.Load])
         ;
 
 //subscriptlist: subscript (',' subscript)* [',']
+//FIXME: tuples not always created when commas are present.
 subscriptlist returns [exprType etype]
 @after {
    $subscriptlist.tree = $etype;
@@ -1070,11 +1170,21 @@ subscriptlist returns [exprType etype]
     ;
 
 //subscript: '.' '.' '.' | test | [test] ':' [test] [sliceop]
-subscript : DOT DOT DOT -> Ellipsis
-          | (test[expr_contextType.Load] COLON) => t1=test[expr_contextType.Load] (COLON (t2=test[expr_contextType.Load])? (sliceop)?)? -> ^(Subscript ^(Lower $t1) ^(Upper COLON ^(UpperOp $t2)?)? sliceop?)
-          | (COLON) => COLON (test[expr_contextType.Load])? (sliceop)? -> ^(Subscript ^(Upper COLON ^(UpperOp test)?)? sliceop?)
-          | test[expr_contextType.Load] -> ^(Subscript<Index>[$test.start, (exprType)$test.tree])
-          ;
+subscript returns [sliceType sltype]
+@after {
+    if ($sltype != null) {
+        $subscript.tree = $sltype;
+    }
+}
+    : DOT DOT DOT -> Ellipsis
+    | (test[expr_contextType.Load] COLON) => lower=test[expr_contextType.Load] (c1=COLON (upper=test[expr_contextType.Load])? (sliceop)?)? {
+        $sltype = actions.makeSubscript($lower.tree, $c1, $upper.tree, $sliceop.tree);
+    }
+    | (COLON) => c2=COLON (test[expr_contextType.Load])? (sliceop)? {
+        $sltype = actions.makeSubscript(null, $c2, $upper.tree, $sliceop.tree);
+    }
+    | test[expr_contextType.Load] -> ^(Subscript<Index>[$test.start, (exprType)$test.tree])
+    ;
 
 //sliceop: ':' [test]
 sliceop : COLON (test[expr_contextType.Load])? -> ^(Step COLON ^(StepOp test)?)
@@ -1195,7 +1305,7 @@ gen_if: IF test[expr_contextType.Load] gen_iter?
 
 //yield_expr: 'yield' [testlist]
 yield_expr : YIELD testlist[expr_contextType.Load]?
-          -> ^(YIELD ^(Value testlist)?)
+          -> ^(YIELD<Yield>[$YIELD, $testlist.etype])
            ;
 
 //XXX:
@@ -1375,6 +1485,13 @@ STRING
                state.tokenStartCharPositionInLine = -2;
            }
         }
+    ;
+
+STRINGPART
+    : {partial}?=> ('r'|'u'|'ur'|'R'|'U'|'UR'|'uR'|'Ur')?
+        (   '\'\'\'' ~('\'\'\'')*
+        |   '"""' ~('"""')*
+        )
     ;
 
 /** the two '"'? cause a warning -- is there a way to avoid that? */
