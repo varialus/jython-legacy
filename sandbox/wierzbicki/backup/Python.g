@@ -103,8 +103,6 @@ tokens {
     ExceptHandler;
     StrTok;
     NumTok;
-    IsNot;
-    NotIn;
     Type;
     Inst;
     Tback;
@@ -144,6 +142,7 @@ tokens {
     ListIf;
     Parens;
     Brackets;
+
 }
 
 @header {
@@ -796,49 +795,7 @@ suite returns [List stmts]
 //test: or_test ['if' or_test 'else' test] | lambdef
 test[expr_contextType ctype]
 @after {
-    if ($test.tree instanceof Compare) {
-        Compare c = (Compare)$test.tree;
-        //FIXME: Only handling the case of a single comparison.
-        c.left = (exprType)c.getChild(0);
-        c.comparators =  new exprType[]{(exprType)c.getChild(1)};
-        switch (c.getType()) {
-        case LESS:
-            c.ops = new cmpopType[]{cmpopType.Lt};
-            break;
-        case GREATER:
-            c.ops = new cmpopType[]{cmpopType.Gt};
-            break;
-        case EQUAL:
-            c.ops = new cmpopType[]{cmpopType.Eq};
-            break;
-        case GREATEREQUAL:
-            c.ops = new cmpopType[]{cmpopType.GtE};
-            break;
-        case LESSEQUAL:
-            c.ops = new cmpopType[]{cmpopType.LtE};
-            break;
-        case ALT_NOTEQUAL:
-            c.ops = new cmpopType[]{cmpopType.Eq};
-            break;
-        case NOTEQUAL:
-            c.ops = new cmpopType[]{cmpopType.NotEq};
-            break;
-        case IN:
-            c.ops = new cmpopType[]{cmpopType.In};
-            break;
-        case NotIn:
-            c.ops = new cmpopType[]{cmpopType.NotIn};
-            break;
-        case IS:
-            c.ops = new cmpopType[]{cmpopType.Is};
-            break;
-        case IsNot:
-            c.ops = new cmpopType[]{cmpopType.IsNot};
-            break;
-        default:
-            c.ops = new cmpopType[]{cmpopType.UNDEFINED};
-        }
-    } else if ($test.tree instanceof BoolOp) {
+    if ($test.tree instanceof BoolOp) {
         BoolOp b = (BoolOp)$test.tree;
         List values = new ArrayList();
 
@@ -911,20 +868,31 @@ not_test[expr_contextType ctype] returns [exprType etype]
     ;
 
 //comparison: expr (comp_op expr)*
-comparison[expr_contextType ctype]
 //comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
-    : expr[ctype] (LESS<Compare>^ expr[ctype]
-                   |GREATER<Compare>^ expr[ctype]
-                   |EQUAL<Compare>^ expr[ctype]
-                   |GREATEREQUAL<Compare>^ expr[ctype]
-                   |LESSEQUAL<Compare>^ expr[ctype]
-                   |ALT_NOTEQUAL<Compare>^ expr[ctype]
-                   |NOTEQUAL<Compare>^ expr[ctype]
-                   |IN<Compare>^ expr[ctype]
-                  //|NotIn<Compare>^ exper[ctype]
-                   |IS<Compare>^ expr[ctype]
-                  //|IsNot<Compare>^ exper[ctype]
-                  )*
+comparison[expr_contextType ctype]
+@init {
+    List cmps = new ArrayList();
+}
+@after {
+    if (!cmps.isEmpty()) {
+        $comparison.tree = new Compare($left.tree, (exprType)$left.tree, actions.makeCmpOps(cmps), actions.makeExprs($right));
+    }
+}
+    : left=expr[ctype]
+       ( ( LESS right+=expr[ctype] {cmps.add(cmpopType.Lt);}
+         |GREATER right+=expr[ctype] {cmps.add(cmpopType.Gt);}
+         |EQUAL right+=expr[ctype] {cmps.add(cmpopType.Eq);}
+         |GREATEREQUAL right+=expr[ctype] {cmps.add(cmpopType.GtE);}
+         |LESSEQUAL right+=expr[ctype] {cmps.add(cmpopType.LtE);}
+         |ALT_NOTEQUAL right+=expr[ctype] {cmps.add(cmpopType.NotEq);}
+         |NOTEQUAL right+=expr[ctype] {cmps.add(cmpopType.NotEq);}
+         |IN right+=expr[ctype] {cmps.add(cmpopType.In);}
+         |IS right+=expr[ctype] {cmps.add(cmpopType.Is);}
+         |NOT IN right+=expr[ctype] {cmps.add(cmpopType.NotIn);}
+         |IS NOT right+=expr[ctype] {cmps.add(cmpopType.IsNot);}
+         )+
+       |  -> $left
+       )
     ;
 
 //comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
@@ -936,10 +904,11 @@ comp_op : LESS
         | ALT_NOTEQUAL
         | NOTEQUAL
         | IN
-        | NOT IN -> NotIn
+//        | NOT IN -> NotIn
         | IS
-        | IS NOT -> IsNot
+//        | IS NOT -> IsNot
         ;
+
 
 //expr: xor_expr ('|' xor_expr)*
 expr[expr_contextType ect]
@@ -1079,7 +1048,7 @@ atom : LPAREN
        RPAREN
      | LBRACK
        (listmaker -> listmaker
-       | -> ^(Brackets LBRACK ^(ListTok))
+       | -> ^(LBRACK<org.python.antlr.ast.List>[$LBRACK, new exprType[0\], $expr::ctype])
        )
        RBRACK
      | LCURLY (dictmaker)? RCURLY -> ^(Dict LCURLY ^(Elts dictmaker)?)
@@ -1129,7 +1098,7 @@ trailer : LPAREN (arglist ->  ^(LPAREN<Call>[$LPAREN, null, actions.makeExprs($a
                  )
           RPAREN
         | LBRACK s=subscriptlist RBRACK -> $s
-        | DOT attr -> ^(DOT<Attribute>[$DOT, null, $attr.text, expr_contextType.Load])
+        | DOT attr -> ^(DOT<Attribute>[$DOT, null, $attr.text, $expr::ctype])
         ;
 
 //subscriptlist: subscript (',' subscript)* [',']
@@ -1177,11 +1146,11 @@ subscript returns [sliceType sltype]
     }
 }
     : DOT DOT DOT -> Ellipsis
-    | (test[expr_contextType.Load] COLON) => lower=test[expr_contextType.Load] (c1=COLON (upper=test[expr_contextType.Load])? (sliceop)?)? {
-        $sltype = actions.makeSubscript($lower.tree, $c1, $upper.tree, $sliceop.tree);
+    | (test[expr_contextType.Load] COLON) => lower=test[expr_contextType.Load] (c1=COLON (upper1=test[expr_contextType.Load])? (sliceop)?)? {
+        $sltype = actions.makeSubscript($lower.tree, $c1, $upper1.tree, $sliceop.tree);
     }
-    | (COLON) => c2=COLON (test[expr_contextType.Load])? (sliceop)? {
-        $sltype = actions.makeSubscript(null, $c2, $upper.tree, $sliceop.tree);
+    | (COLON) => c2=COLON (upper2=test[expr_contextType.Load])? (sliceop)? {
+        $sltype = actions.makeSubscript(null, $c2, $upper2.tree, $sliceop.tree);
     }
     | test[expr_contextType.Load] -> ^(Subscript<Index>[$test.start, (exprType)$test.tree])
     ;
@@ -1209,6 +1178,9 @@ exprlist2 returns [List etypes]
 
 //testlist: test (',' test)* [',']
 testlist[expr_contextType ctype] returns [exprType etype]
+@after {
+   $testlist.tree = $etype;
+}
     : (test[expr_contextType.Load] COMMA) => t+=test[ctype] (options {k=2;}: c1=COMMA t+=test[ctype])* (c2=COMMA)? {
           $etype = new Tuple($testlist.start, actions.makeExprs($t), ctype);
     }
