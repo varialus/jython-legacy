@@ -157,6 +157,7 @@ import org.python.antlr.ast.argumentsType;
 import org.python.antlr.ast.Assert;
 import org.python.antlr.ast.Assign;
 import org.python.antlr.ast.Attribute;
+import org.python.antlr.ast.AugAssign;
 import org.python.antlr.ast.BinOp;
 import org.python.antlr.ast.BoolOp;
 import org.python.antlr.ast.boolopType;
@@ -504,32 +505,46 @@ small_stmt : expr_stmt
 
 //expr_stmt: testlist (augassign (yield_expr|testlist) |
 //                     ('=' (yield_expr|testlist))*)
-expr_stmt : ((testlist[expr_contextType.Load] (ASSIGN|augassign)) => lhs=testlist[expr_contextType.Store]
-            | lhs=testlist[expr_contextType.Load]
-            )
-            ( (augassign yield_expr -> ^(augassign $lhs yield_expr))
-            | (augassign rhs=testlist[expr_contextType.Load] -> ^(augassign $lhs $rhs))
-            | ((at=ASSIGN t+=testlist[expr_contextType.Store])+ -> ^(AssignTok<Assign>[$at, actions.makeAssignTargets((exprType)$lhs.tree, $t), actions.makeAssignValue($t)]))
-            | ((ay=ASSIGN y+=yield_expr)+ -> ^(AssignTok<Assign>[$ay, actions.makeAssignTargets((exprType)$lhs.tree, $y), actions.makeAssignValue($y)]))
-            | -> ExprTok<Expr>[$lhs.start, (exprType)$lhs.tree]
-            )
-          ;
+expr_stmt 
+@init {
+    stmtType stype = null;
+}
+@after {
+    if (stype != null) {
+        $expr_stmt.tree = stype;
+    }
+}
+
+    :
+    ((testlist[expr_contextType.Load] augassign) => lhs=testlist[expr_contextType.AugStore]
+        ( (aay=augassign y1=yield_expr {stype = new AugAssign($lhs.tree, (exprType)$lhs.tree, $aay.op, (exprType)$y1.tree);})
+        | (aat=augassign rhs=testlist[expr_contextType.Load] {stype = new AugAssign($lhs.tree, (exprType)$lhs.tree, $aat.op, (exprType)$rhs.tree);})
+        )
+    |(testlist[expr_contextType.Load] ASSIGN) => lhs=testlist[expr_contextType.Store]
+        (
+        | ((at=ASSIGN t+=testlist[expr_contextType.Store])+ -> ^(AssignTok<Assign>[$at, actions.makeAssignTargets((exprType)$lhs.tree, $t), actions.makeAssignValue($t)]))
+        | ((ay=ASSIGN y2+=yield_expr)+ -> ^(AssignTok<Assign>[$ay, actions.makeAssignTargets((exprType)$lhs.tree, $y2), actions.makeAssignValue($y2)]))
+        )
+    | lhs=testlist[expr_contextType.Load] -> ExprTok<Expr>[$lhs.start, (exprType)$lhs.tree]
+    )
+    ;
 
 //augassign: ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' |
 //            '<<=' | '>>=' | '**=' | '//=')
-augassign : PLUSEQUAL
-          | MINUSEQUAL
-          | STAREQUAL
-          | SLASHEQUAL
-          | PERCENTEQUAL
-          | AMPEREQUAL
-          | VBAREQUAL
-          | CIRCUMFLEXEQUAL
-          | LEFTSHIFTEQUAL
-          | RIGHTSHIFTEQUAL
-          | DOUBLESTAREQUAL
-          | DOUBLESLASHEQUAL
-          ;
+augassign returns [operatorType op]
+    : PLUSEQUAL {$op = operatorType.Add;}
+    | MINUSEQUAL {$op = operatorType.Sub;}
+    | STAREQUAL {$op = operatorType.Mult;}
+    | SLASHEQUAL {$op = operatorType.Div;}
+    | PERCENTEQUAL {$op = operatorType.Mod;}
+    | AMPEREQUAL {$op = operatorType.BitAnd;}
+    | VBAREQUAL {$op = operatorType.BitOr;}
+    | CIRCUMFLEXEQUAL {$op = operatorType.BitXor;}
+    | LEFTSHIFTEQUAL {$op = operatorType.LShift;}
+    | RIGHTSHIFTEQUAL {$op = operatorType.RShift;}
+    | DOUBLESTAREQUAL {$op = operatorType.Pow;}
+    | DOUBLESLASHEQUAL {$op = operatorType.FloorDiv;}
+    ;
 
 //print_stmt: 'print' ( [ test (',' test)* [','] ] |
 //                      '>>' test [ (',' test)+ [','] ] )
