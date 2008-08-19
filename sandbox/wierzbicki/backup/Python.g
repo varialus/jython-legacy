@@ -75,73 +75,31 @@ tokens {
     INDENT;
     DEDENT;
 
-    ModuleTok;
+    PYNODE;
     Interactive;
     Expression;
-    ExprTok;
-    NameTok;
     Test;
-    Msg;
-    Level;
     Body;
-    Bases; 
-    FunctionDefTok;
-    ArgumentsTok;
-    Args;
     Arg;
-    Keyword;
-    StarArgs;
-    KWArgs;
-    AssignTok;
     AugAssign;
-    TupleTok;
-    ListTok;
     Dict;
     IfExp;
-    TryExcept;
-    TryFinally;
-    ExceptHandler;
-    StrTok;
-    NumTok;
-    Type;
-    Inst;
-    Tback;
-    Globals;
-    Locals;
     Ellipsis;
     ListComp;
     Repr;
-    Subscript;
     Index;
     Target;
-    Value;
-    Lower;
-    Upper;
     Step;
-    UAdd;
-    USub;
-    Invert;
-    Alias;
-    Asname;
-    Decorators;
     GeneratorExp;
     Ifs;
     Elts;
-    CallTok;
-    Dest;
-    Values;
-    Newline;
 
-    FpList;
     StepOp;
-    UpperOp;
 
     GenFor;
     GenIf;
     ListFor;
     ListIf;
-    Parens;
-    Brackets;
 
 }
 
@@ -337,8 +295,8 @@ single_input : NEWLINE* EOF -> ^(Interactive)
 
 //file_input: (NEWLINE | stmt)* ENDMARKER
 file_input
-    : (NEWLINE | s+=stmt)+ -> ^(ModuleTok<Module>[$file_input.start, actions.makeStmts($s)])
-    | -> ^(ModuleTok<Module>[$file_input.start, new stmtType[0\]])
+    : (NEWLINE | s+=stmt)+ -> ^(PYNODE<Module>[$file_input.start, actions.makeStmts($s)])
+    | -> ^(PYNODE<Module>[$file_input.start, new stmtType[0\]])
     ;
 
 //eval_input: testlist NEWLINE* ENDMARKER
@@ -468,7 +426,7 @@ varargslist returns [argumentsType args]
 
 //fpdef: NAME | '(' fplist ')'
 fpdef[expr_contextType ctype] : NAME 
-     -> ^(NameTok<Name>[$NAME, $NAME.text, ctype])
+     -> ^(PYNODE<Name>[$NAME, $NAME.text, ctype])
       | (LPAREN fpdef[expr_contextType.Load] COMMA) => LPAREN fplist RPAREN
      -> fplist
       | LPAREN fplist RPAREN
@@ -522,10 +480,10 @@ expr_stmt
         )
     |(testlist[expr_contextType.Load] ASSIGN) => lhs=testlist[expr_contextType.Store]
         (
-        | ((at=ASSIGN t+=testlist[expr_contextType.Store])+ -> ^(AssignTok<Assign>[$at, actions.makeAssignTargets((exprType)$lhs.tree, $t), actions.makeAssignValue($t)]))
-        | ((ay=ASSIGN y2+=yield_expr)+ -> ^(AssignTok<Assign>[$ay, actions.makeAssignTargets((exprType)$lhs.tree, $y2), actions.makeAssignValue($y2)]))
+        | ((at=ASSIGN t+=testlist[expr_contextType.Store])+ -> ^(PYNODE<Assign>[$at, actions.makeAssignTargets((exprType)$lhs.tree, $t), actions.makeAssignValue($t)]))
+        | ((ay=ASSIGN y2+=yield_expr)+ -> ^(PYNODE<Assign>[$ay, actions.makeAssignTargets((exprType)$lhs.tree, $y2), actions.makeAssignValue($y2)]))
         )
-    | lhs=testlist[expr_contextType.Load] -> ExprTok<Expr>[$lhs.start, (exprType)$lhs.tree]
+    | lhs=testlist[expr_contextType.Load] -> PYNODE<Expr>[$lhs.start, (exprType)$lhs.tree]
     )
     ;
 
@@ -630,7 +588,7 @@ return_stmt : RETURN
             ;
 
 //yield_stmt: yield_expr
-yield_stmt : yield_expr -> ^(ExprTok<Expr>[$yield_expr.start, (exprType)$yield_expr.tree])
+yield_stmt : yield_expr -> ^(PYNODE<Expr>[$yield_expr.start, (exprType)$yield_expr.tree])
            ;
 
 //raise_stmt: 'raise' [test [',' test [',' test]]]
@@ -706,12 +664,15 @@ global_stmt : GLOBAL n+=NAME (COMMA n+=NAME)*
             ;
 
 //exec_stmt: 'exec' expr ['in' test [',' test]]
-exec_stmt returns [stmtType stype]
+exec_stmt
+@init {
+    stmtType stype = null;
+}
 @after {
-   $exec_stmt.tree = $stype;
+   $exec_stmt.tree = stype;
 }
     : EXEC expr[expr_contextType.Load] (IN t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Load])?)? {
-         $stype = new Exec($expr.start, (exprType)$expr.tree, (exprType)$t1.tree, (exprType)$t2.tree);
+         stype = new Exec($expr.start, (exprType)$expr.tree, (exprType)$t1.tree, (exprType)$t2.tree);
     }
     ;
 
@@ -741,22 +702,28 @@ elif_clause : ELIF test[expr_contextType.Load] COLON suite
             ;
 
 //while_stmt: 'while' test ':' suite ['else' ':' suite]
-while_stmt returns [stmtType stype]
+while_stmt
+@init {
+    stmtType stype = null;
+}
 @after {
-   $while_stmt.tree = $stype;
+   $while_stmt.tree = stype;
 }
     : WHILE test[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)? {
-        $stype = actions.makeWhile($WHILE, (exprType)$test.tree, $s1.stmts, $s2.stmts);
+        stype = actions.makeWhile($WHILE, (exprType)$test.tree, $s1.stmts, $s2.stmts);
     }
     ;
 
 //for_stmt: 'for' exprlist 'in' testlist ':' suite ['else' ':' suite]
-for_stmt returns [stmtType stype]
+for_stmt
+@init {
+    stmtType stype = null;
+}
 @after {
-   $for_stmt.tree = $stype;
+   $for_stmt.tree = stype;
 }
     : FOR exprlist[expr_contextType.Store] IN testlist[expr_contextType.Load] COLON s1=suite (ORELSE COLON s2=suite)? {
-        $stype = actions.makeFor($FOR, $exprlist.etype, (exprType)$testlist.tree, $s1.stmts, $s2.stmts);
+        stype = actions.makeFor($FOR, $exprlist.etype, (exprType)$testlist.tree, $s1.stmts, $s2.stmts);
     }
     ;
 
@@ -765,27 +732,33 @@ for_stmt returns [stmtType stype]
 //           ['else' ':' suite]
 //           ['finally' ':' suite] |
 //           'finally' ':' suite))
-try_stmt returns [stmtType stype]
+try_stmt
+@init {
+    stmtType stype = null;
+}
 @after {
-   $try_stmt.tree = $stype;
+   $try_stmt.tree = stype;
 }
     : TRY COLON trysuite=suite
         ( e+=except_clause+ (ORELSE COLON elsesuite=suite)? (FINALLY COLON finalsuite=suite)? {
-            $stype = actions.makeTryExcept($TRY, $trysuite.stmts, $e, $elsesuite.stmts, $finalsuite.stmts);
+            stype = actions.makeTryExcept($TRY, $trysuite.stmts, $e, $elsesuite.stmts, $finalsuite.stmts);
         }
         | FINALLY COLON finalsuite=suite {
-            $stype = actions.makeTryFinally($TRY, $trysuite.stmts, $finalsuite.stmts);
+            stype = actions.makeTryFinally($TRY, $trysuite.stmts, $finalsuite.stmts);
         }
         )
         ;
 
 //with_stmt: 'with' test [ with_var ] ':' suite
-with_stmt returns [stmtType stype]
+with_stmt
+@init {
+    stmtType stype = null;
+}
 @after {
-   $with_stmt.tree = $stype;
+   $with_stmt.tree = stype;
 }
     :WITH test[expr_contextType.Load] (with_var)? COLON suite {
-        $stype = new With($WITH, (exprType)$test.tree, $with_var.etype, actions.makeStmts($suite.stmts));
+        stype = new With($WITH, (exprType)$test.tree, $with_var.etype, actions.makeStmts($suite.stmts));
     }
     ;
 
@@ -1049,7 +1022,7 @@ power returns [exprType etype]
 atom : LPAREN 
        ( yield_expr    -> yield_expr
        | testlist_gexp -> testlist_gexp
-       | -> ^(TupleTok<Tuple>[$LPAREN, new exprType[0\], $expr::ctype])
+       | -> ^(PYNODE<Tuple>[$LPAREN, new exprType[0\], $expr::ctype])
        )
        RPAREN
      | LBRACK
@@ -1059,13 +1032,13 @@ atom : LPAREN
        RBRACK
      | LCURLY (dictmaker)? RCURLY -> ^(Dict LCURLY ^(Elts dictmaker)?)
      | BACKQUOTE testlist[expr_contextType.Load] BACKQUOTE -> ^(Repr BACKQUOTE testlist)
-     | NAME -> ^(NameTok<Name>[$NAME, $NAME.text, $expr::ctype])
-     | INT -> ^(NumTok<Num>[$INT, actions.makeInt($INT)])
-     | LONGINT -> ^(NumTok<Num>[$LONGINT, actions.makeInt($LONGINT)])
-     | FLOAT -> ^(NumTok<Num>[$FLOAT, actions.makeFloat($FLOAT)])
-     | COMPLEX -> ^(NumTok<Num>[$COMPLEX, actions.makeComplex($COMPLEX)])
+     | NAME -> ^(PYNODE<Name>[$NAME, $NAME.text, $expr::ctype])
+     | INT -> ^(PYNODE<Num>[$INT, actions.makeInt($INT)])
+     | LONGINT -> ^(PYNODE<Num>[$LONGINT, actions.makeInt($LONGINT)])
+     | FLOAT -> ^(PYNODE<Num>[$FLOAT, actions.makeFloat($FLOAT)])
+     | COMPLEX -> ^(PYNODE<Num>[$COMPLEX, actions.makeComplex($COMPLEX)])
      | (S+=STRING)+ 
-    -> ^(StrTok<Str>[actions.extractStringToken($S), actions.extractStrings($S)])
+    -> ^(PYNODE<Str>[actions.extractStringToken($S), actions.extractStrings($S)])
      ;
 
 //listmaker: test ( list_for | (',' test)* [','] )
@@ -1085,7 +1058,7 @@ listmaker returns [exprType etype]
 testlist_gexp
     : t+=test[expr_contextType.Load]
         ( ((options {k=2;}: c1=COMMA t+=test[expr_contextType.Load])* (c2=COMMA)?
-         -> { $c1 != null || $c2 != null }? ^(TupleTok<Tuple>[$testlist_gexp.start, actions.makeExprs($t), $expr::ctype])
+         -> { $c1 != null || $c2 != null }? ^(PYNODE<Tuple>[$testlist_gexp.start, actions.makeExprs($t), $expr::ctype])
          -> test
           )
         | ( gen_for -> ^(GeneratorExp test gen_for)
@@ -1158,7 +1131,7 @@ subscript returns [sliceType sltype]
     | (COLON) => c2=COLON (upper2=test[expr_contextType.Load])? (sliceop)? {
         $sltype = actions.makeSubscript(null, $c2, $upper2.tree, $sliceop.tree);
     }
-    | test[expr_contextType.Load] -> ^(Subscript<Index>[$test.start, (exprType)$test.tree])
+    | test[expr_contextType.Load] -> ^(PYNODE<Index>[$test.start, (exprType)$test.tree])
     ;
 
 //sliceop: ':' [test]
@@ -1205,12 +1178,15 @@ dictmaker : test[expr_contextType.Load] COLON test[expr_contextType.Load]
           ;
 
 //classdef: 'class' NAME ['(' [testlist] ')'] ':' suite
-classdef returns [stmtType stype]
+classdef
+@init {
+    stmtType stype = null;
+}
 @after {
-   $classdef.tree = $stype;
+   $classdef.tree = stype;
 }
     :CLASS NAME (LPAREN testlist[expr_contextType.Load]? RPAREN)? COLON suite {
-        $stype = new ClassDef($CLASS, $NAME.getText(), actions.makeBases($testlist.etype), actions.makeStmts($suite.stmts));
+        stype = new ClassDef($CLASS, $NAME.getText(), actions.makeBases($testlist.etype), actions.makeStmts($suite.stmts));
     }
     ;
 
