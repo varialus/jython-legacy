@@ -879,35 +879,26 @@ comparison[expr_contextType ctype]
     }
 }
     : left=expr[ctype]
-       ( ( LESS right+=expr[ctype] {cmps.add(cmpopType.Lt);}
-         |GREATER right+=expr[ctype] {cmps.add(cmpopType.Gt);}
-         |EQUAL right+=expr[ctype] {cmps.add(cmpopType.Eq);}
-         |GREATEREQUAL right+=expr[ctype] {cmps.add(cmpopType.GtE);}
-         |LESSEQUAL right+=expr[ctype] {cmps.add(cmpopType.LtE);}
-         |ALT_NOTEQUAL right+=expr[ctype] {cmps.add(cmpopType.NotEq);}
-         |NOTEQUAL right+=expr[ctype] {cmps.add(cmpopType.NotEq);}
-         |IN right+=expr[ctype] {cmps.add(cmpopType.In);}
-         |IS right+=expr[ctype] {cmps.add(cmpopType.Is);}
-         |NOT IN right+=expr[ctype] {cmps.add(cmpopType.NotIn);}
-         |IS NOT right+=expr[ctype] {cmps.add(cmpopType.IsNot);}
+       ( ( comp_op right+=expr[ctype] {cmps.add($comp_op.op);}
          )+
        |  -> $left
        )
     ;
 
 //comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
-comp_op : LESS
-        | GREATER
-        | EQUAL
-        | GREATEREQUAL
-        | LESSEQUAL
-        | ALT_NOTEQUAL
-        | NOTEQUAL
-        | IN
-//        | NOT IN -> NotIn
-        | IS
-//        | IS NOT -> IsNot
-        ;
+comp_op returns [cmpopType op]
+    : LESS {$op = cmpopType.Lt;}
+    | GREATER {$op = cmpopType.Gt;}
+    | EQUAL {$op = cmpopType.Eq;}
+    | GREATEREQUAL {$op = cmpopType.GtE;}
+    | LESSEQUAL {$op = cmpopType.LtE;}
+    | ALT_NOTEQUAL {$op = cmpopType.NotEq;}
+    | NOTEQUAL {$op = cmpopType.NotEq;}
+    | IN {$op = cmpopType.In;}
+    | NOT IN {$op = cmpopType.NotIn;}
+    | IS {$op = cmpopType.Is;}
+    | IS NOT {$op = cmpopType.IsNot;}
+    ;
 
 
 //expr: xor_expr ('|' xor_expr)*
