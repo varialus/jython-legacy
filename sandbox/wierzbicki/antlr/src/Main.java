@@ -20,7 +20,7 @@ public class Main {
 	PythonLexer lexer = new MyLexer(input);
 	CommonTokenStream tokens = new CommonTokenStream(lexer);
 	tokens.discardOffChannelTokens(true);
-	PythonTokenSource indentedSource = new PythonTokenSource(tokens);
+	PythonTokenSource indentedSource = new PythonTokenSource(tokens, "<test>");
 	tokens = new CommonTokenStream(indentedSource);
 	//System.out.println("tokens="+tokens.getTokens());
 	PythonParser parser = new PythonParser(tokens);

@@ -52,7 +52,16 @@
  *
  *  I (Terence) tested this by running it on the jython-2.1/Lib
  *  directory of 40k lines of Python.
- *  
+ *
+ *  REQUIRES ANTLR v3
+ *
+ *
+ *  Updated the original parser for Python 2.5 features. The parser has been
+ *  altered to produce an AST - the AST work started from tne newcompiler
+ *  grammar from Jim Baker.  The current parsing and compiling strategy looks
+ *  like this:
+ *
+ *  Python source->Python.g->AST (org/python/parser/ast/*)->CodeCompiler(ASM)->.class
  */
 
 grammar Python;
@@ -72,59 +81,126 @@ int implicitLineJoiningLevel = 0;
 int startPos=-1;
 }
 
-single_input : NEWLINE
-             | simple_stmt
-             | compound_stmt NEWLINE
-             ;
-
-file_input : (NEWLINE | stmt)*
-           ;
-
-eval_input : (NEWLINE)* testlist (NEWLINE)*
-           ;
-
-decorators: decorator+
-          ;
-
-decorator: AT dotted_attr (LPAREN arglist? RPAREN)? NEWLINE
-         ;
-
-dotted_attr
-    : NAME (DOT NAME)*
+single_input
+    : NEWLINE* EOF
+    | simple_stmt NEWLINE* EOF
+    | compound_stmt NEWLINE+ EOF
     ;
 
-funcdef : decorators? 'def' NAME parameters COLON suite
-        ;
+file_input
+    : (NEWLINE
+      | stmt
+      )*
+    ;
 
-parameters : LPAREN (varargslist)? RPAREN
-           ;
+eval_input
+    : LEADING_WS? (NEWLINE)* testlist (NEWLINE)* EOF 
+    ;
 
-varargslist : defparameter (options {greedy=true;}:COMMA defparameter)*
-              (COMMA
-                  ( STAR NAME (COMMA DOUBLESTAR NAME)?
-                  | DOUBLESTAR NAME
-                  )?
-              )?
-            | STAR NAME (COMMA DOUBLESTAR NAME)?
-            | DOUBLESTAR NAME
-            ;
+dotted_attr
+    : NAME
+      ( (DOT NAME)+
+      |
+      )
+    ;
 
-defparameter : fpdef (ASSIGN test)?
-             ;
+//attr is here for Java  compatibility.  A Java foo.getIf() can be called from Jython as foo.if
+//     so we need to support any keyword as an attribute.
+attr
+    : NAME
+    | AND
+    | AS
+    | ASSERT
+    | BREAK
+    | CLASS
+    | CONTINUE
+    | DEF
+    | DELETE
+    | ELIF
+    | EXCEPT
+    | EXEC
+    | FINALLY
+    | FROM
+    | FOR
+    | GLOBAL
+    | IF
+    | IMPORT
+    | IN
+    | IS
+    | LAMBDA
+    | NOT
+    | OR
+    | ORELSE
+    | PASS
+    | PRINT
+    | RAISE
+    | RETURN
+    | TRY
+    | WHILE
+    | WITH
+    | YIELD
+    ;
 
-fpdef : NAME
-      | LPAREN fplist RPAREN
-      ;
+decorator
+    : AT dotted_attr 
+    ( LPAREN
+      ( arglist
+      |
+      )
+      RPAREN
+    |
+    ) NEWLINE
+    ;
 
-fplist : fpdef (options {greedy=true;}:COMMA fpdef)* (COMMA)?
-       ;
+decorators
+    : decorator+
+    ;
 
-stmt : simple_stmt
-     | compound_stmt
-     ;
+funcdef
+    : decorators? DEF NAME parameters COLON suite
+    ;
 
-simple_stmt : small_stmt (options {greedy=true;}:SEMI small_stmt)* (SEMI)? NEWLINE
-            ;
+parameters
+    : LPAREN 
+      (varargslist
+      |
+      )
+      RPAREN
+    ;
+
+defparameter
+    : fpdef (ASSIGN test)?
+    ;
+
+varargslist
+    : defparameter (options {greedy=true;}:COMMA defparameter)*
+      (COMMA
+          (STAR NAME (COMMA DOUBLESTAR NAME)?
+          | DOUBLESTAR NAME
+          )?
+      )?
+    | STAR NAME (COMMA DOUBLESTAR NAME)?
+    | DOUBLESTAR NAME
+    ;
+
+fpdef
+    : NAME 
+    | LPAREN fplist RPAREN
+    ;
+
+fplist
+    : fpdef
+      (options {greedy=true;}:COMMA fpdef)* (COMMA)?
+    ;
+
+stmt
+    : simple_stmt
+    | compound_stmt
+    ;
+
+simple_stmt
+    : small_stmt (options {greedy=true;}:SEMI small_stmt)* (SEMI)? NEWLINE
+    ;
 
 small_stmt : expr_stmt
            | print_stmt
@@ -137,307 +213,514 @@ small_stmt : expr_stmt
            | assert_stmt
            ;
 
-expr_stmt : testlist
-            ( augassign yield_expr
-            | augassign testlist
-            | assigns
-            )?
-          ;
-
-assigns
-    : assign_testlist+
-    | assign_yield+
+expr_stmt 
+    : ((testlist augassign) => lhs=testlist
+        ( (augassign yield_expr 
+          )
+        | (augassign testlist
+          )
+        )
+    | (testlist ASSIGN) => lhs=testlist
+        (
+        | ((ASSIGN testlist)+
+          )
+        | ((ASSIGN yield_expr)+
+          )
+        )
+    | lhs=testlist
+    )
     ;
 
-assign_testlist
-       : ASSIGN testlist
-       ;
-
-assign_yield
-    : ASSIGN yield_expr
+augassign
+    : PLUSEQUAL
+    | MINUSEQUAL
+    | STAREQUAL
+    | SLASHEQUAL
+    | PERCENTEQUAL
+    | AMPEREQUAL
+    | VBAREQUAL
+    | CIRCUMFLEXEQUAL
+    | LEFTSHIFTEQUAL
+    | RIGHTSHIFTEQUAL
+    | DOUBLESTAREQUAL
+    | DOUBLESLASHEQUAL
     ;
 
-augassign : PLUSEQUAL
-          | MINUSEQUAL
-          | STAREQUAL
-          | SLASHEQUAL
-          | PERCENTEQUAL
-          | AMPEREQUAL
-          | VBAREQUAL
-          | CIRCUMFLEXEQUAL
-          | LEFTSHIFTEQUAL
-          | RIGHTSHIFTEQUAL
-          | DOUBLESTAREQUAL
-          | DOUBLESLASHEQUAL
-          ;
-
-print_stmt : 'print' (printlist | RIGHTSHIFT printlist)?
-           ;
-
-printlist returns [boolean newline]
-    : test (options {k=2;}: COMMA test)* (COMMA)?
+print_stmt
+    : PRINT 
+      (printlist
+      | RIGHTSHIFT printlist2
+      |
+      )
     ;
 
+//not in CPython's Grammar file
+printlist
+    : (test COMMA) =>
+       test (options {k=2;}: COMMA test)*
+         (trailcomma=COMMA)?
+    | test
+    ;
 
-del_stmt : 'del' exprlist
-         ;
+//XXX: would be nice if printlist and printlist2 could be merged.
+//not in CPython's Grammar file
+printlist2
+    : (test COMMA test) =>
+       test (options {k=2;}: COMMA test)*
+         (trailcomma=COMMA)?
+    | test
+    ;
 
-pass_stmt : 'pass'
-          ;
+del_stmt
+    : DELETE del_list
+    ;
 
-flow_stmt : break_stmt
-          | continue_stmt
-          | return_stmt
-          | raise_stmt
-          | yield_stmt
-          ;
+pass_stmt
+    : PASS
+    ;
 
-break_stmt : 'break'
-           ;
+flow_stmt
+    : break_stmt
+    | continue_stmt
+    | return_stmt
+    | raise_stmt
+    | yield_stmt
+    ;
 
-continue_stmt : 'continue'
-              ;
+break_stmt
+    : BREAK
+    ;
 
-return_stmt : 'return' (testlist)?
-            ;
+continue_stmt
+    : CONTINUE
+    ;
 
-yield_stmt : yield_expr
-           ;
-
-raise_stmt: 'raise' (test (COMMA test (COMMA test)?)?)?
-          ;
-
-import_stmt : import_name
-            | import_from
-            ;
-
-import_name : 'import' dotted_as_names
-            ;
-
-import_from: 'from' (DOT* dotted_name | DOT+) 'import'
-              (STAR
-              | import_as_names
-              | LPAREN import_as_names RPAREN
-              )
-           ;
-
-import_as_names : import_as_name (COMMA import_as_name)* (COMMA)?
-                ;
-
-import_as_name : NAME ('as' NAME)?
-               ;
-
-dotted_as_name : dotted_name ('as' NAME)?
-               ;
-
-dotted_as_names : dotted_as_name (COMMA dotted_as_name)*
-                ;
-dotted_name : NAME (DOT NAME)*
-            ;
-
-global_stmt : 'global' NAME (COMMA NAME)*
-            ;
-
-exec_stmt : 'exec' expr ('in' test (COMMA test)?)?
-          ;
-
-assert_stmt : 'assert' test (COMMA test)?
-            ;
-
-compound_stmt : if_stmt
-              | while_stmt
-              | for_stmt
-              | try_stmt
-              | with_stmt
-              | funcdef
-              | classdef
-              ;
-
-if_stmt: 'if' test COLON suite elif_clause*  ('else' COLON suite)?
-       ;
-
-elif_clause : 'elif' test COLON suite
-            ;
-
-while_stmt : 'while' test COLON suite ('else' COLON suite)?
-           ;
-
-for_stmt : 'for' exprlist 'in' testlist COLON suite ('else' COLON suite)?
-         ;
-
-try_stmt : 'try' COLON suite
-           ( except_clause+ ('else' COLON suite)? ('finally' COLON suite)?
-           | 'finally' COLON suite
-           )
-         ;
-
-with_stmt: 'with' test (with_var)? COLON suite
-         ;
-
-with_var: ('as' | NAME) expr
-        ;
-
-except_clause : 'except' (test (COMMA test)?)? COLON suite
-              ;
-
-suite : simple_stmt
-      | NEWLINE INDENT (stmt)+ DEDENT
+return_stmt
+    : RETURN 
+      (testlist
+      |
+      )
       ;
 
-test: or_test
-    ( ('if' or_test 'else') => 'if' or_test 'else' test)?
+yield_stmt
+    : yield_expr
+    ;
+
+raise_stmt
+    : RAISE (test (COMMA test
+        (COMMA test)?)?)?
+    ;
+
+import_stmt
+    : import_name
+    | import_from
+    ;
+
+import_name
+    : IMPORT dotted_as_names
+    ;
+
+import_from
+    : FROM (DOT* dotted_name | DOT+) IMPORT 
+        (STAR
+        | import_as_names
+        | LPAREN import_as_names COMMA? RPAREN
+        )
+    ;
+
+import_as_names
+    : import_as_name (COMMA import_as_name)*
+    ;
+
+import_as_name
+    : name=NAME (AS asname=NAME)?
+    ;
+
+dotted_as_name
+    : dotted_name (AS NAME)?
+    ;
+
+dotted_as_names
+    : dotted_as_name (COMMA dotted_as_name)*
+    ;
+
+dotted_name
+    : NAME (DOT attr)*
+    ;
+
+global_stmt
+    : GLOBAL NAME (COMMA NAME)*
+    ;
+
+exec_stmt
+    : EXEC expr (IN test
+        (COMMA test)?)?
+    ;
+
+assert_stmt
+    : ASSERT test (COMMA test)?
+    ;
+
+compound_stmt
+    : if_stmt
+    | while_stmt
+    | for_stmt
+    | try_stmt
+    | with_stmt
+    | funcdef
+    | classdef
+    ;
+
+if_stmt
+    : IF test COLON suite elif_clause*
+        (ORELSE COLON suite)?
+    ;
+
+//not in CPython's Grammar file
+elif_clause
+    : ELIF test COLON suite
+    ;
+
+while_stmt
+    : WHILE test COLON suite (ORELSE COLON suite)?
+    ;
+
+for_stmt
+    : FOR exprlist IN testlist COLON suite
+        (ORELSE COLON suite)?
+    ;
+
+try_stmt
+    : TRY COLON suite
+      ( except_clause+ (ORELSE COLON suite)? (FINALLY COLON suite)?
+      | FINALLY COLON suite
+      )
+      ;
+
+with_stmt
+    : WITH test (with_var)? COLON suite
+    ;
+
+with_var
+    : (AS | NAME) expr
+    ;
+
+except_clause
+    : EXCEPT (test (COMMA test)?)? COLON suite
+    ;
+
+suite
+    : simple_stmt
+    | NEWLINE INDENT
+      (stmt
+      )+ DEDENT
+    ;
+
+test
+    :or_test
+      ( (IF or_test ORELSE) => IF o2=or_test ORELSE e=test
+      |
+      )
     | lambdef
     ;
 
-or_test : and_test (OR and_test)*
-        ;
+or_test
+    : left=and_test
+        ( (OR and_test
+          )+
+        |
+        )
+    ;
 
-and_test : not_test (AND not_test)*
-         ;
+and_test
+    : not_test
+        ( (AND not_test
+          )+
+        |
+        )
+    ;
 
-not_test : NOT not_test
-         | comparison
-         ;
+not_test
+    : NOT nt=not_test
+    | comparison
+    ;
 
-comparison: expr (comp_op expr)*
-          ;
+comparison
+    : left=expr
+       ( ( comp_op expr
+         )+
+       |
+       )
+    ;
 
-comp_op : LESS
-        | GREATER
-        | EQUAL
-        | GREATEREQUAL
-        | LESSEQUAL
-        | ALT_NOTEQUAL
-        | NOTEQUAL
-        | 'in'
-        | NOT 'in'
-        | 'is'
-        | 'is' NOT
-        ;
+comp_op
+    : LESS
+    | GREATER
+    | EQUAL
+    | GREATEREQUAL
+    | LESSEQUAL
+    | ALT_NOTEQUAL
+    | NOTEQUAL
+    | IN
+    | NOT IN
+    | IS
+    | IS NOT
+    ;
 
-expr : xor_expr (VBAR xor_expr)*
-     ;
+expr
+    : left=xor_expr
+        ( (VBAR xor_expr
+          )+
+        |
+        )
+    ;
 
-xor_expr : and_expr (CIRCUMFLEX and_expr)*
-         ;
+xor_expr
+    : left=and_expr
+        ( (CIRCUMFLEX and_expr
+          )+
+        |
+        )
+    ;
 
-and_expr : shift_expr (AMPER shift_expr)*
-         ;
+and_expr
+    : shift_expr
+        ( (AMPER shift_expr
+          )+
+        |
+        )
+    ;
 
-shift_expr : arith_expr ((LEFTSHIFT|RIGHTSHIFT) arith_expr)*
-           ;
+shift_expr
+    : left=arith_expr
+        ( ( shift_op arith_expr
+          )+
+        |
+        )
+    ;
 
-arith_expr: term ((PLUS|MINUS) term)*
-          ;
+shift_op
+    : LEFTSHIFT
+    | RIGHTSHIFT
+    ;
 
-term : factor ((STAR | SLASH | PERCENT | DOUBLESLASH ) factor)*
-     ;
+arith_expr
+    : left=term
+        ( (arith_op term
+          )+
+        |
+        )
+    ;
 
-factor : PLUS factor
-       | MINUS factor
-       | TILDE factor
-       | power
-       ;
+arith_op
+    : PLUS
+    | MINUS
+    ;
 
-power : atom (trailer)* (options {greedy=true;}:DOUBLESTAR factor)?
-      ;
+term
+    : factor
+        ( (term_op factor
+          )+
+        |
+        )
+    ;
 
-atom : LPAREN 
-       ( yield_expr
-       | testlist_gexp
-       )?
-       RPAREN
-     | LBRACK (listmaker)? RBRACK
-     | LCURLY (dictmaker)? RCURLY
+term_op
+    :STAR
+    |SLASH
+    |PERCENT
+    |DOUBLESLASH
+    ;
+
+factor
+    : PLUS factor
+    | MINUS factor
+    | TILDE factor
+    | power
+    ;
+
+power
+    : atom (trailer)* (options {greedy=true;}:DOUBLESTAR factor)?
+    ;
+
+atom
+    : LPAREN 
+      ( yield_expr
+      | testlist_gexp
+      |
+      )
+      RPAREN
+    | LBRACK
+      (listmaker
+      |
+      )
+      RBRACK
+    | LCURLY 
+       (dictmaker
+       |
+       )
+       RCURLY
      | BACKQUOTE testlist BACKQUOTE
      | NAME
      | INT
      | LONGINT
      | FLOAT
      | COMPLEX
-     | (STRING)+
+     | (STRING)+ 
      ;
 
-listmaker : test 
-            ( list_for
-            | (options {greedy=true;}:COMMA test)*
-            ) (COMMA)?
+listmaker
+    : test 
+        (list_for
+        | (options {greedy=true;}:COMMA test)*
+        ) (COMMA)?
           ;
 
 testlist_gexp
-    : test ( (options {k=2;}: COMMA test)* (COMMA)?
-           | gen_for
-           )
-           
+    : test
+        ( ((options {k=2;}: COMMA test)* (COMMA)?
+          )
+        | (gen_for
+          )
+        )
     ;
 
-lambdef: 'lambda' (varargslist)? COLON test
-       ;
+lambdef
+    : LAMBDA (varargslist)? COLON test
+    ;
 
-trailer : LPAREN (arglist)? RPAREN
-        | LBRACK subscriptlist RBRACK
-        | DOT NAME
-        ;
+trailer
+    : LPAREN 
+        (arglist
+        |
+        )
+      RPAREN
+    | LBRACK subscriptlist RBRACK
+    | DOT attr
+    ;
 
-subscriptlist : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
-              ;
+subscriptlist
+    : subscript (options {greedy=true;}:COMMA subscript)* (COMMA)?
+    ;
 
-subscript : DOT DOT DOT
-          | test (COLON (test)? (sliceop)?)?
-          | COLON (test)? (sliceop)?
-          ;
+subscript
+    : DOT DOT DOT
+    | (test COLON)
+   => test (COLON (test)? (sliceop)?)?
+    | (COLON)
+   => COLON (test)? (sliceop)?
+    | test
+    ;
 
-sliceop : COLON (test)?
-        ;
+sliceop
+    : COLON
+      (test
+      )?
+    ;
 
-exprlist : expr (options {k=2;}: COMMA expr)* (COMMA)?
-         ;
+exprlist
+    : (expr COMMA) => expr (options {k=2;}: COMMA expr)* (COMMA)?
+    | expr
+    ;
+
+//not in CPython's Grammar file
+del_list
+    : expr (options {k=2;}: COMMA expr)* (COMMA)?
+    ;
 
 testlist
-    : test (options {k=2;}: COMMA test)* (COMMA)?
+    : (test COMMA)
+   => test (options {k=2;}: COMMA test)* (COMMA)?
+    | test
     ;
 
-dictmaker : test COLON test (options {k=2;}:COMMA test COLON test)* (COMMA)?
-          ;
+dictmaker
+    : test COLON test
+        (options {k=2;}:COMMA test COLON test)*
+        (COMMA)?
+    ;
 
-classdef: 'class' NAME (LPAREN testlist? RPAREN)? COLON suite
-        ;
+classdef
+    : CLASS NAME (LPAREN testlist? RPAREN)? COLON suite
+    ;
 
-arglist : argument (COMMA argument)*
-          ( COMMA
-            ( STAR test (COMMA DOUBLESTAR test)?
-            | DOUBLESTAR test
-            )?
+arglist
+    : argument (COMMA argument)*
+          (COMMA
+              ( STAR test (COMMA DOUBLESTAR test)?
+              | DOUBLESTAR test
+              )?
           )?
-        |   STAR test (COMMA DOUBLESTAR test)?
-        |   DOUBLESTAR test
-        ;
+    | STAR test (COMMA DOUBLESTAR test)?
+    | DOUBLESTAR test
+    ;
 
-argument : test ( (ASSIGN test) | gen_for)?
-         ;
+argument
+    : t1=test
+        ((ASSIGN t2=test)
+        | gen_for
+        |
+        )
+    ;
 
-list_iter : list_for
-          | list_if
-          ;
+list_iter
+    : list_for
+    | list_if
+    ;
 
-list_for : 'for' exprlist 'in' testlist (list_iter)?
-         ;
+list_for
+    : FOR exprlist IN testlist (list_iter)?
+    ;
 
-list_if : 'if' test (list_iter)?
-        ;
+list_if
+    : IF test (list_iter)?
+    ;
 
-gen_iter: gen_for
-        | gen_if
-        ;
+gen_iter
+    : gen_for
+    | gen_if
+    ;
 
-gen_for: 'for' exprlist 'in' or_test gen_iter?
-       ;
+gen_for
+    : FOR exprlist IN or_test gen_iter?
+    ;
 
-gen_if: 'if' test gen_iter?
-      ;
+gen_if
+    : IF test gen_iter?
+    ;
 
-yield_expr : 'yield' testlist?
-           ;
+yield_expr
+    : YIELD testlist?
+    ;
+
+AS        : 'as' ;
+ASSERT    : 'assert' ;
+BREAK     : 'break' ;
+CLASS     : 'class' ;
+CONTINUE  : 'continue' ;
+DEF       : 'def' ;
+DELETE    : 'del' ;
+ELIF      : 'elif' ;
+EXCEPT    : 'except' ;
+EXEC      : 'exec' ;
+FINALLY   : 'finally' ;
+FROM      : 'from' ;
+FOR       : 'for' ;
+GLOBAL    : 'global' ;
+IF        : 'if' ;
+IMPORT    : 'import' ;
+IN        : 'in' ;
+IS        : 'is' ;
+LAMBDA    : 'lambda' ;
+ORELSE    : 'else' ;
+PASS      : 'pass'  ;
+PRINT     : 'print' ;
+RAISE     : 'raise' ;
+RETURN    : 'return' ;
+TRY       : 'try' ;
+WHILE     : 'while' ;
+WITH      : 'with' ;
+YIELD     : 'yield' ;
 
 LPAREN    : '(' {implicitLineJoiningLevel++;} ;
 
@@ -553,12 +836,12 @@ Exponent
 INT :   // Hex
         '0' ('x' | 'X') ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
     |   // Octal
-        '0' DIGITS*
+        '0'  ( '0' .. '7' )*
     |   '1'..'9' DIGITS*
     ;
 
 COMPLEX
-    :   INT ('j'|'J')
+    :   DIGITS+ ('j'|'J')
     |   FLOAT ('j'|'J')
     ;
 
@@ -573,12 +856,17 @@ NAME:    ( 'a' .. 'z' | 'A' .. 'Z' | '_')
  *  should make us exit loop not continue.
  */
 STRING
-    :   ('r'|'u'|'ur')?
+    :   ('r'|'u'|'ur'|'R'|'U'|'UR'|'uR'|'Ur')?
         (   '\'\'\'' (options {greedy=false;}:TRIAPOS)* '\'\'\''
         |   '"""' (options {greedy=false;}:TRIQUOTE)* '"""'
         |   '"' (ESC|~('\\'|'\n'|'"'))* '"'
         |   '\'' (ESC|~('\\'|'\n'|'\''))* '\''
-        )
+        ) {
+           if (state.tokenStartLine != input.getLine()) {
+               state.tokenStartLine = input.getLine();
+               state.tokenStartCharPositionInLine = -2;
+           }
+        }
     ;
 
 /** the two '"'? cause a warning -- is there a way to avoid that? */
@@ -604,7 +892,7 @@ ESC
  */
 CONTINUED_LINE
     :    '\\' ('\r')? '\n' (' '|'\t')*  { $channel=HIDDEN; }
-         ( nl=NEWLINE {emit(new ClassicToken(NEWLINE,nl.getText()));}
+         ( nl=NEWLINE {emit(new CommonToken(NEWLINE,nl.getText()));}
          |
          )
     ;
@@ -616,8 +904,11 @@ CONTINUED_LINE
  *  Frank Wierzbicki added: Also ignore FORMFEEDS (\u000C).
  */
 NEWLINE
-    :   (('\u000C')?('\r')? '\n' )+
-        {if ( startPos==0 || implicitLineJoiningLevel>0 )
+@init {
+    int newlines = 0;
+}
+    :   (('\u000C')?('\r')? '\n' {newlines++; } )+ {
+         if ( startPos==0 || implicitLineJoiningLevel>0 )
             $channel=HIDDEN;
         }
     ;
@@ -634,24 +925,42 @@ WS  :    {startPos>0}?=> (' '|'\t'|'\u000C')+ {$channel=HIDDEN;}
 LEADING_WS
 @init {
     int spaces = 0;
+    int newlines = 0;
 }
     :   {startPos==0}?=>
         (   {implicitLineJoiningLevel>0}? ( ' ' | '\t' )+ {$channel=HIDDEN;}
-           |    (     ' '  { spaces++; }
-            |    '\t' { spaces += 8; spaces -= (spaces \% 8); }
-               )+
-            {
-            // make a string of n spaces where n is column number - 1
-            char[] indentation = new char[spaces];
-            for (int i=0; i<spaces; i++) {
-                indentation[i] = ' ';
-            }
-            String s = new String(indentation);
-            emit(new ClassicToken(LEADING_WS,new String(indentation)));
-            }
-            // kill trailing newline if present and then ignore
-            ( ('\r')? '\n' {if (token!=null) token.setChannel(HIDDEN); else $channel=HIDDEN;})*
-           // {token.setChannel(99); }
+        |    (     ' '  { spaces++; }
+             |    '\t' { spaces += 8; spaces -= (spaces \% 8); }
+             )+
+             ( ('\r')? '\n' {newlines++; }
+             )* {
+                   if (input.LA(1) != -1) {
+                       // make a string of n spaces where n is column number - 1
+                       char[] indentation = new char[spaces];
+                       for (int i=0; i<spaces; i++) {
+                           indentation[i] = ' ';
+                       }
+                       CommonToken c = new CommonToken(LEADING_WS,new String(indentation));
+                       c.setLine(input.getLine());
+                       c.setCharPositionInLine(input.getCharPositionInLine());
+                       emit(c);
+                       // kill trailing newline if present and then ignore
+                       if (newlines != 0) {
+                           if (state.token!=null) {
+                               state.token.setChannel(HIDDEN);
+                           } else {
+                               $channel=HIDDEN;
+                           }
+                       }
+                   } else {
+                       // make a string of n newlines
+                       char[] nls = new char[newlines];
+                       for (int i=0; i<newlines; i++) {
+                           nls[i] = '\n';
+                       }
+                       emit(new CommonToken(NEWLINE,new String(nls)));
+                   }
+                }
         )
     ;
 
@@ -677,6 +986,6 @@ COMMENT
     $channel=HIDDEN;
 }
     :    {startPos==0}?=> (' '|'\t')* '#' (~'\n')* '\n'+
-    |    {startPos>0}?=> '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
+    |    '#' (~'\n')* // let NEWLINE handle \n unless char pos==0 for '#'
     ;
 
