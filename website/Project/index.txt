@@ -11,7 +11,11 @@ run Python on any Java platform.
 
 .. admonition:: Latest News
 
-  The Jython development team is proud to announce a new release: Jython 2.2.1!
+  The Jython development team is proud to announce a new alpha release: Jython 2.5a2!
+
+  * `Test the alpha <http://downloads.sourceforge.net/jython/jython_installer-2.5a2.jar>`__
+
+  For production use please continue to use Jython 2.2.1
 
   * `Download location`_
   * `Installation instructions <installation.html>`__
