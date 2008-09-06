@@ -17,7 +17,7 @@ import java.util.zip.ZipInputStream;
  * moment).
  */
 public class JarInstaller {
-    public static final String JYTHON_JAR = "jython.jar";
+    public static final String JYTHON_JAR = "jython-complete.jar";
     
     private static final String PATH_SEPARATOR = "/";
     private static final String LIB_NAME_SEP = "Lib" + PATH_SEPARATOR;
@@ -52,6 +52,8 @@ public class JarInstaller {
             List coreLibFiles = new ArrayList();
             if (!installationType.installSources()) {
                 excludeDirs.add("src");
+                excludeDirs.add("grammar");
+                excludeDirs.add("extlibs");
             }
             if (!installationType.installDocumentation()) {
                 excludeDirs.add("Doc");
@@ -93,6 +95,10 @@ public class JarInstaller {
                         exclude = true;
                     }
                 }
+                // exclude build.xml when not installing source
+                if (!installationType.installSources() && zipEntryName.equals("build.xml"))
+                    exclude = true;
+
                 // handle exclusion of core Lib files
                 if (!exclude) {
                     exclude = shouldExcludeFile(installationType, coreLibFiles, zipEntry, zipEntryName);
@@ -133,6 +139,7 @@ public class JarInstaller {
                 _progressListener.progressStartScripts();
                 StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
                 generator.generateStartScripts();
+                StandalonePackager.emptyDirectory(new File(targetDirectory, "bin"), null);
             } else {
                 _progressListener.progressStandalone();
                 File jythonJar = new File(targetDirectory, JYTHON_JAR);
@@ -220,6 +227,8 @@ public class JarInstaller {
         coreLibFiles.add("javapath.py");
         coreLibFiles.add("jreload.py");
         coreLibFiles.add("marshal.py");
+        coreLibFiles.add("os.py");
+        coreLibFiles.add("posixpath.py");
         coreLibFiles.add("random.py");
         coreLibFiles.add("re.py");
         coreLibFiles.add("site.py");
@@ -228,6 +237,7 @@ public class JarInstaller {
         coreLibFiles.add("sre_compile.py");
         coreLibFiles.add("sre_constants.py");
         coreLibFiles.add("sre_parse.py");
+        coreLibFiles.add("stat.py");
         coreLibFiles.add("string.py");
         coreLibFiles.add("zipfile.py");
         coreLibFiles.add("zlib.py");

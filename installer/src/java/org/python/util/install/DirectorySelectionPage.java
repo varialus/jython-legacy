@@ -142,7 +142,7 @@ public class DirectorySelectionPage extends AbstractWizardPage {
         File defaultDirectory = null;
         File parentDirectory = new File(directory);
         if (parentDirectory.exists() && parentDirectory.isDirectory()) {
-            String jythonSubDirectoryName = "jython" + _jarInfo.getVersion();
+            String jythonSubDirectoryName = "jython" + (_jarInfo.getVersion()).replaceAll("\\+", "");
             defaultDirectory = new File(parentDirectory, jythonSubDirectoryName);
         }
         return defaultDirectory;
