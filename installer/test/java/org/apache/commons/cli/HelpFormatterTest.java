@@ -24,12 +24,15 @@ public class HelpFormatterTest extends TestCase {
      */
     public void testOptionGroupDuplication() {
         String help = getFormattedHelp();
-        String expectedHelp = new String("usage: syntax [-a | -b]\r\n-a,--Aa option A\r\n-b,--Bb option B\r\n");
-        assertEquals("expected usage to be '" + expectedHelp + "' instead of '" + help + "'", expectedHelp, help);
+        String expectedHelp = new String("usage: syntax [-a | -b]\n-a,--Aa option A\n-b,--Bb option B\n");
+        assertEquals("expected usage to be '" + expectedHelp + "' instead of '" + help + "'",
+                     expectedHelp,
+                     help);
     }
 
     /**
-     * Options following an option group used to be non blank separated: [-b | -a][-o] instead of [-b | -a] [-o]
+     * Options following an option group used to be non blank separated: [-b | -a][-o] instead of
+     * [-b | -a] [-o]
      */
     public void testOptionGroupSubsequentOptions() {
         _options.addOption(new Option("o", "Option O"));
@@ -41,7 +44,6 @@ public class HelpFormatterTest extends TestCase {
     //
     // private methods
     //
-
     private String getFormattedHelp() {
         HelpFormatter formatter = new HelpFormatter();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -51,5 +53,4 @@ public class HelpFormatterTest extends TestCase {
         String usage = baos.toString();
         return usage;
     }
-
 }
