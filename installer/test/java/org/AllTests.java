@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -28,7 +27,7 @@ public class AllTests extends TestSuite {
      * @throws Exception
      */
     public static Test suite() throws Exception {
-        Class suiteClass = AllTests.class;
+        Class<AllTests> suiteClass = AllTests.class;
         String testSuiteClassName = suiteClass.getName();
         File suiteFile = new File(suiteClass.getClassLoader().getResource(
                 testSuiteClassName.replace('.', '/').concat(".class")).getFile());
@@ -45,7 +44,7 @@ public class AllTests extends TestSuite {
 
     private static void buildSuite(int prefixLength, String basePackage, File currentDir, FilenameFilter filter,
             TestSuite currentSuite) throws Exception {
-        List potentialDirectories = Arrays.asList(currentDir.listFiles(filter));
+        List<File> potentialDirectories = Arrays.asList(currentDir.listFiles(filter));
         if (potentialDirectories.size() == 0) {
             return;
         }
@@ -54,9 +53,9 @@ public class AllTests extends TestSuite {
         currentPackageName.append(currentDir.getAbsolutePath().substring(prefixLength).replace('\\', '.').replace('/',
                 '.'));
 
-        List classFiles = new ArrayList(potentialDirectories.size());
+        List<File> classFiles = new ArrayList<File>(potentialDirectories.size());
         Collections.sort(potentialDirectories, new FileComparator());
-        Iterator directoryIterator = potentialDirectories.iterator();
+        Iterator<File> directoryIterator = potentialDirectories.iterator();
         while (directoryIterator.hasNext()) {
             File potentialDirectory = (File) directoryIterator.next();
             if (potentialDirectory.isDirectory()) {
@@ -70,7 +69,7 @@ public class AllTests extends TestSuite {
                 classFiles.add(potentialDirectory);
             }
         }
-        Iterator fileIterator = classFiles.iterator();
+        Iterator<File> fileIterator = classFiles.iterator();
         while (fileIterator.hasNext()) {
             File file = (File) fileIterator.next();
             StringBuffer className = new StringBuffer(200);
@@ -93,11 +92,9 @@ public class AllTests extends TestSuite {
         }
     }
 
-    private static class FileComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            Assert.assertTrue(o1 instanceof File);
-            Assert.assertTrue(o2 instanceof File);
-            return ((File) o1).getAbsolutePath().compareTo(((File) o2).getAbsolutePath());
+    private static class FileComparator implements Comparator<File> {
+        public int compare(File f1, File f2) {
+            return f1.getAbsolutePath().compareTo(f2.getAbsolutePath());
         }
     }
     
