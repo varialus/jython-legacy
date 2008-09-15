@@ -33,7 +33,8 @@ public class ChildProcessTest extends TestCase {
         childProcess.setTimeout(2000); // timeout to 2 seconds
         int exitValue = childProcess.run();
         assertEquals("Expected child process to be destroyed instead of " + exitValue,
-                ChildProcess.DESTROYED_AFTER_TIMEOUT, exitValue);
+                     ChildProcess.DESTROYED_AFTER_TIMEOUT,
+                     exitValue);
     }
 
     /**
@@ -80,10 +81,12 @@ public class ChildProcessTest extends TestCase {
     //
     // private methods
     //
-
     private String buildJavaCommand(String classAndArguments) {
+        String quote = "";
+        if (System.getProperty("os.name", "unknown").toLowerCase().indexOf("windows") >= 0) {
+            quote = "\"";
+        }
         String classpath = System.getProperty("java.class.path");
-        return "java -classpath \"" + classpath + "\" " + classAndArguments;
+        return "java -classpath " + quote + classpath + quote + " " + classAndArguments;
     }
-
 }
