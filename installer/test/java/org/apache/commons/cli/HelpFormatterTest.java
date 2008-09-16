@@ -23,8 +23,8 @@ public class HelpFormatterTest extends TestCase {
      * the setUp above used to print [-a | -b] [-a] [-b]
      */
     public void testOptionGroupDuplication() {
-        String help = getFormattedHelp();
-        String expectedHelp = new String("usage: syntax [-a | -b]\n-a,--Aa option A\n-b,--Bb option B\n");
+        String help = unifyNewLines(getFormattedHelp());
+        String expectedHelp = unifyNewLines(new String("usage: syntax [-a | -b]\n-a,--Aa option A\n-b,--Bb option B\n"));
         assertEquals("expected usage to be '" + expectedHelp + "' instead of '" + help + "'",
                      expectedHelp,
                      help);
@@ -52,5 +52,31 @@ public class HelpFormatterTest extends TestCase {
         pw.flush();
         String usage = baos.toString();
         return usage;
+    }
+
+    /**
+     * replace the windows specific \r\n line endings with java like \n line endings
+     * 
+     * @param in
+     *            The string to be transformed
+     * @return The string with unified line endings
+     */
+    private String unifyNewLines(String in) {
+        char[] inChars = in.toCharArray();
+        StringBuilder b = new StringBuilder(inChars.length);
+        for (int i = 0; i < inChars.length; i++) {
+            char current = inChars[i];
+            if (current == '\r') {
+                if (i < inChars.length) {
+                    char next = inChars[i + 1];
+                    if (next == '\n') {
+                        i++;
+                        current = next;
+                    }
+                }
+            }
+            b.append(current);
+        }
+        return b.toString();
     }
 }
