@@ -10,24 +10,28 @@ import java.util.Date;
 public class StartScriptGenerator {
 
     protected final static int UNIX_FLAVOUR = 10;
+
     protected final static int WINDOWS_FLAVOUR = 30;
+
     protected final static int BOTH_FLAVOUR = 50;
+
     protected final static String WIN_CR_LF;
 
     private final static String EXECUTABLE_MODE = "755";
 
     private final static String JYTHON = "jython";
-    private final static String JYTHON_BAT = "jython.bat";
-    private final static String JYTHON_JAR = JarInstaller.JYTHON_JAR;
 
+    private final static String JYTHON_BAT = "jython.bat";
     static {
         int dInt = Integer.parseInt("0d", 16);
         int aInt = Integer.parseInt("0a", 16);
-        WIN_CR_LF = new String(new char[] { (char) dInt, (char) aInt });
+        WIN_CR_LF = new String(new char[] {(char)dInt, (char)aInt});
     }
 
     private File _targetDirectory;
+
     private File _javaHome;
+
     private int _flavour;
 
     public StartScriptGenerator(File targetDirectory, File javaHome) {
@@ -47,7 +51,7 @@ public class StartScriptGenerator {
             // check if we should create unix like scripts, too
             if (hasUnixlikeShell()) {
                 _flavour = BOTH_FLAVOUR;
-           }
+            }
         }
     }
 
@@ -75,16 +79,16 @@ public class StartScriptGenerator {
     }
 
     private final void generateJythonScript() throws IOException {
-        switch (getFlavour()) {
-        case BOTH_FLAVOUR:
-            writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
-            makeExecutable(writeToFile(JYTHON, getJythonScript(BOTH_FLAVOUR)));
-            break;
-        case WINDOWS_FLAVOUR:
-            writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
-            break;
-        default:
-            makeExecutable(writeToFile(JYTHON, getJythonScript(UNIX_FLAVOUR)));
+        switch(getFlavour()){
+            case BOTH_FLAVOUR:
+                writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+                makeExecutable(writeToFile(JYTHON, getJythonScript(BOTH_FLAVOUR)));
+                break;
+            case WINDOWS_FLAVOUR:
+                writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+                break;
+            default:
+                makeExecutable(writeToFile(JYTHON, getJythonScript(UNIX_FLAVOUR)));
         }
     }
 
@@ -152,7 +156,7 @@ public class StartScriptGenerator {
         StringBuffer buffer = getUnixHeaderTemplate();
         buffer.append("JAVA_HOME=\"{2}\"\n");
         buffer.append("JYTHON_HOME=\"{3}\"\n");
-	buffer.append("\n");
+        buffer.append("\n");
         return buffer.toString();
     }
 
@@ -172,25 +176,31 @@ public class StartScriptGenerator {
     }
 
     /**
-     * @param fileName The short file name, e.g. JYTHON_BAT
+     * @param fileName
+     *            The short file name, e.g. JYTHON_BAT
      * 
      * @throws IOException
      */
     private String readFromFile(String fileName) throws IOException {
-	File file = new File(new File(_targetDirectory, "bin"), fileName);
-	FileReader fileReader = new FileReader(file);
-	StringBuffer sb = new StringBuffer();
-	char[] b = new char[8192];
-	int n;
-
-	while ( (n = fileReader.read(b)) > 0) {
-	    sb.append(b, 0, n);
-	}
-	return sb.toString();
+        // default runtime location
+        File file = new File(new File(_targetDirectory, "bin"), fileName);
+        if (!file.exists()) {
+            // deviation: test time location
+            file = new File(_targetDirectory, fileName);
+        }
+        FileReader fileReader = new FileReader(file);
+        StringBuffer sb = new StringBuffer();
+        char[] b = new char[8192];
+        int n;
+        while ((n = fileReader.read(b)) > 0) {
+            sb.append(b, 0, n);
+        }
+        return sb.toString();
     }
 
     /**
-     * @param fileName The short file name, e.g. JYTHON_BAT
+     * @param fileName
+     *            The short file name, e.g. JYTHON_BAT
      * @param contents
      * 
      * @throws IOException
@@ -230,5 +240,4 @@ public class StartScriptGenerator {
             t.printStackTrace();
         }
     }
-
 }
