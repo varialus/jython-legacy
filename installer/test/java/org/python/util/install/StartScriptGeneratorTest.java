@@ -82,7 +82,7 @@ public class StartScriptGeneratorTest extends TestCase {
         String winScript = _generator.getJythonScript(StartScriptGenerator.WINDOWS_FLAVOUR);
         assertTrue(winScript.startsWith(start));
         assertTrue(winScript.length() > 3500);
-        assertTrue(winScript.indexOf("if not [%JAVA_HOME%] == []") > start.length());
+        assertTrue(winScript.indexOf("if not \"%_TRIMMED_JAVA_HOME%\"==\"\"") > start.length());
         assertTrue(winScript.indexOf("-Dpython.home=") > start.length());
         assertTrue(winScript.indexOf("-Dpython.executable=") > start.length());
     }
