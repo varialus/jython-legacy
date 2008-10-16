@@ -30,8 +30,8 @@ public class InstallerCommandLine {
     private static final String SILENT_LONG = "silent";
     private static final String SILENT_DESC = "silent installation (without user interaction)";
 
-    private static final String VERBOSE_SHORT = "v";
-    private static final String VERBOSE_LONG = "verbose";
+    protected static final String VERBOSE_SHORT = "v";
+    protected static final String VERBOSE_LONG = "verbose";
     private static final String VERBOSE_DESC = "print more output during the installation\n"
             + "(also valid in GUI and autotest mode)";
 
@@ -120,6 +120,22 @@ public class InstallerCommandLine {
     public InstallerCommandLine(JarInfo jarInfo) {
         createOptions();
         _jarInfo = jarInfo;
+    }
+
+    /**
+     * Pre-scan of the arguments to detect a verbose flag
+     * @param args 
+     * @return <code>true</code> if there is a verbose option
+     */
+    public static final boolean hasVerboseOptionInArgs(String[] args) {
+        String shortVerbose = "-".concat(VERBOSE_SHORT);
+        String longVerbose = "--".concat(VERBOSE_LONG);
+        for (String arg : args) {
+            if (shortVerbose.equals(arg) || longVerbose.equals(arg)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

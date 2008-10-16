@@ -511,4 +511,27 @@ public class InstallerCommandLineTest extends TestCase {
         commandLine.printHelp();
     }
 
+    public void testHasVerboseOptionInArgs() {
+        String[] args = new String[0];
+        assertFalse(InstallerCommandLine.hasVerboseOptionInArgs(args));
+
+        args = new String[] {"a", "b", "c"};
+        assertFalse(InstallerCommandLine.hasVerboseOptionInArgs(args));
+ 
+        args = new String[] {"a", InstallerCommandLine.VERBOSE_SHORT, "c"};
+        assertFalse(InstallerCommandLine.hasVerboseOptionInArgs(args));
+        
+        args = new String[] {"a", "-" + InstallerCommandLine.VERBOSE_SHORT, "c"};
+        assertTrue(InstallerCommandLine.hasVerboseOptionInArgs(args));
+        
+        args = new String[] {"a", InstallerCommandLine.VERBOSE_LONG, "c"};
+        assertFalse(InstallerCommandLine.hasVerboseOptionInArgs(args));
+        
+        args = new String[] {"a", "-" + InstallerCommandLine.VERBOSE_LONG, "c"};
+        assertFalse(InstallerCommandLine.hasVerboseOptionInArgs(args));
+        
+        args = new String[] {"a", "--" + InstallerCommandLine.VERBOSE_LONG, "c"};
+        assertTrue(InstallerCommandLine.hasVerboseOptionInArgs(args));
+    }
+    
 }
