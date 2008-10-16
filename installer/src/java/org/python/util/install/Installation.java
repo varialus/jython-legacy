@@ -101,7 +101,7 @@ public class Installation {
         }
         boolean valid = true;
         if (major == 1) {
-            if (minor < 2) {
+            if (minor < 5) {
                 valid = false;
             }
         }

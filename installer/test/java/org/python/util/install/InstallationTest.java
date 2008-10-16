@@ -58,11 +58,11 @@ public class InstallationTest extends TestCase {
         javaVersionInfo.setSpecificationVersion("1.1.9");
         assertFalse(Installation.isValidJava(javaVersionInfo));
         javaVersionInfo.setSpecificationVersion("1.2");
-        assertTrue(Installation.isValidJava(javaVersionInfo));
+        assertFalse(Installation.isValidJava(javaVersionInfo));
         javaVersionInfo.setSpecificationVersion("1.3");
-        assertTrue(Installation.isValidJava(javaVersionInfo));
+        assertFalse(Installation.isValidJava(javaVersionInfo));
         javaVersionInfo.setSpecificationVersion("1.4");
-        assertTrue(Installation.isValidJava(javaVersionInfo));
+        assertFalse(Installation.isValidJava(javaVersionInfo));
         javaVersionInfo.setSpecificationVersion("1.5");
         assertTrue(Installation.isValidJava(javaVersionInfo));
         javaVersionInfo.setSpecificationVersion("1.6");
