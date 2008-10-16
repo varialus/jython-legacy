@@ -21,13 +21,13 @@ public class InstallerCommandLine {
     protected static final String INEXCLUDE_DOCUMENTATION = "doc";
     protected static final String INEXCLUDE_SOURCES = "src";
 
-    private static final String CONSOLE_SHORT = "c";
-    private static final String CONSOLE_LONG = "console";
+    protected static final String CONSOLE_SHORT = "c";
+    protected static final String CONSOLE_LONG = "console";
     private static final String CONSOLE_DESC = "console based installation (user interaction)\n"
             + "any other options will be ignored (except 'verbose')";
 
-    private static final String SILENT_SHORT = "s";
-    private static final String SILENT_LONG = "silent";
+    protected static final String SILENT_SHORT = "s";
+    protected static final String SILENT_LONG = "silent";
     private static final String SILENT_DESC = "silent installation (without user interaction)";
 
     protected static final String VERBOSE_SHORT = "v";
@@ -130,12 +130,29 @@ public class InstallerCommandLine {
     public static final boolean hasVerboseOptionInArgs(String[] args) {
         String shortVerbose = "-".concat(VERBOSE_SHORT);
         String longVerbose = "--".concat(VERBOSE_LONG);
-        for (String arg : args) {
-            if (shortVerbose.equals(arg) || longVerbose.equals(arg)) {
-                return true;
-            }
-        }
-        return false;
+        return hasOptionInArgs(args, shortVerbose, longVerbose);
+    }
+
+    /**
+     * Pre-scan of the arguments to detect a console flag
+     * @param args 
+     * @return <code>true</code> if there is a console option
+     */
+    public static final boolean hasConsoleOptionInArgs(String[] args) {
+        String shortConsole = "-".concat(CONSOLE_SHORT);
+        String longConsole = "--".concat(CONSOLE_LONG);
+        return hasOptionInArgs(args, shortConsole, longConsole);
+    }
+
+    /**
+     * Pre-scan of the arguments to detect a silent flag
+     * @param args 
+     * @return <code>true</code> if there is a silent option
+     */
+    public static final boolean hasSilentOptionInArgs(String[] args) {
+        String shortSilent = "-".concat(SILENT_SHORT);
+        String longSilent = "--".concat(SILENT_LONG);
+        return hasOptionInArgs(args, shortSilent, longSilent);
     }
 
     /**
@@ -154,14 +171,20 @@ public class InstallerCommandLine {
      */
     public boolean setArgs(String args[]) {
         _args = args;
-        if (args.length == 0) {
-            // switch to console mode if gui is not allowed
-            if (!Installation.isGuiAllowed()) {
-                _args = new String[] { "-" + CONSOLE_SHORT };
+        if (!hasConsoleOptionInArgs(args) && !hasSilentOptionInArgs(args)
+                && !Installation.isGuiAllowed()) {
+            // auto switch to console mode
+            if (hasVerboseOptionInArgs(args)) {
+                ConsoleInstaller.message("auto-switching to console mode");
             }
+            String[] newArgs = new String[args.length + 1];
+            System.arraycopy(args, 0, newArgs, 0, args.length);
+            newArgs[args.length] = "-" + CONSOLE_SHORT;
+            _args = newArgs;
         }
         try {
-            _commandLine = _parser.parse(_options, _args, false); // throw for missing or unknown options / arguments
+            // throws for missing or unknown options / arguments
+            _commandLine = _parser.parse(_options, _args, false);
         } catch (MissingArgumentException mae) {
             System.err.println(mae.getMessage());
             return false;
@@ -353,6 +376,18 @@ public class InstallerCommandLine {
     //
     // private methods
     //
+    
+    private static final boolean hasOptionInArgs(String[] args, String shortOption, String longOption) {
+        boolean hasOption = false;
+        int i = 0;
+        while (!hasOption && i < args.length) {
+            if (shortOption.equals(args[i]) || longOption.equals(args[i])) {
+                hasOption = true;
+            }
+            i++;
+        }
+        return hasOption;
+    }
 
     private void createOptions() {
         _options = new Options();
