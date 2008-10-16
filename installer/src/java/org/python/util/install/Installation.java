@@ -93,15 +93,15 @@ public class Installation {
         int major = 0;
         int minor = 0;
         StringTokenizer tokenizer = new StringTokenizer(specificationVersion, ".");
-        if( tokenizer.hasMoreTokens()) {
+        if (tokenizer.hasMoreTokens()) {
             major = Integer.valueOf(tokenizer.nextToken()).intValue();
         }
         if (tokenizer.hasMoreTokens()) {
             minor = Integer.valueOf(tokenizer.nextToken()).intValue();
         }
         boolean valid = true;
-        if( major == 1) {
-            if( minor < 2) {
+        if (major == 1) {
+            if (minor < 2) {
                 valid = false;
             }
         }
@@ -266,13 +266,27 @@ public class Installation {
     }
 
     public static boolean isGuiAllowed() {
+        boolean verbose = isVerbose();
+        if (verbose) {
+            ConsoleInstaller.message("checking gui availability");
+        }
         if (Boolean.getBoolean(HEADLESS_PROPERTY_NAME)) {
             return false;
         }
         try {
+            if (verbose) {
+                ConsoleInstaller.message("trying to get the graphics environment");
+            }
             GraphicsEnvironment.getLocalGraphicsEnvironment();
+            if (verbose) {
+                ConsoleInstaller.message("got the graphics environment!");
+            }
             return true;
         } catch (Throwable t) {
+            if (verbose) {
+                ConsoleInstaller.message("got the following exception:");
+                t.printStackTrace();
+            }
             return false;
         }
     }
@@ -299,13 +313,21 @@ public class Installation {
      */
     private static void internalMain(String[] args, Autotest autotest, Tunnel tunnel) {
         try {
+            boolean earlyVerbose = InstallerCommandLine.hasVerboseOptionInArgs(args);
+            if (earlyVerbose) {
+                ConsoleInstaller.message("reading jar info");
+            }
             JarInfo jarInfo = new JarInfo();
             InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
             if (!commandLine.setArgs(args) || commandLine.hasHelpOption()) {
                 commandLine.printHelp();
                 System.exit(1);
             } else {
+                _verbose = commandLine.hasVerboseOption();
                 if (commandLine.hasAutotestOption()) {
+                    if (isVerbose()) {
+                        ConsoleInstaller.message("running autotests");
+                    }
                     _isAutotesting = true;
                     InstallationDriver autotestDriver = new InstallationDriver(commandLine);
                     autotestDriver.drive(); // ! reentrant into internalMain()
@@ -313,10 +335,10 @@ public class Installation {
                     ConsoleInstaller.message("\ncongratulations - autotests complete !");
                     System.exit(0);
                 }
-                if (commandLine.hasVerboseOption()) {
-                    _verbose = true;
-                }
                 if (!useGui(commandLine)) {
+                    if (isVerbose()) {
+                        ConsoleInstaller.message("using the console installer");
+                    }
                     ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
                     consoleInstaller.setTunnel(tunnel);
                     consoleInstaller.install();
@@ -324,6 +346,9 @@ public class Installation {
                         System.exit(0);
                     }
                 } else {
+                    if (isVerbose()) {
+                        ConsoleInstaller.message("using the gui installer");
+                    }
                     new FrameInstaller(commandLine, jarInfo, autotest);
                 }
             }
