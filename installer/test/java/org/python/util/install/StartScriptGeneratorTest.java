@@ -144,17 +144,22 @@ public class StartScriptGeneratorTest extends TestCase {
             assertTrue(fileNamesSet.contains("jython"));
             assertTrue(fileNamesSet.contains("jython.bat"));
         } finally {
+            try {
+                // give windows some time to release file locks
+                Thread.sleep(500);
+            } catch (InterruptedException e) {}
             if (dir.exists()) {
                 rmdir(dir);
             }
         }
     }
 
-    private void rmdir(File dir) {
+    private void rmdir(File dir) throws IOException {
         File[] files = dir.listFiles();
         for (int i = 0; i < files.length; i++) {
             if (files[i].isFile()) {
-                Assert.assertTrue(files[i].delete());
+                Assert.assertTrue("unable to delete '" + files[i].getCanonicalPath() + "'",
+                                  files[i].delete());
             } else {
                 if (files[i].isDirectory()) {
                     rmdir(files[i]);
