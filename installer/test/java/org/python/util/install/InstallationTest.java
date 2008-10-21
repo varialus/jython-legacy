@@ -71,4 +71,17 @@ public class InstallationTest extends TestCase {
         assertTrue(Installation.isValidJava(javaVersionInfo));
     }
 
+    public void testIsGNUJava() {
+        assertFalse(Installation.isGNUJava());
+        String originalVmName = System.getProperty(Installation.JAVA_VM_NAME);
+        try {
+            // fake GNU java
+            System.setProperty(Installation.JAVA_VM_NAME, "GNU libgcj");
+            assertTrue(Installation.isGNUJava());
+        } finally {
+            System.setProperty(Installation.JAVA_VM_NAME, originalVmName);
+            assertFalse(Installation.isGNUJava());
+        }
+    }
+
 }

@@ -171,16 +171,17 @@ public class InstallerCommandLine {
      */
     public boolean setArgs(String args[]) {
         _args = args;
-        if (!hasConsoleOptionInArgs(args) && !hasSilentOptionInArgs(args)
-                && !Installation.isGuiAllowed()) {
-            // auto switch to console mode
-            if (hasVerboseOptionInArgs(args)) {
-                ConsoleInstaller.message("auto-switching to console mode");
+        if (!hasConsoleOptionInArgs(args) && !hasSilentOptionInArgs(args)) {
+            if (!Installation.isGuiAllowed() || Installation.isGNUJava()) {
+                // auto switch to console mode
+                if (hasVerboseOptionInArgs(args)) {
+                    ConsoleInstaller.message("auto-switching to console mode");
+                }
+                String[] newArgs = new String[args.length + 1];
+                System.arraycopy(args, 0, newArgs, 0, args.length);
+                newArgs[args.length] = "-" + CONSOLE_SHORT;
+                _args = newArgs;
             }
-            String[] newArgs = new String[args.length + 1];
-            System.arraycopy(args, 0, newArgs, 0, args.length);
-            newArgs[args.length] = "-" + CONSOLE_SHORT;
-            _args = newArgs;
         }
         try {
             // throws for missing or unknown options / arguments

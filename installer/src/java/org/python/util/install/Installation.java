@@ -23,6 +23,7 @@ public class Installation {
 
     protected static final String OS_NAME = "os.name";
     protected static final String OS_VERSION = "os.version";
+    protected static final String JAVA_VM_NAME = "java.vm.name";
     protected static final String EMPTY = "";
 
     protected static final String HEADLESS_PROPERTY_NAME = "java.awt.headless";
@@ -124,6 +125,16 @@ public class Installation {
             isMacintosh = true;
         }
         return isMacintosh;
+    }
+
+    protected static boolean isGNUJava() {
+        boolean isGNUJava = false;
+        String javaVmName = System.getProperty(JAVA_VM_NAME, "");
+        String lowerVmName = javaVmName.toLowerCase();
+        if (lowerVmName.indexOf("gnu") >= 0 && lowerVmName.indexOf("libgcj") >= 0) {
+            isGNUJava = true;
+        }
+        return isGNUJava;
     }
 
     protected static boolean isJDK141() {

@@ -277,6 +277,38 @@ public class InstallerCommandLineTest extends TestCase {
         }
     }
 
+    public void testGNUSwitchToConsole() {
+        String originalVmName = System.getProperty(Installation.JAVA_VM_NAME);
+        try {
+            // fake GNU java
+            System.setProperty(Installation.JAVA_VM_NAME, "GNU libgcj");
+            assertTrue(Installation.isGNUJava());
+            String[] args;
+            InstallerCommandLine commandLine;
+            // expect auto switch
+            args = new String[] {"-v"};
+            commandLine = new InstallerCommandLine();
+            assertTrue(commandLine.setArgs(args));
+            assertTrue(commandLine.hasVerboseOption());
+            assertTrue(commandLine.hasConsoleOption()); // auto switch
+            // expect no auto switch
+            args = new String[] {"-s", "-d", "some_dir"};
+            commandLine = new InstallerCommandLine();
+            assertTrue(commandLine.setArgs(args));
+            assertTrue(commandLine.hasSilentOption());
+            assertFalse(commandLine.hasVerboseOption());
+            assertFalse(commandLine.hasConsoleOption()); // no auto switch
+            assertTrue(commandLine.hasDirectoryOption());
+            File dir = commandLine.getTargetDirectory();
+            assertNotNull(dir);
+            assertEquals("some_dir", dir.getName());
+        } finally {
+            System.setProperty(Installation.JAVA_VM_NAME, originalVmName);
+            assertFalse(Installation.isGNUJava());
+        }
+    }
+
+
     public void testDirectory() {
         String[] args;
         InstallerCommandLine commandLine;
