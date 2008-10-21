@@ -189,13 +189,17 @@ public class StartScriptGenerator {
             file = new File(_targetDirectory, fileName);
         }
         FileReader fileReader = new FileReader(file);
-        StringBuffer sb = new StringBuffer();
-        char[] b = new char[8192];
-        int n;
-        while ((n = fileReader.read(b)) > 0) {
-            sb.append(b, 0, n);
+        try {
+            StringBuffer sb = new StringBuffer();
+            char[] b = new char[8192];
+            int n;
+            while ((n = fileReader.read(b)) > 0) {
+                sb.append(b, 0, n);
+            }
+            return sb.toString();
+        } finally {
+            fileReader.close();
         }
-        return sb.toString();
     }
 
     /**

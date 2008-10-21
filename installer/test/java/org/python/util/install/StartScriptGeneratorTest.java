@@ -144,10 +144,6 @@ public class StartScriptGeneratorTest extends TestCase {
             assertTrue(fileNamesSet.contains("jython"));
             assertTrue(fileNamesSet.contains("jython.bat"));
         } finally {
-            try {
-                // give windows some time to release file locks
-                Thread.sleep(500);
-            } catch (InterruptedException e) {}
             if (dir.exists()) {
                 rmdir(dir);
             }
