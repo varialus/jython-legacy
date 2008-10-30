@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
  * <ul>
  * <li>wait for the child process to finish.
  * <li>kill the child process after a specified timeout.
- * <li>get the output of the child process (System.out and System.err) redirected to the calling process, unless in
- * silent mode.
+ * <li>get the output of the child process (System.out and System.err) redirected to the calling
+ * process, unless in silent mode.
  * </ul>
  */
 public class ChildProcess {
@@ -21,14 +21,15 @@ public class ChildProcess {
      * Inner class for reading stdout of the child process and printing it onto the caller's stdout.
      */
     private class StdoutMonitor extends Thread {
-        private StdoutMonitor() {
-        }
+
+        private StdoutMonitor() {}
 
         public void run() {
             String line = null;
             BufferedReader stdout = new BufferedReader(new InputStreamReader(_process.getInputStream()));
             try {
-                while ((line = stdout.readLine()) != null) { // blocks until input found or process dead
+                // blocks until input found or process dead
+                while ((line = stdout.readLine()) != null) {
                     if (!isSilent()) {
                         System.out.println(line);
                     }
@@ -41,8 +42,7 @@ public class ChildProcess {
                 if (stdout != null)
                     try {
                         stdout.close();
-                    } catch (IOException e) {
-                    }
+                    } catch (IOException e) {}
             }
         }
     }
@@ -51,14 +51,15 @@ public class ChildProcess {
      * Inner class for reading stderr of the child process and printing it onto the caller's stderr.
      */
     private class StderrMonitor extends Thread {
-        private StderrMonitor() {
-        }
+
+        private StderrMonitor() {}
 
         public void run() {
             String line = null;
             BufferedReader stderr = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
             try {
-                while ((line = stderr.readLine()) != null) { // blocks until input found or process dead
+                // blocks until input found or process dead
+                while ((line = stderr.readLine()) != null) {
                     if (!isSilent()) {
                         System.err.println(line);
                     }
@@ -71,8 +72,7 @@ public class ChildProcess {
                 if (stderr != null)
                     try {
                         stderr.close();
-                    } catch (IOException e) {
-                    }
+                    } catch (IOException e) {}
             }
         }
     }
@@ -140,13 +140,13 @@ public class ChildProcess {
     /**
      * Default constructor
      */
-    public ChildProcess() {
-    }
+    public ChildProcess() {}
 
     /**
      * Constructor taking the command as an argument
      * 
-     * @param command The command to be executed.
+     * @param command
+     *            The command to be executed.
      */
     public ChildProcess(String command) {
         setCommand(command);
@@ -155,7 +155,8 @@ public class ChildProcess {
     /**
      * Constructor taking a command array as an argument
      * 
-     * @param commandArray The command to be executed, every token as array element.
+     * @param commandArray
+     *            The command to be executed, every token as array element.
      */
     public ChildProcess(String commandArray[]) {
         setCommandArray(commandArray);
@@ -164,8 +165,11 @@ public class ChildProcess {
     /**
      * Constructor taking the command and the timeout as an argument
      * 
-     * @param command The command to be executed.
-     * @param timeout in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout at all.
+     * @param command
+     *            The command to be executed.
+     * @param timeout
+     *            in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout
+     *            at all.
      */
     public ChildProcess(String command, long timeout) {
         setCommand(command);
@@ -175,8 +179,11 @@ public class ChildProcess {
     /**
      * Constructor taking a command array and the timeout as an argument
      * 
-     * @param commandArray The command to be executed, every token as array element.
-     * @param timeout in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout at all.
+     * @param commandArray
+     *            The command to be executed, every token as array element.
+     * @param timeout
+     *            in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout
+     *            at all.
      */
     public ChildProcess(String commandArray[], long timeout) {
         setCommandArray(commandArray);
@@ -214,8 +221,9 @@ public class ChildProcess {
     /**
      * Set the timeout (how long should the calling process wait for the child).
      * 
-     * @param timeout in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout at all. This
-     * is the default.
+     * @param timeout
+     *            in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout
+     *            at all. This is the default.
      */
     public void setTimeout(long timeout) {
         _timeout = timeout;
@@ -231,8 +239,8 @@ public class ChildProcess {
     /**
      * Set the debug flag.
      * <p>
-     * Setting this to true will print the submitted command and an information if the child process is destroyed after
-     * the timeout.
+     * Setting this to true will print the submitted command and an information if the child process
+     * is destroyed after the timeout.
      */
     public void setDebug(boolean debug) {
         _debug = debug;
@@ -262,15 +270,16 @@ public class ChildProcess {
     }
 
     /**
-     * Set the interval (in milliseconds) after which the subprocess is checked if it is still alive. Defaults to 1000
-     * ms.
+     * Set the interval (in milliseconds) after which the subprocess is checked if it is still
+     * alive. Defaults to 1000 ms.
      */
     public void setPollAliveInterval(long pollAliveInterval) {
         _pollAliveInterval = pollAliveInterval;
     }
 
     /**
-     * Returns the interval (in milliseconds) after which the subprocess is checked if it is still alive.
+     * Returns the interval (in milliseconds) after which the subprocess is checked if it is still
+     * alive.
      */
     public long getPollAliveInterval() {
         return _pollAliveInterval;
@@ -283,10 +292,10 @@ public class ChildProcess {
         boolean isTimeout = false;
         long currentTime = System.currentTimeMillis();
         long diff = 0;
-
-        if (getTimeout() != INFINITE_TIMEOUT) {
+        long timeout = getTimeout();
+        if (timeout != INFINITE_TIMEOUT) {
             diff = currentTime - _startTime;
-            if (diff > getTimeout()) {
+            if (diff > timeout) {
                 isTimeout = true;
             }
         }
@@ -300,7 +309,6 @@ public class ChildProcess {
         try {
             // determine start time
             _startTime = System.currentTimeMillis();
-
             // start the process
             if (getCommandArray() != null) {
                 _process = Runtime.getRuntime().exec(getCommandArray());
@@ -308,13 +316,11 @@ public class ChildProcess {
                 _process = Runtime.getRuntime().exec(getCommand());
             }
             debugCommand();
-
             // handle stdout and stderr
             StdoutMonitor stdoutMonitor = new StdoutMonitor();
             stdoutMonitor.start();
             StderrMonitor stderrMonitor = new StderrMonitor();
             stderrMonitor.start();
-
             // run the subprocess as long as wanted
             while (!isTimeout() && isAlive()) {
                 try {
@@ -325,7 +331,6 @@ public class ChildProcess {
                     }
                 }
             }
-
             // end properly
             if (isAlive()) { // sets the exit value in case process is dead
                 destroy();
@@ -381,20 +386,22 @@ public class ChildProcess {
      */
     private void debugCommand() {
         if (isDebug()) {
-            if (getCommandArray() != null) {
+            String[] commandArray = getCommandArray();
+            if (commandArray != null) {
                 System.out.print("[ChildProcess] command '");
-                for (int i = 0; i < getCommandArray().length; i++) {
+                for (int i = 0; i < commandArray.length; i++) {
+                    String commandPart = commandArray[i];
                     if (i == 0) {
-                        System.out.print(getCommandArray()[i]);
+                        System.out.print(commandPart);
                     } else {
-                        System.out.print(" " + getCommandArray()[i]);
+                        System.out.print(" " + commandPart);
                     }
                 }
                 System.out.println("' is now running...");
             } else {
-                System.out.println("[ChildProcess] command '" + getCommand() + "' is now running...");
+                System.out.println("[ChildProcess] command '" + getCommand()
+                        + "' is now running...");
             }
         }
     }
-
 }
