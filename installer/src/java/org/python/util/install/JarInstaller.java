@@ -241,6 +241,7 @@ public class JarInstaller {
         coreLibFiles.add("stat.py");
         coreLibFiles.add("string.py");
         coreLibFiles.add("threading.py");
+        coreLibFiles.add("UserDict.py");
         coreLibFiles.add("zipfile.py");
         coreLibFiles.add("zlib.py");
         return coreLibFiles;
