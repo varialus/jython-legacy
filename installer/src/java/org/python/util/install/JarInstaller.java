@@ -226,7 +226,9 @@ public class JarInstaller {
         coreLibFiles.add("javapath.py");
         coreLibFiles.add("jreload.py");
         coreLibFiles.add("marshal.py");
+        coreLibFiles.add("ntpath.py");
         coreLibFiles.add("os.py");
+        coreLibFiles.add("popen2.py");
         coreLibFiles.add("posixpath.py");
         coreLibFiles.add("random.py");
         coreLibFiles.add("re.py");
@@ -238,6 +240,7 @@ public class JarInstaller {
         coreLibFiles.add("sre_parse.py");
         coreLibFiles.add("stat.py");
         coreLibFiles.add("string.py");
+        coreLibFiles.add("threading.py");
         coreLibFiles.add("zipfile.py");
         coreLibFiles.add("zlib.py");
         return coreLibFiles;
