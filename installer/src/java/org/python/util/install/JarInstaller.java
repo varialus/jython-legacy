@@ -139,7 +139,6 @@ public class JarInstaller {
                 _progressListener.progressStartScripts();
                 StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
                 generator.generateStartScripts();
-                StandalonePackager.emptyDirectory(new File(targetDirectory, "bin"), null);
             } else {
                 _progressListener.progressStandalone();
                 File jythonJar = new File(targetDirectory, JYTHON_JAR);
