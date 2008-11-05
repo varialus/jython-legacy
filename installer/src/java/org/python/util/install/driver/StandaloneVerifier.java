@@ -12,28 +12,23 @@ public class StandaloneVerifier extends NormalVerifier {
 
     public void verify() throws DriverException {
         // make sure only JYTHON_JAR is in the target directory
-        if (getTargetDir().listFiles().length != 1) {
+        if (getTargetDir().listFiles().length > 1) {
             throw new DriverException("more than " + JYTHON_JAR + " installed");
         }
-
         // make sure JYTHON_JAR contains a MANIFEST and a /Lib directory
         verifyJythonJar();
-
         // do the jython startup verification from the superclass
         super.verify();
     }
 
-    /**
-     * overrides superclass method getting the command to start jython
-     */
-    protected String[] getCommand() throws DriverException {
+    @Override
+    protected String[] getSimpleCommand() throws DriverException {
         String parentDirName = null;
         try {
             parentDirName = getTargetDir().getCanonicalPath() + File.separator;
         } catch (IOException ioe) {
             throw new DriverException(ioe);
         }
-
         String command[] = new String[4];
         command[0] = null;
         String javaHomeString = System.getProperty(JavaVersionTester.JAVA_HOME, null);
@@ -41,7 +36,8 @@ public class StandaloneVerifier extends NormalVerifier {
             File javaHome = new File(javaHomeString);
             if (javaHome.exists()) {
                 try {
-                    command[0] = javaHome.getCanonicalPath() + File.separator + "bin" + File.separator + "java";
+                    command[0] = javaHome.getCanonicalPath() + File.separator + "bin"
+                            + File.separator + "java";
                 } catch (IOException ioe) {
                     throw new DriverException(ioe);
                 }
@@ -56,6 +52,11 @@ public class StandaloneVerifier extends NormalVerifier {
         return command;
     }
 
+    @Override
+    protected boolean doShellScriptTests() {
+        return false;
+    }
+
     private void verifyJythonJar() throws DriverException {
         File jythonJar = getTargetDir().listFiles()[0];
         JarFile jar = null;
@@ -65,9 +66,9 @@ public class StandaloneVerifier extends NormalVerifier {
                 throw new DriverException(JYTHON_JAR + " contains no MANIFEST");
             }
             boolean hasLibDir = false;
-            Enumeration entries = jar.entries();
+            Enumeration<JarEntry> entries = jar.entries();
             while (!hasLibDir && entries.hasMoreElements()) {
-                JarEntry entry = (JarEntry) entries.nextElement();
+                JarEntry entry = (JarEntry)entries.nextElement();
                 if (entry.getName().startsWith("Lib/")) {
                     hasLibDir = true;
                 }
@@ -81,10 +82,8 @@ public class StandaloneVerifier extends NormalVerifier {
             if (jar != null) {
                 try {
                     jar.close();
-                } catch (IOException ioe) {
-                }
+                } catch (IOException ioe) {}
             }
         }
     }
-
 }

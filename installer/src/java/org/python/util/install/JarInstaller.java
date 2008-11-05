@@ -13,25 +13,31 @@ import java.util.zip.ZipInputStream;
 
 /**
  * Working horse extracting the contents of the installation .jar to the file system. <br>
- * The directory stucture is preserved, but there is the possibility to exclude some entries (directories at the
- * moment).
+ * The directory stucture is preserved, but there is the possibility to exclude some entries
+ * (directories at the moment).
  */
 public class JarInstaller {
+
     public static final String JYTHON_JAR = "jython-complete.jar";
-    
+
     private static final String PATH_SEPARATOR = "/";
+
     private static final String LIB_NAME_SEP = "Lib" + PATH_SEPARATOR;
+
     private static final String LIB_PAWT_SEP = LIB_NAME_SEP + "pawt" + PATH_SEPARATOR;
+
     private static final int BUFFER_SIZE = 1024;
 
     private ProgressListener _progressListener;
+
     private JarInfo _jarInfo;
-    private List _installationListeners;
+
+    private List<InstallationListener> _installationListeners;
 
     public JarInstaller(ProgressListener progressListener, JarInfo jarInfo) {
         _progressListener = progressListener;
         _jarInfo = jarInfo;
-        _installationListeners = new ArrayList();
+        _installationListeners = new ArrayList<InstallationListener>();
     }
 
     /**
@@ -48,8 +54,8 @@ public class JarInstaller {
         try {
             // has to correspond with build.xml
             // has to correspond with build.Lib.include.properties
-            List excludeDirs = _jarInfo.getExcludeDirs();
-            List coreLibFiles = new ArrayList();
+            List<String> excludeDirs = _jarInfo.getExcludeDirs();
+            List<String> coreLibFiles = new ArrayList<String>();
             if (!installationType.installSources()) {
                 excludeDirs.add("src");
                 excludeDirs.add("grammar");
@@ -73,35 +79,36 @@ public class JarInstaller {
                 excludeDirs.add(LIB_NAME_SEP + "email/test");
                 excludeDirs.add(LIB_NAME_SEP + "test");
             }
-
             int count = 0;
             int percent = 0;
             int numberOfIntervals = 100 / _progressListener.getInterval();
             int numberOfEntries = approximateNumberOfEntries(installationType);
             int threshold = numberOfEntries / numberOfIntervals + 1; // +1 = pessimistic
             boolean coreExclusionReported = false;
-
             // unzip
-            ZipInputStream zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(_jarInfo
-                    .getJarFile()), BUFFER_SIZE));
+            ZipInputStream zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(_jarInfo.getJarFile()),
+                                                                                 BUFFER_SIZE));
             ZipEntry zipEntry = zipInput.getNextEntry();
             while (zipEntry != null) {
                 String zipEntryName = zipEntry.getName();
                 boolean exclude = false;
                 // handle exclusion of directories
-                Iterator excludeDirsAsIterator = excludeDirs.iterator();
+                Iterator<String> excludeDirsAsIterator = excludeDirs.iterator();
                 while (excludeDirsAsIterator.hasNext()) {
-                    if (zipEntryName.startsWith((String) excludeDirsAsIterator.next() + PATH_SEPARATOR)) {
+                    if (zipEntryName.startsWith((String)excludeDirsAsIterator.next()
+                            + PATH_SEPARATOR)) {
                         exclude = true;
                     }
                 }
                 // exclude build.xml when not installing source
                 if (!installationType.installSources() && zipEntryName.equals("build.xml"))
                     exclude = true;
-
                 // handle exclusion of core Lib files
                 if (!exclude) {
-                    exclude = shouldExcludeFile(installationType, coreLibFiles, zipEntry, zipEntryName);
+                    exclude = shouldExcludeFile(installationType,
+                                                coreLibFiles,
+                                                zipEntry,
+                                                zipEntryName);
                     if (Installation.isVerbose() && !coreExclusionReported && exclude) {
                         ConsoleInstaller.message("excluding some .py files, like " + zipEntryName);
                         coreExclusionReported = true;
@@ -125,7 +132,7 @@ public class JarInstaller {
                         byte[] buffer = new byte[BUFFER_SIZE];
                         int len;
                         while ((len = zipInput.read(buffer)) > 0) {
-                          output.write(buffer, 0, len);
+                            output.write(buffer, 0, len);
                         }
                         output.close();
                         file.setLastModified(zipEntry.getTime());
@@ -150,13 +157,14 @@ public class JarInstaller {
                 _progressListener.progressChanged(90); // approx
                 packager.addFullDirectory(libDir);
                 packager.close();
+                // TODO:Oti move to FileHelper
                 StandalonePackager.emptyDirectory(targetDirectory, jythonJar);
             }
-            // end
+            // finish: inform listeners
             _progressListener.progressFinished();
-            Iterator installationListenersIterator = _installationListeners.iterator();
+            Iterator<InstallationListener> installationListenersIterator = _installationListeners.iterator();
             while (installationListenersIterator.hasNext()) {
-                ((InstallationListener) installationListenersIterator.next()).progressFinished();
+                installationListenersIterator.next().progressFinished();
             }
         } catch (IOException ioe) {
             throw new InstallerException(Installation.getText(TextKeys.ERROR_ACCESS_JARFILE), ioe);
@@ -194,29 +202,29 @@ public class JarInstaller {
         int lastSepIndex = zipEntryName.lastIndexOf(PATH_SEPARATOR);
         if (lastSepIndex > 0) {
             File directory = new File(targetDirectory, zipEntryName.substring(0, lastSepIndex));
-            if (directory.exists() && directory.isDirectory()) {
-            } else {
+            if (directory.exists() && directory.isDirectory()) {} else {
                 if (!directory.mkdirs()) {
-                    throw new InstallerException(Installation.getText(TextKeys.UNABLE_CREATE_DIRECTORY, directory
-                            .getAbsolutePath()));
+                    throw new InstallerException(Installation.getText(TextKeys.UNABLE_CREATE_DIRECTORY,
+                                                                      directory.getAbsolutePath()));
                 }
             }
         }
     }
 
-    private File createFile(final File targetDirectory, final String zipEntryName) throws IOException {
+    private File createFile(final File targetDirectory, final String zipEntryName)
+            throws IOException {
         File file = new File(targetDirectory, zipEntryName);
-        if (file.exists() && file.isFile()) {
-        } else {
+        if (file.exists() && file.isFile()) {} else {
             if (!file.createNewFile()) {
-                throw new InstallerException(Installation.getText(TextKeys.UNABLE_CREATE_FILE, file.getCanonicalPath()));
+                throw new InstallerException(Installation.getText(TextKeys.UNABLE_CREATE_FILE,
+                                                                  file.getCanonicalPath()));
             }
         }
         return file;
     }
 
-    private List getCoreLibFiles() {
-        List coreLibFiles = new ArrayList();
+    private List<String> getCoreLibFiles() {
+        List<String> coreLibFiles = new ArrayList<String>();
         coreLibFiles.add("__future__.py");
         coreLibFiles.add("copy.py");
         coreLibFiles.add("dbexts.py");
@@ -247,8 +255,10 @@ public class JarInstaller {
         return coreLibFiles;
     }
 
-    private boolean shouldExcludeFile(InstallationType installationType, List coreLibFiles, ZipEntry zipEntry,
-            String zipEntryName) {
+    private boolean shouldExcludeFile(InstallationType installationType,
+                                      List<String> coreLibFiles,
+                                      ZipEntry zipEntry,
+                                      String zipEntryName) {
         boolean exclude = false;
         if (!installationType.installLibraryModules()) {
             // handle files in Lib
@@ -257,9 +267,9 @@ public class JarInstaller {
                 if (!zipEntryName.startsWith(LIB_PAWT_SEP)) {
                     if (zipEntryName.endsWith(".py")) { // only compare *.py files
                         exclude = true;
-                        Iterator coreLibFilesAsIterator = coreLibFiles.iterator();
+                        Iterator<String> coreLibFilesAsIterator = coreLibFiles.iterator();
                         while (coreLibFilesAsIterator.hasNext()) {
-                            String coreFileName = (String) coreLibFilesAsIterator.next();
+                            String coreFileName = (String)coreLibFilesAsIterator.next();
                             if (zipEntryName.endsWith(PATH_SEPARATOR + coreFileName)) {
                                 exclude = false;
                             }
@@ -270,5 +280,4 @@ public class JarInstaller {
         }
         return exclude;
     }
-
 }

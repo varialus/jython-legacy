@@ -110,7 +110,7 @@ public class InstallationDriver {
     private void validate(Autotest autoTest) throws DriverException {
         autoTest.assertTargetDirNotEmpty();
         if (autoTest.getVerifier() != null) {
-            System.out.println("verifying installation ...");
+            System.out.println("verifying installation - this can take a while ...");
             autoTest.getVerifier().verify();
             System.out.println("... installation ok.\n");
         }

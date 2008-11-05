@@ -75,8 +75,8 @@ public class JarInfo {
         return _numberOfEntries;
     }
 
-    public List getExcludeDirs() throws IOException {
-        List excludeDirs = new ArrayList();
+    public List<String> getExcludeDirs() throws IOException {
+        List<String> excludeDirs = new ArrayList<String>();
         Attributes jythonAttributes = getManifest().getAttributes(JYTHON);
         if (jythonAttributes != null) {
             // do not use containsKey
@@ -122,7 +122,7 @@ public class JarInfo {
             throw new InstallerException(Installation.getText(TextKeys.JAR_NOT_FOUND, _jarFile.getAbsolutePath()));
         }
         JarFile jarFile = new JarFile(_jarFile);
-        Enumeration entries = jarFile.entries();
+        Enumeration<JarEntry> entries = jarFile.entries();
         _numberOfEntries = 0;
         while (entries.hasMoreElements()) {
             JarEntry entry = (JarEntry) entries.nextElement();

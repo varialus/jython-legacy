@@ -3,6 +3,7 @@ package org.python.util.install.driver;
 import java.io.File;
 import java.io.IOException;
 
+import org.python.util.install.FileHelper;
 import org.python.util.install.InstallationListener;
 import org.python.util.install.InstallerCommandLine;
 

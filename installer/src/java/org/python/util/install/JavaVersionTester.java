@@ -1,7 +1,6 @@
 package org.python.util.install;
 
 import java.io.File;
-import java.io.FileWriter;
 
 /**
  * Helper class to test a java version
@@ -39,10 +38,7 @@ public class JavaVersionTester {
     }
 
     private static void writeTempFile(File file) throws Exception {
-        FileWriter writer = new FileWriter(file);
-        writer.write(createFileContent());
-        writer.flush();
-        writer.close();
+        FileHelper.write(file, createFileContent());
     }
 
     private static String createFileContent() {

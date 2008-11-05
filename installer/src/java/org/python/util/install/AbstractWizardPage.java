@@ -9,6 +9,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public abstract class AbstractWizardPage extends JPanel implements TextKeys {
+    private static final long serialVersionUID = -5233805023557214279L;
+
     private static final String _ICON_FILE_NAME = "jython_small_c.png";
 
     private static ImageIcon _imageIcon = null;
@@ -54,11 +56,7 @@ public abstract class AbstractWizardPage extends JPanel implements TextKeys {
      */
     protected ImageIcon getIcon() {
         if (_imageIcon == null) {
-            String className = getClass().getName();
-            String packageName = className.substring(0, className.lastIndexOf("."));
-            String packagePath = packageName.replace('.', '/');
-            URL iconURL = Thread.currentThread().getContextClassLoader().getResource(
-                    packagePath + "/" + _ICON_FILE_NAME);
+            URL iconURL = FileHelper.getRelativeURL(getClass(), _ICON_FILE_NAME);
             if (iconURL != null) {
                 _imageIcon = new ImageIcon(iconURL);
             }

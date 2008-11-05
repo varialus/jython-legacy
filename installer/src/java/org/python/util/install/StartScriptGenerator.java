@@ -1,8 +1,6 @@
 package org.python.util.install;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -16,8 +14,6 @@ public class StartScriptGenerator {
     protected final static int BOTH_FLAVOUR = 50;
 
     protected final static String WIN_CR_LF;
-
-    private final static String EXECUTABLE_MODE = "755";
 
     private final static String JYTHON = "jython";
 
@@ -75,20 +71,26 @@ public class StartScriptGenerator {
     }
 
     protected final void generateStartScripts() throws IOException {
-        generateJythonScript();
-    }
-
-    private final void generateJythonScript() throws IOException {
+        File bin = new File(getTargetDirectory(), "bin");
+        File bin_jython = new File(bin, JYTHON);
         switch(getFlavour()){
             case BOTH_FLAVOUR:
-                writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
-                makeExecutable(writeToFile(JYTHON, getJythonScript(BOTH_FLAVOUR)));
+                writeToTargetDir(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+                FileHelper.makeExecutable(writeToTargetDir(JYTHON, getJythonScript(BOTH_FLAVOUR)));
+                FileHelper.makeExecutable(bin_jython);
                 break;
             case WINDOWS_FLAVOUR:
-                writeToFile(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+                writeToTargetDir(JYTHON_BAT, getJythonScript(WINDOWS_FLAVOUR));
+                // delete the *nix script in /bin dir
+                bin_jython.delete();
                 break;
             default:
-                makeExecutable(writeToFile(JYTHON, getJythonScript(UNIX_FLAVOUR)));
+                FileHelper.makeExecutable(writeToTargetDir(JYTHON, getJythonScript(UNIX_FLAVOUR)));
+                FileHelper.makeExecutable(bin_jython);
+                // delete the windows script in /bin dir
+                File bin_jython_bat = new File(bin, JYTHON_BAT);
+                bin_jython_bat.delete();
+                break;
         }
     }
 
@@ -116,7 +118,7 @@ public class StartScriptGenerator {
         parameters[0] = new Date().toString();
         parameters[1] = System.getProperty("user.name");
         parameters[2] = _javaHome.getCanonicalPath();
-        parameters[3] = _targetDirectory.getCanonicalPath();
+        parameters[3] = getTargetDirectory().getCanonicalPath();
         return MessageFormat.format(template, (Object[])parameters);
     }
 
@@ -183,65 +185,31 @@ public class StartScriptGenerator {
      */
     private String readFromFile(String fileName) throws IOException {
         // default runtime location
-        File file = new File(new File(_targetDirectory, "bin"), fileName);
+        File targetDirectory = getTargetDirectory();
+        File file = new File(new File(targetDirectory, "bin"), fileName);
         if (!file.exists()) {
             // deviation: test time location
-            file = new File(_targetDirectory, fileName);
+            file = new File(targetDirectory, fileName);
         }
-        FileReader fileReader = new FileReader(file);
-        try {
-            StringBuffer sb = new StringBuffer();
-            char[] b = new char[8192];
-            int n;
-            while ((n = fileReader.read(b)) > 0) {
-                sb.append(b, 0, n);
-            }
-            return sb.toString();
-        } finally {
-            fileReader.close();
-        }
+        return FileHelper.readAll(file);
     }
 
     /**
+     * Create (or overwrite) the specified file in the target directory
+     * 
      * @param fileName
      *            The short file name, e.g. JYTHON_BAT
      * @param contents
      * 
      * @throws IOException
      */
-    private File writeToFile(String fileName, String contents) throws IOException {
-        File file = new File(_targetDirectory, fileName);
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
-        if (file.exists()) {
-            if (file.canWrite()) {
-                FileWriter fileWriter = new FileWriter(file);
-                fileWriter.write(contents);
-                fileWriter.flush();
-                fileWriter.close();
-            }
-        }
+    private File writeToTargetDir(String fileName, String contents) throws IOException {
+        File file = new File(getTargetDirectory(), fileName);
+        FileHelper.write(file, contents);
         return file;
     }
 
-    /**
-     * do a chmod on the passed file
-     * 
-     * @param scriptFile
-     */
-    private void makeExecutable(File scriptFile) {
-        try {
-            String command[] = new String[3];
-            command[0] = "chmod";
-            command[1] = EXECUTABLE_MODE;
-            command[2] = scriptFile.getAbsolutePath();
-            long timeout = 3000;
-            ChildProcess childProcess = new ChildProcess(command, timeout);
-            childProcess.run();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+    private File getTargetDirectory() {
+        return _targetDirectory;
     }
 }

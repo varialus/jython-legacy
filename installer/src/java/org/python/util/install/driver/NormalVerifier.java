@@ -2,19 +2,34 @@ package org.python.util.install.driver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import org.python.util.install.ChildProcess;
+import org.python.util.install.FileHelper;
 import org.python.util.install.Installation;
+import org.python.util.install.JavaVersionTester;
 
 public class NormalVerifier implements Verifier {
 
     protected static final String AUTOTEST_PY = "autotest.py";
-    private static final String JYTHON_UP = "jython up and running";
+
+    protected static final String JYTHON_TEST = "jython_test";
+
+    private static final String BIN = "bin";
+
+    private static final String BAT_EXTENSION = ".bat";
+
+    private static final String JYTHON_UP = "jython up and running!";
+
     private static final String JYTHON = "jython";
+
+    private static final String TEMPLATE_SUFFIX = ".template";
+
+    private static final String VERIFYING = "verifying";
 
     private File _targetDir;
 
@@ -27,11 +42,126 @@ public class NormalVerifier implements Verifier {
     }
 
     public void verify() throws DriverException {
-        // create the test .py script
-        createTestScriptFile();
+        createTestScriptFile(); // create the test .py script
+        // verify the most simple start of jython works
+        verifyStart(getSimpleCommand());
+        if (doShellScriptTests()) {
+            // verify more complex versions of starting jython
+            verifyStart(getShellScriptTestCommand());
+        }
+    }
 
-        // start jython and capture the output
-        ChildProcess childProcess = new ChildProcess(getCommand());
+    /**
+     * Will be overridden in subclass StandaloneVerifier
+     * 
+     * @return the command array to start jython with
+     * @throws DriverException
+     *             if there was a problem getting the target directory path
+     */
+    protected String[] getSimpleCommand() throws DriverException {
+        String parentDirName = null;
+        try {
+            parentDirName = getTargetDir().getCanonicalPath() + File.separator;
+        } catch (IOException ioe) {
+            throw new DriverException(ioe);
+        }
+        String[] command = new String[2];
+        if (Installation.isWindows()) {
+            command[0] = parentDirName + JYTHON + BAT_EXTENSION;
+        } else {
+            command[0] = parentDirName + JYTHON;
+        }
+        command[1] = parentDirName + AUTOTEST_PY;
+        return command;
+    }
+
+    /**
+     * @return The command to test the shell script more deeply
+     * @throws DriverException
+     */
+    protected final String[] getShellScriptTestCommand() throws DriverException {
+        // first we have to create the shell script
+        File testCommandDir = getShellScriptTestCommandDir();
+        if (!testCommandDir.exists()) {
+            if (!testCommandDir.mkdirs()) {
+                throw new DriverException("unable to create directory "
+                        + testCommandDir.getAbsolutePath());
+            }
+        }
+        String commandName = JYTHON_TEST;
+        boolean isWindows = Installation.isWindows();
+        if (isWindows) {
+            commandName = commandName.concat(BAT_EXTENSION);
+        }
+        File command = new File(testCommandDir, commandName);
+        try {
+            if (!command.exists()) {
+                command.createNewFile();
+            }
+            FileHelper.write(command, getShellScriptTestContents());
+            if (!isWindows) {
+                FileHelper.makeExecutable(command);
+            }
+            return new String[] {command.getCanonicalPath()};
+        } catch (Exception e) {
+            throw new DriverException(e);
+        }
+    }
+
+    /**
+     * @return The contents of the shell test script
+     * @throws DriverException
+     */
+    protected final String getShellScriptTestContents() throws DriverException {
+        String contents = "";
+        String templateName = JYTHON_TEST;
+        if (Installation.isWindows()) {
+            templateName = templateName.concat(BAT_EXTENSION);
+        }
+        templateName = templateName.concat(TEMPLATE_SUFFIX);
+        InputStream inputStream = FileHelper.getRelativeURLAsStream(getClass(), templateName);
+        if (inputStream != null) {
+            try {
+                String template = FileHelper.readAll(inputStream);
+                String targetDirPath = getTargetDir().getCanonicalPath();
+                String upScriptPath = getSimpleCommand()[1];
+                String javaHomeString = System.getProperty(JavaVersionTester.JAVA_HOME, "");
+                contents = MessageFormat.format(template,
+                                                targetDirPath,
+                                                upScriptPath,
+                                                javaHomeString,
+                                                VERIFYING);
+            } catch (Exception e) {
+                throw new DriverException(e);
+            }
+        }
+        return contents;
+    }
+
+    /**
+     * @return The directory where to create the shell script test command in.
+     * 
+     * @throws DriverException
+     */
+    protected final File getShellScriptTestCommandDir() throws DriverException {
+        String dirName;
+        try {
+            dirName = getTargetDir().getCanonicalPath().concat(File.separator).concat(BIN);
+            return new File(dirName);
+        } catch (IOException ioe) {
+            throw new DriverException(ioe);
+        }
+    }
+
+    /**
+     * Internal method verifying a jython-starting command by capturing the ouptut
+     * 
+     * @param command
+     * 
+     * @throws DriverException
+     */
+    private void verifyStart(String[] command) throws DriverException {
+        ChildProcess childProcess = new ChildProcess(command);
         childProcess.setDebug(true);
         ByteArrayOutputStream redirectedErr = new ByteArrayOutputStream();
         ByteArrayOutputStream redirectedOut = new ByteArrayOutputStream();
@@ -46,7 +176,6 @@ public class NormalVerifier implements Verifier {
             System.setErr(oldErr);
             System.setOut(oldOut);
         }
-
         // verify the output
         String output = null;
         String error = null;
@@ -60,40 +189,30 @@ public class NormalVerifier implements Verifier {
             throw new DriverException(ioe);
         }
         if (exitValue != 0) {
-            throw new DriverException("start of jython failed, output:\n" + output + "\nerror:\n" + error);
+            throw new DriverException("start of jython failed, output:\n" + output + "\nerror:\n"
+                    + error);
         }
         verifyError(error);
         verifyOutput(output);
     }
 
     /**
-     * will be overridden in subclass StandaloneVerifier
+     * Will be overridden in subclass StandaloneVerifier
      * 
-     * @return the command array to start jython with
-     * @throws DriverException if there was a problem getting the target directory path
+     * @return <code>true</code> if the jython start shell script should be verified (using
+     *         different options)
      */
-    protected String[] getCommand() throws DriverException {
-        String parentDirName = null;
-        try {
-            parentDirName = getTargetDir().getCanonicalPath() + File.separator;
-        } catch (IOException ioe) {
-            throw new DriverException(ioe);
-        }
-        String[] command = new String[2];
-        if (Installation.isWindows()) {
-            command[0] = parentDirName + JYTHON + ".bat";
-        } else {
-            command[0] = parentDirName + JYTHON;
-        }
-        command[1] = parentDirName + AUTOTEST_PY;
-        return command;
+    protected boolean doShellScriptTests() {
+        return true;
     }
 
     private void verifyError(String error) throws DriverException {
         StringTokenizer tokenizer = new StringTokenizer(error, "\n");
         while (tokenizer.hasMoreTokens()) {
             String line = tokenizer.nextToken();
-            if (!line.startsWith("*sys-package-mgr*")) {
+            if (line.startsWith("*sys-package-mgr*")) {
+                feedback(line);
+            } else {
                 throw new DriverException(error);
             }
         }
@@ -104,9 +223,12 @@ public class NormalVerifier implements Verifier {
         StringTokenizer tokenizer = new StringTokenizer(output, "\n");
         while (tokenizer.hasMoreTokens()) {
             String line = tokenizer.nextToken();
-            if (!line.startsWith("[ChildProcess]")) {
+            if (line.startsWith("[ChildProcess]") || line.startsWith(VERIFYING)) {
+                feedback(line);
+            } else {
                 if (line.startsWith(JYTHON_UP)) {
                     started = true;
+                    feedback(line);
                 } else {
                     throw new DriverException(output);
                 }
@@ -118,22 +240,24 @@ public class NormalVerifier implements Verifier {
     }
 
     private String getTestScript() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("import sys\n");
-        buf.append("print '" + JYTHON_UP + "'\n");
-        return buf.toString();
+        StringBuilder b = new StringBuilder(80);
+        b.append("import sys\n");
+        b.append("print '");
+        b.append(JYTHON_UP);
+        b.append("'\n");
+        return b.toString();
     }
 
     private void createTestScriptFile() throws DriverException {
         File file = new File(getTargetDir(), AUTOTEST_PY);
         try {
-            FileWriter writer = new FileWriter(file);
-            writer.write(getTestScript());
-            writer.flush();
-            writer.close();
+            FileHelper.write(file, getTestScript());
         } catch (IOException ioe) {
             throw new DriverException(ioe);
         }
     }
 
+    private void feedback(String line) {
+        System.out.println(line);
+    }
 }

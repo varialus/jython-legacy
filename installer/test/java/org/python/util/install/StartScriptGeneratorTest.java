@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class StartScriptGeneratorTest extends TestCase {
@@ -109,7 +108,7 @@ public class StartScriptGeneratorTest extends TestCase {
         assertEquals(StartScriptGenerator.BOTH_FLAVOUR, testGenerator.getFlavour());
     }
 
-    public void testGenerateBothFlavours() throws IOException {
+    public void testWindowsFlavour() throws IOException {
         File dir = new File(System.getProperty("java.io.tmpdir"), "StartScriptGeneratorTest");
         try {
             if (!dir.exists()) {
@@ -128,6 +127,97 @@ public class StartScriptGeneratorTest extends TestCase {
                 assertTrue(jython_bat.createNewFile());
             }
             File javaHome = new File(System.getProperty("java.home"));
+            // windows flavour
+            TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(dir,
+                                                                                  javaHome,
+                                                                                  false);
+            testGenerator.setFlavour(StartScriptGenerator.WINDOWS_FLAVOUR);
+            testGenerator.generateStartScripts();
+            String[] fileNames = dir.list();
+            int fileNamesLength = fileNames.length;
+            assertEquals(2, fileNamesLength); // 1 file plus the /bin subdirectory
+            HashSet<String> fileNamesSet = new HashSet<String>(2);
+            for (int i = 0; i < fileNamesLength; i++) {
+                fileNamesSet.add(fileNames[i]);
+            }
+            assertTrue(fileNamesSet.contains("bin"));
+            assertTrue(fileNamesSet.contains("jython.bat"));
+            fileNames = bin.list();
+            assertEquals(1, fileNames.length);
+            assertEquals("jython.bat", fileNames[0]);
+        } finally {
+            if (dir.exists()) {
+                assertTrue("unable to delete directory ".concat(dir.getAbsolutePath()),
+                           FileHelper.rmdir(dir));
+            }
+        }
+    }
+
+    public void testUnixFlavour() throws IOException {
+        File dir = new File(System.getProperty("java.io.tmpdir"), "StartScriptGeneratorTest");
+        try {
+            if (!dir.exists()) {
+                assertTrue(dir.mkdirs());
+            }
+            File bin = new File(dir, "bin");
+            if (!bin.exists()) {
+                assertTrue(bin.mkdirs());
+            }
+            File jython = new File(bin, "jython");
+            if (!jython.exists()) {
+                assertTrue(jython.createNewFile());
+            }
+            File jython_bat = new File(bin, "jython.bat");
+            if (!jython_bat.exists()) {
+                assertTrue(jython_bat.createNewFile());
+            }
+            File javaHome = new File(System.getProperty("java.home"));
+            // unix flavour
+            TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(dir,
+                                                                                  javaHome,
+                                                                                  false);
+            testGenerator.setFlavour(StartScriptGenerator.UNIX_FLAVOUR);
+            testGenerator.generateStartScripts();
+            String[] fileNames = dir.list();
+            int fileNamesLength = fileNames.length;
+            assertEquals(2, fileNamesLength); // 1 file plus the /bin subdirectory
+            HashSet<String> fileNamesSet = new HashSet<String>(2);
+            for (int i = 0; i < fileNamesLength; i++) {
+                fileNamesSet.add(fileNames[i]);
+            }
+            assertTrue(fileNamesSet.contains("bin"));
+            assertTrue(fileNamesSet.contains("jython"));
+            fileNames = bin.list();
+            assertEquals(1, fileNames.length);
+            assertEquals("jython", fileNames[0]);
+        } finally {
+            if (dir.exists()) {
+                assertTrue("unable to delete directory ".concat(dir.getAbsolutePath()),
+                           FileHelper.rmdir(dir));
+            }
+        }
+    }
+
+    public void testBothFlavours() throws IOException {
+        File dir = new File(System.getProperty("java.io.tmpdir"), "StartScriptGeneratorTest");
+        try {
+            if (!dir.exists()) {
+                assertTrue(dir.mkdirs());
+            }
+            File bin = new File(dir, "bin");
+            if (!bin.exists()) {
+                assertTrue(bin.mkdirs());
+            }
+            File jython = new File(bin, "jython");
+            if (!jython.exists()) {
+                assertTrue(jython.createNewFile());
+            }
+            File jython_bat = new File(bin, "jython.bat");
+            if (!jython_bat.exists()) {
+                assertTrue(jython_bat.createNewFile());
+            }
+            File javaHome = new File(System.getProperty("java.home"));
+            // both flavours
             TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(dir,
                                                                                   javaHome,
                                                                                   true);
@@ -135,34 +225,30 @@ public class StartScriptGeneratorTest extends TestCase {
             testGenerator.setFlavour(StartScriptGenerator.WINDOWS_FLAVOUR);
             testGenerator.generateStartScripts();
             String[] fileNames = dir.list();
-            assertEquals(3, fileNames.length); // 2 files plus the /bin subdirectory
+            int fileNamesLength = fileNames.length;
+            assertEquals(3, fileNamesLength); // 2 files plus the /bin subdirectory
             Set<String> fileNamesSet = new HashSet<String>(4);
-            for (int i = 0; i < fileNames.length; i++) {
+            for (int i = 0; i < fileNamesLength; i++) {
                 fileNamesSet.add(fileNames[i]);
             }
             assertTrue(fileNamesSet.contains("bin"));
             assertTrue(fileNamesSet.contains("jython"));
             assertTrue(fileNamesSet.contains("jython.bat"));
+            fileNames = bin.list();
+            fileNamesLength = fileNames.length;
+            assertEquals(2, fileNamesLength);
+            fileNamesSet = new HashSet<String>(4);
+            for (int i = 0; i < fileNamesLength; i++) {
+                fileNamesSet.add(fileNames[i]);
+            }
+            assertTrue(fileNamesSet.contains("jython"));
+            assertTrue(fileNamesSet.contains("jython.bat"));
         } finally {
             if (dir.exists()) {
-                rmdir(dir);
+                assertTrue("unable to delete directory ".concat(dir.getAbsolutePath()),
+                           FileHelper.rmdir(dir));
             }
         }
-    }
-
-    private void rmdir(File dir) throws IOException {
-        File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isFile()) {
-                Assert.assertTrue("unable to delete '" + files[i].getCanonicalPath() + "'",
-                                  files[i].delete());
-            } else {
-                if (files[i].isDirectory()) {
-                    rmdir(files[i]);
-                }
-            }
-        }
-        assertTrue(dir.delete());
     }
 
     class TestStartScriptGenerator extends StartScriptGenerator {

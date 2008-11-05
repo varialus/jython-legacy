@@ -13,8 +13,6 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-import org.python.util.install.driver.FileHelper;
-
 import junit.framework.TestCase;
 
 public class StandalonePackagerTest extends TestCase {
@@ -109,7 +107,7 @@ public class StandalonePackagerTest extends TestCase {
 
         assertTrue(_targetJarFile.exists());
 
-        Map mandatoryEntries = new HashMap(3);
+        Map<String, String> mandatoryEntries = new HashMap<String, String>(8);
         mandatoryEntries.put(_contentDir.getName(), "dir");
         mandatoryEntries.put(_contentFile.getName(), "file");
         mandatoryEntries.put(_nextContentFile.getName(), "file");
@@ -120,7 +118,7 @@ public class StandalonePackagerTest extends TestCase {
 
         JarFile targetJarFile = new JarFile(_targetJarFile);
         try {
-            Enumeration entries = targetJarFile.entries();
+            Enumeration<JarEntry> entries = targetJarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = (JarEntry) entries.nextElement();
                 String name;
