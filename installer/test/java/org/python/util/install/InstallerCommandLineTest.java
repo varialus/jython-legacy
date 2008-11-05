@@ -269,6 +269,22 @@ public class InstallerCommandLineTest extends TestCase {
             File dir = commandLine.getTargetDirectory();
             assertNotNull(dir);
             assertEquals("some_dir", dir.getName());
+            
+            // -A (autotest) should override as well
+            args = new String[] {"-A"};
+            commandLine = new InstallerCommandLine();
+            assertTrue(commandLine.setArgs(args));
+            assertFalse(commandLine.hasVerboseOption());
+            assertFalse(commandLine.hasConsoleOption()); // no auto switch
+            assertFalse(commandLine.hasSilentOption());
+            
+            // console aready present should be no problem
+            args = new String[] {"-c", "-v"};
+            commandLine = new InstallerCommandLine();
+            assertTrue(commandLine.setArgs(args));
+            assertTrue(commandLine.hasVerboseOption());
+            assertTrue(commandLine.hasConsoleOption());
+            assertFalse(commandLine.hasSilentOption());
         } finally {
             if (!originalHeadless) {
                 System.setProperty(Installation.HEADLESS_PROPERTY_NAME, "false");
@@ -606,52 +622,6 @@ public class InstallerCommandLineTest extends TestCase {
         
         args = new String[] {"a", "--" + InstallerCommandLine.VERBOSE_LONG, "c"};
         assertTrue(InstallerCommandLine.hasVerboseOptionInArgs(args));
-    }
-
-    public void testHasConsoleOptionInArgs() {
-        String[] args = new String[0];
-        assertFalse(InstallerCommandLine.hasConsoleOptionInArgs(args));
-
-        args = new String[] {"a", "b", "c"};
-        assertFalse(InstallerCommandLine.hasConsoleOptionInArgs(args));
- 
-        args = new String[] {"a", InstallerCommandLine.CONSOLE_SHORT, "c"};
-        assertFalse(InstallerCommandLine.hasConsoleOptionInArgs(args));
-        
-        args = new String[] {"a", "-" + InstallerCommandLine.CONSOLE_SHORT, "c"};
-        assertTrue(InstallerCommandLine.hasConsoleOptionInArgs(args));
-        
-        args = new String[] {"a", InstallerCommandLine.CONSOLE_LONG, "c"};
-        assertFalse(InstallerCommandLine.hasConsoleOptionInArgs(args));
-        
-        args = new String[] {"a", "-" + InstallerCommandLine.CONSOLE_LONG, "c"};
-        assertFalse(InstallerCommandLine.hasConsoleOptionInArgs(args));
-        
-        args = new String[] {"a", "--" + InstallerCommandLine.CONSOLE_LONG, "c"};
-        assertTrue(InstallerCommandLine.hasConsoleOptionInArgs(args));
-    }
-
-    public void testHasSilentOptionInArgs() {
-        String[] args = new String[0];
-        assertFalse(InstallerCommandLine.hasSilentOptionInArgs(args));
-
-        args = new String[] {"a", "b", "c"};
-        assertFalse(InstallerCommandLine.hasSilentOptionInArgs(args));
- 
-        args = new String[] {"a", InstallerCommandLine.SILENT_SHORT, "c"};
-        assertFalse(InstallerCommandLine.hasSilentOptionInArgs(args));
-        
-        args = new String[] {"a", "-" + InstallerCommandLine.SILENT_SHORT, "c"};
-        assertTrue(InstallerCommandLine.hasSilentOptionInArgs(args));
-        
-        args = new String[] {"a", InstallerCommandLine.SILENT_LONG, "c"};
-        assertFalse(InstallerCommandLine.hasSilentOptionInArgs(args));
-        
-        args = new String[] {"a", "-" + InstallerCommandLine.SILENT_LONG, "c"};
-        assertFalse(InstallerCommandLine.hasSilentOptionInArgs(args));
-        
-        args = new String[] {"a", "--" + InstallerCommandLine.SILENT_LONG, "c"};
-        assertTrue(InstallerCommandLine.hasSilentOptionInArgs(args));
     }
     
 }

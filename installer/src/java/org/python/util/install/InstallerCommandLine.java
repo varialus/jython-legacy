@@ -134,28 +134,6 @@ public class InstallerCommandLine {
     }
 
     /**
-     * Pre-scan of the arguments to detect a console flag
-     * @param args 
-     * @return <code>true</code> if there is a console option
-     */
-    public static final boolean hasConsoleOptionInArgs(String[] args) {
-        String shortConsole = "-".concat(CONSOLE_SHORT);
-        String longConsole = "--".concat(CONSOLE_LONG);
-        return hasOptionInArgs(args, shortConsole, longConsole);
-    }
-
-    /**
-     * Pre-scan of the arguments to detect a silent flag
-     * @param args 
-     * @return <code>true</code> if there is a silent option
-     */
-    public static final boolean hasSilentOptionInArgs(String[] args) {
-        String shortSilent = "-".concat(SILENT_SHORT);
-        String longSilent = "--".concat(SILENT_LONG);
-        return hasOptionInArgs(args, shortSilent, longSilent);
-    }
-
-    /**
      * constructor intended for JUnit tests only.
      */
     public InstallerCommandLine() {
@@ -170,19 +148,26 @@ public class InstallerCommandLine {
      * <code>false</code> is returned
      */
     public boolean setArgs(String args[]) {
-        _args = args;
-        if (!hasConsoleOptionInArgs(args) && !hasSilentOptionInArgs(args)) {
-            if (!Installation.isGuiAllowed() || Installation.isGNUJava()) {
-                // auto switch to console mode
-                if (hasVerboseOptionInArgs(args)) {
-                    ConsoleInstaller.message("auto-switching to console mode");
+        // pre-process args to determine if we can (and should) switch to console mode
+        try {
+            CommandLine preCommandLine = _parser.parse(_options, args, false);
+            if (!hasConsoleOption(preCommandLine) && !hasSilentOption(preCommandLine)
+                    && !hasAutotestOption(preCommandLine)) {
+                if (!Installation.isGuiAllowed() || Installation.isGNUJava()) {
+                    // auto switch to console mode
+                    if (hasVerboseOption(preCommandLine)) {
+                        ConsoleInstaller.message("auto-switching to console mode");
+                    }
+                    String[] newArgs = new String[args.length + 1];
+                    System.arraycopy(args, 0, newArgs, 0, args.length);
+                    newArgs[args.length] = "-" + CONSOLE_SHORT;
+                    args = newArgs;
                 }
-                String[] newArgs = new String[args.length + 1];
-                System.arraycopy(args, 0, newArgs, 0, args.length);
-                newArgs[args.length] = "-" + CONSOLE_SHORT;
-                _args = newArgs;
             }
+        } catch (Exception e) {
+            // ignore
         }
+        _args = args;
         try {
             // throws for missing or unknown options / arguments
             _commandLine = _parser.parse(_options, _args, false);
@@ -245,15 +230,27 @@ public class InstallerCommandLine {
     }
 
     public boolean hasSilentOption() {
-        return _commandLine.hasOption(SILENT_SHORT) || _commandLine.hasOption(SILENT_LONG);
+        return hasSilentOption(_commandLine);
+    }
+
+    private boolean hasSilentOption(CommandLine commandLine) {
+        return commandLine.hasOption(SILENT_SHORT) || commandLine.hasOption(SILENT_LONG);
     }
 
     public boolean hasConsoleOption() {
-        return _commandLine.hasOption(CONSOLE_SHORT) || _commandLine.hasOption(CONSOLE_LONG);
+        return hasConsoleOption(_commandLine);
+    }
+    
+    private boolean hasConsoleOption(CommandLine commandLine) {
+        return commandLine.hasOption(CONSOLE_SHORT) || commandLine.hasOption(CONSOLE_LONG);
     }
 
     public boolean hasAutotestOption() {
-        return _commandLine.hasOption(AUTOTEST_SHORT) || _commandLine.hasOption(AUTOTEST_LONG);
+        return hasAutotestOption(_commandLine);
+    }
+    
+    private boolean hasAutotestOption(CommandLine commandLine) {
+        return commandLine.hasOption(AUTOTEST_SHORT) || commandLine.hasOption(AUTOTEST_LONG);
     }
 
     public boolean hasDirectoryOption() {
@@ -277,7 +274,11 @@ public class InstallerCommandLine {
     }
 
     public boolean hasVerboseOption() {
-        return _commandLine.hasOption(VERBOSE_SHORT) || _commandLine.hasOption(VERBOSE_LONG);
+        return hasVerboseOption(_commandLine);
+    }
+
+    private boolean hasVerboseOption(CommandLine commandLine) {
+        return commandLine.hasOption(VERBOSE_SHORT) || commandLine.hasOption(VERBOSE_LONG);
     }
 
     public void printHelp() {
