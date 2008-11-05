@@ -29,12 +29,11 @@ set JYTHON_HOME="%_INSTALL_DIR%"
 call jython.bat "%_SCRIPT%"
 set E=%ERRORLEVEL%
 
-rem this exposes the last part of issue 1125
-rem echo "{3}: both homes UNquoted:"
-rem set JAVA_HOME=%_JAVA_HOME%
-rem set JYTHON_HOME=%_INSTALL_DIR%
-rem call jython.bat "%_SCRIPT%"
-rem set E=%ERRORLEVEL%
+echo {3}: both homes UNquoted:
+set JAVA_HOME=%_JAVA_HOME%
+set JYTHON_HOME=%_INSTALL_DIR%
+call jython.bat "%_SCRIPT%"
+set E=%ERRORLEVEL%
 
 rem cleanup:
 set JAVA_HOME=%_OLD_JAVA_HOME%
