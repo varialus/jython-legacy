@@ -93,14 +93,9 @@ public class ChildProcess {
     private static final int NOT_SET_EXITVALUE = -9;
 
     /**
-     * The command to be executed
-     */
-    private String _command = null;
-
-    /**
      * The command as an array of strings
      */
-    private String _commandArray[] = null;
+    private String _command[] = null;
 
     /**
      * The timeout (in milliseconds)
@@ -143,79 +138,41 @@ public class ChildProcess {
     public ChildProcess() {}
 
     /**
-     * Constructor taking the command as an argument
-     * 
-     * @param command
-     *            The command to be executed.
-     */
-    public ChildProcess(String command) {
-        setCommand(command);
-    }
-
-    /**
      * Constructor taking a command array as an argument
      * 
-     * @param commandArray
+     * @param command
      *            The command to be executed, every token as array element.
      */
-    public ChildProcess(String commandArray[]) {
-        setCommandArray(commandArray);
-    }
-
-    /**
-     * Constructor taking the command and the timeout as an argument
-     * 
-     * @param command
-     *            The command to be executed.
-     * @param timeout
-     *            in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout
-     *            at all.
-     */
-    public ChildProcess(String command, long timeout) {
+    public ChildProcess(String command[]) {
         setCommand(command);
-        setTimeout(timeout);
     }
 
     /**
      * Constructor taking a command array and the timeout as an argument
      * 
-     * @param commandArray
+     * @param command
      *            The command to be executed, every token as array element.
      * @param timeout
      *            in milliseconds. Special value: <code>INFINITE_TIMEOUT</code> indicates no timeout
      *            at all.
      */
-    public ChildProcess(String commandArray[], long timeout) {
-        setCommandArray(commandArray);
+    public ChildProcess(String command[], long timeout) {
+        setCommand(command);
         setTimeout(timeout);
-    }
-
-    /**
-     * Set the command to be executed
-     */
-    public void setCommand(String command) {
-        _command = command;
-    }
-
-    /**
-     * Get the command to be executed
-     */
-    public String getCommand() {
-        return _command;
     }
 
     /**
      * Set the command array. This will override (but not overwrite) a previously set command
      */
-    public void setCommandArray(String commandArray[]) {
-        _commandArray = commandArray;
+    public void setCommand(String command[]) {
+        _command = command;
     }
 
     /**
      * Returns the command array
      */
-    public String[] getCommandArray() {
-        return _commandArray;
+    public String[] getCommand() {
+        return _command;
     }
 
     /**
@@ -310,11 +267,7 @@ public class ChildProcess {
             // determine start time
             _startTime = System.currentTimeMillis();
             // start the process
-            if (getCommandArray() != null) {
-                _process = Runtime.getRuntime().exec(getCommandArray());
-            } else {
-                _process = Runtime.getRuntime().exec(getCommand());
-            }
+            _process = Runtime.getRuntime().exec(getCommand());
             debugCommand();
             // handle stdout and stderr
             StdoutMonitor stdoutMonitor = new StdoutMonitor();
@@ -386,11 +339,11 @@ public class ChildProcess {
      */
     private void debugCommand() {
         if (isDebug()) {
-            String[] commandArray = getCommandArray();
-            if (commandArray != null) {
+            String[] command = getCommand();
+            if (command != null) {
                 System.out.print("[ChildProcess] command '");
-                for (int i = 0; i < commandArray.length; i++) {
-                    String commandPart = commandArray[i];
+                for (int i = 0; i < command.length; i++) {
+                    String commandPart = command[i];
                     if (i == 0) {
                         System.out.print(commandPart);
                     } else {
@@ -398,9 +351,6 @@ public class ChildProcess {
                     }
                 }
                 System.out.println("' is now running...");
-            } else {
-                System.out.println("[ChildProcess] command '" + getCommand()
-                        + "' is now running...");
             }
         }
     }

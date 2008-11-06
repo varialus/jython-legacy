@@ -58,7 +58,7 @@ public class StartScriptGenerator {
     protected boolean hasUnixlikeShell() {
         int errorCode = 0;
         try {
-            String command = "sh -c env";
+            String command[] = new String[] {"sh", "-c", "env"};
             long timeout = 3000;
             ChildProcess childProcess = new ChildProcess(command, timeout);
             childProcess.setDebug(false);

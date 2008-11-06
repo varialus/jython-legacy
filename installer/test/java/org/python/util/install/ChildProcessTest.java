@@ -15,7 +15,7 @@ public class ChildProcessTest extends TestCase {
      */
     public void testDefault() {
         ChildProcess childProcess = new ChildProcess();
-        String command = buildJavaCommand(CLASS_NAME);
+        String command[] = buildJavaCommand(CLASS_NAME);
         childProcess.setCommand(command);
         childProcess.setDebug(true);
         int exitValue = childProcess.run();
@@ -27,7 +27,7 @@ public class ChildProcessTest extends TestCase {
      */
     public void testTimeout() {
         ChildProcess childProcess = new ChildProcess();
-        String command = buildJavaCommand(CLASS_NAME);
+        String command[] = buildJavaCommand(CLASS_NAME);
         childProcess.setCommand(command);
         childProcess.setDebug(true);
         childProcess.setTimeout(2000); // timeout to 2 seconds
@@ -38,23 +38,11 @@ public class ChildProcessTest extends TestCase {
     }
 
     /**
-     * test the child process with a command array
-     */
-    public void testCommandArray() {
-        String command = buildJavaCommand(CLASS_NAME);
-        String commandArray[] = command.split(" ");
-        ChildProcess childProcess = new ChildProcess(commandArray);
-        childProcess.setDebug(true);
-        int exitValue = childProcess.run();
-        assertEquals("Expected child process to end normally instead of " + exitValue, 0, exitValue);
-    }
-
-    /**
      * test silent mode
      */
     public void testSilent() throws IOException {
         ChildProcess childProcess = new ChildProcess();
-        String command = "lwiklsl -siwK";
+        String command[] = new String[] {"lwiklsl", "-siwK"};
         childProcess.setCommand(command);
         childProcess.setDebug(false);
         childProcess.setSilent(true);
@@ -81,12 +69,12 @@ public class ChildProcessTest extends TestCase {
     //
     // private methods
     //
-    private String buildJavaCommand(String classAndArguments) {
+    private String[] buildJavaCommand(String classAndArguments) {
         String quote = "";
         if (System.getProperty("os.name", "unknown").toLowerCase().indexOf("windows") >= 0) {
             quote = "\"";
         }
         String classpath = System.getProperty("java.class.path");
-        return "java -classpath " + quote + classpath + quote + " " + classAndArguments;
+        return new String[] {"java",  "-classpath",  quote.concat(classpath).concat(quote), classAndArguments};
     }
 }

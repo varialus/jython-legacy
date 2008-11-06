@@ -37,7 +37,8 @@ public class ChmodTest_Standalone {
             System.err.println(getPrefix() + "unable to create file " + path);
             System.exit(1);
         } else {
-            ChildProcess childProcess = new ChildProcess("chmod " + _mode + " " + path, 3000);
+            String command[] = new String[] {"chmod", _mode, path};
+            ChildProcess childProcess = new ChildProcess(command, 3000);
             childProcess.setDebug(true);
             int exitValue = childProcess.run();
             if (exitValue != 0) {
