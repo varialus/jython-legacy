@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # 3 variables to be set from the caller (unquoted) -> quoted in here:
 _INSTALL_DIR="{0}"
 _SCRIPT="{1}"
