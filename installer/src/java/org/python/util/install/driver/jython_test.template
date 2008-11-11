@@ -8,14 +8,20 @@ _JAVA_HOME="{2}"
 # save old home env vars:
 _OLD_JAVA_HOME=$JAVA_HOME
 _OLD_JYTHON_HOME=$JYTHON_HOME
+# save current dir
+_CURDIR=`pwd`
 
 cd "$_INSTALL_DIR/bin"
 
-# auto detection of JYTHON_HOME does not yet work
-#echo "{3}: only JAVA_HOME:"
-#export JAVA_HOME="$_JAVA_HOME"
-#export JYTHON_HOME=
-#./jython "$_SCRIPT"
+echo "{3}: no home:"
+export JAVA_HOME=
+export JYTHON_HOME=
+./jython "$_SCRIPT"
+
+echo "{3}: only JAVA_HOME:"
+export JAVA_HOME="$_JAVA_HOME"
+export JYTHON_HOME=
+./jython "$_SCRIPT"
 
 echo "{3}: only JYTHON_HOME:"
 export JAVA_HOME=
@@ -27,6 +33,14 @@ export JAVA_HOME="$_JAVA_HOME"
 export JYTHON_HOME="$_INSTALL_DIR"
 ./jython "$_SCRIPT"
 
+cd ~
+
+echo "{3}: no home, calling from another working dir:"
+export JAVA_HOME=
+export JYTHON_HOME=
+"$_INSTALL_DIR/bin/jython" "$_SCRIPT"
+
 # cleanup:
+cd "$_CURDIR"
 export JAVA_HOME=$_OLD_JAVA_HOME
 export JYTHON_HOME=$_OLD_JYTHON_HOME
