@@ -35,6 +35,28 @@ set JYTHON_HOME=%_INSTALL_DIR%
 call jython.bat "%_SCRIPT%"
 set E=%ERRORLEVEL%
 
+cd ..
+
+echo {3}: no home, calling in home dir:
+set JAVA_HOME=
+set JYTHON_HOME=
+call jython.bat "%_SCRIPT%"
+set E=%ERRORLEVEL%
+
+cd ..
+
+echo {3}: no home, calling /jython.bat from another working dir:"
+set JAVA_HOME=
+set JYTHON_HOME=
+call "%_INSTALL_DIR%\jython.bat" "%_SCRIPT%"
+set E=%ERRORLEVEL%
+
+echo {3}: no home, calling bin/jython.bat from another working dir:"
+set JAVA_HOME=
+set JYTHON_HOME=
+call "%_INSTALL_DIR%\bin\jython.bat" "%_SCRIPT%"
+set E=%ERRORLEVEL%
+
 rem cleanup:
 set JAVA_HOME=%_OLD_JAVA_HOME%
 set JYTHON_HOME=%_OLD_JYTHON_HOME%

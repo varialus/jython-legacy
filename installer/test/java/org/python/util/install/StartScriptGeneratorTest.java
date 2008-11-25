@@ -49,7 +49,7 @@ public class StartScriptGeneratorTest extends TestCase {
         buf.append("JAVA_HOME=\"");
         buf.append(System.getProperty("java.home"));
         buf.append("\"\n");
-        buf.append("JYTHON_HOME=\"");
+        buf.append("JYTHON_HOME_FALLBACK=\"");
         buf.append(_targetDir.getAbsolutePath());
         buf.append("\"\n");
         // some rudimentary tests - feel free to do more
@@ -59,6 +59,11 @@ public class StartScriptGeneratorTest extends TestCase {
         assertTrue(unixScript.length() > 3500);
         assertTrue(unixScript.indexOf("-Dpython.home=") > start.length());
         assertTrue(unixScript.indexOf("-Dpython.executable=") > start.length());
+        // no hard coding of JYTHON_HOME
+        int jythonHomeIndex = unixScript.indexOf("if [ -z \"$JYTHON_HOME\" ] ; then");
+        assertTrue(jythonHomeIndex >= 0);
+        int definitionIndex = unixScript.indexOf("JYTHON_HOME=");
+        assertTrue(definitionIndex > jythonHomeIndex || definitionIndex < 0);
     }
 
     public void testWindows() throws IOException {
@@ -72,7 +77,7 @@ public class StartScriptGeneratorTest extends TestCase {
         winBuf.append(System.getProperty("java.home"));
         winBuf.append("\"");
         winBuf.append(WIN_CR_LF);
-        winBuf.append("set JYTHON_HOME=\"");
+        winBuf.append("set JYTHON_HOME_FALLBACK=\"");
         winBuf.append(_targetDir.getAbsolutePath());
         winBuf.append("\"");
         winBuf.append(WIN_CR_LF);
@@ -84,6 +89,11 @@ public class StartScriptGeneratorTest extends TestCase {
         assertTrue(winScript.indexOf("if not \"%_TRIMMED_JAVA_HOME%\"==\"\"") > start.length());
         assertTrue(winScript.indexOf("-Dpython.home=") > start.length());
         assertTrue(winScript.indexOf("-Dpython.executable=") > start.length());
+        // no hard coding of JYTHON_HOME
+        int jythonHomeIndex = winScript.indexOf("if not \"%_TRIMMED_JYTHON_HOME%\"==\"\"");
+        assertTrue(jythonHomeIndex >= 0);
+        int definitionIndex = winScript.indexOf("set JYTHON_HOME=");
+        assertTrue(definitionIndex > jythonHomeIndex || definitionIndex < 0);
     }
 
     public void testFlavour() {

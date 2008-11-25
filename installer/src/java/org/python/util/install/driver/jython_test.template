@@ -33,9 +33,21 @@ export JAVA_HOME="$_JAVA_HOME"
 export JYTHON_HOME="$_INSTALL_DIR"
 ./jython "$_SCRIPT"
 
+cd ..
+
+echo "{3}: no home, calling in home dir:"
+export JAVA_HOME=
+export JYTHON_HOME=
+./jython "$_SCRIPT"
+
 cd ~
 
-echo "{3}: no home, calling from another working dir:"
+echo "{3}: no home, calling /jython from another working dir:"
+export JAVA_HOME=
+export JYTHON_HOME=
+"$_INSTALL_DIR/jython" "$_SCRIPT"
+
+echo "{3}: no home, calling /bin/jython from another working dir:"
 export JAVA_HOME=
 export JYTHON_HOME=
 "$_INSTALL_DIR/bin/jython" "$_SCRIPT"
