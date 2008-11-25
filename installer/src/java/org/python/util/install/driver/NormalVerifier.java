@@ -242,6 +242,7 @@ public class NormalVerifier implements Verifier {
     private String getTestScript() {
         StringBuilder b = new StringBuilder(80);
         b.append("import sys\n");
+        b.append("import os\n");
         b.append("print '");
         b.append(JYTHON_UP);
         b.append("'\n");
