@@ -178,22 +178,22 @@ public class JarInstaller {
     }
 
     private int approximateNumberOfEntries(InstallationType installationType) {
-        int numberOfEntries = 65; // core (minimum)
+        int numberOfEntries = 100; // core (minimum)
         if (installationType.installLibraryModules()) {
             if (installationType.isStandalone()) {
-                numberOfEntries += 240;
+                numberOfEntries += 480;
             } else {
-                numberOfEntries += 664;
+                numberOfEntries += 1260;
             }
         }
         if (installationType.installDemosAndExamples()) {
-            numberOfEntries += 44;
+            numberOfEntries += 50;
         }
         if (installationType.installDocumentation()) {
-            numberOfEntries += 209;
+            numberOfEntries += 185;
         }
         if (installationType.installSources()) {
-            numberOfEntries += 401;
+            numberOfEntries += 585;
         }
         return numberOfEntries;
     }
