@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -326,6 +327,7 @@ public class Installation {
         try {
             boolean earlyVerbose = InstallerCommandLine.hasVerboseOptionInArgs(args);
             if (earlyVerbose) {
+                dumpSystemProperties();
                 ConsoleInstaller.message("reading jar info");
             }
             JarInfo jarInfo = new JarInfo();
@@ -370,6 +372,24 @@ public class Installation {
             t.printStackTrace();
             System.exit(1);
         }
+    }
+    
+    private static void dumpSystemProperties() throws IOException {
+        @SuppressWarnings("unchecked")
+        Enumeration<String> names = (Enumeration<String>)System.getProperties().propertyNames();
+        StringBuilder contents = new StringBuilder(400);
+        contents.append("Properties at the beginning of the Jython installation:\n\n");
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            String value = System.getProperty(name, "");
+            contents.append(name);
+            contents.append('=');
+            contents.append(value);
+            contents.append("\n");
+        }
+        File output = File.createTempFile("System", ".properties");
+        FileHelper.write(output, contents.toString());
+        ConsoleInstaller.message("system properties dumped to " + output.getAbsolutePath());
     }
 
 }
