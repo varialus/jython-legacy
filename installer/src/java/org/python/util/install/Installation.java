@@ -150,57 +150,53 @@ public class Installation {
     /**
      * Get the version info of an external (maybe other) jvm.
      * 
-     * @param javaHome The java home of the external jvm. The /bin directory is assumed to be a direct child directory.
+     * @param javaHomeHandler
+     *            The java home handler pointing to the java home of the external jvm.<br>
+     *            The /bin directory is assumed to be a direct child directory.
+     * 
      * @return The versionInfo
      */
-    protected static JavaVersionInfo getExternalJavaVersion(File javaHome) {
+    protected static JavaVersionInfo getExternalJavaVersion(JavaHomeHandler javaHomeHandler) {
         JavaVersionInfo versionInfo = new JavaVersionInfo();
-
-        File binDirectory = new File(javaHome, "bin");
-        if (binDirectory.exists() && binDirectory.isDirectory()) {
-            if (binDirectory.list(new JavaFilenameFilter()).length > 0) {
-                try {
-                    ConsoleInstaller.message(getText(TextKeys.C_CHECK_JAVA_VERSION));
-                    // launch the java command - temporary file will be written by the child process
-                    File tempFile = File.createTempFile("jython_installation", ".properties");
-                    if (tempFile.exists() && tempFile.canWrite()) {
-                        String command[] = new String[5];
-                        command[0] = binDirectory.getAbsolutePath() + File.separator + "java";
-                        command[1] = "-cp";
-                        command[2] = System.getProperty("java.class.path"); // our own class path should be ok here
-                        command[3] = JavaVersionTester.class.getName();
-                        command[4] = tempFile.getAbsolutePath();
-
-                        if (isVerbose()) {
-                            ConsoleInstaller.message("executing: " + command[0] + " " + command[1] + " " + command[2]
-                                    + " " + command[3] + " " + command[4]);
-                        }
-                        ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
-                        childProcess.setDebug(Installation.isVerbose());
-                        int errorCode = childProcess.run();
-                        if (errorCode != NORMAL_RETURN) {
-                            versionInfo.setErrorCode(errorCode);
-                            versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHome.getAbsolutePath()));
-                        } else {
-                            Properties tempProperties = new Properties();
-                            tempProperties.load(new FileInputStream(tempFile));
-                            fillJavaVersionInfo(versionInfo, tempProperties);
-                        }
-                    } else {
-                        versionInfo.setErrorCode(ERROR_RETURN);
-                        versionInfo.setReason(getText(TextKeys.C_UNABLE_CREATE_TMPFILE, tempFile.getAbsolutePath()));
+        if (javaHomeHandler.isValidHome()) {
+            try {
+                ConsoleInstaller.message(getText(TextKeys.C_CHECK_JAVA_VERSION));
+                // launch the java command - temporary file will be written by the child process
+                File tempFile = File.createTempFile("jython_installation", ".properties");
+                if (tempFile.exists() && tempFile.canWrite()) {
+                    String command[] = new String[5];
+                    command[0] = javaHomeHandler.getExecutableName();
+                    command[1] = "-cp";
+                    // our own class path should be ok here
+                    command[2] = System.getProperty("java.class.path"); 
+                    command[3] = JavaVersionTester.class.getName();
+                    command[4] = tempFile.getAbsolutePath();
+                    if (isVerbose()) {
+                        ConsoleInstaller.message("executing: " + command[0] + " " + command[1]
+                                + " " + command[2] + " " + command[3] + " " + command[4]);
                     }
-                } catch (IOException e) {
+                    ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
+                    childProcess.setDebug(Installation.isVerbose());
+                    int errorCode = childProcess.run();
+                    if (errorCode != NORMAL_RETURN) {
+                        versionInfo.setErrorCode(errorCode);
+                        versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHomeHandler.toString()));
+                    } else {
+                        Properties tempProperties = new Properties();
+                        tempProperties.load(new FileInputStream(tempFile));
+                        fillJavaVersionInfo(versionInfo, tempProperties);
+                    }
+                } else {
                     versionInfo.setErrorCode(ERROR_RETURN);
-                    versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHome.getAbsolutePath()));
+                    versionInfo.setReason(getText(TextKeys.C_UNABLE_CREATE_TMPFILE, tempFile.getAbsolutePath()));
                 }
-            } else {
+            } catch (IOException e) {
                 versionInfo.setErrorCode(ERROR_RETURN);
-                versionInfo.setReason(getText(TextKeys.C_NO_JAVA_EXECUTABLE, binDirectory.getAbsolutePath()));
+                versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHomeHandler.toString()));
             }
         } else {
             versionInfo.setErrorCode(ERROR_RETURN);
-            versionInfo.setReason(getText(TextKeys.C_NOT_A_DIRECTORY, binDirectory.getAbsolutePath()));
+            versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, javaHomeHandler.toString()));
         }
 
         return versionInfo;

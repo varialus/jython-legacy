@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 import org.python.util.install.ChildProcess;
 import org.python.util.install.FileHelper;
 import org.python.util.install.Installation;
-import org.python.util.install.JavaVersionTester;
+import org.python.util.install.JavaHomeHandler;
 
 public class NormalVerifier implements Verifier {
 
@@ -125,7 +125,11 @@ public class NormalVerifier implements Verifier {
                 String template = FileHelper.readAll(inputStream);
                 String targetDirPath = getTargetDir().getCanonicalPath();
                 String upScriptPath = getSimpleCommand()[1];
-                String javaHomeString = System.getProperty(JavaVersionTester.JAVA_HOME, "");
+                JavaHomeHandler javaHomeHandler = new JavaHomeHandler();
+                String javaHomeString = "";
+                if (javaHomeHandler.isValidHome()) {
+                    javaHomeString = javaHomeHandler.getHome().getAbsolutePath();
+                }
                 contents = MessageFormat.format(template,
                                                 targetDirPath,
                                                 upScriptPath,

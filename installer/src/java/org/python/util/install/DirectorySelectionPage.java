@@ -17,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class DirectorySelectionPage extends AbstractWizardPage {
+
+    private static final long serialVersionUID = -3672273150338356549L;
+    
     private JLabel _label;
     private JTextField _directory;
     private JButton _browse;
@@ -111,9 +114,14 @@ public class DirectorySelectionPage extends AbstractWizardPage {
         File defaultDirectory = null;
         // 1st try (on windows): root
         if (Installation.isWindows()) {
-            directory = System.getProperty(JavaVersionTester.JAVA_HOME, "C:");
-            if (directory.length() > 2) {
-                directory = directory.substring(0, 2);
+            JavaHomeHandler handler = new JavaHomeHandler();
+            if (handler.isValidHome()) {
+                directory = handler.getHome().getAbsolutePath();
+                if (directory.length() > 2) {
+                    directory = directory.substring(0, 2);
+                }
+            } else {
+                directory = "C:";
             }
             defaultDirectory = makeJythonSubDirectory(directory);
         }

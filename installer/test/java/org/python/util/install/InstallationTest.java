@@ -9,8 +9,8 @@ import junit.framework.TestCase;
 public class InstallationTest extends TestCase {
 
     public void testGetExternalJavaVersion() {
-        File javaHome = new File(System.getProperty(JavaVersionTester.JAVA_HOME));
-        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+        JavaHomeHandler javaHomeHandler = new JavaHomeHandler();
+        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHomeHandler);
         assertEquals(Installation.NORMAL_RETURN, versionInfo.getErrorCode());
         assertEquals("", versionInfo.getReason());
         assertTrue(versionInfo.getVersion().length() > 0);
@@ -21,30 +21,32 @@ public class InstallationTest extends TestCase {
     }
 
     public void testGetExternalJavaVersionWithError() {
-        File javaHome = new File(System.getProperty("user.home"), "non_existing");
-        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+        JavaHomeHandler javaHomeHandler = new JavaHomeHandler("non_existing/home");
+        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHomeHandler);
         assertEquals(Installation.ERROR_RETURN, versionInfo.getErrorCode());
         String reason = versionInfo.getReason();
-        assertTrue(reason.indexOf("directory") >= 0 || reason.indexOf("Verzeichnis") >= 0);
+        assertTrue(reason.indexOf("invalid") >= 0);
     }
 
     public void testGetExternalJavaVersionNoBinDirectory() {
-        File javaHome = new File(System.getProperty("user.home"));
-        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+        File wrongHome = new File(System.getProperty("user.home"));
+        JavaHomeHandler javaHomeHandler = new JavaHomeHandler(wrongHome.getAbsolutePath());
+        JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHomeHandler);
         assertEquals(Installation.ERROR_RETURN, versionInfo.getErrorCode());
         String reason = versionInfo.getReason();
-        assertTrue(reason.indexOf("directory") >= 0 || reason.indexOf("Verzeichnis") >= 0);
+        assertTrue(reason.indexOf("invalid") >= 0);
     }
 
     public void testGetExternalJavaVersionNoJavaInBinDirectory() {
-        File javaHome = new File(System.getProperty("user.home"));
-        File binDir = new File(javaHome, "bin");
+        File wrongHome = new File(System.getProperty("user.home"));
+        File binDir = new File(wrongHome, "bin");
         assertFalse(binDir.exists());
         try {
             assertTrue(binDir.mkdirs());
-            JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+            JavaHomeHandler javaHomeHandler = new JavaHomeHandler(wrongHome.getAbsolutePath());
+            JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHomeHandler);
             assertEquals(Installation.ERROR_RETURN, versionInfo.getErrorCode());
-            assertTrue(versionInfo.getReason().indexOf("java") >= 0);
+            assertTrue(versionInfo.getReason().indexOf("invalid") >= 0);
         } finally {
             if (binDir.exists()) {
                 binDir.delete();

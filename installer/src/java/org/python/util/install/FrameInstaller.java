@@ -26,6 +26,8 @@ public class FrameInstaller {
 
     private static Properties _properties = new Properties();
 
+    private static JavaHomeHandler _javaHomeHandler;
+
     protected FrameInstaller(InstallerCommandLine commandLine, JarInfo jarInfo, Autotest autotest) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -38,7 +40,7 @@ public class FrameInstaller {
             setTargetDirectory(commandLine.getTargetDirectory().getAbsolutePath());
         }
         if (commandLine.hasJavaHomeOption()) {
-            setTargetJavaHome(commandLine.getJavaHome().getAbsolutePath());
+            setJavaHomeHandler(commandLine.getJavaHomeHandler());
         }
         Wizard wizard = new Wizard(jarInfo, autotest);
         wizard.addWindowListener(new WindowAdapter() {
@@ -72,12 +74,15 @@ public class FrameInstaller {
         return getProperty(TextKeys.TARGET_DIRECTORY_PROPERTY);
     }
 
-    protected static void setTargetJavaHome(String javaHome) {
-        setProperty(TextKeys.TARGET_JAVA_HOME_PROPERTY, javaHome.trim());
+    protected static void setJavaHomeHandler(JavaHomeHandler javaHomeHandler) {
+        _javaHomeHandler = javaHomeHandler;
     }
 
-    protected static String getTargetJavaHome() {
-        return getProperty(TextKeys.TARGET_JAVA_HOME_PROPERTY);
+    protected static JavaHomeHandler getJavaHomeHandler() {
+        if (_javaHomeHandler == null) {
+            _javaHomeHandler = new JavaHomeHandler();
+        }
+        return _javaHomeHandler;
     }
 
     protected static void setLanguage(Locale locale) {

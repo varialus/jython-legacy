@@ -20,6 +20,8 @@ import javax.swing.JTextField;
 
 public class JavaSelectionPage extends AbstractWizardPage {
 
+    private static final long serialVersionUID = 2871052924519223110L;
+
     private final static String _CURRENT_ACTION_COMMAND = "current";
     private final static String _OTHER_ACTION_COMMAND = "other";
 
@@ -123,24 +125,18 @@ public class JavaSelectionPage extends AbstractWizardPage {
     protected void beforeValidate() {
     }
 
-    private String getDefaultJavaHome() {
-        return System.getProperty(JavaVersionTester.JAVA_HOME);
-    }
-
     private void setValues() {
-        String javaHome = FrameInstaller.getTargetJavaHome();
         boolean current = true;
-        if (javaHome != null && javaHome.length() > 0) {
-            if (!javaHome.equals(getDefaultJavaHome())) {
-                current = false;
-            }
+        JavaHomeHandler javaHomeHandler = FrameInstaller.getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation()) {
+            current = false;
         }
         setCurrent(current);
     }
 
     private void setCurrent(boolean current) {
         if (current) {
-            FrameInstaller.setTargetJavaHome(getDefaultJavaHome());
+            FrameInstaller.setJavaHomeHandler(new JavaHomeHandler());
             _currentButton.setSelected(true);
             _otherButton.setSelected(false);
             _javaHome.setEnabled(false);
@@ -151,7 +147,12 @@ public class JavaSelectionPage extends AbstractWizardPage {
             _javaHome.setEnabled(true);
             _browse.setEnabled(true);
         }
-        _javaHome.setText(FrameInstaller.getTargetJavaHome());
+        JavaHomeHandler javaHomeHandler = FrameInstaller.getJavaHomeHandler();
+        if (javaHomeHandler.isValidHome()) {
+            _javaHome.setText(javaHomeHandler.getHome().getAbsolutePath());
+        } else {
+            _javaHome.setText("");
+        }
         _javaHome.setToolTipText(_javaHome.getText());
     }
 
@@ -171,7 +172,7 @@ public class JavaSelectionPage extends AbstractWizardPage {
             }
             int returnValue = fileChooser.showDialog(_browse, getText(SELECT));
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                FrameInstaller.setTargetJavaHome(fileChooser.getSelectedFile().getAbsolutePath());
+                FrameInstaller.setJavaHomeHandler(new JavaHomeHandler(fileChooser.getSelectedFile().getAbsolutePath()));
                 setValues();
             }
         }
@@ -189,8 +190,9 @@ public class JavaSelectionPage extends AbstractWizardPage {
         }
 
         public void focusLost(FocusEvent e) {
-            FrameInstaller.setTargetJavaHome(_javaHome.getText());
-            _javaHome.setToolTipText(_javaHome.getText());
+            String javaHome = _javaHome.getText();
+            FrameInstaller.setJavaHomeHandler(new JavaHomeHandler(javaHome));
+            _javaHome.setToolTipText(javaHome);
         }
     }
 

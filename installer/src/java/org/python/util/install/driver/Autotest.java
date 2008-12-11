@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.python.util.install.FileHelper;
 import org.python.util.install.InstallationListener;
 import org.python.util.install.InstallerCommandLine;
+import org.python.util.install.JavaHomeHandler;
 
 public abstract class Autotest implements InstallationListener {
 
@@ -16,7 +17,7 @@ public abstract class Autotest implements InstallationListener {
 
     private String _name;
     private File _targetDir;
-    private File _javaHome;
+    private JavaHomeHandler _javaHomeHandler;
     private boolean _verbose;
     private String[] _commandLineArgs;
     private Verifier _verifier;
@@ -36,7 +37,7 @@ public abstract class Autotest implements InstallationListener {
         createTargetDirectory();
         setCommandLineArgs(new String[0]); // a priori value
         _verbose = commandLine.hasVerboseOption();
-        _javaHome = commandLine.getJavaHome(); // null if not present
+        _javaHomeHandler = commandLine.getJavaHomeHandler();
     }
 
     /**
@@ -77,17 +78,10 @@ public abstract class Autotest implements InstallationListener {
     }
 
     /**
-     * @return <code>true</code> if this test has a java home deviation
+     * @return the java home handler, can be asked for deviation using <code>isDeviation()</code>.
      */
-    protected boolean hasJavaHomeDeviation() {
-        return getJavaHome() != null;
-    }
-
-    /**
-     * @return the deviation for java home, <code>null</code> if there is none
-     */
-    protected File getJavaHome() {
-        return _javaHome;
+    protected JavaHomeHandler getJavaHomeHandler() {
+        return _javaHomeHandler;
     }
 
     /**
@@ -135,9 +129,10 @@ public abstract class Autotest implements InstallationListener {
         if (isVerbose()) {
             addArgument("-v");
         }
-        if (hasJavaHomeDeviation()) {
+        JavaHomeHandler javaHomeHandler = getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
             addArgument("-j");
-            addArgument(getJavaHome().getAbsolutePath());
+            addArgument(javaHomeHandler.getHome().getAbsolutePath());
         }
     }
 

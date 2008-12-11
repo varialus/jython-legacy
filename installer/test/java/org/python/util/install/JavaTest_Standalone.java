@@ -1,7 +1,5 @@
 package org.python.util.install;
 
-import java.io.File;
-
 import org.python.util.install.Installation.JavaVersionInfo;
 
 /**
@@ -11,8 +9,8 @@ public class JavaTest_Standalone {
 
     public static void main(String[] args) {
         if (args.length > 0) {
-            File javaHome = new File(args[0]);
-            JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHome);
+            JavaHomeHandler javaHomeHandler = new JavaHomeHandler(args[0]);
+            JavaVersionInfo versionInfo = Installation.getExternalJavaVersion(javaHomeHandler);
             if (versionInfo.getErrorCode() != Installation.NORMAL_RETURN) {
                 System.err.println(versionInfo.getReason());
             } else {

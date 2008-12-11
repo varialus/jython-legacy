@@ -381,7 +381,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertNotNull(type);
         assertTrue(type.isStandalone());
 
-        assertNull(commandLine.getJavaHome());
+        assertFalse(commandLine.getJavaHomeHandler().isDeviation());
     }
 
     public void testInclude() {
@@ -500,23 +500,28 @@ public class InstallerCommandLineTest extends TestCase {
         assertFalse(commandLine.setArgs(args));
     }
 
-    public void testJavaHome() {
+    public void testJavaHomeHandler() {
         String[] args;
         InstallerCommandLine commandLine;
+        final String javaHomeName = "java/home/dir";
 
-        args = new String[] { "-j", "java" };
+        args = new String[] { "-j", javaHomeName };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasJavaHomeOption());
-        assertNotNull(commandLine.getJavaHome());
-        assertEquals("java", commandLine.getJavaHome().getName());
+        JavaHomeHandler javaHomeHandler = commandLine.getJavaHomeHandler();
+        assertNotNull(javaHomeHandler);
+        assertTrue(javaHomeHandler.toString().indexOf(javaHomeName) >= 0);
+        assertTrue(javaHomeHandler.isDeviation());
 
-        args = new String[] { "--jre", "java" };
+        args = new String[] { "--jre", javaHomeName };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasJavaHomeOption());
-        assertNotNull(commandLine.getJavaHome());
-        assertEquals("java", commandLine.getJavaHome().getName());
+        javaHomeHandler = commandLine.getJavaHomeHandler();
+        assertNotNull(javaHomeHandler);
+        assertTrue(javaHomeHandler.toString().indexOf(javaHomeName) >= 0);
+        assertTrue(javaHomeHandler.isDeviation());
 
         assertNull(commandLine.getTargetDirectory());
     }
@@ -524,6 +529,7 @@ public class InstallerCommandLineTest extends TestCase {
     public void testExamples() {
         String[] args;
         InstallerCommandLine commandLine;
+        final String javaHomeName = "java/home/dir";
 
         args = new String[] { "-c" };
         commandLine = new InstallerCommandLine();
@@ -538,7 +544,7 @@ public class InstallerCommandLineTest extends TestCase {
         assertNotNull(commandLine.getTargetDirectory());
         assertEquals("dir", commandLine.getTargetDirectory().getName());
 
-        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-j", "java", "-v" };
+        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-j", javaHomeName, "-v" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasSilentOption());
@@ -552,10 +558,12 @@ public class InstallerCommandLineTest extends TestCase {
         assertTrue(commandLine.getInstallationType().installLibraryModules());
         assertFalse(commandLine.getInstallationType().installSources());
         assertTrue(commandLine.hasJavaHomeOption());
-        assertEquals("java", commandLine.getJavaHome().getName());
+        JavaHomeHandler javaHomeHandler = commandLine.getJavaHomeHandler();
+        assertTrue(javaHomeHandler.toString().indexOf(javaHomeName) >= 0);
+        assertTrue(javaHomeHandler.isDeviation());
         assertTrue(commandLine.hasVerboseOption());
 
-        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-e", "doc", "demo", "-i", "src", "-j", "java", "-v" };
+        args = new String[] { "-s", "-d", "dir", "-t", "standard", "-e", "doc", "demo", "-i", "src", "-j", javaHomeName, "-v" };
         commandLine = new InstallerCommandLine();
         assertTrue(commandLine.setArgs(args));
         assertTrue(commandLine.hasSilentOption());
@@ -569,7 +577,9 @@ public class InstallerCommandLineTest extends TestCase {
         assertTrue(commandLine.getInstallationType().installLibraryModules());
         assertTrue(commandLine.getInstallationType().installSources());
         assertTrue(commandLine.hasJavaHomeOption());
-        assertEquals("java", commandLine.getJavaHome().getName());
+        javaHomeHandler = commandLine.getJavaHomeHandler();
+        assertTrue(javaHomeHandler.toString().indexOf(javaHomeName) >= 0);
+        assertTrue(javaHomeHandler.isDeviation());
         assertTrue(commandLine.hasVerboseOption());
     }
 

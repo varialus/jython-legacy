@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.python.util.install.Installation;
 import org.python.util.install.InstallerCommandLine;
+import org.python.util.install.JavaHomeHandler;
 
 public class InstallationDriver {
     private SilentAutotest[] _silentTests;
@@ -186,8 +187,9 @@ public class InstallationDriver {
         test1.addAnswer("3"); // type: minimum
         test1.addAnswer("n"); // include: nothing
         test1.addAnswer(test1.getTargetDir().getAbsolutePath()); // target directory
-        if (test1.hasJavaHomeDeviation()) {
-            test1.addAnswer(test1.getJavaHome().getAbsolutePath()); // different jre
+        JavaHomeHandler javaHomeHandler = test1.getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
+            test1.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
             test1.addAnswer("=="); // current jre
         }
@@ -214,8 +216,9 @@ public class InstallationDriver {
         test2.addAnswer("wrongAnswer"); // wrong answer
         test2.addAnswer("n"); // no further excludes
         test2.addAnswer(test2.getTargetDir().getAbsolutePath()); // target directory
-        if (test2.hasJavaHomeDeviation()) {
-            test2.addAnswer(test2.getJavaHome().getAbsolutePath()); // different jre
+        javaHomeHandler = test2.getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
+            test2.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
             test2.addAnswer("=="); // current jre
         }
@@ -233,8 +236,9 @@ public class InstallationDriver {
         test3.addAnswer("y"); // accept license
         test3.addAnswer("9"); // type: standalone
         test3.addAnswer(test3.getTargetDir().getAbsolutePath()); // target directory
-        if (test3.hasJavaHomeDeviation()) {
-            test3.addAnswer(test3.getJavaHome().getAbsolutePath()); // different jre
+        javaHomeHandler = test3.getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
+            test3.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
             test3.addAnswer("=="); // current jre
         }
@@ -256,8 +260,9 @@ public class InstallationDriver {
         test4.addAnswer("y"); // exclude
         test4.addAnswer("n"); // no further excludes
         test4.addAnswer(test4.getTargetDir().getAbsolutePath()); // target directory
-        if (test4.hasJavaHomeDeviation()) {
-            test4.addAnswer(test4.getJavaHome().getAbsolutePath()); // different jre
+        javaHomeHandler = test4.getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
+            test4.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
             test4.addAnswer("=="); // current jre
         }
@@ -403,13 +408,15 @@ public class InstallationDriver {
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
         guiTest.addKeyAction(KeyEvent.VK_TAB);
-        if (guiTest.hasJavaHomeDeviation()) { // need 2 more tabs
+        JavaHomeHandler javaHomeHandler = guiTest.getJavaHomeHandler();
+        boolean isValidDeviation = javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome(); 
+        if (isValidDeviation) { // need 2 more tabs
             guiTest.addKeyAction(KeyEvent.VK_TAB);
             guiTest.addKeyAction(KeyEvent.VK_TAB);
         }
         guiTest.addKeyAction(KeyEvent.VK_SPACE);
         // overview page
-        if (guiTest.hasJavaHomeDeviation()) {
+        if (isValidDeviation) {
             guiTest.addKeyAction(KeyEvent.VK_SPACE, 3000); // enough time to check the java version
         } else {
             guiTest.addKeyAction(KeyEvent.VK_SPACE);

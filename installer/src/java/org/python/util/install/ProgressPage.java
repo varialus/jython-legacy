@@ -13,6 +13,8 @@ import org.python.util.install.driver.Autotest;
 
 public class ProgressPage extends AbstractWizardPage implements ProgressListener {
 
+    private static final long serialVersionUID = 9013748834030994976L;
+
     private JarInfo _jarInfo;
     private JLabel _label;
     private JProgressBar _progressBar;
@@ -78,8 +80,8 @@ public class ProgressPage extends AbstractWizardPage implements ProgressListener
             jarInstaller.addInstallationListener(_autotest);
         }
         File targetDirectory = new File(FrameInstaller.getTargetDirectory());
-        File javaHome = new File(FrameInstaller.getTargetJavaHome());
-        jarInstaller.inflate(targetDirectory, FrameInstaller.getInstallationType(), javaHome);
+        JavaHomeHandler javaHomeHandler = FrameInstaller.getJavaHomeHandler();
+        jarInstaller.inflate(targetDirectory, FrameInstaller.getInstallationType(), javaHomeHandler);
     }
 
     protected void passivate() {

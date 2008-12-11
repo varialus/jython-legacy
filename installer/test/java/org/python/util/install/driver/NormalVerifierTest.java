@@ -77,7 +77,7 @@ public class NormalVerifierTest extends TestCase {
         assertTrue(contents.indexOf("autotest.py") > 0);
         String targetDirPath = _verifier.getTargetDir().getCanonicalPath();
         String upScriptPath = _verifier.getSimpleCommand()[1];
-        String javaHome = System.getProperty(JavaVersionTester.JAVA_HOME, "");
+        String javaHome = System.getProperty(JavaVersionTester.JAVA_HOME, ""); // change this ++++++
         assertTrue(javaHome.length() > 0);
         // platform specific asserts
         if (Installation.isWindows()) {

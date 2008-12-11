@@ -308,13 +308,14 @@ public class InstallerCommandLine {
     }
 
     /**
-     * @return the requested java home directory, <code>null</code> if no java home specified
+     * @return a java home handler for the requested java home directory, or a default handler if no
+     *         java home specified
      */
-    public File getJavaHome() {
+    public JavaHomeHandler getJavaHomeHandler() {
         if (hasJavaHomeOption()) {
-            return new File(_commandLine.getOptionValue(JRE_SHORT));
+            return new JavaHomeHandler(_commandLine.getOptionValue(JRE_SHORT));
         } else {
-            return null;
+            return new JavaHomeHandler();
         }
     }
 

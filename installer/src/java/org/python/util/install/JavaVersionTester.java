@@ -27,11 +27,15 @@ public class JavaVersionTester {
                     System.exit(1);
                 }
             } else {
-                System.err.println("problems with temp file " + tempFilePath);
+                if (!tempFile.exists()) {
+                    System.err.println("temp file " + tempFilePath + " does not exist");
+                } else {
+                    System.err.println("cannot write to temp file " + tempFilePath);
+                }
                 System.exit(1);
             }
         } else {
-            System.err.println("no temp file given");
+            System.err.println("no temp file given. usage: JavaVersionTester tempfile");
             System.out.println("exiting with 1");
             System.exit(1);
         }
@@ -43,7 +47,7 @@ public class JavaVersionTester {
 
     private static String createFileContent() {
         StringBuffer sb = new StringBuffer(500);
-        String java_home = System.getProperty(JAVA_HOME, UNKNOWN);
+        String java_home = new JavaHomeHandler().getExecutableName();
         if (File.separatorChar != '/') {
             java_home = java_home.replace(File.separatorChar, '/'); // backslash would be interpreted as escape char
         }

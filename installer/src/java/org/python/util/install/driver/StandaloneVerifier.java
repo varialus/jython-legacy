@@ -6,7 +6,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.python.util.install.JavaVersionTester;
+import org.python.util.install.JavaHomeHandler;
 
 public class StandaloneVerifier extends NormalVerifier {
 
@@ -30,22 +30,7 @@ public class StandaloneVerifier extends NormalVerifier {
             throw new DriverException(ioe);
         }
         String command[] = new String[4];
-        command[0] = null;
-        String javaHomeString = System.getProperty(JavaVersionTester.JAVA_HOME, null);
-        if (javaHomeString != null) {
-            File javaHome = new File(javaHomeString);
-            if (javaHome.exists()) {
-                try {
-                    command[0] = javaHome.getCanonicalPath() + File.separator + "bin"
-                            + File.separator + "java";
-                } catch (IOException ioe) {
-                    throw new DriverException(ioe);
-                }
-            }
-        }
-        if (command[0] == null) {
-            command[0] = "java";
-        }
+        command[0] = new JavaHomeHandler().getExecutableName();
         command[1] = "-jar";
         command[2] = parentDirName + JYTHON_JAR;
         command[3] = parentDirName + AUTOTEST_PY;

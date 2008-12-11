@@ -33,8 +33,7 @@ public class StartScriptGeneratorTest extends TestCase {
         _targetDir = new File(_targetDir, "shell");
         assertTrue(_targetDir.exists());
         assertTrue(_targetDir.isDirectory());
-        File javaHome = new File(System.getProperty("java.home"));
-        _generator = new StartScriptGenerator(_targetDir, javaHome);
+        _generator = new StartScriptGenerator(_targetDir, new JavaHomeHandler());
     }
 
     // TODO: test on Solaris
@@ -105,7 +104,7 @@ public class StartScriptGeneratorTest extends TestCase {
         _generator.setFlavour(expectedFlavour);
         assertEquals(expectedFlavour, _generator.getFlavour());
         TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(new File("dummy"),
-                                                                              new File("dummy"),
+                                                                              new JavaHomeHandler("dummy"),
                                                                               false);
         expectedFlavour = StartScriptGenerator.WINDOWS_FLAVOUR;
         testGenerator.setFlavour(expectedFlavour);
@@ -113,7 +112,9 @@ public class StartScriptGeneratorTest extends TestCase {
         expectedFlavour = StartScriptGenerator.UNIX_FLAVOUR;
         testGenerator.setFlavour(expectedFlavour);
         assertEquals(expectedFlavour, testGenerator.getFlavour());
-        testGenerator = new TestStartScriptGenerator(new File("dummy"), new File("dummy"), true);
+        testGenerator = new TestStartScriptGenerator(new File("dummy"),
+                                                     new JavaHomeHandler("dummy"),
+                                                     true);
         testGenerator.setFlavour(StartScriptGenerator.WINDOWS_FLAVOUR);
         assertEquals(StartScriptGenerator.BOTH_FLAVOUR, testGenerator.getFlavour());
     }
@@ -136,10 +137,9 @@ public class StartScriptGeneratorTest extends TestCase {
             if (!jython_bat.exists()) {
                 assertTrue(jython_bat.createNewFile());
             }
-            File javaHome = new File(System.getProperty("java.home"));
             // windows flavour
             TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(dir,
-                                                                                  javaHome,
+                                                                                  new JavaHomeHandler(),
                                                                                   false);
             testGenerator.setFlavour(StartScriptGenerator.WINDOWS_FLAVOUR);
             testGenerator.generateStartScripts();
@@ -181,10 +181,9 @@ public class StartScriptGeneratorTest extends TestCase {
             if (!jython_bat.exists()) {
                 assertTrue(jython_bat.createNewFile());
             }
-            File javaHome = new File(System.getProperty("java.home"));
             // unix flavour
             TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(dir,
-                                                                                  javaHome,
+                                                                                  new JavaHomeHandler(),
                                                                                   false);
             testGenerator.setFlavour(StartScriptGenerator.UNIX_FLAVOUR);
             testGenerator.generateStartScripts();
@@ -226,10 +225,9 @@ public class StartScriptGeneratorTest extends TestCase {
             if (!jython_bat.exists()) {
                 assertTrue(jython_bat.createNewFile());
             }
-            File javaHome = new File(System.getProperty("java.home"));
             // both flavours
             TestStartScriptGenerator testGenerator = new TestStartScriptGenerator(dir,
-                                                                                  javaHome,
+                                                                                  new JavaHomeHandler(),
                                                                                   true);
             // test generator constructor timing problem: do set the flavour once again
             testGenerator.setFlavour(StartScriptGenerator.WINDOWS_FLAVOUR);
@@ -265,8 +263,10 @@ public class StartScriptGeneratorTest extends TestCase {
 
         private boolean _hasBothFlavours;
 
-        public TestStartScriptGenerator(File targetDirectory, File javaHome, boolean hasBothFlavours) {
-            super(targetDirectory, javaHome);
+        public TestStartScriptGenerator(File targetDirectory,
+                                        JavaHomeHandler javaHomeHandler,
+                                        boolean hasBothFlavours) {
+            super(targetDirectory, javaHomeHandler);
             _hasBothFlavours = hasBothFlavours;
         }
 

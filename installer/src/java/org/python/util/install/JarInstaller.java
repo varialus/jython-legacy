@@ -50,7 +50,7 @@ public class JarInstaller {
      * @param targetDirectory
      * @param installationType
      */
-    public void inflate(final File targetDirectory, InstallationType installationType, File javaHome) {
+    public void inflate(final File targetDirectory, InstallationType installationType, JavaHomeHandler javaHomeHandler) {
         try {
             // has to correspond with build.xml
             // has to correspond with build.Lib.include.properties
@@ -144,7 +144,7 @@ public class JarInstaller {
             if (!installationType.isStandalone()) {
                 // generate start scripts
                 _progressListener.progressStartScripts();
-                StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHome);
+                StartScriptGenerator generator = new StartScriptGenerator(targetDirectory, javaHomeHandler);
                 generator.generateStartScripts();
             } else {
                 _progressListener.progressStandalone();

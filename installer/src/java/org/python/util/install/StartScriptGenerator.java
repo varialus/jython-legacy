@@ -31,13 +31,13 @@ public class StartScriptGenerator {
 
     private File _targetDirectory;
 
-    private File _javaHome;
+    private JavaHomeHandler _javaHomeHandler;
 
     private int _flavour;
 
-    public StartScriptGenerator(File targetDirectory, File javaHome) {
+    public StartScriptGenerator(File targetDirectory, JavaHomeHandler javaHomeHandler) {
         _targetDirectory = targetDirectory;
-        _javaHome = javaHome;
+        _javaHomeHandler = javaHomeHandler;
         if (Installation.isWindows()) {
             setFlavour(WINDOWS_FLAVOUR);
         } else {
@@ -115,15 +115,13 @@ public class StartScriptGenerator {
      * 
      * {0} : current date <br>
      * {1} : user.name <br>
-     * {2} : java home directory <br>
-     * {3} : target directory <br>
+     * {2} : target directory <br>
      */
     private String getStartScript(String template) throws IOException {
         String parameters[] = new String[4];
         parameters[0] = new Date().toString();
         parameters[1] = System.getProperty("user.name");
-        parameters[2] = _javaHome.getCanonicalPath();
-        parameters[3] = getTargetDirectory().getCanonicalPath();
+        parameters[2] = getTargetDirectory().getCanonicalPath();
         return MessageFormat.format(template, (Object[])parameters);
     }
 
@@ -136,11 +134,16 @@ public class StartScriptGenerator {
         StringBuilder builder = getWindowsHeaderTemplate();
         builder.append("set ");
         builder.append(JAVA_HOME);
-        builder.append("=\"{2}\"");
+        builder.append("=");
+        if (_javaHomeHandler.isValidHome()) {
+            builder.append("\"");
+            builder.append(_javaHomeHandler.getHome().getAbsolutePath());
+            builder.append("\"");
+        }
         builder.append(WIN_CR_LF);
         builder.append("set ");
         builder.append(JYTHON_HOME_FALLBACK);
-        builder.append("=\"{3}\"");
+        builder.append("=\"{2}\"");
         builder.append(WIN_CR_LF);
         builder.append(WIN_CR_LF);
         return builder.toString();
@@ -171,9 +174,15 @@ public class StartScriptGenerator {
     private String getUnixJythonTemplate() {
         StringBuilder builder = getUnixHeaderTemplate();
         builder.append(JAVA_HOME);
-        builder.append("=\"{2}\"\n");
+        builder.append("=");
+        if (_javaHomeHandler.isValidHome()) {
+            builder.append("\"");
+            builder.append(_javaHomeHandler.getHome().getAbsolutePath());
+            builder.append("\"");
+        }
+        builder.append("\n");
         builder.append(JYTHON_HOME_FALLBACK);
-        builder.append("=\"{3}\"\n");
+        builder.append("=\"{2}\"\n");
         builder.append("\n");
         return builder.toString();
     }

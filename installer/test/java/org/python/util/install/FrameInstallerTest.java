@@ -60,4 +60,14 @@ public class FrameInstallerTest extends TestCase {
         assertFalse(returnedType.installDocumentation());
         assertFalse(returnedType.installSources());
     }
+    
+    public void testSetGetJavaHomeHandler() {
+        assertNotNull(FrameInstaller.getJavaHomeHandler());
+        JavaHomeHandler handler1 = new JavaHomeHandler();
+        JavaHomeHandler handler2 = new JavaHomeHandler("some/dir");
+        FrameInstaller.setJavaHomeHandler(handler1);
+        assertEquals(handler1, FrameInstaller.getJavaHomeHandler());
+        FrameInstaller.setJavaHomeHandler(handler2);
+        assertEquals(handler2, FrameInstaller.getJavaHomeHandler());
+    }
 }
