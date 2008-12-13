@@ -50,6 +50,10 @@ public class Installation {
     protected static boolean isVerbose() {
         return _verbose;
     }
+    
+    protected static void setVerbose(boolean verbose) {
+        _verbose = verbose;
+    }
 
     protected static boolean isAutotesting() {
         return _isAutotesting;
@@ -321,8 +325,9 @@ public class Installation {
      */
     private static void internalMain(String[] args, Autotest autotest, Tunnel tunnel) {
         try {
-            boolean earlyVerbose = InstallerCommandLine.hasVerboseOptionInArgs(args);
-            if (earlyVerbose) {
+            setVerbose(InstallerCommandLine.hasVerboseOptionInArgs(args));
+            boolean verbose = isVerbose();
+            if (verbose) {
                 dumpSystemProperties();
                 ConsoleInstaller.message("reading jar info");
             }
@@ -332,9 +337,8 @@ public class Installation {
                 commandLine.printHelp();
                 System.exit(1);
             } else {
-                _verbose = commandLine.hasVerboseOption();
                 if (commandLine.hasAutotestOption()) {
-                    if (isVerbose()) {
+                    if (verbose) {
                         ConsoleInstaller.message("running autotests");
                     }
                     _isAutotesting = true;
@@ -345,7 +349,7 @@ public class Installation {
                     System.exit(0);
                 }
                 if (!useGui(commandLine)) {
-                    if (isVerbose()) {
+                    if (verbose) {
                         ConsoleInstaller.message("using the console installer");
                     }
                     ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
@@ -355,7 +359,7 @@ public class Installation {
                         System.exit(0);
                     }
                 } else {
-                    if (isVerbose()) {
+                    if (verbose) {
                         ConsoleInstaller.message("using the gui installer");
                     }
                     new FrameInstaller(commandLine, jarInfo, autotest);
