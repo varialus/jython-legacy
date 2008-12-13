@@ -91,9 +91,7 @@ public class Installation {
 
     protected static boolean isValidJava(JavaVersionInfo javaVersionInfo) {
         String specificationVersion = javaVersionInfo.getSpecificationVersion();
-        if (Installation.isVerbose()) {
-            ConsoleInstaller.message("specification version: '" + specificationVersion + "'");
-        }
+        verboseOutput("specification version: '" + specificationVersion + "'");
         // major.minor.micro
         // according to http://java.sun.com/j2se/1.5.0/docs/guide/versioning/spec/versioning2.html
         int major = 0;
@@ -175,10 +173,8 @@ public class Installation {
                     command[2] = System.getProperty("java.class.path"); 
                     command[3] = JavaVersionTester.class.getName();
                     command[4] = tempFile.getAbsolutePath();
-                    if (isVerbose()) {
-                        ConsoleInstaller.message("executing: " + command[0] + " " + command[1]
-                                + " " + command[2] + " " + command[3] + " " + command[4]);
-                    }
+                    verboseOutput("executing: " + command[0] + " " + command[1] + " " + command[2]
+                            + " " + command[3] + " " + command[4]);
                     ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
                     childProcess.setDebug(Installation.isVerbose());
                     int errorCode = childProcess.run();
@@ -278,28 +274,24 @@ public class Installation {
     }
 
     public static boolean isGuiAllowed() {
-        boolean verbose = isVerbose();
-        if (verbose) {
-            ConsoleInstaller.message("checking gui availability");
-        }
+        verboseOutput("checking gui availability");
         if (Boolean.getBoolean(HEADLESS_PROPERTY_NAME)) {
+            verboseOutput(HEADLESS_PROPERTY_NAME + " is true");
             return false;
-        }
-        try {
-            if (verbose) {
-                ConsoleInstaller.message("trying to get the graphics environment");
-            }
-            GraphicsEnvironment.getLocalGraphicsEnvironment();
-            if (verbose) {
-                ConsoleInstaller.message("got the graphics environment!");
-            }
-            return true;
-        } catch (Throwable t) {
-            if (verbose) {
-                ConsoleInstaller.message("got the following exception:");
-                t.printStackTrace();
-            }
+        } else if (GraphicsEnvironment.isHeadless()) {
+            verboseOutput("GraphicsEnvironment is headless");
             return false;
+        } else {
+            try {
+                verboseOutput("trying to get the GraphicsEnvironment");
+                GraphicsEnvironment.getLocalGraphicsEnvironment();
+                verboseOutput("got the GraphicsEnvironment!");
+                return true;
+            } catch (Throwable t) {
+                verboseOutput("got the following exception:");
+                verboseOutput(t);
+                return false;
+            }
         }
     }
 
@@ -326,11 +318,8 @@ public class Installation {
     private static void internalMain(String[] args, Autotest autotest, Tunnel tunnel) {
         try {
             setVerbose(InstallerCommandLine.hasVerboseOptionInArgs(args));
-            boolean verbose = isVerbose();
-            if (verbose) {
-                dumpSystemProperties();
-                ConsoleInstaller.message("reading jar info");
-            }
+            dumpSystemProperties();
+            verboseOutput("reading jar info");
             JarInfo jarInfo = new JarInfo();
             InstallerCommandLine commandLine = new InstallerCommandLine(jarInfo);
             if (!commandLine.setArgs(args) || commandLine.hasHelpOption()) {
@@ -338,9 +327,7 @@ public class Installation {
                 System.exit(1);
             } else {
                 if (commandLine.hasAutotestOption()) {
-                    if (verbose) {
-                        ConsoleInstaller.message("running autotests");
-                    }
+                    verboseOutput("running autotests");
                     _isAutotesting = true;
                     InstallationDriver autotestDriver = new InstallationDriver(commandLine);
                     autotestDriver.drive(); // ! reentrant into internalMain()
@@ -349,9 +336,7 @@ public class Installation {
                     System.exit(0);
                 }
                 if (!useGui(commandLine)) {
-                    if (verbose) {
-                        ConsoleInstaller.message("using the console installer");
-                    }
+                    verboseOutput("using the console installer");
                     ConsoleInstaller consoleInstaller = new ConsoleInstaller(commandLine, jarInfo);
                     consoleInstaller.setTunnel(tunnel);
                     consoleInstaller.install();
@@ -359,9 +344,7 @@ public class Installation {
                         System.exit(0);
                     }
                 } else {
-                    if (verbose) {
-                        ConsoleInstaller.message("using the gui installer");
-                    }
+                    verboseOutput("using the gui installer");
                     new FrameInstaller(commandLine, jarInfo, autotest);
                 }
             }
@@ -375,21 +358,35 @@ public class Installation {
     }
     
     private static void dumpSystemProperties() throws IOException {
-        @SuppressWarnings("unchecked")
-        Enumeration<String> names = (Enumeration<String>)System.getProperties().propertyNames();
-        StringBuilder contents = new StringBuilder(400);
-        contents.append("Properties at the beginning of the Jython installation:\n\n");
-        while (names.hasMoreElements()) {
-            String name = names.nextElement();
-            String value = System.getProperty(name, "");
-            contents.append(name);
-            contents.append('=');
-            contents.append(value);
-            contents.append("\n");
+        if (isVerbose()) {
+            @SuppressWarnings("unchecked")
+            Enumeration<String> names = (Enumeration<String>)System.getProperties().propertyNames();
+            StringBuilder contents = new StringBuilder(400);
+            contents.append("Properties at the beginning of the Jython installation:\n\n");
+            while (names.hasMoreElements()) {
+                String name = names.nextElement();
+                String value = System.getProperty(name, "");
+                contents.append(name);
+                contents.append('=');
+                contents.append(value);
+                contents.append("\n");
+            }
+            File output = File.createTempFile("System", ".properties");
+            FileHelper.write(output, contents.toString());
+            ConsoleInstaller.message("system properties dumped to " + output.getAbsolutePath());
         }
-        File output = File.createTempFile("System", ".properties");
-        FileHelper.write(output, contents.toString());
-        ConsoleInstaller.message("system properties dumped to " + output.getAbsolutePath());
+    }
+    
+    private static void verboseOutput(String message) {
+        if (isVerbose()) {
+            ConsoleInstaller.message(message);
+        }
+    }
+    
+    private static void verboseOutput(Throwable t) {
+        if (isVerbose()) {
+            t.printStackTrace();
+        }
     }
 
 }
