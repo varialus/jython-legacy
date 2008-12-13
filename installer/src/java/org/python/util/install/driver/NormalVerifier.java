@@ -214,7 +214,7 @@ public class NormalVerifier implements Verifier {
         StringTokenizer tokenizer = new StringTokenizer(error, "\n");
         while (tokenizer.hasMoreTokens()) {
             String line = tokenizer.nextToken();
-            if (line.startsWith("*sys-package-mgr*")) {
+            if (isExpectedError(line)) {
                 feedback(line);
             } else {
                 throw new DriverException(error);
@@ -222,25 +222,44 @@ public class NormalVerifier implements Verifier {
         }
     }
 
+    private boolean isExpectedError(String line) {
+        boolean expected = false;
+        if (line.startsWith("*sys-package-mgr*")) {
+            expected = true;
+        } else if (line.indexOf("32 bit") >= 0 && line.indexOf("64 bit") >= 0) {
+            // OS X incompatibility message when using -A -j java1.6.0 from java1.5.0
+            expected = true;
+        }
+        return expected;
+    }
+
     private void verifyOutput(String output) throws DriverException {
         boolean started = false;
         StringTokenizer tokenizer = new StringTokenizer(output, "\n");
         while (tokenizer.hasMoreTokens()) {
             String line = tokenizer.nextToken();
-            if (line.startsWith("[ChildProcess]") || line.startsWith(VERIFYING)) {
+            if (isExpectedOutput(line)) {
                 feedback(line);
-            } else {
                 if (line.startsWith(JYTHON_UP)) {
                     started = true;
-                    feedback(line);
-                } else {
-                    throw new DriverException(output);
                 }
+            } else {
+                throw new DriverException(output);
             }
         }
         if (!started) {
             throw new DriverException("start of jython failed:\n" + output);
         }
+    }
+
+    private boolean isExpectedOutput(String line) {
+        boolean expected = false;
+        if (line.startsWith("[ChildProcess]") || line.startsWith(VERIFYING)) {
+            expected = true;
+        } else if (line.startsWith(JYTHON_UP)) {
+            expected = true;
+        }
+        return expected;
     }
 
     private String getTestScript() {
