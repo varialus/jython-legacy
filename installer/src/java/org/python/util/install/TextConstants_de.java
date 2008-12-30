@@ -94,7 +94,7 @@ public class TextConstants_de extends ListResourceBundle implements TextKeys, Un
         { C_CONGRATULATIONS, "Gratulation!" }, // congratulations
         { C_CREATE_DIRECTORY, "Das Verzeichnis {0} gibt es nicht - soll es erstellt werden ?" }, // console
         { C_ENTER_TARGET_DIRECTORY, "Bitte geben Sie das Zielverzeichnis ein" }, // console
-        { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte Java Home Verzeichnis ein ({0} fuer das aktuelle)" }, // console
+        { C_ENTER_JAVA_HOME, "Bitte geben Sie das gewuenschte Java Home Verzeichnis ein (Enter fuer das aktuelle)" }, // console
         { C_ENGLISH, "Englisch" }, // language
         { C_EXCLUDE, "Moechten Sie Teile von der Installation ausschliessen ?" }, // installation type
         { C_GENERATING_START_SCRIPTS, "Start Scripts werden generiert ..." }, // progress

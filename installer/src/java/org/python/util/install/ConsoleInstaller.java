@@ -15,6 +15,8 @@ import org.python.util.install.driver.Tunnel;
 
 public class ConsoleInstaller implements ProgressListener, TextKeys {
 
+    public static final String CURRENT_JRE = "=";
+
     private static final String _CANCEL = "c";
 
     private static final String _PROMPT = ">>>";
@@ -23,7 +25,6 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
 
     private static final String _END_ANSWERS = "]";
 
-    private static final String _CURRENT = "==";
 
     private InstallerCommandLine _commandLine;
 
@@ -80,25 +81,33 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     }
 
     private String question(String question) {
-        return question(question, null, false);
+        return question(question, null, false, null);
     }
 
     private String question(String question, boolean answerRequired) {
-        return question(question, null, answerRequired);
+        return question(question, null, answerRequired, null);
     }
 
-    private String question(String question, List<String> answers) {
-        return question(question, answers, true);
+    private String question(String question, List<String> answers, String defaultAnswer) {
+        return question(question, answers, true, defaultAnswer);
     }
 
     /**
      * question and answer
      * 
+     * @param question
      * @param answers
      *            Possible answers (may be null)
+     * @param answerRequired
+     * @param defaultAnswer
+     *            (may be null)
+     * 
      * @return (chosen) answer
      */
-    private String question(String question, List<String> answers, boolean answerRequired) {
+    private String question(String question,
+                            List<String> answers,
+                            boolean answerRequired,
+                            String defaultAnswer) {
         try {
             if (answers != null && answers.size() > 0) {
                 question = question + " " + _BEGIN_ANSWERS;
@@ -106,7 +115,16 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 while (answersAsIterator.hasNext()) {
                     if (!question.endsWith(_BEGIN_ANSWERS))
                         question = question + "/";
-                    question = question + answersAsIterator.next();
+                    String possibleAnswer = answersAsIterator.next();
+                    if (possibleAnswer.equalsIgnoreCase(defaultAnswer)) {
+                        if (Character.isDigit(possibleAnswer.charAt(0))) {
+                            question = question.concat(" ").concat(possibleAnswer).concat(" ");
+                        } else {
+                            question = question + possibleAnswer.toUpperCase();
+                        }
+                    } else {
+                        question = question + possibleAnswer;
+                    }
                 }
                 question = question + _END_ANSWERS;
             }
@@ -117,21 +135,26 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 // output to normal System.out
                 System.out.print(question); // intended print, not println (!)
                 answer = readLine();
-                if (answers != null && answers.size() > 0) {
-                    Iterator<String> answersAsIterator = answers.iterator();
-                    while (answersAsIterator.hasNext()) {
-                        if (answer.equalsIgnoreCase(answersAsIterator.next())) {
-                            match = true;
-                        }
+                if ("".equals(answer) && answerRequired) {
+                    // check default answer
+                    if (defaultAnswer != null) {
+                        match = true;
+                        answer = defaultAnswer;
                     }
                 } else {
-                    match = true;
-                    if (answerRequired && "".equals(answer)) {
-                        match = false;
+                    if (answers != null && answers.size() > 0) {
+                        Iterator<String> answersAsIterator = answers.iterator();
+                        while (answersAsIterator.hasNext()) {
+                            if (answer.equalsIgnoreCase(answersAsIterator.next())) {
+                                match = true;
+                            }
+                        }
+                    } else {
+                        match = true;
                     }
-                }
-                if (!match && !_CANCEL.equalsIgnoreCase(answer)) {
-                    message(getText(C_INVALID_ANSWER, answer));
+                    if (!match && !_CANCEL.equalsIgnoreCase(answer)) {
+                        message(getText(C_INVALID_ANSWER, answer));
+                    }
                 }
             }
             if (_CANCEL.equalsIgnoreCase(answer)) {
@@ -172,15 +195,20 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         availableLanguages.add(getText(C_GERMAN)); // 1 == German
         List<String> answers = new ArrayList<String>(availableLanguages.size());
         String languages = "";
+        String defaultAnswer = null;
         for (Iterator<String> iterator = availableLanguages.iterator(); iterator.hasNext();) {
             String language = iterator.next();
+            String possibleAnswer = language.substring(0, 1);
+            if (defaultAnswer == null) {
+                defaultAnswer = possibleAnswer;
+            }
             languages = languages + language + ", ";
-            answers.add(language.substring(0, 1).toLowerCase());
+            answers.add(possibleAnswer.toLowerCase());
         }
         languages = languages.substring(0, languages.length() - 2);
         message(getText(C_AVAILABLE_LANGUAGES, languages));
-        String answer = question(getText(C_SELECT_LANGUAGE), answers);
-        if (answer.equalsIgnoreCase((String)answers.get(1))) {
+        String answer = question(getText(C_SELECT_LANGUAGE), answers, defaultAnswer);
+        if (answer.equalsIgnoreCase(answers.get(1))) {
             Installation.setLanguage(Locale.GERMAN);
         } else {
             Installation.setLanguage(Locale.ENGLISH);
@@ -196,7 +224,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         message("  " + Installation.STANDARD + ". " + getText(C_STANDARD));
         message("  " + Installation.MINIMUM + ". " + getText(C_MINIMUM));
         message("  " + Installation.STANDALONE + ". " + getText(C_STANDALONE));
-        String answer = question(getText(C_SELECT_INSTALL_TYPE), getTypeAnswers());
+        String answer = question(getText(C_SELECT_INSTALL_TYPE), getTypeAnswers(), Installation.ALL);
         if (Installation.ALL.equals(answer)) {
             installationType.setAll();
         } else if (Installation.STANDARD.equals(answer)) {
@@ -209,10 +237,10 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         if (!installationType.isStandalone()) {
             // include parts ?
             if (!installationType.isAll()) {
-                answer = question(getText(C_INCLUDE), getYNAnswers());
+                answer = question(getText(C_INCLUDE), getYNAnswers(), no);
                 if (yes.equals(answer)) {
                     do {
-                        answer = question(getText(C_INEXCLUDE_PARTS, no), getInExcludeAnswers());
+                        answer = question(getText(C_INEXCLUDE_PARTS, no), getInExcludeAnswers(), no);
                         if (InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES.equals(answer)) {
                             installationType.addLibraryModules();
                         } else if (InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES.equals(answer)) {
@@ -230,10 +258,10 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
             }
             // exclude parts ?
             if (!installationType.isMinimum()) {
-                answer = question(getText(C_EXCLUDE), getYNAnswers());
+                answer = question(getText(C_EXCLUDE), getYNAnswers(), no);
                 if (yes.equals(answer)) {
                     do {
-                        answer = question(getText(C_INEXCLUDE_PARTS, no), getInExcludeAnswers());
+                        answer = question(getText(C_INEXCLUDE_PARTS, no), getInExcludeAnswers(), no);
                         if (InstallerCommandLine.INEXCLUDE_LIBRARY_MODULES.equals(answer)) {
                             installationType.removeLibraryModules();
                         } else if (InstallerCommandLine.INEXCLUDE_DEMOS_AND_EXAMPLES.equals(answer)) {
@@ -259,9 +287,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         message(getText(C_JAVA_VERSION,
                         javaInfo.getJavaVersionInfo().getVendor(),
                         javaInfo.getJavaVersionInfo().getVersion()));
-        if (Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
-            question(getText(C_PROCEED));
-        } else {
+        if (!Installation.isValidJava(javaInfo.getJavaVersionInfo())) {
             message(getText(C_UNSUPPORTED_JAVA));
             question(getText(C_PROCEED_ANYWAY));
         }
@@ -269,9 +295,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         String osName = System.getProperty(Installation.OS_NAME);
         String osVersion = System.getProperty(Installation.OS_VERSION);
         message(getText(C_OS_VERSION, osName, osVersion));
-        if (Installation.isValidOs()) {
-            question(getText(C_PROCEED));
-        } else {
+        if (!Installation.isValidOs()) {
             message(getText(C_UNSUPPORTED_OS));
             question(getText(C_PROCEED_ANYWAY));
         }
@@ -309,7 +333,9 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     }
 
     private void acceptLicense() {
-        String read = question(getText(C_READ_LICENSE), getYNAnswers());
+        String no = getText(C_NO);
+        String yes = getText(C_YES);
+        String read = question(getText(C_READ_LICENSE), getYNAnswers(), no);
         if (read.equalsIgnoreCase(getText(C_YES))) {
             String licenseText = "n/a";
             try {
@@ -319,13 +345,15 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 throw new InstallerException(ioe);
             }
         }
-        String accept = question(getText(C_ACCEPT), getYNAnswers());
+        String accept = question(getText(C_ACCEPT), getYNAnswers(), yes);
         if (!accept.equalsIgnoreCase(getText(C_YES))) {
             throw new InstallationCancelledException();
         }
     }
 
     private File determineTargetDirectory() {
+        String no = getText(C_NO);
+        String yes = getText(C_YES);
         File targetDirectory = null;
         try {
             do {
@@ -337,11 +365,13 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                         if (targetDirectory.list().length > 0) {
                             String overwrite = question(getText(C_OVERWRITE_DIRECTORY,
                                                                 targetDirectory.getCanonicalPath()),
-                                                        getYNAnswers());
+                                                        getYNAnswers(),
+                                                        no);
                             if (overwrite.equalsIgnoreCase(getText(C_YES))) {
                                 String clear = question(getText(C_CLEAR_DIRECTORY,
                                                                 targetDirectory.getCanonicalPath()),
-                                                        getYNAnswers());
+                                                        getYNAnswers(),
+                                                        yes);
                                 if (clear.equalsIgnoreCase(getText(C_YES))) {
                                     clearDirectory(targetDirectory);
                                 }
@@ -351,7 +381,8 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 } else {
                     String create = question(getText(C_CREATE_DIRECTORY,
                                                      targetDirectory.getCanonicalPath()),
-                                             getYNAnswers());
+                                             getYNAnswers(),
+                                             yes);
                     if (create.equalsIgnoreCase(getText(C_YES))) {
                         if (!targetDirectory.mkdirs()) {
                             throw new InstallerException(getText(C_UNABLE_CREATE_DIRECTORY,
@@ -371,9 +402,9 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
         JavaHomeHandler javaHomeHandler = null;
         boolean javaFound = false;
         while (!javaFound) {
-            String javaHomeName = question(getText(C_ENTER_JAVA_HOME, _CURRENT), true);
+            String javaHomeName = question(getText(C_ENTER_JAVA_HOME), null, true, CURRENT_JRE);
             // only validate deviations
-            if (_CURRENT.equals(javaHomeName)) {
+            if (CURRENT_JRE.equals(javaHomeName)) {
                 javaHomeHandler = new JavaHomeHandler();
                 javaFound = true;
             } else {
@@ -419,7 +450,8 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
     }
 
     private void showReadme(final File targetDirectory) {
-        String read = question(getText(C_READ_README), getYNAnswers());
+        String no = getText(C_NO);
+        String read = question(getText(C_READ_README), getYNAnswers(), no);
         if (read.equalsIgnoreCase(getText(C_YES))) {
             try {
                 message(_jarInfo.getReadmeText());
@@ -465,7 +497,7 @@ public class ConsoleInstaller implements ProgressListener, TextKeys {
                 }
             }
             String proceed = question(getText(C_CONFIRM_TARGET, targetDirectory.getCanonicalPath()),
-                                      getYNAnswers());
+                                      getYNAnswers(), getText(C_YES));
             if (!proceed.equalsIgnoreCase(getText(C_YES))) {
                 throw new InstallationCancelledException();
             }

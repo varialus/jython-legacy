@@ -93,7 +93,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_CONGRATULATIONS, "Congratulations!" }, // congratulations
         { C_CREATE_DIRECTORY, "Unable to find directory {0}, create it ?" }, // console
         { C_ENTER_TARGET_DIRECTORY, "Please enter the target directory" }, // console
-        { C_ENTER_JAVA_HOME, "Please enter the target java home directory ({0} for current)" }, // console
+        { C_ENTER_JAVA_HOME, "Please enter the java home directory (empty for using the current java runtime)" }, // console
         { C_ENGLISH, "English" }, // language
         { C_EXCLUDE, "Do you want to exclude parts from the installation ?" }, // installation type
         { C_GENERATING_START_SCRIPTS, "Generating start scripts ..." }, // progress
@@ -111,7 +111,7 @@ public class TextConstants extends ListResourceBundle implements TextKeys {
         { C_NON_EMPTY_TARGET_DIRECTORY, "Target directory {0} is not empty" }, // error
         { C_NOT_A_DIRECTORY, "{0} is not a directory. " }, // error
         { C_NOT_FOUND, "{0} not found. " }, // error
-        { C_OS_VERSION, "Your operation system version is: {0} / {1}" }, // version
+        { C_OS_VERSION, "Your operating system version is: {0} / {1}" }, // version
         { C_OVERWRITE_DIRECTORY, "Directory {0} is not empty - ok to overwrite contents ?" }, // console
         { C_PACKING_STANDALONE_JAR, "Packing standalone " + JarInstaller.JYTHON_JAR + " ..." }, // progress
         { C_PROCEED, "Please press Enter to proceed" }, // console

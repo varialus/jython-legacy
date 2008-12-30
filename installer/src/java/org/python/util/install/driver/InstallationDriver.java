@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.python.util.install.ConsoleInstaller;
 import org.python.util.install.Installation;
 import org.python.util.install.InstallerCommandLine;
 import org.python.util.install.JavaHomeHandler;
@@ -191,10 +192,8 @@ public class InstallationDriver {
         if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
             test1.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
-            test1.addAnswer("=="); // current jre
+            test1.addAnswer(ConsoleInstaller.CURRENT_JRE);
         }
-        test1.addAnswer(""); // simple enter for java version
-        test1.addAnswer(""); // simple enter for os version
         test1.addAnswer("y"); // confirm copying
         test1.addAnswer("n"); // no readme
         test1.setVerifier(new NormalVerifier());
@@ -220,10 +219,8 @@ public class InstallationDriver {
         if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
             test2.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
-            test2.addAnswer("=="); // current jre
+            test2.addAnswer(ConsoleInstaller.CURRENT_JRE);
         }
-        test2.addAnswer(""); // simple enter for java version
-        test2.addAnswer(""); // simple enter for os version
         test2.addAnswer("y"); // confirm copying
         test2.addAnswer("n"); // no readme
         test2.setVerifier(new NormalVerifier());
@@ -240,10 +237,8 @@ public class InstallationDriver {
         if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
             test3.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
-            test3.addAnswer("=="); // current jre
+            test3.addAnswer(ConsoleInstaller.CURRENT_JRE);
         }
-        test3.addAnswer(""); // simple enter for java version
-        test3.addAnswer(""); // simple enter for os version
         test3.addAnswer("y"); // confirm copying
         test3.addAnswer("n"); // no readme
         test3.setVerifier(new StandaloneVerifier());
@@ -264,10 +259,8 @@ public class InstallationDriver {
         if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
             test4.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
         } else {
-            test4.addAnswer("=="); // current jre
+            test4.addAnswer(ConsoleInstaller.CURRENT_JRE);
         }
-        test4.addAnswer(""); // simple enter for java version
-        test4.addAnswer(""); // simple enter for os version
         test4.addAnswer("y"); // confirm copying
         test4.addAnswer("n"); // no readme
         test4.setVerifier(new NormalVerifier());
