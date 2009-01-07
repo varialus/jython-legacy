@@ -30,7 +30,7 @@ public abstract class Autotest implements InstallationListener {
      */
     protected Autotest(InstallerCommandLine commandLine) throws IOException, DriverException {
         _count++;
-        setName();
+        buildName();
         if (_rootDirectory == null) {
             createRootDirectory();
         }
@@ -161,17 +161,24 @@ public abstract class Autotest implements InstallationListener {
     // private stuff
     //
 
-    private void setName() {
-        String countAsString = "";
+    /**
+     * build a test name containing some special characters (which will be used to create the target
+     * directory), and store it into <code>_name</code>.
+     */
+    private void buildName() {
+        StringBuilder b = new StringBuilder(24);
         if (_count <= 99) {
-            countAsString += "0";
+            b.append('0');
         }
         if (_count <= 9) {
-            countAsString += "0";
+            b.append('0');
         }
-        countAsString += _count;
-        // explicitly use a blank in the directory name, to nail down some platform specific problems
-        _name = countAsString + " " + getNameSuffix() + "_";
+        b.append(_count);
+        // explicitly use a blank, to nail down some platform specific problems
+        b.append(' ');
+        b.append(getNameSuffix());
+        b.append('_');
+        _name = b.toString();
     }
 
     /**
