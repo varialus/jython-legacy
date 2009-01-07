@@ -112,7 +112,7 @@ public class JarInfo {
         // we expect an URL like:
         // jar:file:/C:/stuff/jython21i.jar!/org/python/util/install/JarInfo.class
         String urlString = URLDecoder.decode(url.toString(), "UTF-8");
-        int jarSeparatorIndex = urlString.indexOf(JAR_SEPARATOR);
+        int jarSeparatorIndex = urlString.lastIndexOf(JAR_SEPARATOR);
         if (!urlString.startsWith(JAR_URL_PREFIX) || jarSeparatorIndex <= 0) {
             throw new InstallerException(Installation.getText(TextKeys.UNEXPECTED_URL, urlString));
         }
