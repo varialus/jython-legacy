@@ -18,7 +18,7 @@ import java.util.zip.ZipInputStream;
  */
 public class JarInstaller {
 
-    public static final String JYTHON_JAR = "jython-complete.jar";
+    public static final String JYTHON_JAR = "jython.jar";
 
     private static final String PATH_SEPARATOR = "/";
 

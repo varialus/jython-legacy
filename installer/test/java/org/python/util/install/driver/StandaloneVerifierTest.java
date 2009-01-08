@@ -3,6 +3,7 @@ package org.python.util.install.driver;
 import java.io.File;
 
 import org.python.util.install.Installation;
+import org.python.util.install.JarInstaller;
 
 import junit.framework.TestCase;
 
@@ -58,7 +59,7 @@ public class StandaloneVerifierTest extends TestCase {
         assertEquals(4, command.length);
         assertEquals(expectedCommand, command[0]);
         assertEquals("-jar", command[1]);
-        assertEquals(prefix.concat("jython-complete.jar"), command[2]);
+        assertEquals(prefix.concat(JarInstaller.JYTHON_JAR), command[2]);
         assertEquals(expectedArgument, command[3]);
     }
 
