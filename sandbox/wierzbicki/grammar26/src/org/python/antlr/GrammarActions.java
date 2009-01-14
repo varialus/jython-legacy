@@ -350,6 +350,12 @@ public class GrammarActions {
         if (s.startsWith("0x") || s.startsWith("0X")) {
             radix = 16;
             s = s.substring(2, s.length());
+        } else if (s.startsWith("0o") || s.startsWith("0O")) {
+            radix = 8;
+            s = s.substring(2, s.length());
+        } else if (s.startsWith("0b") || s.startsWith("0B")) {
+            radix = 2;
+            s = s.substring(2, s.length());
         } else if (s.startsWith("0")) {
             radix = 8;
         }
@@ -414,6 +420,10 @@ public class GrammarActions {
         int start = 0;
         int end;
         boolean ustring = false;
+
+        if (quoteChar == 'b' || quoteChar == 'B') {
+            start++;
+        }
 
         if (quoteChar == 'u' || quoteChar == 'U') {
             ustring = true;

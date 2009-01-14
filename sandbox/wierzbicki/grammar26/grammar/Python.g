@@ -942,9 +942,9 @@ with_var returns [expr etype]
       }
     ;
 
-//except_clause: 'except' [test [',' test]]
+//except_clause: 'except' [test [('as' | ',') test]]
 except_clause
-    : EXCEPT (t1=test[expr_contextType.Load] (COMMA t2=test[expr_contextType.Store])?)? COLON suite[!$suite.isEmpty() && $suite::continueIllegal]
+    : EXCEPT (t1=test[expr_contextType.Load] ((COMMA | AS) t2=test[expr_contextType.Store])?)? COLON suite[!$suite.isEmpty() && $suite::continueIllegal]
    -> ^(EXCEPT<ExceptHandler>[$EXCEPT, actions.castExpr($t1.tree), actions.castExpr($t2.tree),
           actions.castStmts($suite.stypes)])
     ;
@@ -1487,7 +1487,7 @@ arglist returns [List args, List keywords, expr starargs, expr kwargs]
 }
     : argument[arguments, kws, gens, true] (COMMA argument[arguments, kws, gens, false])*
           (COMMA
-              ( STAR s=test[expr_contextType.Load] (COMMA DOUBLESTAR k=test[expr_contextType.Load])?
+              ( STAR s=test[expr_contextType.Load] (COMMA argument[arguments, kws, gens, false])* (COMMA DOUBLESTAR k=test[expr_contextType.Load])?
               | DOUBLESTAR k=test[expr_contextType.Load]
               )?
           )?
@@ -1741,8 +1741,12 @@ Exponent
 INT :   // Hex
         '0' ('x' | 'X') ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
     |   // Octal
-        '0'  ( '0' .. '7' )*
-    |   '1'..'9' DIGITS*
+        '0' ('o' | 'O') ( '0' .. '7' )*
+    |   '0'  ( '0' .. '7' )*
+    |   // Binary
+        '0' ('b' | 'B') ( '0' .. '1' )*
+    |   // Decimal
+        '1'..'9' DIGITS*
     ;
 
 COMPLEX
@@ -1761,7 +1765,7 @@ NAME:    ( 'a' .. 'z' | 'A' .. 'Z' | '_')
  *  should make us exit loop not continue.
  */
 STRING
-    :   ('r'|'u'|'ur'|'R'|'U'|'UR'|'uR'|'Ur')?
+    :   ('r'|'u'|'b'|'ur'|'R'|'U'|'B'|'UR'|'uR'|'Ur')?
         (   '\'\'\'' (options {greedy=false;}:TRIAPOS)* '\'\'\''
         |   '"""' (options {greedy=false;}:TRIQUOTE)* '"""'
         |   '"' (ESC|~('\\'|'\n'|'"'))* '"'
@@ -1775,7 +1779,7 @@ STRING
     ;
 
 STRINGPART
-    : {partial}?=> ('r'|'u'|'ur'|'R'|'U'|'UR'|'uR'|'Ur')?
+    : {partial}?=> ('r'|'u'|'b'|'ur'|'R'|'U'|'B'|'UR'|'uR'|'Ur')?
         (   '\'\'\'' ~('\'\'\'')*
         |   '"""' ~('"""')*
         )
