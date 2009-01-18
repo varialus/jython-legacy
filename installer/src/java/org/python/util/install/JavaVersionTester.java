@@ -9,7 +9,7 @@ public class JavaVersionTester {
 
     public static final String JAVA_HOME = "java.home";
     protected static final String JAVA_VERSION = "java.version";
-    protected static final String JAVA_SPECIFICATION_VERSION = "java.specification.version";
+    public static final String JAVA_SPECIFICATION_VERSION = "java.specification.version";
     protected static final String JAVA_VENDOR = "java.vendor";
     private static final String NEWLINE = "\n";
 

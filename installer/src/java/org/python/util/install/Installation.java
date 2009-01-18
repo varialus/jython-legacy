@@ -17,6 +17,9 @@ import org.python.util.install.driver.InstallationDriver;
 import org.python.util.install.driver.Tunnel;
 
 public class Installation {
+    public final static int NORMAL_RETURN = 0;
+    public final static int ERROR_RETURN = 1;
+    
     protected static final String ALL = "1";
     protected static final String STANDARD = "2";
     protected static final String MINIMUM = "3";
@@ -28,9 +31,6 @@ public class Installation {
     protected static final String EMPTY = "";
 
     protected static final String HEADLESS_PROPERTY_NAME = "java.awt.headless";
-
-    protected final static int NORMAL_RETURN = 0;
-    protected final static int ERROR_RETURN = 1;
 
     private static final String RESOURCE_CLASS = "org.python.util.install.TextConstants";
 
@@ -92,24 +92,31 @@ public class Installation {
     protected static boolean isValidJava(JavaVersionInfo javaVersionInfo) {
         String specificationVersion = javaVersionInfo.getSpecificationVersion();
         verboseOutput("specification version: '" + specificationVersion + "'");
-        // major.minor.micro
-        // according to http://java.sun.com/j2se/1.5.0/docs/guide/versioning/spec/versioning2.html
-        int major = 0;
-        int minor = 0;
-        StringTokenizer tokenizer = new StringTokenizer(specificationVersion, ".");
-        if (tokenizer.hasMoreTokens()) {
-            major = Integer.valueOf(tokenizer.nextToken()).intValue();
-        }
-        if (tokenizer.hasMoreTokens()) {
-            minor = Integer.valueOf(tokenizer.nextToken()).intValue();
-        }
         boolean valid = true;
-        if (major == 1) {
-            if (minor < 5) {
-                valid = false;
-            }
+        if (getJavaSpecificationVersion(specificationVersion) < 15) {
+            valid = false;
         }
         return valid;
+    }
+
+    /**
+     * @return specification version as an int, e.g. 15 or 16 (the micro part is ignored)
+     * @param specificationVersion
+     *            as system property
+     */
+    public static int getJavaSpecificationVersion(String specificationVersion) {
+        // major.minor.micro
+        // according to http://java.sun.com/j2se/1.5.0/docs/guide/versioning/spec/versioning2.html
+        String major = "1";
+        String minor = "0";
+        StringTokenizer tokenizer = new StringTokenizer(specificationVersion, ".");
+        if (tokenizer.hasMoreTokens()) {
+            major = tokenizer.nextToken();
+        }
+        if (tokenizer.hasMoreTokens()) {
+            minor = tokenizer.nextToken();
+        }
+        return Integer.valueOf(major.concat(minor)).intValue();
     }
 
     public static boolean isWindows() {
@@ -201,6 +208,46 @@ public class Installation {
 
         return versionInfo;
     }
+    
+    /**
+     * @return The system default java version
+     */
+    public static JavaVersionInfo getDefaultJavaVersion() {
+        JavaVersionInfo versionInfo = new JavaVersionInfo();
+        String executableName = "java";
+        try {
+            // launch the java command - temporary file will be written by the child process
+            File tempFile = File.createTempFile("jython_installation", ".properties");
+            if (tempFile.exists() && tempFile.canWrite()) {
+                String command[] = new String[5];
+                command[0] = executableName;
+                command[1] = "-cp";
+                // our own class path should be ok here
+                command[2] = System.getProperty("java.class.path");
+                command[3] = JavaVersionTester.class.getName();
+                command[4] = tempFile.getAbsolutePath();
+                ChildProcess childProcess = new ChildProcess(command, 10000); // 10 seconds
+                childProcess.setDebug(false);
+                int errorCode = childProcess.run();
+                if (errorCode != NORMAL_RETURN) {
+                    versionInfo.setErrorCode(errorCode);
+                    versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, executableName));
+                } else {
+                    Properties tempProperties = new Properties();
+                    tempProperties.load(new FileInputStream(tempFile));
+                    fillJavaVersionInfo(versionInfo, tempProperties);
+                }
+            } else {
+                versionInfo.setErrorCode(ERROR_RETURN);
+                versionInfo.setReason(getText(TextKeys.C_UNABLE_CREATE_TMPFILE,
+                                              tempFile.getAbsolutePath()));
+            }
+        } catch (IOException e) {
+            versionInfo.setErrorCode(ERROR_RETURN);
+            versionInfo.setReason(getText(TextKeys.C_NO_VALID_JAVA, executableName));
+        }
+        return versionInfo;
+    }
 
     protected static void fillJavaVersionInfo(JavaVersionInfo versionInfo, Properties properties) {
         versionInfo.setVersion(properties.getProperty(JavaVersionTester.JAVA_VERSION));
@@ -208,7 +255,7 @@ public class Installation {
         versionInfo.setVendor(properties.getProperty(JavaVersionTester.JAVA_VENDOR));
     }
 
-    protected static class JavaVersionInfo {
+    public static class JavaVersionInfo {
         private String _version;
         private String _specificationVersion;
         private String _vendor;
@@ -246,7 +293,7 @@ public class Installation {
             return _version;
         }
 
-        protected String getSpecificationVersion() {
+        public String getSpecificationVersion() {
             return _specificationVersion;
         }
 
@@ -254,7 +301,7 @@ public class Installation {
             return _vendor;
         }
 
-        protected int getErrorCode() {
+        public int getErrorCode() {
             return _errorCode;
         }
 

@@ -73,6 +73,15 @@ public class InstallationTest extends TestCase {
         assertTrue(Installation.isValidJava(javaVersionInfo));
     }
 
+    public void testGetJavaSpecificationVersion() {
+        String specificationVersion = "1.4.2";
+        assertEquals(14, Installation.getJavaSpecificationVersion(specificationVersion));
+        specificationVersion = "1.5.0";
+        assertEquals(15, Installation.getJavaSpecificationVersion(specificationVersion));
+        specificationVersion = "1.6.0";
+        assertEquals(16, Installation.getJavaSpecificationVersion(specificationVersion));
+    }
+
     public void testIsGNUJava() {
         assertFalse(Installation.isGNUJava());
         String originalVmName = System.getProperty(Installation.JAVA_VM_NAME);
@@ -84,6 +93,15 @@ public class InstallationTest extends TestCase {
             System.setProperty(Installation.JAVA_VM_NAME, originalVmName);
             assertFalse(Installation.isGNUJava());
         }
+    }
+    
+    public void testGetDefaultJavaVersion() {
+        JavaVersionInfo info = Installation.getDefaultJavaVersion();
+        assertNotNull(info);
+        assertEquals(Installation.NORMAL_RETURN, info.getErrorCode());
+        String specVersion = info.getSpecificationVersion();
+        assertNotNull(specVersion);
+        assertTrue(specVersion.length() >= 3);
     }
 
 }
