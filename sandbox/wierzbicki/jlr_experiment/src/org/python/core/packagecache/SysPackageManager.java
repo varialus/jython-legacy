@@ -3,23 +3,6 @@
 
 package org.python.core.packagecache;
 
-import org.python.core.imp;
-import org.python.core.Py;
-import org.python.core.PyJavaPackage;
-import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.core.PyStringMap;
-import org.python.core.PySystemState;
-import org.python.core.util.RelativeFile;
-
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.io.*;
-
-import org.python.core.Options;
-import org.python.util.Generic;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -28,6 +11,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
@@ -37,20 +21,38 @@ import java.security.AccessControlException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.python.core.Options;
+import org.python.core.Py;
+import org.python.core.PyJavaPackage;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.core.PyStringMap;
+import org.python.core.PySystemState;
+import org.python.core.imp;
+import org.python.core.util.RelativeFile;
+import org.python.util.Generic;
 
 /**
  * System package manager. Used by org.python.core.PySystemState.
  */
 public class SysPackageManager implements PackageManager {
 
-    /* from PathPackageManager constructor */
-    public PyList searchPath;
-
     /* from old PackageManager */
-    public PyJavaPackage topLevelPackage;
+    private PyList searchPath;
+    private PyJavaPackage topLevelPackage;
+
+    private boolean indexModified;
+
+    private Map<String,JarXEntry> jarfiles;
+
+    // for default cache (local fs based) impl
+    private File cachedir;
 
     protected void message(String msg) {
         Py.writeMessage("*sys-package-mgr*", msg);
@@ -179,7 +181,7 @@ public class SysPackageManager implements PackageManager {
         PyList basic = basicDoDir(jpkg, instantiate, exclpkgs);
         PyList ret = new PyList();
 
-        doDir(this.searchPath, ret, jpkg, instantiate, exclpkgs);
+        doDir(this.getSearchPath(), ret, jpkg, instantiate, exclpkgs);
 
         PySystemState system = Py.getSystemState();
 
@@ -199,7 +201,7 @@ public class SysPackageManager implements PackageManager {
      * @return true if pkg exists
      */
     public boolean packageExists(String pkg, String name) {
-        if (packageExists(this.searchPath, pkg, name)) {
+        if (packageExists(this.getSearchPath(), pkg, name)) {
             return true;
         }
 
@@ -243,6 +245,34 @@ public class SysPackageManager implements PackageManager {
             }
         }
         return false;
+    }
+
+    /**
+     * @return the searchPath
+     */
+    public PyList getSearchPath() {
+        return searchPath;
+    }
+
+    /**
+     * @param searchPath the searchPath to set
+     */
+    public void setSearchPath(PyList searchPath) {
+        this.searchPath = searchPath;
+    }
+
+    /**
+     * @return the topLevelPackage
+     */
+    public PyJavaPackage getTopLevelPackage() {
+        return topLevelPackage;
+    }
+
+    /**
+     * @param topLevelPackage the topLevelPackage to set
+     */
+    public void setTopLevelPackage(PyJavaPackage topLevelPackage) {
+        this.topLevelPackage = topLevelPackage;
     }
 
     class PackageExistsFileFilter implements FilenameFilter {
@@ -366,9 +396,9 @@ public class SysPackageManager implements PackageManager {
     public void addDirectory(File dir) {
         try {
             if (dir.getPath().length() == 0) {
-                this.searchPath.append(Py.EmptyString);
+                this.getSearchPath().append(Py.EmptyString);
             } else {
-                this.searchPath.append(new PyString(dir.getCanonicalPath()));
+                this.getSearchPath().append(new PyString(dir.getCanonicalPath()));
             }
         } catch (IOException e) {
             warning("skipping bad directory, '" + dir + "'");
@@ -434,10 +464,6 @@ public class SysPackageManager implements PackageManager {
     protected boolean filterByAccess(String name, int acc) {
         return (acc & Modifier.PUBLIC) != Modifier.PUBLIC;
     }
-
-    private boolean indexModified;
-
-    private Map<String,JarXEntry> jarfiles;
 
     private static String listToString(List<String> list) {
         int n = list.size();
@@ -709,7 +735,7 @@ public class SysPackageManager implements PackageManager {
                     packs.put(packageName, classes);
                 }
             } catch (EOFException eof) {
-                ;
+                //ignore
             }
             istream.close();
 
@@ -762,7 +788,7 @@ public class SysPackageManager implements PackageManager {
                     this.jarfiles.put(jarcanon, new JarXEntry(cachefile, mtime));
                 }
             } catch (EOFException eof) {
-                ;
+                //ignore
             }
             istream.close();
         } catch (IOException ioe) {
@@ -906,10 +932,6 @@ public class SysPackageManager implements PackageManager {
                 new FileOutputStream(cachefile)));
     }
 
-    // for default cache (local fs based) impl
-
-    private File cachedir;
-
     /**
      * Initialize off-the-shelf (default) local file-system cache impl. Must be
      * called before {@link #initCache}. cachedir is the cache repository
@@ -986,7 +1008,7 @@ public class SysPackageManager implements PackageManager {
     }
 
     public PyObject lookupName(String name) {
-        PyObject top = this.topLevelPackage;
+        PyObject top = this.getTopLevelPackage();
         do {
             int dot = name.indexOf('.');
             String firstName = name;
@@ -1017,7 +1039,7 @@ public class SysPackageManager implements PackageManager {
      */
     public PyJavaPackage makeJavaPackage(String name, String classes,
             String jarfile) {
-        PyJavaPackage p = this.topLevelPackage;
+        PyJavaPackage p = this.getTopLevelPackage();
         if (name.length() != 0)
             p = p.addPackage(name, jarfile);
 
