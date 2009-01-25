@@ -41,7 +41,7 @@ import org.python.util.Generic;
 /**
  * System package manager. Used by org.python.core.PySystemState.
  */
-public class SysPackageManager implements PackageManager {
+public class SysPackageManager implements PyPackageManager {
 
     /* from old PackageManager */
     private PyList searchPath;

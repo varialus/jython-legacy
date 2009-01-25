@@ -82,7 +82,7 @@ public class SyspathJavaLoader extends ClassLoader {
         }
 
         try {
-            // this has the side affect of adding the jar to the PackageManager during the
+            // this has the side affect of adding the jar to the PyPackageManager during the
             // initialization of the SyspathArchive
             path = new SyspathArchive(sys.getPath(path.toString()));
         } catch (Exception e) {

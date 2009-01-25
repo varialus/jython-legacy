@@ -3,7 +3,7 @@
 
 package org.python.core;
 
-import org.python.core.packagecache.PackageManager;
+import org.python.core.packagecache.PyPackageManager;
 
 import java.util.StringTokenizer;
 
@@ -26,7 +26,7 @@ public class PyJavaPackage extends PyObject {
 
     /** (Control) package manager whose hierarchy contains this java pkg.
      */
-    public PackageManager __mgr__;
+    public PyPackageManager __mgr__;
 
     public PyJavaPackage(String name) {
         this(name, null, null);
@@ -36,12 +36,12 @@ public class PyJavaPackage extends PyObject {
         this(name, null, jarfile);
     }
 
-    public PyJavaPackage(String name,PackageManager mgr) {
+    public PyJavaPackage(String name,PyPackageManager mgr) {
         this(name, mgr, null);
     }
 
 
-    public PyJavaPackage(String name,PackageManager mgr,String jarfile) {
+    public PyJavaPackage(String name,PyPackageManager mgr,String jarfile) {
         __file__ = jarfile;
         __name__ = name;
 
@@ -113,7 +113,7 @@ public class PyJavaPackage extends PyObject {
 
     /**
      * Used for 'from xyz import *', dynamically dir pkg filling up __dict__. It uses
-     * {@link PackageManager#doDir} implementation furnished by the control package manager with
+     * {@link PyPackageManager#doDir} implementation furnished by the control package manager with
      * instantiate true. The package manager should load classes with {@link #addClass} in the
      * package.
      *
@@ -151,8 +151,8 @@ public class PyJavaPackage extends PyObject {
 
     public void __setattr__(String attr, PyObject value) {
         if (attr == "__mgr__") {
-            PackageManager newMgr = Py.tojava(value,
-                                                       PackageManager.class);
+            PyPackageManager newMgr = Py.tojava(value,
+                                                       PyPackageManager.class);
             if (newMgr == null) {
                 throw Py.TypeError("cannot set java package __mgr__ to None");
             }

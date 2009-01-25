@@ -21,7 +21,7 @@ import java.util.jar.JarFile;
 import org.python.Version;
 import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
-import org.python.core.packagecache.PackageManager;
+import org.python.core.packagecache.PyPackageManager;
 import org.python.core.packagecache.SysPackageManager;
 import org.python.modules.Setup;
 import org.python.modules.zipimport.zipimporter;
@@ -80,7 +80,7 @@ public class PySystemState extends PyObject
     private static Map<String,String> builtinNames;
     public static PyTuple builtin_module_names = null;
 
-    public static PackageManager packageManager;
+    public static PyPackageManager packageManager;
     private static File cachedir;
 
     private static PyList defaultPath;
