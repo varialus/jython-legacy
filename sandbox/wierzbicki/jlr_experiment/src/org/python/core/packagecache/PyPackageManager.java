@@ -7,7 +7,40 @@ import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 
-public interface PyPackageManager extends PackageManager {
+public interface PyPackageManager {
+
+    Class findClass(String pkg, String name, String reason);
+
+    Class findClass(String pkg, String name);
+
+    void notifyPackageImport(String pkg, String name);
+
+    boolean packageExists(String pkg, String name);
+
+    /**
+     * Append a directory to the list of directories searched for java packages
+     * and java classes.
+     *
+     * @param dir A directory.
+     */
+    void addDirectory(java.io.File dir);
+
+    /**
+     * Append a directory to the list of directories searched for java packages
+     * and java classes.
+     *
+     * @param dir A directory name.
+     */
+    void addJarDir(String dir, boolean cache);
+
+    /**
+     * Append a jar file to the list of locations searched for java packages and
+     * java classes.
+     *
+     * @param jarfile A directory name.
+     */
+    void addJar(String jarfile, boolean cache);
+
 
     /**
      * Reports the specified package content names. Should be overriden. Used by
@@ -33,5 +66,5 @@ public interface PyPackageManager extends PackageManager {
      * @param jarfile involved jarfile; can be null
      * @return created/updated package
      */
-    PyJavaPackage makeJavaPackage(String name, String classes, String jarfile);
+    Object makeJavaPackage(String name, String classes, String jarfile);
 }
