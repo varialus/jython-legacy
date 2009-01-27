@@ -80,45 +80,13 @@ public abstract class BasePackageManager {
         }
     }
 
-    private void addJarPath(String path) {
+    protected void addJarPath(String path) {
         StringTokenizer tok = new StringTokenizer(path,
                 java.io.File.pathSeparator);
         while (tok.hasMoreTokens()) {
             // ??pending: do jvms trim? how is interpreted entry=""?
             String entry = tok.nextToken();
             addJarDir(entry, true, false);
-        }
-    }
-
-    protected void findAllPackages(Properties registry) {
-        String paths = registry.getProperty("python.packages.paths",
-                "java.class.path,sun.boot.class.path");
-        String directories = registry.getProperty(
-                "python.packages.directories", "java.ext.dirs");
-        String fakepath = registry
-                .getProperty("python.packages.fakepath", null);
-        StringTokenizer tok = new StringTokenizer(paths, ",");
-        while (tok.hasMoreTokens()) {
-            String entry = tok.nextToken().trim();
-            String tmp = registry.getProperty(entry);
-            if (tmp == null) {
-                continue;
-            }
-            addClassPath(tmp);
-        }
-
-        tok = new StringTokenizer(directories, ",");
-        while (tok.hasMoreTokens()) {
-            String entry = tok.nextToken().trim();
-            String tmp = registry.getProperty(entry);
-            if (tmp == null) {
-                continue;
-            }
-            addJarPath(tmp);
-        }
-
-        if (fakepath != null) {
-            addClassPath(fakepath);
         }
     }
 
