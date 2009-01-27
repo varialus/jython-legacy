@@ -18,6 +18,8 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessControlException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,51 +28,29 @@ import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.python.core.Options;
-import org.python.core.Py;
-import org.python.core.PyJavaPackage;
-import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.core.PyStringMap;
-import org.python.core.PySystemState;
-import org.python.core.imp;
-import org.python.core.util.RelativeFile;
-import org.python.util.Generic;
-
 /**
  * Base package manager.
  */
 public abstract class BasePackageManager {
 
     /* from old PackageManager */
-    protected PyList searchPath;
-    protected PyJavaPackage topLevelPackage;
+    protected List searchPath;
 
     protected boolean indexModified;
+    protected boolean respectJavaAccessibility;
 
     protected Map<String,JarXEntry> jarfiles;
 
     // for default cache (local fs based) impl
     protected File cachedir;
 
-    protected void message(String msg) {
-        Py.writeMessage("*sys-package-mgr*", msg);
-    }
-
-    protected void warning(String warn) {
-        Py.writeWarning("*sys-package-mgr*", warn);
-    }
-
-    protected void comment(String msg) {
-        Py.writeComment("*sys-package-mgr*", msg);
-    }
-
-    protected void debug(String msg) {
-        Py.writeDebug("*sys-package-mgr*", msg);
+    public BasePackageManager(boolean respectJavaAccessibility) {
+        this.respectJavaAccessibility = respectJavaAccessibility;
     }
 
     public abstract Object makeJavaPackage(String name, String classes, String jarfile);
+
+    public abstract Class findClass(String pkg, String name, String reason);
 
     public void addJar(String jarfile, boolean cache) {
         addJarToPackages(new File(jarfile), cache);
@@ -146,220 +126,29 @@ public abstract class BasePackageManager {
         if (pkg != null && pkg.length() > 0) {
             name = pkg + '.' + name;
         }
-        Py.writeComment("import", "'" + name + "' as java package");
+        comment("import " + "'" + name + "' as java package");
     }
 
     public Class findClass(String pkg, String name) {
         Class c = findClass(pkg, name, "java class");
         if (c != null) {
-            Py.writeComment("import", "'" + name + "' as java class");
+            comment("import " + "'" + name + "' as java class");
         }
         return c;
-    }
-
-    public Class findClass(String pkg, String name, String reason) {
-        if (pkg != null && pkg.length() > 0) {
-            name = pkg + '.' + name;
-        }
-        return Py.findClassEx(name, reason);
-    }
-
-    /**
-     * Dynamically check if pkg.name exists as java pkg in the controlled
-     * hierarchy. Should be overriden.
-     *
-     * @param pkg parent pkg name
-     * @param name candidate name
-     * @return true if pkg exists
-     */
-    public boolean packageExists(String pkg, String name) {
-        if (packageExists(this.getSearchPath(), pkg, name)) {
-            return true;
-        }
-
-        PySystemState system = Py.getSystemState();
-
-        if (system.getClassLoader() == null
-                && packageExists(Py.getSystemState().path, pkg, name)) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Helper for {@link #packageExists(java.lang.String,java.lang.String)}.
-     * Scans for package pkg.name the directories in path.
-     */
-    protected boolean packageExists(PyList path, String pkg, String name) {
-        String child = pkg.replace('.', File.separatorChar) + File.separator
-                + name;
-
-        for (int i = 0; i < path.__len__(); i++) {
-            String dir = path.pyget(i).__str__().toString();
-
-            File f = new RelativeFile(dir, child);
-            if (f.isDirectory() && imp.caseok(f, name)) {
-                /*
-                 * Figure out if we have a directory a mixture of python and
-                 * java or just an empty directory (which means Java) or a
-                 * directory with only Python source (which means Python).
-                 */
-                PackageExistsFileFilter m = new PackageExistsFileFilter();
-                f.listFiles(m);
-                boolean exists = m.packageExists();
-                if (exists) {
-                    Py.writeComment("import", "java package as '"
-                            + f.getAbsolutePath() + "'");
-                }
-                return exists;
-            }
-        }
-        return false;
     }
 
     /**
      * @return the searchPath
      */
-    public PyList getSearchPath() {
+    public List getSearchPath() {
         return searchPath;
     }
 
     /**
      * @param searchPath the searchPath to set
      */
-    public void setSearchPath(PyList searchPath) {
+    public void setSearchPath(List searchPath) {
         this.searchPath = searchPath;
-    }
-
-    /**
-     * @return the topLevelPackage
-     */
-    public PyJavaPackage getTopLevelPackage() {
-        return topLevelPackage;
-    }
-
-    /**
-     * @param topLevelPackage the topLevelPackage to set
-     */
-    public void setTopLevelPackage(PyJavaPackage topLevelPackage) {
-        this.topLevelPackage = topLevelPackage;
-    }
-
-    class PackageExistsFileFilter implements FilenameFilter {
-        private boolean java;
-
-        private boolean python;
-
-        public boolean accept(File dir, String name) {
-            if(name.endsWith(".py") || name.endsWith("$py.class") || name.endsWith("$_PyInner.class")) {
-                python = true;
-            }else if (name.endsWith(".class")) {
-                java = true;
-            }
-            return false;
-        }
-
-        public boolean packageExists() {
-            if (this.python && !this.java) {
-                return false;
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Helper for {@link #doDir(PyJavaPackage,boolean,boolean)}. Scans for
-     * package jpkg content over the directories in path. Add to ret the founded
-     * classes/pkgs. Filter out classes using {@link #filterByName},{@link #filterByAccess}.
-     */
-    protected void doDir(PyList path, PyList ret, PyJavaPackage jpkg,
-            boolean instantiate, boolean exclpkgs) {
-        String child = jpkg.__name__.replace('.', File.separatorChar);
-
-        for (int i = 0; i < path.__len__(); i++) {
-            String dir = path.pyget(i).__str__().toString();
-            if (dir.length() == 0) {
-                dir = null;
-            }
-
-            File childFile = new File(dir, child);
-
-            String[] list = childFile.list();
-            if (list == null) {
-                continue;
-            }
-
-            doList: for (int j = 0; j < list.length; j++) {
-                String jname = list[j];
-
-                File cand = new File(childFile, jname);
-
-                int jlen = jname.length();
-
-                boolean pkgCand = false;
-
-                if (cand.isDirectory()) {
-                    if (!instantiate && exclpkgs) {
-                        continue;
-                    }
-                    pkgCand = true;
-                } else {
-                    if (!jname.endsWith(".class")) {
-                        continue;
-                    }
-                    jlen -= 6;
-                }
-
-                jname = jname.substring(0, jlen);
-                PyString name = new PyString(jname);
-
-                if (filterByName(jname, pkgCand)) {
-                    continue;
-                }
-
-                // for opt maybe we should some hash-set for ret
-                if (jpkg.__dict__.has_key(name) || jpkg.clsSet.has_key(name)
-                        || ret.__contains__(name)) {
-                    continue;
-                }
-
-                if (!Character.isJavaIdentifierStart(jname.charAt(0))) {
-                    continue;
-                }
-
-                for (int k = 1; k < jlen; k++) {
-                    if (!Character.isJavaIdentifierPart(jname.charAt(k))) {
-                        continue doList;
-                    }
-                }
-
-                if (!pkgCand) {
-                    try {
-                        int acc = checkAccess(new BufferedInputStream(
-                                new FileInputStream(cand)));
-                        if ((acc == -1) || filterByAccess(jname, acc)) {
-                            continue;
-                        }
-                    } catch (IOException e) {
-                        continue;
-                    }
-                }
-
-                if (instantiate) {
-                    if (pkgCand) {
-                        jpkg.addPackage(jname);
-                    } else {
-                        jpkg.addClass(jname, Py.findClass(jpkg.__name__ + "." + jname));
-                    }
-                }
-
-                ret.append(name);
-
-            }
-        }
-
     }
 
     /**
@@ -368,9 +157,9 @@ public abstract class BasePackageManager {
     public void addDirectory(File dir) {
         try {
             if (dir.getPath().length() == 0) {
-                this.getSearchPath().append(Py.EmptyString);
+                this.getSearchPath().add("");
             } else {
-                this.getSearchPath().append(new PyString(dir.getCanonicalPath()));
+                this.getSearchPath().add(dir.getCanonicalPath());
             }
         } catch (IOException e) {
             warning("skipping bad directory, '" + dir + "'");
@@ -392,10 +181,10 @@ public abstract class BasePackageManager {
      * true if path refers to a jar.
      */
     public void addClassPath(String path) {
-        PyList paths = new PyString(path).split(java.io.File.pathSeparator);
+        String[] paths = path.split(java.io.File.pathSeparator);
 
-        for (int i = 0; i < paths.__len__(); i++) {
-            String entry = paths.pyget(i).toString();
+        for (int i = 0; i < paths.length; i++) {
+            String entry = paths[i].toString();
             if (entry.endsWith(".jar") || entry.endsWith(".zip")) {
                 addJarToPackages(new File(entry), true);
             } else {
@@ -481,7 +270,7 @@ public abstract class BasePackageManager {
 
         List<String>[] vec = zipPackages.get(packageName);
         if (vec == null) {
-            vec = new List[] { Generic.list(), Generic.list() };
+            vec = new List[] { new ArrayList(), new ArrayList() };
             zipPackages.put(packageName, vec);
         }
         int access = checkAccess(zip);
@@ -494,7 +283,7 @@ public abstract class BasePackageManager {
 
     // Extract all of the packages in a single jarfile
     private Map<String, String> getZipPackages(InputStream jarin) throws IOException {
-        Map<String, List<String>[]> zipPackages = Generic.map();
+        Map<String, List<String>[]> zipPackages = new HashMap<String, List<String>[]>();
 
         ZipInputStream zip = new ZipInputStream(jarin);
 
@@ -505,7 +294,7 @@ public abstract class BasePackageManager {
         }
 
         // Turn each vector into a comma-separated String
-        Map<String, String> transformed = Generic.map();
+        Map<String, String> transformed = new HashMap<String, String>();
         for (String key : zipPackages.keySet()) {
             List<String>[] vec = zipPackages.get(key);
             String classes = listToString(vec[0]);
@@ -673,7 +462,7 @@ public abstract class BasePackageManager {
             String classes = entry.getValue();
 
             int idx = classes.indexOf('@');
-            if (idx >= 0 && Options.respectJavaAccessibility) {
+            if (idx >= 0 && respectJavaAccessibility) {
                 classes = classes.substring(0, idx);
             }
 
@@ -699,7 +488,7 @@ public abstract class BasePackageManager {
                 deleteCacheFile(cachefile);
                 return null;
             }
-            Map<String, String> packs = Generic.map();
+            Map<String, String> packs = new HashMap<String, String>();
             try {
                 while (true) {
                     String packageName = istream.readUTF();
@@ -744,7 +533,7 @@ public abstract class BasePackageManager {
      */
     protected void initCache() {
         this.indexModified = false;
-        this.jarfiles = Generic.map();
+        this.jarfiles = new HashMap<String,JarXEntry>();
 
         try {
             DataInputStream istream = inOpenIndex();
@@ -995,6 +784,22 @@ public abstract class BasePackageManager {
             }
         }
         return istream.readShort();
+    }
+
+    //Do nothing by default.
+    protected void message(String msg) {
+    }
+
+    //Do nothing by default.
+    protected void warning(String warn) {
+    }
+
+    //Do nothing by default.
+    protected void comment(String msg) {
+    }
+
+    //Do nothing by default.
+    protected void debug(String msg) {
     }
 
 }

@@ -43,7 +43,10 @@ import org.python.util.Generic;
  */
 public class SysPackageManager extends BasePackageManager implements PyPackageManager{
 
+    protected PyJavaPackage topLevelPackage;
+
     public SysPackageManager(File cachedir, Properties registry) {
+        super(Options.respectJavaAccessibility);
         /* from PathPackageManager constructor */
         this.searchPath = new PyList();
 
@@ -55,6 +58,175 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
             findAllPackages(registry);
             saveCache();
         }
+    }
+
+    /**
+     * @return the topLevelPackage
+     */
+    public PyJavaPackage getTopLevelPackage() {
+        return topLevelPackage;
+    }
+
+    /**
+     * @param topLevelPackage the topLevelPackage to set
+     */
+    public void setTopLevelPackage(PyJavaPackage topLevelPackage) {
+        this.topLevelPackage = topLevelPackage;
+    }
+
+    public Class findClass(String pkg, String name, String reason) {
+        if (pkg != null && pkg.length() > 0) {
+            name = pkg + '.' + name;
+        }
+        return Py.findClassEx(name, reason);
+    }
+
+    /**
+     * Dynamically check if pkg.name exists as java pkg in the controlled
+     * hierarchy. Should be overriden.
+     *
+     * @param pkg parent pkg name
+     * @param name candidate name
+     * @return true if pkg exists
+     */
+    public boolean packageExists(String pkg, String name) {
+        if (packageExists(this.getSearchPath(), pkg, name)) {
+            return true;
+        }
+
+        PySystemState system = Py.getSystemState();
+
+        if (system.getClassLoader() == null
+                && packageExists(Py.getSystemState().path, pkg, name)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Helper for {@link #packageExists(java.lang.String,java.lang.String)}.
+     * Scans for package pkg.name the directories in path.
+     */
+    protected boolean packageExists(List path, String pkg, String name) {
+        String child = pkg.replace('.', File.separatorChar) + File.separator
+                + name;
+
+        for (int i = 0; i < path.size(); i++) {
+            String dir = path.get(i).toString();
+
+            File f = new RelativeFile(dir, child);
+            if (f.isDirectory() && imp.caseok(f, name)) {
+                /*
+                 * Figure out if we have a directory a mixture of python and
+                 * java or just an empty directory (which means Java) or a
+                 * directory with only Python source (which means Python).
+                 */
+                PackageExistsFileFilter m = new PackageExistsFileFilter();
+                f.listFiles(m);
+                boolean exists = m.packageExists();
+                if (exists) {
+                    Py.writeComment("import", "java package as '"
+                            + f.getAbsolutePath() + "'");
+                }
+                return exists;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Helper for {@link #doDir(PyJavaPackage,boolean,boolean)}. Scans for
+     * package jpkg content over the directories in path. Add to ret the founded
+     * classes/pkgs. Filter out classes using {@link #filterByName},{@link #filterByAccess}.
+     */
+    protected void doDir(List path, PyList ret, PyJavaPackage jpkg,
+            boolean instantiate, boolean exclpkgs) {
+        String child = jpkg.__name__.replace('.', File.separatorChar);
+
+        for (int i = 0; i < path.size(); i++) {
+            String dir = path.get(i).toString();
+            if (dir.length() == 0) {
+                dir = null;
+            }
+
+            File childFile = new File(dir, child);
+
+            String[] list = childFile.list();
+            if (list == null) {
+                continue;
+            }
+
+            doList: for (int j = 0; j < list.length; j++) {
+                String jname = list[j];
+
+                File cand = new File(childFile, jname);
+
+                int jlen = jname.length();
+
+                boolean pkgCand = false;
+
+                if (cand.isDirectory()) {
+                    if (!instantiate && exclpkgs) {
+                        continue;
+                    }
+                    pkgCand = true;
+                } else {
+                    if (!jname.endsWith(".class")) {
+                        continue;
+                    }
+                    jlen -= 6;
+                }
+
+                jname = jname.substring(0, jlen);
+                PyString name = new PyString(jname);
+
+                if (filterByName(jname, pkgCand)) {
+                    continue;
+                }
+
+                // for opt maybe we should some hash-set for ret
+                if (jpkg.__dict__.has_key(name) || jpkg.clsSet.has_key(name)
+                        || ret.__contains__(name)) {
+                    continue;
+                }
+
+                if (!Character.isJavaIdentifierStart(jname.charAt(0))) {
+                    continue;
+                }
+
+                for (int k = 1; k < jlen; k++) {
+                    if (!Character.isJavaIdentifierPart(jname.charAt(k))) {
+                        continue doList;
+                    }
+                }
+
+                if (!pkgCand) {
+                    try {
+                        int acc = checkAccess(new BufferedInputStream(
+                                new FileInputStream(cand)));
+                        if ((acc == -1) || filterByAccess(jname, acc)) {
+                            continue;
+                        }
+                    } catch (IOException e) {
+                        continue;
+                    }
+                }
+
+                if (instantiate) {
+                    if (pkgCand) {
+                        jpkg.addPackage(jname);
+                    } else {
+                        jpkg.addClass(jname, Py.findClass(jpkg.__name__ + "." + jname));
+                    }
+                }
+
+                ret.append(name);
+
+            }
+        }
+
     }
 
     public PyList doDir(PyJavaPackage jpkg, boolean instantiate,
@@ -164,6 +336,44 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
             p.addPlaceholders(classes);
 
         return p;
+    }
+
+    protected void message(String msg) {
+        Py.writeMessage("*sys-package-mgr*", msg);
+    }
+
+    protected void warning(String warn) {
+        Py.writeWarning("*sys-package-mgr*", warn);
+    }
+
+    protected void comment(String msg) {
+        Py.writeComment("*sys-package-mgr*", msg);
+    }
+
+    protected void debug(String msg) {
+        Py.writeDebug("*sys-package-mgr*", msg);
+    }
+
+    class PackageExistsFileFilter implements FilenameFilter {
+        private boolean java;
+
+        private boolean python;
+
+        public boolean accept(File dir, String name) {
+            if(name.endsWith(".py") || name.endsWith("$py.class") || name.endsWith("$_PyInner.class")) {
+                python = true;
+            }else if (name.endsWith(".class")) {
+                java = true;
+            }
+            return false;
+        }
+
+        public boolean packageExists() {
+            if (this.python && !this.java) {
+                return false;
+            }
+            return true;
+        }
     }
 
 }

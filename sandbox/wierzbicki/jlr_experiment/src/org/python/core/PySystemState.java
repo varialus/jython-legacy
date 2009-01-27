@@ -1023,7 +1023,7 @@ public class PySystemState extends PyObject
     }
 
     public static PyJavaPackage add_package(String n, String contents) {
-        return packageManager.makeJavaPackage(n, contents, null);
+        return (PyJavaPackage)packageManager.makeJavaPackage(n, contents, null);
     }
 
     /**
