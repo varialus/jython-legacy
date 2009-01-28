@@ -3,11 +3,10 @@
 
 package org.python.core.packagecache;
 
-import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 
-public interface PyPackageManager {
+public interface PackageManager {
 
     Class findClass(String pkg, String name, String reason);
 
@@ -51,7 +50,8 @@ public interface PyPackageManager {
      * @param instantiate if true then instatiate reported names in package dict
      * @param exclpkgs exclude packages (just when instantiate is false)
      */
-    PyList doDir(PyJavaPackage jpkg, boolean instantiate, boolean exclpkgs);
+    //XXX
+    PyList doDir(JavaPackage jpkg, boolean instantiate, boolean exclpkgs);
 
     //XXX
     PyObject lookupName(String name);

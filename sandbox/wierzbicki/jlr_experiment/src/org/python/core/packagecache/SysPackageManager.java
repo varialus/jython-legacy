@@ -18,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessControlException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,30 +42,16 @@ import org.python.util.Generic;
 /**
  * System package manager. Used by org.python.core.PySystemState.
  */
-public class SysPackageManager extends BasePackageManager implements PyPackageManager{
-
-    protected PyJavaPackage topLevelPackage;
+public class SysPackageManager extends BasePackageManager {
 
     public SysPackageManager(File cachedir, Properties registry) {
-        super(Options.respectJavaAccessibility);
-        /* from PathPackageManager constructor */
-        this.searchPath = new PyList();
-
-        /* from old PackageManager constructor */
-        this.topLevelPackage = new PyJavaPackage("", this);
-
-        if (useCacheDir(cachedir)) {
-            initCache();
-            findAllPackages(registry);
-            saveCache();
-        }
+        super(new PyJavaPackage(""), cachedir, Options.respectJavaAccessibility, findClassPaths(registry), findJarPaths(registry));
     }
 
-    protected void findAllPackages(Properties registry) {
+    private static List<String> findClassPaths(Properties registry) {
+        List<String> classpaths = new ArrayList<String>();
         String paths = registry.getProperty("python.packages.paths",
                 "java.class.path,sun.boot.class.path");
-        String directories = registry.getProperty(
-                "python.packages.directories", "java.ext.dirs");
         String fakepath = registry
                 .getProperty("python.packages.fakepath", null);
         StringTokenizer tok = new StringTokenizer(paths, ",");
@@ -74,36 +61,42 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
             if (tmp == null) {
                 continue;
             }
-            addClassPath(tmp);
+            classpaths.add(tmp);
         }
 
-        tok = new StringTokenizer(directories, ",");
+        if (fakepath != null) {
+            classpaths.add(fakepath);
+        }
+        return classpaths;
+    }
+
+    private static List<String> findJarPaths(Properties registry) {
+        List<String> paths = new ArrayList<String>();
+        String directories = registry.getProperty(
+                "python.packages.directories", "java.ext.dirs");
+        StringTokenizer tok = new StringTokenizer(directories, ",");
         while (tok.hasMoreTokens()) {
             String entry = tok.nextToken().trim();
             String tmp = registry.getProperty(entry);
             if (tmp == null) {
                 continue;
             }
-            addJarPath(tmp);
+            paths.add(tmp);
         }
-
-        if (fakepath != null) {
-            addClassPath(fakepath);
-        }
+        return paths;
     }
-
 
     /**
      * @return the topLevelPackage
      */
-    public PyJavaPackage getTopLevelPackage() {
+    public JavaPackage getTopLevelPackage() {
         return topLevelPackage;
     }
 
     /**
      * @param topLevelPackage the topLevelPackage to set
      */
-    public void setTopLevelPackage(PyJavaPackage topLevelPackage) {
+    public void setTopLevelPackage(JavaPackage topLevelPackage) {
         this.topLevelPackage = topLevelPackage;
     }
 
@@ -174,9 +167,9 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
      * package jpkg content over the directories in path. Add to ret the founded
      * classes/pkgs. Filter out classes using {@link #filterByName},{@link #filterByAccess}.
      */
-    protected void doDir(List path, PyList ret, PyJavaPackage jpkg,
+    protected void doDir(List path, PyList ret, JavaPackage jpkg,
             boolean instantiate, boolean exclpkgs) {
-        String child = jpkg.__name__.replace('.', File.separatorChar);
+        String child = jpkg.getName().replace('.', File.separatorChar);
 
         for (int i = 0; i < path.size(); i++) {
             String dir = path.get(i).toString();
@@ -220,7 +213,7 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
                 }
 
                 // for opt maybe we should some hash-set for ret
-                if (jpkg.__dict__.has_key(name) || jpkg.clsSet.has_key(name)
+                if (((PyStringMap)jpkg.getMembers()).has_key(name) || ((PyStringMap)jpkg.getClasses()).has_key(name)
                         || ret.__contains__(name)) {
                     continue;
                 }
@@ -251,7 +244,7 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
                     if (pkgCand) {
                         jpkg.addPackage(jname);
                     } else {
-                        jpkg.addClass(jname, Py.findClass(jpkg.__name__ + "." + jname));
+                        jpkg.addClass(jname, Py.findClass(jpkg.getName() + "." + jname));
                     }
                 }
 
@@ -259,10 +252,9 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
 
             }
         }
-
     }
 
-    public PyList doDir(PyJavaPackage jpkg, boolean instantiate,
+    public PyList doDir(JavaPackage jpkg, boolean instantiate,
             boolean exclpkgs) {
         PyList basic = basicDoDir(jpkg, instantiate, exclpkgs);
         PyList ret = new PyList();
@@ -282,12 +274,12 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
 
     /**
      * Basic helper implementation of {@link #doDir}. It merges information
-     * from jpkg {@link PyJavaPackage#clsSet} and {@link PyJavaPackage#__dict__}.
+     * from jpkg {@link JavaPackage#clsSet} and {@link JavaPackage#__dict__}.
      */
-    protected PyList basicDoDir(PyJavaPackage jpkg, boolean instantiate,
+    protected PyList basicDoDir(JavaPackage jpkg, boolean instantiate,
             boolean exclpkgs) {
-        PyStringMap dict = jpkg.__dict__;
-        PyStringMap cls = jpkg.clsSet;
+        PyStringMap dict = (PyStringMap)jpkg.getMembers();
+        PyStringMap cls = (PyStringMap)jpkg.getClasses();
 
         if (!instantiate) {
             PyList ret = cls.keys();
@@ -309,7 +301,7 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
         for (PyObject pyname : cls.keys().asIterable()) {
             if (!dict.has_key(pyname)) {
                 String name = pyname.toString();
-                jpkg.addClass(name, Py.findClass(jpkg.__name__ + "." + name));
+                jpkg.addClass(name, Py.findClass(jpkg.getName() + "." + name));
             }
         }
 
@@ -328,9 +320,8 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
         return list1;
     }
 
-
     public PyObject lookupName(String name) {
-        PyObject top = this.getTopLevelPackage();
+        PyObject top = (PyObject)this.getTopLevelPackage();
         do {
             int dot = name.indexOf('.');
             String firstName = name;
@@ -359,9 +350,9 @@ public class SysPackageManager extends BasePackageManager implements PyPackageMa
      * @param jarfile involved jarfile; can be null
      * @return created/updated package
      */
-    public Object makeJavaPackage(String name, String classes,
+    public JavaPackage makeJavaPackage(String name, String classes,
             String jarfile) {
-        PyJavaPackage p = this.getTopLevelPackage();
+        JavaPackage p = this.getTopLevelPackage();
         if (name.length() != 0)
             p = p.addPackage(name, jarfile);
 

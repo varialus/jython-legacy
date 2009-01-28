@@ -3,7 +3,8 @@
 
 package org.python.core;
 
-import org.python.core.packagecache.PyPackageManager;
+import org.python.core.packagecache.PackageManager;
+import org.python.core.packagecache.JavaPackage;
 
 import java.util.StringTokenizer;
 
@@ -11,7 +12,7 @@ import java.util.StringTokenizer;
  * A representation of java package.
  */
 
-public class PyJavaPackage extends PyObject {
+public class PyJavaPackage extends PyObject implements JavaPackage{
     public String __name__;
 
 
@@ -26,7 +27,7 @@ public class PyJavaPackage extends PyObject {
 
     /** (Control) package manager whose hierarchy contains this java pkg.
      */
-    public PyPackageManager __mgr__;
+    public PackageManager __mgr__;
 
     public PyJavaPackage(String name) {
         this(name, null, null);
@@ -36,12 +37,11 @@ public class PyJavaPackage extends PyObject {
         this(name, null, jarfile);
     }
 
-    public PyJavaPackage(String name,PyPackageManager mgr) {
+    public PyJavaPackage(String name,PackageManager mgr) {
         this(name, mgr, null);
     }
 
-
-    public PyJavaPackage(String name,PyPackageManager mgr,String jarfile) {
+    public PyJavaPackage(String name,PackageManager mgr,String jarfile) {
         __file__ = jarfile;
         __name__ = name;
 
@@ -56,11 +56,11 @@ public class PyJavaPackage extends PyObject {
         __dict__.__setitem__("__name__", new PyString(__name__));
     }
 
-    public PyJavaPackage addPackage(String name) {
+    public JavaPackage addPackage(String name) {
         return addPackage(name, null);
     }
 
-    public PyJavaPackage addPackage(String name, String jarfile) {
+    public JavaPackage addPackage(String name, String jarfile) {
         int dot = name.indexOf('.');
         String firstName=name;
         String lastName=null;
@@ -85,7 +85,7 @@ public class PyJavaPackage extends PyObject {
         else return p;
     }
 
-    public PyObject addClass(String name, Class<?> c) {
+    public Object addClass(String name, Class<?> c) {
         PyObject ret = Py.java2py(c);
         __dict__.__setitem__(name.intern(), ret);
         return ret;
@@ -113,7 +113,7 @@ public class PyJavaPackage extends PyObject {
 
     /**
      * Used for 'from xyz import *', dynamically dir pkg filling up __dict__. It uses
-     * {@link PyPackageManager#doDir} implementation furnished by the control package manager with
+     * {@link PackageManager#doDir} implementation furnished by the control package manager with
      * instantiate true. The package manager should load classes with {@link #addClass} in the
      * package.
      *
@@ -131,11 +131,11 @@ public class PyJavaPackage extends PyObject {
 
         if (__mgr__.packageExists(__name__,name)) {
             __mgr__.notifyPackageImport(__name__,name);
-            return addPackage(name);
+            return (PyObject)addPackage(name);
         }
 
         Class c = __mgr__.findClass(__name__,name);
-        if (c != null) return addClass(name,c);
+        if (c != null) return (PyObject)addClass(name,c);
 
         if (name == "__name__") return new PyString(__name__);
         if (name == "__dict__") return __dict__;
@@ -151,8 +151,8 @@ public class PyJavaPackage extends PyObject {
 
     public void __setattr__(String attr, PyObject value) {
         if (attr == "__mgr__") {
-            PyPackageManager newMgr = Py.tojava(value,
-                                                       PyPackageManager.class);
+            PackageManager newMgr = Py.tojava(value,
+                                                       PackageManager.class);
             if (newMgr == null) {
                 throw Py.TypeError("cannot set java package __mgr__ to None");
             }
@@ -170,4 +170,15 @@ public class PyJavaPackage extends PyObject {
     public String toString()  {
         return "<java package "+__name__+" "+Py.idstr(this)+">";
     }
+
+    public String getName() { return __name__; }
+    public Object dir() { return __dir__(); }
+    public Object getClasses() { return clsSet; }
+    public Object getMembers() { return __dict__; }
+    public void setPackageManager (PackageManager mgr) { __mgr__ = mgr; }
+    //public Object addClass(String string, Class<?> clazz);
+    //public JavaPackage addPackage(String name);
+    //public JavaPackage addPackage(String name, String jarfile);
+    //public void addPlaceholders(String classes);
+
 }

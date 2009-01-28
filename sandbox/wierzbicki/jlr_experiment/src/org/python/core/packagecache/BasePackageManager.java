@@ -31,7 +31,9 @@ import java.util.zip.ZipInputStream;
 /**
  * Base package manager.
  */
-public abstract class BasePackageManager {
+public abstract class BasePackageManager implements PackageManager {
+
+    protected JavaPackage topLevelPackage;
 
     /* from old PackageManager */
     protected List searchPath;
@@ -44,8 +46,22 @@ public abstract class BasePackageManager {
     // for default cache (local fs based) impl
     protected File cachedir;
 
-    public BasePackageManager(boolean respectJavaAccessibility) {
+    public BasePackageManager(JavaPackage top, File cachedir, boolean respectJavaAccessibility, List<String> classpaths, List<String> jarpaths) {
         this.respectJavaAccessibility = respectJavaAccessibility;
+        this.searchPath = new ArrayList();
+        this.topLevelPackage = top;
+        top.setPackageManager(this);
+        if (useCacheDir(cachedir)) {
+            initCache();
+            for (String c : classpaths) {
+                addClassPath(c);
+            }
+            for (String j : jarpaths) {
+                addJarPath(j);
+            }
+            saveCache();
+        }
+
     }
 
     public abstract Object makeJavaPackage(String name, String classes, String jarfile);
@@ -164,7 +180,6 @@ public abstract class BasePackageManager {
         }
     }
 
-    //Copied from CachedJarsPackageManager
     /**
      * Filter class/pkg by name helper method - hook. The default impl. is used
      * by {@link #addJarToPackages} in order to filter out classes whose name
