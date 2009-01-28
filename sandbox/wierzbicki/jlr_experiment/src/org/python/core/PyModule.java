@@ -112,7 +112,7 @@ public class PyModule extends PyObject {
         }
 
         if (attr == null) {
-            attr = PySystemState.packageManager.lookupName(fullName);
+            attr = (PyObject)PySystemState.packageManager.lookupName(fullName);
         }
 
         if (attr != null) {

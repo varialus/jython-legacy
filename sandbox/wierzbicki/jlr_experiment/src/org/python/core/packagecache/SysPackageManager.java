@@ -167,7 +167,7 @@ public class SysPackageManager extends BasePackageManager {
      * package jpkg content over the directories in path. Add to ret the founded
      * classes/pkgs. Filter out classes using {@link #filterByName},{@link #filterByAccess}.
      */
-    protected void doDir(List path, PyList ret, JavaPackage jpkg,
+    protected void doDir(List path, List ret, JavaPackage jpkg,
             boolean instantiate, boolean exclpkgs) {
         String child = jpkg.getName().replace('.', File.separatorChar);
 
@@ -214,7 +214,7 @@ public class SysPackageManager extends BasePackageManager {
 
                 // for opt maybe we should some hash-set for ret
                 if (((PyStringMap)jpkg.getMembers()).has_key(name) || ((PyStringMap)jpkg.getClasses()).has_key(name)
-                        || ret.__contains__(name)) {
+                        || ret.contains(name)) {
                     continue;
                 }
 
@@ -248,16 +248,16 @@ public class SysPackageManager extends BasePackageManager {
                     }
                 }
 
-                ret.append(name);
+                ret.add(name);
 
             }
         }
     }
 
-    public PyList doDir(JavaPackage jpkg, boolean instantiate,
+    public List doDir(JavaPackage jpkg, boolean instantiate,
             boolean exclpkgs) {
-        PyList basic = basicDoDir(jpkg, instantiate, exclpkgs);
-        PyList ret = new PyList();
+        List basic = basicDoDir(jpkg, instantiate, exclpkgs);
+        List ret = new PyList();
 
         doDir(this.getSearchPath(), ret, jpkg, instantiate, exclpkgs);
 
@@ -267,7 +267,8 @@ public class SysPackageManager extends BasePackageManager {
             doDir(system.path, ret, jpkg, instantiate, exclpkgs);
         }
 
-        return merge(basic, ret);
+        basic.addAll(ret);
+        return basic;
     }
 
     /* From old PackageManager */
@@ -276,7 +277,7 @@ public class SysPackageManager extends BasePackageManager {
      * Basic helper implementation of {@link #doDir}. It merges information
      * from jpkg {@link JavaPackage#clsSet} and {@link JavaPackage#__dict__}.
      */
-    protected PyList basicDoDir(JavaPackage jpkg, boolean instantiate,
+    protected List basicDoDir(JavaPackage jpkg, boolean instantiate,
             boolean exclpkgs) {
         PyStringMap dict = (PyStringMap)jpkg.getMembers();
         PyStringMap cls = (PyStringMap)jpkg.getClasses();
@@ -306,18 +307,6 @@ public class SysPackageManager extends BasePackageManager {
         }
 
         return dict.keys();
-    }
-
-    /**
-     * Helper merging list2 into list1. Returns list1.
-     */
-    protected PyList merge(PyList list1, PyList list2) {
-        for (int i = 0; i < list2.__len__(); i++) {
-            PyObject name = list2.pyget(i);
-            list1.append(name);
-        }
-
-        return list1;
     }
 
     public PyObject lookupName(String name) {

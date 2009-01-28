@@ -108,7 +108,7 @@ public class PyJavaPackage extends PyObject implements JavaPackage{
     }
 
     public PyObject __dir__() {
-        return __mgr__.doDir(this,false,false);
+        return (PyObject)__mgr__.doDir(this,false,false);
     }
 
     /**
@@ -120,7 +120,7 @@ public class PyJavaPackage extends PyObject implements JavaPackage{
      * @return list of member names
      */
     public PyObject fillDir() {
-        return __mgr__.doDir(this,true,false);
+        return (PyObject)__mgr__.doDir(this,true,false);
     }
 
 

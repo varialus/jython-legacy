@@ -36,7 +36,7 @@ public class JavaImporter extends PyObject {
     public PyObject find_module(String name, PyObject path) {
         Py.writeDebug("import", "trying " + name
                 + " in packagemanager for path " + path);
-        PyObject ret = PySystemState.packageManager.lookupName(name.intern());
+        PyObject ret = (PyObject)PySystemState.packageManager.lookupName(name.intern());
         if (ret != null) {
             Py.writeComment("import", "'" + name + "' as java package");
             return this;
@@ -45,7 +45,7 @@ public class JavaImporter extends PyObject {
     }
 
     public PyObject load_module(String name) {
-        return PySystemState.packageManager.lookupName(name.intern());
+        return (PyObject)PySystemState.packageManager.lookupName(name.intern());
     }
 
     /**

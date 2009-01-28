@@ -3,8 +3,7 @@
 
 package org.python.core.packagecache;
 
-import org.python.core.PyList;
-import org.python.core.PyObject;
+import java.util.List;
 
 public interface PackageManager {
 
@@ -45,16 +44,14 @@ public interface PackageManager {
      * Reports the specified package content names. Should be overriden. Used by
      * {@link PyJavaPackage#__dir__} and {@link PyJavaPackage#fillDir}.
      *
-     * @return resulting list of names (PyList of PyString)
+     * @return resulting list of names (List of PyString)
      * @param jpkg queried package
      * @param instantiate if true then instatiate reported names in package dict
      * @param exclpkgs exclude packages (just when instantiate is false)
      */
-    //XXX
-    PyList doDir(JavaPackage jpkg, boolean instantiate, boolean exclpkgs);
+    List doDir(JavaPackage jpkg, boolean instantiate, boolean exclpkgs);
 
-    //XXX
-    PyObject lookupName(String name);
+    Object lookupName(String name);
 
     /**
      * Creates package/updates statically known classes info. Uses
