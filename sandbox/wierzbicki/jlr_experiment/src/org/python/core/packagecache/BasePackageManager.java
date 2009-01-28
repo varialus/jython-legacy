@@ -46,7 +46,12 @@ public abstract class BasePackageManager implements PackageManager {
     // for default cache (local fs based) impl
     protected File cachedir;
 
-    public BasePackageManager(JavaPackage top, File cachedir, boolean respectJavaAccessibility, List<String> classpaths, List<String> jarpaths) {
+    public BasePackageManager(JavaPackage top,
+                              File cachedir,
+                              boolean respectJavaAccessibility,
+                              List<String> classpaths,
+                              List<String> jarpaths) {
+
         this.respectJavaAccessibility = respectJavaAccessibility;
         this.searchPath = new ArrayList();
         this.topLevelPackage = top;
@@ -65,8 +70,22 @@ public abstract class BasePackageManager implements PackageManager {
     }
 
     public abstract Object makeJavaPackage(String name, String classes, String jarfile);
-
     public abstract Class findClass(String pkg, String name, String reason);
+
+    /**
+     * @return the topLevelPackage
+     */
+    public JavaPackage getTopLevelPackage() {
+        return topLevelPackage;
+    }
+
+    /**
+     * @param topLevelPackage the topLevelPackage to set
+     */
+    public void setTopLevelPackage(JavaPackage topLevelPackage) {
+        this.topLevelPackage = topLevelPackage;
+    }
+
 
     public void addJar(String jarfile, boolean cache) {
         addJarToPackages(new File(jarfile), cache);

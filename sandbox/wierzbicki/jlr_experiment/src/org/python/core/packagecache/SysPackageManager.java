@@ -45,7 +45,11 @@ import org.python.util.Generic;
 public class SysPackageManager extends BasePackageManager {
 
     public SysPackageManager(File cachedir, Properties registry) {
-        super(new PyJavaPackage(""), cachedir, Options.respectJavaAccessibility, findClassPaths(registry), findJarPaths(registry));
+        super(new PyJavaPackage(""),
+                cachedir,
+                Options.respectJavaAccessibility,
+                findClassPaths(registry),
+                findJarPaths(registry));
     }
 
     private static List<String> findClassPaths(Properties registry) {
@@ -84,20 +88,6 @@ public class SysPackageManager extends BasePackageManager {
             paths.add(tmp);
         }
         return paths;
-    }
-
-    /**
-     * @return the topLevelPackage
-     */
-    public JavaPackage getTopLevelPackage() {
-        return topLevelPackage;
-    }
-
-    /**
-     * @param topLevelPackage the topLevelPackage to set
-     */
-    public void setTopLevelPackage(JavaPackage topLevelPackage) {
-        this.topLevelPackage = topLevelPackage;
     }
 
     public Class findClass(String pkg, String name, String reason) {
@@ -160,7 +150,6 @@ public class SysPackageManager extends BasePackageManager {
         }
         return false;
     }
-
 
     /**
      * Helper for {@link #doDir(PyJavaPackage,boolean,boolean)}. Scans for
@@ -270,8 +259,6 @@ public class SysPackageManager extends BasePackageManager {
         basic.addAll(ret);
         return basic;
     }
-
-    /* From old PackageManager */
 
     /**
      * Basic helper implementation of {@link #doDir}. It merges information
