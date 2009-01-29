@@ -176,9 +176,4 @@ public class PyJavaPackage extends PyObject implements JavaPackage{
     public Object getClasses() { return clsSet; }
     public Object getMembers() { return __dict__; }
     public void setPackageManager (PackageManager mgr) { __mgr__ = mgr; }
-    //public Object addClass(String string, Class<?> clazz);
-    //public JavaPackage addPackage(String name);
-    //public JavaPackage addPackage(String name, String jarfile);
-    //public void addPlaceholders(String classes);
-
 }
