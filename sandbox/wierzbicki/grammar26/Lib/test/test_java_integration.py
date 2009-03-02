@@ -1,3 +1,4 @@
+import operator
 import os
 import unittest
 import subprocess
@@ -6,9 +7,10 @@ import re
  
 from test import test_support
 
-from java.lang import (ExceptionInInitializerError, String, Runnable, System, Runtime, Math, Byte)
+from java.lang import (ClassCastException, ExceptionInInitializerError, String, Runnable, System,
+        Runtime, Math, Byte)
 from java.math import BigDecimal, BigInteger
-from java.io import (FileInputStream, FileNotFoundException, FileOutputStream, FileWriter,
+from java.io import (File, FileInputStream, FileNotFoundException, FileOutputStream, FileWriter,
     OutputStreamWriter, UnsupportedEncodingException)
 from java.util import ArrayList, Date, HashMap, Hashtable, StringTokenizer, Vector
 
@@ -17,7 +19,8 @@ from java.awt.event import ComponentEvent
 from javax.swing.tree import TreePath
 
 from org.python.core.util import FileUtil
-from org.python.tests import BeanImplementation, Listenable
+from org.python.tests import BeanImplementation, Child, Listenable, CustomizableMapHolder
+from org.python.tests.mro import (ConfusedOnGetitemAdd, FirstPredefinedGetitem, GetitemAdder)
 
 class InstantiationTest(unittest.TestCase):
     def test_cant_instantiate_abstract(self):
@@ -62,6 +65,21 @@ class BeanTest(unittest.TestCase):
                 self.assertEquals("name", bself.getName())
         SubBean()
 
+    def test_inheriting_half_bean(self):
+        c = Child()
+        self.assertEquals("blah", c.value)
+        c.value = "bleh"
+        self.assertEquals("bleh", c.value)
+        self.assertEquals(7, c.id)
+        c.id = 16
+        self.assertEquals(16, c.id)
+
+    def test_awt_hack(self):
+        # We ignore several deprecated methods in java.awt.* in favor of bean properties that were
+        # addded in Java 1.1.  This tests that one of those bean properties is visible.
+        c = Container()
+        c.size = 400, 300
+        self.assertEquals(Dimension(400, 300), c.size)
 
 class SysIntegrationTest(unittest.TestCase):
     def setUp(self):
@@ -330,6 +348,39 @@ class JavaDelegationTest(unittest.TestCase):
         for i in v:
             pass
 
+    def test_comparable_delegation(self):
+        first_file = File("a")
+        first_date = Date(100)
+        for a, b, c in [(first_file, File("b"), File("c")), (first_date, Date(1000), Date())]:
+            self.assertTrue(a.compareTo(b) < 0)
+            self.assertEquals(-1, cmp(a, b))
+            self.assertTrue(a.compareTo(c) < 0)
+            self.assertEquals(-1, cmp(a, c))
+            self.assertEquals(0, a.compareTo(a))
+            self.assertEquals(0, cmp(a, a))
+            self.assertTrue(b.compareTo(a) > 0)
+            self.assertEquals(1, cmp(b, a))
+            self.assertTrue(c.compareTo(b) > 0)
+            self.assertEquals(1, cmp(c, b))
+            self.assertTrue(a < b)
+            self.assertTrue(a <= a)
+            self.assertTrue(b > a)
+            self.assertTrue(c >= a)
+            self.assertTrue(a != b)
+            l = [b, c, a]
+            self.assertEquals(a, min(l))
+            self.assertEquals(c, max(l))
+            l.sort()
+            self.assertEquals([a, b, c], l)
+        # Check that we fall back to the default comparison(class name) instead of using compareTo
+        # on non-Comparable types
+        self.assertRaises(ClassCastException, first_file.compareTo, first_date)
+        self.assertEquals(-1, cmp(first_file, first_date))
+        self.assertTrue(first_file < first_date)
+        self.assertTrue(first_file <= first_date)
+        self.assertTrue(first_date > first_file)
+        self.assertTrue(first_date >= first_file)
+       
 class SecurityManagerTest(unittest.TestCase):
     def test_nonexistent_import_with_security(self):
         policy = test_support.findfile("python_home.policy")
@@ -337,6 +388,42 @@ class SecurityManagerTest(unittest.TestCase):
         self.assertEquals(subprocess.call([sys.executable,  "-J-Dpython.cachedir.skip=true",
             "-J-Djava.security.manager", "-J-Djava.security.policy=%s" % policy, script]),
             0)
+
+class JavaWrapperCustomizationTest(unittest.TestCase):
+    def tearDown(self):
+        CustomizableMapHolder.clearAdditions()
+
+    def test_adding_item_access(self):
+        m = CustomizableMapHolder()
+        self.assertRaises(TypeError, operator.getitem, m, "initial")
+        CustomizableMapHolder.addGetitem()
+        self.assertEquals(m.held["initial"], m["initial"])
+        # dict would throw a KeyError here, but Map returns null for a missing key
+        self.assertEquals(None, m["nonexistent"])
+        self.assertRaises(TypeError, operator.setitem, m, "initial")
+        CustomizableMapHolder.addSetitem()
+        m["initial"] = 12
+        self.assertEquals(12, m["initial"])
+
+    def test_adding_attributes(self):
+        m = CustomizableMapHolder()
+        self.assertRaises(AttributeError, getattr, m, "initial")
+        CustomizableMapHolder.addGetattribute()
+        self.assertEquals(7, m.held["initial"], "Existing fields should still be accessible")
+        self.assertEquals(7, m.initial)
+        self.assertEquals(None, m.nonexistent, "Nonexistent fields should be passed on to the Map")
+    
+    def test_adding_on_interface(self):    
+        GetitemAdder.addPredefined()
+        class UsesInterfaceMethod(FirstPredefinedGetitem):
+            pass
+        self.assertEquals("key", UsesInterfaceMethod()["key"])
+        
+    def test_add_on_mro_conflict(self):
+        """Adding same-named methods to Java classes with MRO conflicts produces TypeError"""
+        GetitemAdder.addPredefined()
+        self.assertRaises(TypeError, __import__, "org.python.tests.mro.ConfusedOnImport")
+        self.assertRaises(TypeError, GetitemAdder.addPostdefined)
 
 def test_main():
     test_support.run_unittest(InstantiationTest, 
@@ -351,7 +438,8 @@ def test_main():
                               BigNumberTest,
                               JavaStringTest,
                               JavaDelegationTest,
-                              SecurityManagerTest)
+                              SecurityManagerTest,
+                              JavaWrapperCustomizationTest)
 
 if __name__ == "__main__":
     test_main()

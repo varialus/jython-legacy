@@ -5,14 +5,14 @@ import unittest
 
 from test import test_support
 
-from java.lang import (Boolean, Class, ClassLoader, Integer, Object, Runnable, String, Thread,
-        ThreadGroup)
+from java.lang import (Boolean, Class, ClassLoader, Comparable,Integer, Object, Runnable, String,
+        Thread, ThreadGroup)
 from java.util import Date, Hashtable, Vector
 
 from java.awt import Color, Component, Dimension, Rectangle
 from javax.swing.table import AbstractTableModel
 
-from org.python.tests import BeanInterface, Callbacker
+from org.python.tests import BeanInterface, Callbacker, Coercions
 
 class InterfaceTest(unittest.TestCase):
     def test_java_calling_python_interface_implementation(self):
@@ -28,6 +28,22 @@ class InterfaceTest(unittest.TestCase):
             def call(pyself, extraarg):
                 self.fail("Shouldn't be callable with a no args")
         self.assertRaises(TypeError, Callbacker.callNoArg, PyBadCallback())
+
+    def test_inheriting_from_python_and_java_interface(self):
+        calls = []
+        class Runner(Runnable):
+            def run(self):
+                calls.append("Runner.run")
+
+        class ComparableRunner(Comparable, Runner):
+            def compareTo(self, other):
+                calls.append("ComparableRunner.compareTo")
+                return 0
+
+        c = ComparableRunner()
+        c.compareTo(None)
+        c.run()
+        self.assertEquals(calls, ["ComparableRunner.compareTo", "Runner.run"]) 
 
 class TableModelTest(unittest.TestCase):
     def test_class_coercion(self):
@@ -89,17 +105,39 @@ class PythonSubclassesTest(unittest.TestCase):
         except TypeError:
             pass
 
-    def test_multilevel_override(self):
-        class SubDate(Date): 
-           def toString(self): 
-               s = Date.toString(self)
-               return 'SubDate -> Date'
+        class PyDim(Dimension):
+            pass
+        class PyDimRun(PyDim, Runnable):
+            pass
+        try:
+            class PyDimRunCol(PyDimRun, Color):
+                pass
+            self.fail("Shouldn't be able to subclass more than one concrete java class")
+        except TypeError:
+            pass
 
-        class SubSubDate(SubDate): 
+    def test_multilevel_override(self):
+        runs = []
+        class SubDate(Date):
+            def run(self):
+                runs.append("SubDate")
+
+            def method(self):
+                return "SubDateMethod"
+
+            def toString(self): 
+                s = Date.toString(self)
+                return 'SubDate -> Date'
+
+        class SubSubDate(SubDate, Runnable):
             def toString(self):
                 return 'SubSubDate -> ' + SubDate.toString(self) 
+
         self.assertEquals("SubDate -> Date", SubDate().toString())
         self.assertEquals("SubSubDate -> SubDate -> Date", SubSubDate().toString())
+        self.assertEquals("SubDateMethod", SubSubDate().method())
+        Coercions.runRunnable(SubSubDate())
+        self.assertEquals(["SubDate"], runs)
 
     def test_passthrough(self):
         class CallbackPassthrough(Callbacker.Callback):

@@ -1,11 +1,16 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.security.AccessControlException;
 import java.util.Map;
 import java.util.Properties;
@@ -322,7 +327,7 @@ public class PySystemState extends PyObject
             setWarnoptions(value);
         } else {
             PyObject ret = getType().lookup(name); // xxx fix fix fix
-            if (ret != null && ret.jtryset(this, value)) {
+            if (ret != null && ret._doset(this, value)) {
                 return;
             }
             __dict__.__setitem__(name, value);
@@ -333,7 +338,7 @@ public class PySystemState extends PyObject
         checkMustExist(name);
         PyObject ret = getType().lookup(name); // xxx fix fix fix
         if (ret != null) {
-            ret.jtryset(this, PyAttributeDeleted.INSTANCE);
+            ret._doset(this, PyAttributeDeleted.INSTANCE);
         }
         try {
             __dict__.__delitem__(name);
@@ -495,23 +500,24 @@ public class PySystemState extends PyObject
                     jarIndex = lowerCaseClasspath.indexOf(JYTHON_DEV_JAR);
                 }
                 if (jarIndex >= 0) {
-                    int start = classpath.lastIndexOf(java.io.File.pathSeparator, jarIndex) + 1;
+                    int start = classpath.lastIndexOf(File.pathSeparator, jarIndex) + 1;
                     root = classpath.substring(start, jarIndex);
-                } else {
-                    // in case JYTHON_JAR is referenced from a MANIFEST inside another jar on the classpath
-                    root = jarFileName;
+                } else if (jarFileName != null) {
+                    // in case JYTHON_JAR is referenced from a MANIFEST inside another jar on the
+                    // classpath
+                    root = new File(jarFileName).getParent();
                 }
             }
         }
-        if (root != null) {
-            File rootFile = new File(root);
-            try {
-                root = rootFile.getCanonicalPath();
-            } catch (IOException ioe) {
-                root = rootFile.getAbsolutePath();
-            }
+        if (root == null) {
+            return null;
         }
-        return root;
+        File rootFile = new File(root);
+        try {
+            return rootFile.getCanonicalPath();
+        } catch (IOException ioe) {
+            return rootFile.getAbsolutePath();
+        }
     }
 
     public static void determinePlatform(Properties props) {
@@ -539,9 +545,6 @@ public class PySystemState extends PyObject
             Py.writeError("systemState", "trying to reinitialize registry");
             return;
         }
-        if (preProperties == null) {
-            preProperties = getBaseProperties();
-        }
 
         registry = preProperties;
         String prefix = findRoot(preProperties, postProperties, jarFileName);
@@ -554,8 +557,7 @@ public class PySystemState extends PyObject
             }
             try {
                 addRegistryFile(new File(prefix, "registry"));
-                File homeFile = new File(registry.getProperty("user.home"),
-                                         ".jython");
+                File homeFile = new File(registry.getProperty("user.home"), ".jython");
                 addRegistryFile(homeFile);
             } catch (Exception exc) {
             }
@@ -573,9 +575,7 @@ public class PySystemState extends PyObject
             }
         } catch (SecurityException e) {
         }
-        if (postProperties != null) {
-            registry.putAll(postProperties);
-        }
+        registry.putAll(postProperties);
         if (standalone) {
             // set default standalone property (if not yet set)
             if (!registry.containsKey(PYTHON_CACHEDIR_SKIP)) {
@@ -615,21 +615,23 @@ public class PySystemState extends PyObject
     }
 
     public static synchronized void initialize() {
-        initialize(null, null, new String[] {""});
+        initialize(null, null);
+    }
+
+    public static synchronized void initialize(Properties preProperties, Properties postProperties) {
+        initialize(preProperties, postProperties, new String[] {""});
     }
 
     public static synchronized void initialize(Properties preProperties,
                                                Properties postProperties,
-                                               String[] argv)
-    {
+                                               String[] argv) {
         initialize(preProperties, postProperties, argv, null);
     }
 
     public static synchronized void initialize(Properties preProperties,
                                                Properties postProperties,
                                                String[] argv,
-                                               ClassLoader classLoader)
-    {
+                                               ClassLoader classLoader) {
         initialize(preProperties, postProperties, argv, classLoader, new ClassicPyObjectAdapter());
     }
 
@@ -640,6 +642,116 @@ public class PySystemState extends PyObject
                                                ExtensiblePyObjectAdapter adapter) {
         if (initialized) {
             return;
+        }
+        if (preProperties == null) {
+            preProperties = getBaseProperties();
+        }
+        if (postProperties == null) {
+            postProperties = new Properties();
+        }
+        try {
+            ClassLoader context = Thread.currentThread().getContextClassLoader();
+            if (context != null) {
+                if (initialize(preProperties, postProperties, argv, classLoader, adapter, context)) {
+                    return;
+                }
+            } else {
+                Py.writeDebug("initializer", "Context class loader null, skipping");
+            }
+            ClassLoader sysStateLoader = PySystemState.class.getClassLoader();
+            if (sysStateLoader != null) {
+                if (initialize(preProperties,
+                               postProperties,
+                               argv,
+                               classLoader,
+                               adapter,
+                               sysStateLoader)) {
+                    return;
+                }
+            } else {
+                Py.writeDebug("initializer", "PySystemState.class class loader null, skipping");
+            }
+        } catch (UnsupportedCharsetException e) {
+            Py.writeWarning("initializer", "Unable to load the UTF-8 charset to read an initializer definition");
+            e.printStackTrace(System.err);
+        } catch (SecurityException e) {
+            // Must be running in a security environment that doesn't allow access to the class
+            // loader
+        } catch (Exception e) {
+            Py.writeWarning("initializer",
+                            "Unexpected exception thrown while trying to use initializer service");
+            e.printStackTrace(System.err);
+        }
+        doInitialize(preProperties, postProperties, argv, classLoader, adapter);
+    }
+
+    private static final String INITIALIZER_SERVICE =
+        "META-INF/services/org.python.core.JythonInitializer";
+
+    /**
+     * Attempts to read a SystemStateInitializer service from the given classloader, instantiate it,
+     * and initialize with it.
+     *
+     * @throws UnsupportedCharsetException
+     *             if unable to load UTF-8 to read a service definition
+     * @return true if a service is found and successfully initializes.
+     */
+    private static boolean initialize(Properties pre,
+                                      Properties post,
+                                      String[] argv,
+                                      ClassLoader sysClassLoader,
+                                      ExtensiblePyObjectAdapter adapter,
+                                      ClassLoader initializerClassLoader) {
+        InputStream in = initializerClassLoader.getResourceAsStream(INITIALIZER_SERVICE);
+        if (in == null) {
+            Py.writeDebug("initializer", "'" + INITIALIZER_SERVICE + "' not found on " + initializerClassLoader);
+            return false;
+        }
+        BufferedReader r = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
+        String className;
+        try {
+            className = r.readLine();
+        } catch (IOException e) {
+            Py.writeWarning("initializer", "Failed reading '" + INITIALIZER_SERVICE + "' from "
+                    + initializerClassLoader);
+            e.printStackTrace(System.err);
+            return false;
+        }
+        Class<?> initializer;
+        try {
+            initializer = initializerClassLoader.loadClass(className);
+        } catch (ClassNotFoundException e) {
+            Py.writeWarning("initializer", "Specified initializer class '" + className
+                    + "' not found, continuing");
+            return false;
+        }
+        try {
+            ((JythonInitializer)initializer.newInstance()).initialize(pre,
+                                                                      post,
+                                                                      argv,
+                                                                      sysClassLoader,
+                                                                      adapter);
+        } catch (Exception e) {
+            Py.writeWarning("initializer", "Failed initializing with class '" + className
+                    + "', continuing");
+            e.printStackTrace(System.err);
+            return false;
+        }
+        if (!initialized) {
+            Py.writeWarning("initializer", "Initializer '" + className
+                    + "' failed to call doInitialize, using default initialization");
+        }
+        return initialized;
+    }
+
+
+    public static synchronized PySystemState doInitialize(Properties preProperties,
+                                                 Properties postProperties,
+                                                 String[] argv,
+                                                 ClassLoader classLoader,
+                                                 ExtensiblePyObjectAdapter adapter) {
+        if (initialized) {
+            return Py.defaultSystemState;
         }
         initialized = true;
         Py.setAdapter(adapter);
@@ -662,11 +774,13 @@ public class PySystemState extends PyObject
         // Finish up standard Python initialization...
         Py.defaultSystemState = new PySystemState();
         Py.setSystemState(Py.defaultSystemState);
-        if (classLoader != null)
+        if (classLoader != null) {
             Py.defaultSystemState.setClassLoader(classLoader);
+        }
         Py.initClassExceptions(getDefaultBuiltins());
         // Make sure that Exception classes have been loaded
         new PySyntaxError("", 1, 1, "", "");
+        return Py.defaultSystemState;
     }
 
     private static void initStaticFields() {
@@ -888,7 +1002,7 @@ public class PySystemState extends PyObject
         if (url != null) {
             try {
                 String urlString = URLDecoder.decode(url.toString());
-                int jarSeparatorIndex = urlString.indexOf(JAR_SEPARATOR);
+                int jarSeparatorIndex = urlString.lastIndexOf(JAR_SEPARATOR);
                 if (urlString.startsWith(JAR_URL_PREFIX) && jarSeparatorIndex > 0) {
                     jarFileName = urlString.substring(JAR_URL_PREFIX.length(), jarSeparatorIndex);
                 }
@@ -1026,7 +1140,11 @@ public class PySystemState extends PyObject
         PyException exc = Py.getThreadState().exception;
         if(exc == null)
             return new PyTuple(Py.None, Py.None, Py.None);
-        return new PyTuple(exc.type, exc.value, exc.traceback);
+        PyObject tb = exc.traceback;
+        PyObject value = exc.value;
+        return new PyTuple(exc.type,
+                value == null ? Py.None : value,
+                tb == null ? Py.None : tb);
     }
 
     public static void exc_clear() {

@@ -14,9 +14,6 @@ package org.python.core;
  */
 public abstract class PySequence extends PyObject {
 
-    /**
-     * This constructor is used by PyJavaClass.init()
-     */
     public PySequence() {}
     public int gListAllocatedStatus = -1;
 
@@ -252,7 +249,7 @@ public abstract class PySequence extends PyObject {
     protected int boundToSequence(int index) {
         int length = __len__();
         if(index < 0) {
-            index = index += length;
+            index += length;
             if(index < 0) {
                 index = 0;
             }

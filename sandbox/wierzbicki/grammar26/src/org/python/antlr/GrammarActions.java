@@ -493,7 +493,7 @@ public class GrammarActions {
             Num num = (Num)o;
             if (num.getInternalN() instanceof PyInteger) {
                 int v = ((PyInteger)num.getInternalN()).getValue();
-                if (v > 0) {
+                if (v >= 0) {
                     num.setN(new PyInteger(-v));
                     return num;
                 }
@@ -505,13 +505,13 @@ public class GrammarActions {
                 }
             } else if (num.getInternalN() instanceof PyFloat) {
                 double v = ((PyFloat)num.getInternalN()).getValue();
-                if (v > 0) {
+                if (v >= 0) {
                     num.setN(new PyFloat(-v));
                     return num;
                 }
             } else if (num.getInternalN() instanceof PyComplex) {
                 double v = ((PyComplex)num.getInternalN()).imag;
-                if (v > 0) {
+                if (v >= 0) {
                     num.setN(new PyComplex(0,-v));
                     return num;
                 }

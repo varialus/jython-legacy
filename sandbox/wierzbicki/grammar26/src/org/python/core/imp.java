@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.python.compiler.Module;
 import org.python.core.util.FileUtil;
 
 /**
@@ -132,6 +133,14 @@ public class imp {
         return data;
     }
 
+    public static byte[] compileSource(String name, File file) {
+        return compileSource(name, file, null);
+    }
+
+    public static byte[] compileSource(String name, File file, String sourceFilename) {
+        return compileSource(name, file, sourceFilename, null);
+    }
+
     public static byte[] compileSource(String name, File file, String sourceFilename,
             String compiledFilename) {
         if (sourceFilename == null) {
@@ -189,9 +198,7 @@ public class imp {
         }
     }
 
-    public static byte[] compileSource(String name,
-                                InputStream fp,
-                                String filename) {
+    public static byte[] compileSource(String name, InputStream fp, String filename) {
         ByteArrayOutputStream ofp = new ByteArrayOutputStream();
         try {
             if(filename == null) {
@@ -203,21 +210,14 @@ public class imp {
             } finally {
                 fp.close();
             }
-            org.python.compiler.Module.compile(node,
-                                               ofp,
-                                               name + "$py",
-                                               filename,
-                                               true,
-                                               false,
-                                               null);
+            Module.compile(node, ofp, name + "$py", filename, true, false, null);
             return ofp.toByteArray();
         } catch(Throwable t) {
             throw ParserFacade.fixParseError(null, t, filename);
         }
     }
 
-    public static PyObject createFromSource(String name, InputStream fp,
-            String filename) {
+    public static PyObject createFromSource(String name, InputStream fp, String filename) {
         return createFromSource(name, fp, filename, null);
     }
 
@@ -318,40 +318,11 @@ public class imp {
         return importer;
     }
 
-    static PyObject replacePathItem(PySystemState sys, PyObject path) {
-        if (path instanceof SyspathArchive) {
-            // already an archive
-            return null;
-        }
-
-        try {
-            // this has the side affect of adding the jar to the PackageManager
-            // during the initialization of the SyspathArchive
-            return new SyspathArchive(sys.getPath(path.toString()));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     static PyObject find_module(String name, String moduleName, PyList path) {
 
         PyObject loader = Py.None;
         PySystemState sys = Py.getSystemState();
         PyObject metaPath = sys.meta_path;
-
-        /*
-         * Needed to convert all entries on the path to SyspathArchives if
-         * necessary.
-         */
-        PyList ppath = path == null ? sys.path : path;
-        for (int i = 0; i < ppath.__len__(); i++) {
-            PyObject p = ppath.__getitem__(i);
-            PyObject q = replacePathItem(sys, p);
-            if (q == null) {
-                continue;
-            }
-            ppath.__setitem__(i, q);
-        }
 
         for (PyObject importer : metaPath.asIterable()) {
             PyObject findModule = importer.__getattr__("find_module");
@@ -827,14 +798,7 @@ public class imp {
         return submods;
     }
 
-    private static PyTuple all = null;
-
-    private synchronized static PyTuple getStarArg() {
-        if (all == null) {
-            all = new PyTuple(Py.newString('*'));
-        }
-        return all;
-    }
+    private final static PyTuple all = new PyTuple(Py.newString('*'));
 
     /**
      * Called from jython generated code when a statement like "from spam.eggs
@@ -842,7 +806,7 @@ public class imp {
      */
     public static void importAll(String mod, PyFrame frame) {
         PyObject module = __builtin__.__import__(mod, frame.f_globals, frame
-                .getLocals(), getStarArg());
+                .getLocals(), all);
         PyObject names;
         boolean filter = true;
         if (module instanceof PyJavaPackage) {
@@ -859,6 +823,27 @@ public class imp {
 
         loadNames(names, module, frame.getLocals(), filter);
     }
+
+    public static void importAll(PyObject module, PyFrame frame) {
+        PyObject names;
+        boolean filter = true;
+        if (module instanceof PyJavaPackage) {
+            names = ((PyJavaPackage) module).fillDir();
+        } else {
+            PyObject __all__ = module.__findattr__("__all__");
+            if (__all__ != null) {
+                names = __all__;
+                filter = false;
+            } else {
+                names = module.__dir__();
+            }
+        }
+
+        loadNames(names, module, frame.getLocals(), filter);
+    }
+
+
+
 
     /**
      * From a module, load the attributes found in <code>names</code> into

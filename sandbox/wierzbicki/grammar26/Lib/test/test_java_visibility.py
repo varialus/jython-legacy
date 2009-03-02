@@ -68,6 +68,11 @@ class VisibilityTest(unittest.TestCase):
         v = Visible()
         self.assertEquals(Results.PUBLIC_FIELD, v.visibleField)
         self.assertEquals(Results.PUBLIC_STATIC_FIELD, Visible.visibleStaticField)
+        Visible.visibleStaticField = Results.PUBLIC_STATIC_FIELD + 1
+        self.assertEquals(Results.PUBLIC_STATIC_FIELD + 1, Visible.visibleStaticField)
+        self.assertEquals(Results.PUBLIC_STATIC_FIELD + 1, Visible.getVisibleStaticField())
+        Visible.setVisibleStaticField(Results.PUBLIC_STATIC_FIELD)
+        self.assertEquals(Results.PUBLIC_STATIC_FIELD, Visible.visibleStaticField)
         self.assertEquals(Results.PUBLIC_METHOD, v.visibleInstance(0))
         self.assertEquals(Results.OVERLOADED_PUBLIC_METHOD, v.visibleInstance('a'))
         self.assertEquals(Results.EXTRA_ARG_PUBLIC_METHOD, v.visibleInstance(0, 'b'))
@@ -186,6 +191,13 @@ class CoercionTest(unittest.TestCase):
         self.assertEquals("5", c.takePyObjInst(1, 2, 3, 4, 5))
         self.assertEquals("OtherSubVisible[]", c.takeArray([OtherSubVisible()]))
         self.assertEquals("SubVisible[]", c.takeArray([SubVisible()]))
+
+    def test_iterable_coercion(self):
+        def simple_gen():
+            yield 1
+            yield 2
+            yield 3
+        self.assertEquals(6, Coercions.takeIterable(simple_gen()))
 
     def test_class_coercion(self):
         c = Coercions()
