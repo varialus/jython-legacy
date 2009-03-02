@@ -136,6 +136,10 @@ def _map_exception(exc, circumstance=ALL):
     exception.java_exception = exc
     return exception
 
+#XXX: just copying from CPython -- someone with better knowledge of socket.py
+#     should check if this makes sense.
+_GLOBAL_DEFAULT_TIMEOUT = object()
+
 MODE_BLOCKING    = 'block'
 MODE_NONBLOCKING = 'nonblock'
 MODE_TIMEOUT     = 'timeout'

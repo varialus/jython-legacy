@@ -187,6 +187,8 @@ def warn(message, category=None, stacklevel=1):
         fnl = filename.lower()
         if fnl.endswith((".pyc", ".pyo")):
             filename = filename[:-1]
+        elif fnl.endswith("$py.class"):
+            filename = filename[:-9] + '.py'
     else:
         if module == "__main__":
             try:
@@ -391,12 +393,16 @@ _processoptions(sys.warnoptions)
 if not _warnings_defaults:
     simplefilter("ignore", category=PendingDeprecationWarning, append=1)
     simplefilter("ignore", category=ImportWarning, append=1)
-    bytes_warning = sys.flags.bytes_warning
-    if bytes_warning > 1:
-        bytes_action = "error"
-    elif bytes_warning:
-        bytes_action = "default"
-    else:
-        bytes_action = "ignore"
+
+    #FIXME: setting to "ignore" just to get moving
+    bytes_action = "ignore"
+    #bytes_warning = sys.flags.bytes_warning
+    #if bytes_warning > 1:
+    #    bytes_action = "error"
+    #elif bytes_warning:
+    #    bytes_action = "default"
+    #else:
+    #    bytes_action = "ignore"
+
     simplefilter(bytes_action, category=BytesWarning, append=1)
 del _warnings_defaults

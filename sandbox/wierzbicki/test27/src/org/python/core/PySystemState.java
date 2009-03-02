@@ -101,6 +101,9 @@ public class PySystemState extends PyObject
 
     private static boolean initialized = false;
 
+    //XXX: placeholder.
+    public static final boolean py3kwarning = false;
+
     /** The arguments passed to this program on the command line. */
     public PyList argv = new PyList();
 

@@ -553,6 +553,8 @@ def runtest_inner(test, generate, verbose, quiet,
     else:
         cfp = cStringIO.StringIO()
 
+    #XXX: seems to need setting outside of the try block.
+    indirect_test = None
     try:
         save_stdout = sys.stdout
         if junit_xml_dir:
@@ -605,6 +607,7 @@ def runtest_inner(test, generate, verbose, quiet,
             print test, "skipped --", msg
             sys.stdout.flush()
         if junit_xml_dir:
+            from test.junit_xml import Tee, write_direct_test
             write_direct_test(junit_xml_dir, abstest, time.time() - start,
                               'skipped', sys.exc_info(),
                               stdout=stdout.getvalue(),
@@ -629,6 +632,7 @@ def runtest_inner(test, generate, verbose, quiet,
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
         if junit_xml_dir and indirect_test is None:
+            from test.junit_xml import Tee, write_direct_test
             write_direct_test(junit_xml_dir, abstest, time.time() - start,
                               'error', sys.exc_info(),
                               stdout=stdout.getvalue(),
