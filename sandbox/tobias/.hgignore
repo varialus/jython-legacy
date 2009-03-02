@@ -1,4 +1,5 @@
+~$
+\.class$
 \.svn/
-\.hgignore$
-README.txt$
-compiler
+^(?!jython)
+^jython/build/

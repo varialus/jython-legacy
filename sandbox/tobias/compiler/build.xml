@@ -1,0 +1,53 @@
+<project name="compiler" default="build" basedir=".">
+  <property name="source.dir"     location="${basedir}/src"/>
+  <property name="build.dir"      location="${basedir}/build"/>
+  <property name="target.dir"     location="${build.dir}"/>
+  <property name="asm.version"    value="3.1"/>
+  <property name="debug"          value="true"/>
+
+  <target name="build" depends="build setup,compile,jar"/>
+
+  <target name="build setup">
+    <fail unless="javalib.dir">Path to java library not specified.</fail>
+    <fail unless="jython.jar">Path to jython jar not specified.</fail>
+    <fail unless="agent.jar">Path to agent library not specified.</fail>
+    <fail unless="util.jar">Path to utilities jar not specified.</fail>
+    <path id="build.classpath">
+      <pathelement path="${jython.jar}"/>
+      <pathelement path="${agent.jar}"/>
+      <pathelement path="${util.jar}"/>
+      <pathelement path="${javalib.dir}/asm-${asm.version}.jar"/>
+      <pathelement path="${javalib.dir}/asm-commons-${asm.version}.jar"/>
+      <pathelement path="${javalib.dir}/asm-util-${asm.version}.jar"/>
+    </path>
+    <property name="compile.dir"  location="${build.dir}/classes"/>
+    <property name="compiler.jar" location="${target.dir}/compiler.jar"/>
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <target name="compile" depends="build setup">
+    <mkdir dir="${compile.dir}"/>
+    <javac destdir="${compile.dir}"
+	   debug="${debug}"
+	   debuglevel="lines,vars,source"
+	   fork="true">
+      <src path="${source.dir}"/>
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="build setup,compile">
+    <jar destfile="${compiler.jar}">
+      <fileset dir="${compile.dir}"/>
+      <!--
+      <service type="">
+	<provider classname=""/>
+      </service>
+      -->
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+</project>

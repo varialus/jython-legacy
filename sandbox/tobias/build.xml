@@ -1,0 +1,157 @@
+<project name="advanced" default="all" basedir=".">
+  <target name="all" depends="jython,compiler,frame,util,bytecode,agent"/>
+  
+  <property name="target.dir" location="${basedir}/target"/>
+  
+  <!-- Setup mercurial -->
+  <target name="initialize">
+    <exec executable="svn" outputproperty="svn.info">
+      <arg value="info"/>
+      <arg value="jython"/>
+    </exec>
+    <property name="svn.base"
+	      value="https://jython.svn.sourceforge.net/svnroot/jython"/>
+    <condition property="jython.branch" value="trunk">
+      <matches string="${svn.info}" multiline="true">
+	<regexp pattern="^URL: ${svn.base}/trunk/jython$"/>
+      </matches>
+    </condition>
+    <condition property="jython.branch" value="advanced">
+      <matches string="${svn.info}" multiline="true">
+	<regexp pattern="^URL: ${svn.base}/branches/advanced$"/>
+      </matches>
+    </condition>
+    <fail message="Unknown Jython branch" unless="jython.branch"/>
+    <exec executable="hg" outputproperty="hg.tip">
+      <arg value="tip"/>
+    </exec>
+    <condition property="hg.should.commit" value="${os.name}" else="">
+      <matches string="${hg.tip}" multiline="true">
+	<regexp pattern="^changeset: *-1:[0-9a-fA-F]*$"/>
+      </matches>
+    </condition>
+    <exec executable="hg" os="${hg.should.commit}">
+      <arg value="commit"/>
+      <arg value="--addremove"/>
+      <arg value="--message"/>
+      <arg value="Initial import."/>
+    </exec>
+    <exec executable="hg" outputproperty="hg.qselect">
+      <arg value="qselect"/>
+    </exec>
+    <condition property="hg.should.qselect" value="${os.name}" else="">
+      <matches string="${hg.qselect}" multiline="true">
+	<regexp pattern="^no active guards$"/>
+      </matches>
+    </condition>
+    <exec executable="hg" os="${hg.should.qselect}">
+      <arg value="qselect"/>
+      <arg value="${jython.branch}"/>
+    </exec>
+    <exec executable="hg">
+      <arg value="qpush"/>
+      <arg value="-a"/>
+    </exec>
+  </target>
+
+  <target name="setup target">
+    <mkdir dir="${target.dir}"/>
+  </target>
+  <target name="clean" depends="clean jython,clean compiler,clean agent,clean bytecode,clean util,clean frame">
+    <delete dir="${target.dir}"/>
+  </target>
+
+  <target name="jython" depends="setup target">
+    <echo>Building Jython</echo>
+    <ant dir="${basedir}/jython" inheritAll="false">
+      <property name="dist.dir" location="${target.dir}/dist"/>
+    </ant>
+  </target>
+  <target name="regrtest" depends="setup target">
+    <echo>Executing Jython regression tests</echo>
+    <ant dir="${basedir}/jython" inheritAll="false" target="regrtest">
+      <property name="dist.dir" location="${target.dir}/dist"/>
+    </ant>
+  </target>
+  <target name="clean jython">
+    <echo>Cleaning the Jython build</echo>
+    <ant dir="${basedir}/jython" inheritAll="false" target="clean">
+      <property name="dist.dir" location="${target.dir}/dist"/>
+    </ant>
+  </target>
+
+  <target name="compiler" depends="setup target,jython,agent,util">
+    <echo>Building the compiler subproject</echo>
+    <ant dir="${basedir}/compiler" inheritAll="false">
+      <property name="jython.jar" location="${target.dir}/dist/jython-dev.jar"/>
+      <property name="agent.jar" location="${target.dir}/agent-user.jar"/>
+      <property name="javalib.dir" location="${target.dir}/dist/javalib"/>
+      <property name="util.jar" location="${target.dir}/util.jar"/>
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+  <target name="clean compiler">
+    <echo>Cleaning the compiler subproject</echo>
+    <ant dir="${basedir}/compiler" inheritAll="false" target="clean">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+
+  <target name="agent" depends="setup target">
+    <echo>Building the agent subproject</echo>
+    <ant dir="${basedir}/agent" inheritAll="false">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+  <target name="clean agent">
+    <echo>Cleaning the agent subproject</echo>
+    <ant dir="${basedir}/agent" inheritAll="false" target="clean">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+
+  <target name="bytecode" depends="setup target,jython,compiler">
+    <echo>Building the bytecode subproject</echo>
+    <ant dir="${basedir}/bytecode" inheritAll="false">
+      <property name="jython.jar" location="${target.dir}/dist/jython-dev.jar"/>
+      <property name="compiler.jar" location="${target.dir}/compiler.jar"/>
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+  <target name="clean bytecode">
+    <echo>Cleaning the bytecode subproject</echo>
+    <ant dir="${basedir}/bytecode" inheritAll="false" target="clean">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+
+  <target name="util" depends="setup target,jython,frame">
+    <echo>Building the util subproject</echo>
+    <ant dir="${basedir}/util" inheritAll="false">
+      <property name="jython.jar" location="${target.dir}/dist/jython-dev.jar"/>
+      <property name="frame.jar"
+		location="${target.dir}/dist/frame/frameintrospect.jar"/>
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+  <target name="clean util">
+    <echo>Cleaning the util subproject</echo>
+    <ant dir="${basedir}/util" inheritAll="false" target="clean">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+
+  <target name="frame" depends="setup target">
+    <echo>Building the frame subproject</echo>
+    <ant dir="${basedir}/frame" inheritAll="false">
+      <property name="jython.jar" location="${target.dir}/dist/jython-dev.jar"/>
+      <property name="build" location="${target.dir}/frame"/>
+    </ant>
+  </target>
+  <target name="clean frame">
+    <echo>Cleaning the frame subproject</echo>
+    <ant dir="${basedir}/frame" inheritAll="false" target="clean">
+      <property name="build" location="${target.dir}/frame"/>
+    </ant>
+  </target>
+</project>

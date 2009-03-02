@@ -1,0 +1,48 @@
+<project name="instrumentation-agent" default="all" basedir=".">
+  <target name="all" depends="agent,user"/>
+  <property name="source.dir"     location="${basedir}/src"/>
+  <property name="build.dir"      location="${basedir}/build"/>
+  <property name="compile.dir"    location="${build.dir}/classes"/>
+  <property name="target.dir"     location="${build.dir}"/>
+  <property name="agent.jar"      location="${target.dir}/agent.jar"/>
+  <property name="user.jar"       location="${target.dir}/agent-user.jar"/>
+  <property name="agent.name"     value="DeferringAgent"/>
+  <property name="agent.package"  value="org.python.javaagent"/>
+  <property name="agent.class"    value="${agent.package}.${agent.name}"/>
+  <property name="debug"          value="true"/>
+  <property name="agent.pattern"  value="**/${agent.name}.class"/>
+  
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <target name="build">
+    <mkdir dir="${compile.dir}"/>
+    <javac destdir="${compile.dir}"
+	   debug="${debug}"
+	   debuglevel="lines,vars,source"
+	   fork="true">
+      <src path="${source.dir}"/>
+    </javac>
+  </target>
+
+  <target name="agent" depends="build">
+    <jar destfile="${agent.jar}">
+      <fileset dir="${build.dir}"
+	       includes="${agent.pattern}"/>
+      <manifest>
+	<attribute name="Premain-Class" value="${agent.class}"/>
+	<attribute name="Can-Redefine-Classes" value="true"/>
+	<attribute name="Agent-Class" value="${agent.class}"/>
+	<attribute name="Can-Retransform-Classes" value="true"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="user" depends="build">
+    <jar destfile="${user.jar}">
+      <fileset dir="${build.dir}"
+	       excludes="${agent.pattern}"/>
+    </jar>
+  </target>
+</project>

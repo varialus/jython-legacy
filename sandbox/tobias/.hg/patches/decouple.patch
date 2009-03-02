@@ -1,0 +1,375 @@
+diff --git a/jython/src/org/python/compiler/LegacyCompiler.java b/jython/src/org/python/compiler/LegacyCompiler.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/compiler/LegacyCompiler.java
+@@ -0,0 +1,72 @@
++package org.python.compiler;
++
++import java.io.ByteArrayOutputStream;
++import java.io.OutputStream;
++
++import org.python.antlr.base.mod;
++import org.python.core.BytecodeLoader;
++import org.python.core.CompilerFlags;
++import org.python.core.Py;
++import org.python.core.PyCode;
++import org.python.core.PythonCodeBundle;
++import org.python.core.PythonCompiler;
++
++public class LegacyCompiler implements PythonCompiler {
++
++    public PythonCodeBundle compile(mod node, String name, String filename,
++            boolean linenumbers, boolean printResults, CompilerFlags cflags) {
++        return new LazyLegacyBundle(node, name, filename, linenumbers,
++                printResults, cflags);
++    }
++
++    private static class LazyLegacyBundle implements PythonCodeBundle {
++
++        private final mod node;
++        private final String name;
++        private final String filename;
++        private final boolean linenumbers;
++        private final boolean printResults;
++        private final CompilerFlags cflags;
++        private ByteArrayOutputStream ostream = null;
++
++        public LazyLegacyBundle(mod node, String name, String filename,
++                boolean linenumbers, boolean printResults, CompilerFlags cflags) {
++            this.node = node;
++            this.name = name;
++            this.filename = filename;
++            this.linenumbers = linenumbers;
++            this.printResults = printResults;
++            this.cflags = cflags;
++        }
++
++        public PyCode loadCode() throws Exception {
++            return BytecodeLoader.makeCode(name, ostream().toByteArray(),
++                    filename);
++        }
++
++        public void writeTo(OutputStream stream) throws Exception {
++            if (this.ostream != null) {
++                stream.write(ostream.toByteArray());
++            } else {
++                Module.compile(node, stream, name, filename, linenumbers,
++                        printResults, cflags);
++            }
++        }
++
++        public void saveCode(String directory) throws Exception {
++            // FIXME: this is slightly broken, it should use the directory
++            Py.saveClassFile(name, ostream());
++        }
++
++        private ByteArrayOutputStream ostream() throws Exception {
++            if (ostream == null) {
++                ostream = new ByteArrayOutputStream();
++                Module.compile(node, ostream, name, filename, linenumbers,
++                        printResults, cflags);
++            }
++            return ostream;
++        }
++
++    }
++
++}
+diff --git a/jython/src/org/python/compiler/Module.java b/jython/src/org/python/compiler/Module.java
+--- a/jython/src/org/python/compiler/Module.java
++++ b/jython/src/org/python/compiler/Module.java
+@@ -12,10 +12,14 @@
+ 
+ import org.objectweb.asm.Label;
+ import org.objectweb.asm.Opcodes;
++import org.python.core.CodeBootstrap;
+ import org.python.core.CodeFlag;
++import org.python.core.CodeLoader;
+ import org.python.core.CompilerFlags;
+ import org.python.core.Py;
+ import org.python.core.PyException;
++import org.python.core.PyRunnableBootstrap;
++import org.objectweb.asm.Type;
+ import org.python.antlr.ParseException;
+ import org.python.antlr.PythonTree;
+ import org.python.antlr.ast.Suite;
+@@ -541,10 +545,26 @@
+         c.dup();
+         c.ldc(classfile.name);
+         c.invokespecial(classfile.name, "<init>", "(" + $str + ")V");
++        c.invokevirtual(classfile.name, "getMain", "()" + $pyCode);
++        String bootstrap = Type.getDescriptor(CodeBootstrap.class);
++        c.invokestatic(Type.getInternalName(CodeLoader.class),
++                CodeLoader.SIMPLE_FACTORY_METHOD_NAME,
++                "(" + $pyCode +  ")" + bootstrap);
+         c.aload(0);
+-        c.invokestatic("org/python/core/Py", "runMain", "(" + $pyRunnable + $strArr + ")V");
++        c.invokestatic("org/python/core/Py", "runMain", "(" + bootstrap + $strArr + ")V");
+         c.return_();
+     }
++    
++    public void addBootstrap() throws IOException {
++        Code c = classfile.addMethod(CodeLoader.GET_BOOTSTRAP_METHOD_NAME,
++                "()" + Type.getDescriptor(CodeBootstrap.class),
++                ACC_PUBLIC | ACC_STATIC);
++        c.ldc(Type.getType("L" + classfile.name + ";"));
++        c.invokestatic(Type.getInternalName(PyRunnableBootstrap.class),
++                PyRunnableBootstrap.REFLECTION_METHOD_NAME,
++                "(" + $clss + ")" + Type.getDescriptor(CodeBootstrap.class));
++        c.areturn();
++    }
+ 
+     public void addConstants(Code c) throws IOException {
+         classfile.addField("self", "L"+classfile.name+";",
+@@ -599,6 +619,7 @@
+         addInit();
+         addRunnable();
+         addMain();
++        addBootstrap();
+ 
+         addFunctions();
+ 
+diff --git a/jython/src/org/python/core/CodeBootstrap.java b/jython/src/org/python/core/CodeBootstrap.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/CodeBootstrap.java
+@@ -0,0 +1,7 @@
++package org.python.core;
++
++public interface CodeBootstrap {
++    
++    PyCode loadCode(CodeLoader loader);
++
++}
+diff --git a/jython/src/org/python/core/CodeLoader.java b/jython/src/org/python/core/CodeLoader.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/CodeLoader.java
+@@ -0,0 +1,60 @@
++package org.python.core;
++
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++import java.lang.reflect.Modifier;
++
++public final class CodeLoader {
++
++    public static final String GET_BOOTSTRAP_METHOD_NAME = "getCodeBootstrap";
++    public final String name;
++    public final String filename;
++
++    private CodeLoader(String name, String filename) {
++        this.name = name;
++        this.filename = filename;
++    }
++
++    public static boolean canLoad(Class<?> cls) {
++        try {
++            Method getBootstrap = cls.getMethod(GET_BOOTSTRAP_METHOD_NAME);
++            return Modifier.isStatic(getBootstrap.getModifiers());
++        } catch (Exception e) {
++            return false;
++        }
++    }
++
++    public static PyCode loadCode(Class<?> cls, String name, String filename)
++            throws SecurityException, NoSuchMethodException,
++            IllegalArgumentException, IllegalAccessException,
++            InvocationTargetException {
++        Method getBootstrap = cls.getMethod(GET_BOOTSTRAP_METHOD_NAME);
++        CodeBootstrap bootstrap = (CodeBootstrap) getBootstrap.invoke(null);
++        return loadCode(bootstrap, name, filename);
++    }
++
++    public static PyCode loadCode(Class<?> cls) throws SecurityException,
++            IllegalArgumentException, NoSuchMethodException,
++            IllegalAccessException, InvocationTargetException {
++        return loadCode(cls, null, null);
++    }
++
++    public static PyCode loadCode(CodeBootstrap bootstrap, String name,
++            String filename) {
++        return bootstrap.loadCode(new CodeLoader(name, filename));
++    }
++
++    public static PyCode loadCode(CodeBootstrap bootstrap) {
++        return loadCode(bootstrap, null, null);
++    }
++
++    public static final String SIMPLE_FACTORY_METHOD_NAME = "createSimpleBootstrap";
++
++    public static CodeBootstrap createSimpleBootstrap(final PyCode code) {
++        return new CodeBootstrap() {
++            public PyCode loadCode(CodeLoader loader) {
++                return code;
++            }
++        };
++    }
++}
+diff --git a/jython/src/org/python/core/CompilerFacade.java b/jython/src/org/python/core/CompilerFacade.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/CompilerFacade.java
+@@ -0,0 +1,39 @@
++package org.python.core;
++
++import org.python.antlr.base.mod;
++import org.python.compiler.LegacyCompiler;
++
++/**
++ * Facade for different compiler implementations.
++ * 
++ * The static methods of this class act as a Facade for the compiler subsystem.
++ * This is so that the rest of Jython (even generated code) can statically link
++ * to the static interface of this class, while allowing for different
++ * implementations of the various components of the compiler subsystem.
++ * 
++ * @author Tobias Ivarsson
++ */
++public class CompilerFacade {
++    
++    private static volatile PythonCompiler compiler = loadDefaultCompiler();
++
++    public static void setCompiler(PythonCompiler compiler) {
++        CompilerFacade.compiler = compiler;
++    }
++
++    private static PythonCompiler loadDefaultCompiler() {
++        return new LegacyCompiler();
++    }
++
++    public static PyCode compile(mod node, String name, String filename,
++            boolean linenumbers, boolean printResults, CompilerFlags cflags) {
++        try {
++            PythonCodeBundle bundle = compiler.compile(node, name, filename,
++                    linenumbers, printResults, cflags);
++            bundle.saveCode(Options.proxyDebugDirectory);
++            return bundle.loadCode();
++        } catch (Throwable t) {
++            throw ParserFacade.fixParseError(null, t, filename);
++        }
++    }
++}
+diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.java
+--- a/jython/src/org/python/core/Py.java
++++ b/jython/src/org/python/core/Py.java
+@@ -862,9 +862,19 @@
+      * Called by the code generated in {@link Module#addMain()}
+      */
+     public static void runMain(PyRunnable main, String[] args) throws Exception {
++        runMain(new PyRunnableBootstrap(main), args);
++    }
++
++    /**
++     * Initializes a default PythonInterpreter and runs the code loaded from the
++     * {@link CodeBootstrap} as __main__ Called by the code generated in
++     * {@link Module#addMain()}
++     */
++    public static void runMain(CodeBootstrap main, String[] args)
++            throws Exception {
+         PySystemState.initialize(null, null, args, main.getClass().getClassLoader());
+         try {
+-            imp.createFromCode("__main__", main.getMain());
++            imp.createFromCode("__main__", CodeLoader.loadCode(main));
+         } catch (PyException e) {
+             Py.getSystemState().callExitFunc();
+             if (Py.matchException(e, Py.SystemExit)) {
+@@ -1632,6 +1642,8 @@
+     public static PyCode compile_flags(mod node, String name, String filename,
+                                          boolean linenumbers, boolean printResults,
+                                          CompilerFlags cflags) {
++        return CompilerFacade.compile(node, name, filename, linenumbers, printResults, cflags);
++        /*
+         try {
+             ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+             Module.compile(node, ostream, name, filename, linenumbers, printResults, cflags);
+@@ -1642,6 +1654,7 @@
+         } catch (Throwable t) {
+             throw ParserFacade.fixParseError(null, t, filename);
+         }
++        */
+     }
+ 
+     public static PyCode compile_flags(mod node, String filename,
+diff --git a/jython/src/org/python/core/PyRunnableBootstrap.java b/jython/src/org/python/core/PyRunnableBootstrap.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/PyRunnableBootstrap.java
+@@ -0,0 +1,43 @@
++package org.python.core;
++
++import java.lang.reflect.Constructor;
++
++public class PyRunnableBootstrap implements CodeBootstrap {
++
++    public static final String REFLECTION_METHOD_NAME = "getFilenameConstructorReflectionBootstrap";
++    private final PyRunnable runnable;
++
++    PyRunnableBootstrap(PyRunnable runnable) {
++        this.runnable = runnable;
++    }
++
++    public PyCode loadCode(CodeLoader loader) {
++        return runnable.getMain();
++    }
++
++    public static CodeBootstrap getFilenameConstructorReflectionBootstrap(
++            Class<? extends PyRunnable> cls) {
++        final Constructor<? extends PyRunnable> constructor;
++        try {
++            constructor = cls.getConstructor(String.class);
++        } catch (Exception e) {
++            throw new IllegalArgumentException(
++                    "PyRunnable class does not specify apropriate constructor.",
++                    e);
++        }
++        return new CodeBootstrap() {
++
++            public PyCode loadCode(CodeLoader loader) {
++                try {
++                    return constructor.newInstance(loader.filename).getMain();
++                } catch (Exception e) {
++                    throw new IllegalArgumentException(
++                            "PyRunnable class constructor does not support instantiation protocol.",
++                            e);
++                }
++            }
++
++        };
++    }
++
++}
+diff --git a/jython/src/org/python/core/PythonCodeBundle.java b/jython/src/org/python/core/PythonCodeBundle.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/PythonCodeBundle.java
+@@ -0,0 +1,13 @@
++package org.python.core;
++
++import java.io.OutputStream;
++
++public interface PythonCodeBundle {
++
++    PyCode loadCode() throws Exception;
++
++    void writeTo(OutputStream stream) throws Exception;
++
++    void saveCode(String directory) throws Exception;
++
++}
+diff --git a/jython/src/org/python/core/PythonCompiler.java b/jython/src/org/python/core/PythonCompiler.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/PythonCompiler.java
+@@ -0,0 +1,11 @@
++package org.python.core;
++
++import org.python.antlr.base.mod;
++
++public interface PythonCompiler {
++
++    PythonCodeBundle compile(mod node, String name, String filename,
++            boolean linenumbers, boolean printResults, CompilerFlags cflags)
++            throws Exception;
++
++}

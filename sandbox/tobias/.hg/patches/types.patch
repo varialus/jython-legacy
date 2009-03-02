@@ -1,0 +1,1546 @@
+diff --git a/jython/Lib/codeop.py b/jython/Lib/codeop.py
+--- a/jython/Lib/codeop.py
++++ b/jython/Lib/codeop.py
+@@ -57,8 +57,8 @@
+ """
+ 
+ # import internals, not guaranteed interface
+-from org.python.core import Py,CompilerFlags
+-from org.python.core.PyTableCode import PyCF_DONT_IMPLY_DEDENT
++from org.python.core import Py,CompilerFlags,CompileMode
++from org.python.core.CompilerFlags import PyCF_DONT_IMPLY_DEDENT
+ 
+ # public interface
+ 
+@@ -84,6 +84,7 @@
+     """
+     if symbol not in ['single','eval']:
+         raise ValueError,"symbol arg must be either single or eval"
++    symbol = CompileMode.getMode(symbol)
+     return Py.compile_command_flags(source,filename,symbol,Py.getCompilerFlags(),0)
+ 
+ class Compile:
+@@ -95,6 +96,7 @@
+         self._cflags = CompilerFlags()
+ 
+     def __call__(self, source, filename, symbol):
++        symbol = CompileMode.getMode(symbol)
+         return Py.compile_flags(source, filename, symbol, self._cflags)
+ 
+ class CommandCompiler:
+@@ -128,5 +130,6 @@
+         """
+         if symbol not in ['single','eval']:
+             raise ValueError,"symbol arg must be either single or eval"
++        symbol = CompileMode.getMode(symbol)
+         return Py.compile_command_flags(source,filename,symbol,self._cflags,0)
+ 
+diff --git a/jython/src/org/python/Version.java b/jython/src/org/python/Version.java
+--- a/jython/src/org/python/Version.java
++++ b/jython/src/org/python/Version.java
+@@ -3,7 +3,13 @@
+ 
+ import java.io.InputStream;
+ import java.io.IOException;
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.EnumSet;
+ import java.util.Properties;
++import java.util.Set;
++
++import org.python.core.CodeFlag;
+ 
+ /**
+  * Jython version information.
+@@ -36,6 +42,10 @@
+     /** Short version of branch, e.g. asm. */
+     public static String SHORT_BRANCH;
+ 
++    /** The flags that are set by default in a code object. */
++    private static final Collection<CodeFlag> defaultCodeFlags = Arrays.asList(
++            CodeFlag.CO_NESTED, CodeFlag.CO_GENERATOR_ALLOWED);
++
+     private static final String headURL =
+             "$HeadURL: https://jython.svn.sourceforge.net/svnroot/jython/trunk/jython/src/org/python/Version.java $";
+ 
+@@ -144,4 +154,8 @@
+     public static String getVersion() {
+         return String.format("%.80s (%.80s) %.80s", PY_VERSION, getBuildInfo(), getVM());
+     }
++
++    public static Set<CodeFlag> getDefaultCodeFlags() {
++        return EnumSet.copyOf(defaultCodeFlags);
++    }
+ }
+diff --git a/jython/src/org/python/antlr/BaseParser.java b/jython/src/org/python/antlr/BaseParser.java
+--- a/jython/src/org/python/antlr/BaseParser.java
++++ b/jython/src/org/python/antlr/BaseParser.java
+@@ -1,15 +1,31 @@
+ package org.python.antlr;
+ 
+ import org.antlr.runtime.CharStream;
++import org.antlr.runtime.CommonTokenStream;
++import org.antlr.runtime.RecognitionException;
+ import org.antlr.runtime.Token;
++import org.python.antlr.base.mod;
+ 
+ public class BaseParser {
+ 
+-    protected CharStream charStream;
+-    protected boolean partial;
+-    protected String filename;
+-    protected String encoding;
++    protected final CharStream charStream;
++    @Deprecated
++    protected final boolean partial;
++    protected final String filename;
++    protected final String encoding;
+     protected ErrorHandler errorHandler = new FailFastHandler();
++    
++    public BaseParser(CharStream stream, String filename, String encoding) {
++        this(stream, filename, encoding, false);
++    }
++    
++    @Deprecated
++    public BaseParser(CharStream stream, String filename, String encoding, boolean partial) {
++        this.charStream = stream;
++        this.filename = filename;
++        this.encoding = encoding;
++        this.partial = partial;
++    }
+ 
+     public void setAntlrErrorHandler(ErrorHandler eh) {
+         this.errorHandler = eh;
+@@ -25,4 +41,60 @@
+             return super.nextToken();
+         }
+     }
++    
++    private CharStream charStream(boolean single) {
++        return charStream;
++    }
++
++    private PythonParser setupParser(boolean single) {
++        PythonLexer lexer = new PyLexer(this.charStream(single));
++        lexer.setErrorHandler(errorHandler);
++        CommonTokenStream tokens = new CommonTokenStream(lexer);
++        PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename, single);
++        tokens = new CommonTokenStream(indentedSource);
++        PythonParser parser = new PythonParser(tokens, encoding);
++        parser.setErrorHandler(errorHandler);
++        parser.setTreeAdaptor(new PythonTreeAdaptor());
++        return parser;
++    }
++
++    public mod parseExpression() {
++        mod tree = null;
++        PythonParser parser = setupParser(false);
++        try {
++            PythonParser.eval_input_return r = parser.eval_input();
++            tree = (mod)r.tree;
++        } catch (RecognitionException e) {
++            //XXX: this can't happen.  Need to strip the throws from antlr
++            //     generated code.
++        }
++        return tree;
++    }
++
++    public mod parseInteractive() {
++        mod tree = null;
++        PythonParser parser = setupParser(true);
++        try {
++            PythonParser.single_input_return r = parser.single_input();
++            tree = (mod)r.tree;
++        } catch (RecognitionException e) {
++            //I am only throwing ParseExceptions, but "throws RecognitionException" still gets
++            //into the generated code.
++            System.err.println("FIXME: pretty sure this can't happen -- but needs to be checked");
++        }
++        return tree;
++    }
++
++    public mod parseModule() {
++        mod tree = null;
++        PythonParser parser = setupParser(false);
++        try {
++            PythonParser.file_input_return r = parser.file_input();
++            tree = (mod)r.tree;
++        } catch (RecognitionException e) {
++            //XXX: this can't happen.  Need to strip the throws from antlr
++            //     generated code.
++        }
++        return tree;
++    }
+ }
+diff --git a/jython/src/org/python/antlr/ExpressionParser.java b/jython/src/org/python/antlr/ExpressionParser.java
+deleted file mode 100644
+--- a/jython/src/org/python/antlr/ExpressionParser.java
++++ /dev/null
+@@ -1,36 +0,0 @@
+-package org.python.antlr;
+-
+-import org.antlr.runtime.CharStream;
+-import org.antlr.runtime.CommonTokenStream;
+-import org.antlr.runtime.RecognitionException;
+-import org.python.antlr.base.mod;
+-
+-public class ExpressionParser extends BaseParser {
+-
+-    public ExpressionParser(CharStream cs, String filename, String encoding) {
+-        this.charStream = cs;
+-        this.filename = filename;
+-        this.encoding = encoding;
+-    }
+-
+-    public mod parse() {
+-        mod tree = null;
+-        PythonLexer lexer = new PyLexer(this.charStream);
+-        lexer.setErrorHandler(errorHandler);
+-        CommonTokenStream tokens = new CommonTokenStream(lexer);
+-        PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename);
+-        tokens = new CommonTokenStream(indentedSource);
+-        PythonParser parser = new PythonParser(tokens, encoding);
+-        parser.setErrorHandler(errorHandler);
+-        parser.setTreeAdaptor(new PythonTreeAdaptor());
+-
+-        try {
+-            PythonParser.eval_input_return r = parser.eval_input();
+-            tree = (mod)r.tree;
+-        } catch (RecognitionException e) {
+-            //XXX: this can't happen.  Need to strip the throws from antlr
+-            //     generated code.
+-        }
+-        return tree;
+-    }
+-}
+diff --git a/jython/src/org/python/antlr/InteractiveParser.java b/jython/src/org/python/antlr/InteractiveParser.java
+deleted file mode 100644
+--- a/jython/src/org/python/antlr/InteractiveParser.java
++++ /dev/null
+@@ -1,41 +0,0 @@
+-package org.python.antlr;
+-
+-import java.io.BufferedReader;
+-import java.io.IOException;
+-
+-import org.antlr.runtime.CommonTokenStream;
+-import org.antlr.runtime.RecognitionException;
+-import org.python.antlr.base.mod;
+-
+-public class InteractiveParser extends BaseParser {
+-
+-    private BufferedReader bufreader;
+-
+-    public InteractiveParser(BufferedReader br, String filename, String encoding) {
+-        this.bufreader = br;
+-        this.filename = filename;
+-        this.encoding = encoding;
+-    }
+-
+-    public mod parse() throws IOException {
+-        mod tree = null;
+-        PythonLexer lexer = new PyLexer(new NoCloseReaderStream(bufreader));
+-        lexer.setErrorHandler(errorHandler);
+-        CommonTokenStream tokens = new CommonTokenStream(lexer);
+-        PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename, true);
+-        tokens = new CommonTokenStream(indentedSource);
+-        PythonParser parser = new PythonParser(tokens, encoding);
+-        parser.setErrorHandler(errorHandler);
+-        parser.setTreeAdaptor(new PythonTreeAdaptor());
+-
+-        try {
+-            PythonParser.single_input_return r = parser.single_input();
+-            tree = (mod)r.tree;
+-        } catch (RecognitionException e) {
+-            //I am only throwing ParseExceptions, but "throws RecognitionException" still gets
+-            //into the generated code.
+-            System.err.println("FIXME: pretty sure this can't happen -- but needs to be checked");
+-        }
+-        return tree;
+-    }
+-}
+diff --git a/jython/src/org/python/antlr/ModuleParser.java b/jython/src/org/python/antlr/ModuleParser.java
+deleted file mode 100644
+--- a/jython/src/org/python/antlr/ModuleParser.java
++++ /dev/null
+@@ -1,39 +0,0 @@
+-package org.python.antlr;
+-
+-import org.antlr.runtime.CharStream;
+-import org.antlr.runtime.CommonTokenStream;
+-import org.antlr.runtime.RecognitionException;
+-import org.python.antlr.base.mod;
+-
+-public class ModuleParser extends BaseParser {
+-    public ModuleParser(CharStream cs, String filename, String encoding) {
+-        this(cs, filename, encoding, false);
+-    }
+-
+-    public ModuleParser(CharStream cs, String filename, String encoding, boolean partial) {
+-        this.charStream = cs;
+-        this.filename = filename;
+-        this.encoding = encoding;
+-        this.partial = partial;
+-    }
+-
+-    public mod file_input() {
+-        mod tree = null;
+-        PythonLexer lexer = new PyLexer(this.charStream);
+-        lexer.setErrorHandler(errorHandler);
+-        CommonTokenStream tokens = new CommonTokenStream(lexer);
+-        PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename);
+-        tokens = new CommonTokenStream(indentedSource);
+-        PythonParser parser = new PythonParser(tokens, encoding);
+-        parser.setErrorHandler(errorHandler);
+-        parser.setTreeAdaptor(new PythonTreeAdaptor());
+-        try {
+-            PythonParser.file_input_return r = parser.file_input();
+-            tree = (mod)r.tree;
+-        } catch (RecognitionException e) {
+-            //XXX: this can't happen.  Need to strip the throws from antlr
+-            //     generated code.
+-        }
+-        return tree;
+-    }
+-}
+diff --git a/jython/src/org/python/antlr/ast/AstModule.java b/jython/src/org/python/antlr/ast/AstModule.java
+--- a/jython/src/org/python/antlr/ast/AstModule.java
++++ b/jython/src/org/python/antlr/ast/AstModule.java
+@@ -8,12 +8,12 @@
+ import org.python.antlr.op.*;
+ import org.python.core.AstList;
+ import org.python.core.ClassDictInit;
++import org.python.core.CompilerFlags;
+ import org.python.core.imp;
+ import org.python.core.Py;
+ import org.python.core.PyInteger;
+ import org.python.core.PyObject;
+ import org.python.core.PyString;
+-import org.python.core.PyTableCode;
+ import org.python.core.PyType;
+ 
+ import org.python.antlr.AST;
+@@ -27,7 +27,7 @@
+         dict.__setitem__("__doc__", Py.None);
+         dict.__setitem__("__name__", new PyString("_ast"));
+         dict.__setitem__("__version__", new PyString("62047"));
+-        dict.__setitem__("PyCF_ONLY_AST", new PyInteger(PyTableCode.PyCF_ONLY_AST));
++        dict.__setitem__("PyCF_ONLY_AST", new PyInteger(CompilerFlags.PyCF_ONLY_AST));
+ 
+         dict.__setitem__("astlist", AstList.TYPE);
+ 
+diff --git a/jython/src/org/python/compiler/Future.java b/jython/src/org/python/compiler/Future.java
+--- a/jython/src/org/python/compiler/Future.java
++++ b/jython/src/org/python/compiler/Future.java
+@@ -8,73 +8,65 @@
+ import org.python.antlr.ast.Interactive;
+ import org.python.antlr.ast.Module;
+ import org.python.antlr.ast.Str;
++import org.python.antlr.ast.alias;
+ import org.python.antlr.base.mod;
+ import org.python.antlr.base.stmt;
++import org.python.core.CodeFlag;
++import org.python.core.FutureFeature;
++import org.python.core.Pragma;
++import org.python.core.PragmaReceiver;
+ 
++import java.util.EnumSet;
+ import java.util.List;
++import java.util.Set;
+ 
+ public class Future {
++    Set<FutureFeature> featureSet = EnumSet.noneOf(FutureFeature.class);
++    private final PragmaReceiver features = new PragmaReceiver() {
+ 
+-    private boolean division = false;
+-    private boolean with_statement = false;
+-    private boolean absolute_import = false;
++        public void add(Pragma pragma) {
++            if (pragma instanceof FutureFeature) {
++                FutureFeature feature = (FutureFeature) pragma;
++                featureSet.add(feature);
++            }
++        }
+ 
+-    private static final String FUTURE = "__future__";
++    };
+ 
+     private boolean check(ImportFrom cand) throws Exception {
+-        if (!cand.getInternalModule().equals(FUTURE))
++        if (!cand.getInternalModule().equals(FutureFeature.MODULE_NAME))
+             return false;
+-        int n = cand.getInternalNames().size();
+-        if (n == 0) {
+-            throw new ParseException("future statement does not support import *", cand);
++        if (cand.getInternalNames().isEmpty()) {
++            throw new ParseException(
++                    "future statement does not support import *", cand);
+         }
+-        for (int i = 0; i < n; i++) {
+-            String feature = cand.getInternalNames().get(i).getInternalName();
+-            // *known* features
+-            if (feature.equals("nested_scopes")) {
+-                continue;
++        try {
++            for (alias feature : cand.getInternalNames()) {
++                // *known* features
++                FutureFeature.addFeature(feature.getInternalName(), features);
+             }
+-            if (feature.equals("division")) {
+-                division = true;
+-                continue;
+-            }
+-            if (feature.equals("generators")) {
+-                continue;
+-            }
+-            if (feature.equals("with_statement")) {
+-                with_statement = true;
+-                continue;
+-            }
+-            if (feature.equals("absolute_import")) {
+-                absolute_import = true;
+-                continue;
+-            }
+-            if (feature.equals("braces")) {
+-                throw new ParseException("not a chance", cand);
+-            }
+-            if (feature.equals("GIL") || feature.equals("global_interpreter_lock")) {
+-                throw new ParseException("Never going to happen!", cand);
+-            }
+-            throw new ParseException("future feature " + feature + " is not defined", cand);
++        } catch (ParseException pe) {
++            throw new ParseException(pe.getMessage(), cand);
+         }
+         return true;
+     }
+ 
+-    public void preprocessFutures(mod node,
+-                                  org.python.core.CompilerFlags cflags)
+-        throws Exception
+-    {
++    public void preprocessFutures(mod node, org.python.core.CompilerFlags cflags)
++            throws Exception {
+         if (cflags != null) {
+-            division = cflags.division;
+-            with_statement = cflags.with_statement;
+-            absolute_import = cflags.absolute_import;
++            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION))
++                FutureFeature.division.addTo(features);
++            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_WITH_STATEMENT))
++                FutureFeature.with_statement.addTo(features);
++            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT))
++                FutureFeature.absolute_import.addTo(features);
+         }
+         int beg = 0;
+         List<stmt> suite = null;
+         if (node instanceof Module) {
+             suite = ((Module) node).getInternalBody();
+-            if (suite.size() > 0 && suite.get(0) instanceof Expr &&
+-                            ((Expr) suite.get(0)).getInternalValue() instanceof Str) {
++            if (suite.size() > 0 && suite.get(0) instanceof Expr
++                    && ((Expr) suite.get(0)).getInternalValue() instanceof Str) {
+                 beg++;
+             }
+         } else if (node instanceof Interactive) {
+@@ -85,45 +77,36 @@
+ 
+         for (int i = beg; i < suite.size(); i++) {
+             stmt s = suite.get(i);
+-            if (!(s instanceof ImportFrom))
+-                break;
++            if (!(s instanceof ImportFrom)) break;
+             s.from_future_checked = true;
+-            if (!check((ImportFrom)s))
+-                break;
++            if (!check((ImportFrom) s)) break;
+         }
+ 
+         if (cflags != null) {
+-            cflags.division = cflags.division || division;
+-        }
+-        if (cflags != null) {
+-            cflags.with_statement = cflags.with_statement || with_statement;
+-        }
+-        if (cflags != null) {
+-            cflags.absolute_import = cflags.absolute_import || absolute_import;
++            for (FutureFeature feature : featureSet) {
++                feature.setFlag(cflags);
++            }
+         }
+     }
+ 
+-
+     public static void checkFromFuture(ImportFrom node) throws Exception {
+-        if (node.from_future_checked)
+-            return;
+-        if (node.getInternalModule().equals(FUTURE)) {
+-            throw new ParseException("from __future__ imports must occur " +
+-                                     "at the beginning of the file",node);
++        if (node.from_future_checked) return;
++        if (node.getInternalModule().equals(FutureFeature.MODULE_NAME)) {
++            throw new ParseException("from __future__ imports must occur "
++                    + "at the beginning of the file", node);
+         }
+         node.from_future_checked = true;
+     }
+ 
+     public boolean areDivisionOn() {
+-        return division;
++        return featureSet.contains(FutureFeature.division);
+     }
+ 
+     public boolean withStatementSupported() {
+-        return with_statement;
++        return featureSet.contains(FutureFeature.with_statement);
+     }
+ 
+     public boolean isAbsoluteImportOn() {
+-        return absolute_import;
++        return featureSet.contains(FutureFeature.absolute_import);
+     }
+-
+ }
+diff --git a/jython/src/org/python/compiler/Module.java b/jython/src/org/python/compiler/Module.java
+--- a/jython/src/org/python/compiler/Module.java
++++ b/jython/src/org/python/compiler/Module.java
+@@ -12,6 +12,7 @@
+ 
+ import org.objectweb.asm.Label;
+ import org.objectweb.asm.Opcodes;
++import org.python.core.CodeFlag;
+ import org.python.core.CompilerFlags;
+ import org.python.core.Py;
+ import org.python.core.PyException;
+@@ -500,17 +501,17 @@
+         code.jy_npurecell = scope.jy_npurecell;
+ 
+         if (compiler.optimizeGlobals) {
+-            code.moreflags |= org.python.core.PyTableCode.CO_OPTIMIZED;
++            code.moreflags |= org.python.core.CodeFlag.CO_OPTIMIZED.flag;
+         }
+         if (compiler.my_scope.generator) {
+-            code.moreflags |= org.python.core.PyTableCode.CO_GENERATOR;
++            code.moreflags |= org.python.core.CodeFlag.CO_GENERATOR.flag;
+         }
+         if (cflags != null) {
+-            if (cflags.generator_allowed) {
+-                code.moreflags |= org.python.core.PyTableCode.CO_GENERATOR_ALLOWED;
++            if (cflags.isFlagSet(CodeFlag.CO_GENERATOR_ALLOWED)) {
++                code.moreflags |= org.python.core.CodeFlag.CO_GENERATOR_ALLOWED.flag;
+             }
+-            if (cflags.division) {
+-                code.moreflags |= org.python.core.PyTableCode.CO_FUTUREDIVISION;
++            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
++                code.moreflags |= org.python.core.CodeFlag.CO_FUTURE_DIVISION.flag;
+             }
+         }
+ 
+diff --git a/jython/src/org/python/compiler/pbc/Bytecode.java b/jython/src/org/python/compiler/pbc/Bytecode.java
+--- a/jython/src/org/python/compiler/pbc/Bytecode.java
++++ b/jython/src/org/python/compiler/pbc/Bytecode.java
+@@ -14,6 +14,8 @@
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Set;
++
++import org.python.core.CodeFlag;
+ import org.python.core.Py;
+ import org.python.core.Opcode;
+ import org.python.core.PyBaseCode;
+@@ -25,7 +27,7 @@
+ 
+     private int co_argcount = 0;
+     private int co_stacksize = 0;
+-    private int co_flags = PyBaseCode.CO_OPTIMIZED | PyBaseCode.CO_NEWLOCALS; // typical usage
++    private int co_flags = CodeFlag.CO_OPTIMIZED.flag | CodeFlag.CO_NEWLOCALS.flag; // typical usage
+ //    co_filename = '<generated code>'
+ //    co_name = '<lambda>'
+ //    co_firstlineno = 0
+@@ -135,7 +137,7 @@
+ 
+     public void YIELD_VALUE() {
+         stackchange(1, 1);
+-        co_flags |= PyBaseCode.CO_GENERATOR;
++        co_flags |= CodeFlag.CO_GENERATOR.flag;
+         emit(Opcode.YIELD_VALUE);
+     }
+ 
+diff --git a/jython/src/org/python/core/CodeFlag.java b/jython/src/org/python/core/CodeFlag.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/CodeFlag.java
+@@ -0,0 +1,106 @@
++package org.python.core;
++
++import java.util.Arrays;
++import java.util.Collections;
++import java.util.Iterator;
++
++/**
++ * Represents flags that can be set on code objects.
++ * 
++ * @author Tobias Ivarsson
++ */
++public enum CodeFlag {
++    /**
++     * Denotes that the code block uses fast locals.
++     */
++    CO_OPTIMIZED(0x0001),
++    /**
++     * Denotes that a new dictionary should be created for the code block.
++     */
++    CO_NEWLOCALS(0x0002),
++    /**
++     * The compiled code block has a varargs argument.
++     */
++    CO_VARARGS(0x0004),
++    /**
++     * The compiled code block has a varkeyword argument.
++     */
++    CO_VARKEYWORDS(0x0008),
++    /**
++     * The compiled code block is a generator code block.
++     */
++    CO_GENERATOR(0x0020),
++    /**
++     * Denotes that nested scopes are enabled in the code block.
++     */
++    CO_NESTED(0x0010),
++    /**
++     * Denotes that generators are enabled in the code block.
++     */
++    CO_GENERATOR_ALLOWED(0x1000),
++    /**
++     * Standard division of integers returns float, truncating division needs to
++     * be enforced.
++     */
++    CO_FUTURE_DIVISION(0x2000),
++    /**
++     * Absolute import.
++     */
++    CO_FUTURE_ABSOLUTE_IMPORT(0x4000),
++    /**
++     * With statement.
++     */
++    CO_FUTURE_WITH_STATEMENT(0x8000);
++
++    public final int flag;
++    private static Iterable<CodeFlag> allFlags = Collections.unmodifiableList(Arrays.asList(values()));
++
++    private CodeFlag(int flag) {
++        this.flag = flag;
++    }
++
++    public boolean isFlagBitSetIn(int flags) {
++        return (flags & flag) != 0;
++    }
++
++    static Iterable<CodeFlag> parse(final int flags) {
++        return new Iterable<CodeFlag>() {
++
++            public Iterator<CodeFlag> iterator() {
++                return new Iterator<CodeFlag>() {
++                    Iterator<CodeFlag> all = allFlags.iterator();
++                    CodeFlag next = null;
++
++                    public boolean hasNext() {
++                        if (next != null) {
++                            return true;
++                        }
++                        while (all.hasNext()) {
++                            CodeFlag flag = all.next();
++                            if (flag.isFlagBitSetIn(flags)) {
++                                next = flag;
++                                return true;
++                            }
++                        }
++                        return false;
++                    }
++
++                    public CodeFlag next() {
++                        if (hasNext()) try {
++                            return next;
++                        } finally {
++                            next = null;
++                        }
++                        throw new IllegalStateException();
++                    }
++
++                    public void remove() {
++                        throw new UnsupportedOperationException();
++                    }
++
++                };
++            }
++
++        };
++    }
++}
+diff --git a/jython/src/org/python/core/CompileMode.java b/jython/src/org/python/core/CompileMode.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/CompileMode.java
+@@ -0,0 +1,33 @@
++package org.python.core;
++
++import org.python.antlr.BaseParser;
++import org.python.antlr.base.mod;
++
++public enum CompileMode {
++    eval {
++        @Override
++        mod dispatch(BaseParser parser) {
++            return parser.parseExpression();
++        }
++    },
++    single {
++        @Override
++        mod dispatch(BaseParser parser) {
++            return parser.parseInteractive();
++        }
++    },
++    exec {
++        @Override
++        mod dispatch(BaseParser parser) {
++            return parser.parseModule();
++        }
++    };
++    abstract mod dispatch(BaseParser parser);
++
++    public static CompileMode getMode(String mode) {
++        if (!mode.equals("exec") && !mode.equals("eval") && !mode.equals("single")) {
++            throw Py.ValueError("compile() arg 3 must be 'exec' or 'eval' or 'single'");
++        }
++        return valueOf(mode);
++    }
++}
+diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/python/core/CompilerFlags.java
+--- a/jython/src/org/python/core/CompilerFlags.java
++++ b/jython/src/org/python/core/CompilerFlags.java
+@@ -1,46 +1,84 @@
+ 
+ package org.python.core;
+ 
++import java.util.Set;
++
++import org.python.Version;
++
+ public class CompilerFlags {
+-
+-    private int co_flags;
+-
+-    public boolean nested_scopes = true;
+-    public boolean division;
+-    public boolean generator_allowed = true;
+-    public boolean with_statement;
+-    public boolean absolute_import;
+-
++    // These flags don't mean anything to the code, only to the compiler
++    public static final int PyCF_SOURCE_IS_UTF8    = 0x0100;
++    public static final int PyCF_DONT_IMPLY_DEDENT = 0x0200;
++    public static final int PyCF_ONLY_AST          = 0x0400;
+     public boolean only_ast;
+     public boolean dont_imply_dedent;
+     public boolean source_is_utf8;
+ 
+     public String encoding;
++    private final Set<CodeFlag> flags = Version.getDefaultCodeFlags();
+ 
+     public CompilerFlags() {}
+ 
+     public CompilerFlags(int co_flags) {
+-        this.co_flags = co_flags;
+-        nested_scopes = isEnabled(PyTableCode.CO_NESTED);
+-        division = isEnabled(PyTableCode.CO_FUTUREDIVISION);
+-        generator_allowed = isEnabled(PyTableCode.CO_GENERATOR_ALLOWED);
+-        absolute_import = isEnabled(PyTableCode.CO_FUTURE_ABSOLUTE_IMPORT);
+-        with_statement = isEnabled(PyTableCode.CO_WITH_STATEMENT);
+-        only_ast = isEnabled(PyTableCode.PyCF_ONLY_AST);
+-        dont_imply_dedent = isEnabled(PyTableCode.PyCF_DONT_IMPLY_DEDENT);
+-        source_is_utf8 = isEnabled(PyTableCode.PyCF_SOURCE_IS_UTF8);
++        for (CodeFlag flag : CodeFlag.parse(co_flags)) {
++            setFlag(flag);
++        }
++        only_ast = isEnabled(co_flags, PyCF_ONLY_AST);
++        dont_imply_dedent = isEnabled(co_flags, PyCF_DONT_IMPLY_DEDENT);
++        source_is_utf8 = isEnabled(co_flags, PyCF_SOURCE_IS_UTF8);
+     }
+ 
+-    private boolean isEnabled(int codeConstant) {
++    private boolean isEnabled(int co_flags, int codeConstant) {
+         return (co_flags & codeConstant) != 0;
+     }
+ 
+-    public String toString() {
+-        return String.format("CompilerFlags[division=%s nested_scopes=%s generators=%s "
+-                             + "with_statement=%s absolute_import=%s only_ast=%s "
+-                             + "dont_imply_dedent=%s  source_is_utf8=%s]", division, nested_scopes,
+-                             generator_allowed, with_statement, absolute_import, only_ast,
+-                             dont_imply_dedent, source_is_utf8);
++    public void setFlag(CodeFlag flag) {
++        flags.add(flag);
+     }
+ 
++    public boolean isFlagSet(CodeFlag flag) {
++        return flags.contains(flag);
++    }
++
++    public String toString() {
++        return String.format(
++        "CompilerFlags[division=%s nested_scopes=%s generators=%s "
++                        + "with_statement=%s absolute_import=%s only_ast=%s "
++                        + "dont_imply_dedent=%s  source_is_utf8=%s]", 
++        isFlagSet(CodeFlag.CO_FUTURE_DIVISION),
++                isFlagSet(CodeFlag.CO_NESTED),
++                isFlagSet(CodeFlag.CO_GENERATOR_ALLOWED),
++                isFlagSet(CodeFlag.CO_FUTURE_WITH_STATEMENT),
++                isFlagSet(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT),
++        only_ast, dont_imply_dedent, source_is_utf8);
++    }
++
++    public static CompilerFlags getCompilerFlags() {
++        return getCompilerFlags(0, false);
++    }
++
++    private static final int CO_ALL_FEATURES = CompilerFlags.PyCF_DONT_IMPLY_DEDENT
++    | CompilerFlags.PyCF_ONLY_AST
++    | CompilerFlags.PyCF_SOURCE_IS_UTF8
++    | CodeFlag.CO_NESTED.flag
++    | CodeFlag.CO_GENERATOR_ALLOWED.flag
++    | CodeFlag.CO_FUTURE_DIVISION.flag
++    | CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT.flag
++    | CodeFlag.CO_FUTURE_WITH_STATEMENT.flag;
++    
++    public static CompilerFlags getCompilerFlags(int flags, boolean dont_inherit) {
++        if ((flags & ~CO_ALL_FEATURES) != 0) {
++            throw Py.ValueError("compile(): unrecognised flags");
++        }
++        CompilerFlags cflags = null;
++        if (dont_inherit) {
++            cflags = new CompilerFlags(flags);
++        } else {
++            PyFrame frame = Py.getFrame();
++            if (frame != null && frame.f_code != null) {
++                cflags = new CompilerFlags(frame.f_code.co_flags | flags);
++            }
++        }
++        return cflags;
++    }
+ }
+diff --git a/jython/src/org/python/core/FutureFeature.java b/jython/src/org/python/core/FutureFeature.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/FutureFeature.java
+@@ -0,0 +1,101 @@
++package org.python.core;
++
++import org.python.antlr.ParseException;
++
++public enum FutureFeature implements Pragma {
++    /**
++     * Enables nested scopes.
++     */
++    nested_scopes(CodeFlag.CO_NESTED),
++    /**
++     * Makes integer / integer division return float.
++     */
++    division(CodeFlag.CO_FUTURE_DIVISION),
++    /**
++     * Enables generators.
++     */
++    generators(CodeFlag.CO_GENERATOR_ALLOWED),
++    /**
++     * Enables absolute imports.
++     */
++    absolute_import(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT),
++    /**
++     * Enables the with statement.
++     */
++    with_statement(CodeFlag.CO_FUTURE_WITH_STATEMENT),
++    /**
++     * Use braces for block delimiters instead of indentation.
++     */
++    braces {
++        @Override
++        public void addTo(PragmaReceiver features) {
++            throw new ParseException("not a chance");
++        }
++    },
++    /**
++     * Enable the Global Interpreter Lock in Jython.
++     */
++    GIL {
++        @Override
++        public void addTo(PragmaReceiver features) {
++            throw new ParseException("Never going to happen!");
++        }
++    },
++    /**
++     * Enable the Global Interpreter Lock in Jython.
++     */
++    global_interpreter_lock {
++        @Override
++        public void addTo(PragmaReceiver features) {
++            GIL.addTo(features);
++        }
++    };
++
++    public static final String MODULE_NAME = "__future__";
++    public static final PragmaModule PRAGMA_MODULE = new PragmaModule(
++            MODULE_NAME) {
++
++        @Override
++        public Pragma getPragma(String name) {
++            return getFeature(name);
++        }
++
++        @Override
++        public Pragma getStarPragma() {
++            throw new ParseException("future feature * is not defined");
++        }
++    };
++    private final CodeFlag flag;
++
++    private FutureFeature(CodeFlag flag) {
++        this.flag = flag;
++    }
++
++    private FutureFeature() {
++        this(null);
++    }
++
++    public void addTo(PragmaReceiver features) {
++        features.add(this);
++    }
++
++    public static void addFeature(String featureName, PragmaReceiver features) {
++        getFeature(featureName).addTo(features);
++    }
++
++    private static FutureFeature getFeature(String featureName) {
++        try {
++            return valueOf(featureName);
++        } catch (IllegalArgumentException ex) {
++            throw new ParseException("future feature " + featureName
++                    + " is not defined");
++        }
++    }
++
++    public void setFlag(CompilerFlags cflags) {
++        if (flag != null) {
++            cflags.setFlag(flag);
++        }
++    }
++
++}
+diff --git a/jython/src/org/python/core/ParserFacade.java b/jython/src/org/python/core/ParserFacade.java
+--- a/jython/src/org/python/core/ParserFacade.java
++++ b/jython/src/org/python/core/ParserFacade.java
+@@ -23,10 +23,7 @@
+ import org.antlr.runtime.CommonTokenStream;
+ 
+ import org.python.antlr.BaseParser;
+-import org.python.antlr.ExpressionParser;
+-import org.python.antlr.InteractiveParser;
+ import org.python.antlr.ParseException;
+-import org.python.antlr.ModuleParser;
+ import org.python.antlr.NoCloseReaderStream;
+ import org.python.antlr.PythonTree;
+ import org.python.antlr.PythonLexer;
+@@ -111,30 +108,23 @@
+      * PyIndentationErrors.
+      */
+     private static mod parse(ExpectedEncodingBufferedReader reader,
+-                                String kind,
++                                CompileMode kind,
+                                 String filename,
+                                 CompilerFlags cflags) throws Throwable {
+         reader.mark(MARK_LIMIT); // We need the ability to move back on the
+                                  // reader, for the benefit of fixParseError and
+                                  // validPartialSentence
+-        if (kind.equals("eval")) {
++        if (kind != null) {
+             CharStream cs = new NoCloseReaderStream(reader);
+-            ExpressionParser e = new ExpressionParser(cs, filename, cflags.encoding);
+-            return e.parse();
+-        } else if (kind.equals("single")) {
+-            InteractiveParser i = new InteractiveParser(reader, filename, cflags.encoding);
+-            return i.parse();
+-        } else if (kind.equals("exec")) {
+-            CharStream cs = new NoCloseReaderStream(reader);
+-            ModuleParser g = new ModuleParser(cs, filename, cflags.encoding);
+-            return g.file_input();
++            BaseParser parser = new BaseParser(cs, filename, cflags.encoding);
++            return kind.dispatch(parser);
+         } else {
+             throw Py.ValueError("parse kind must be eval, exec, or single");
+         }
+     }
+ 
+     public static mod parse(InputStream stream,
+-                                String kind,
++                                CompileMode kind,
+                                 String filename,
+                                 CompilerFlags cflags) {
+         ExpectedEncodingBufferedReader bufReader = null;
+@@ -151,7 +141,7 @@
+     }
+ 
+     public static mod parse(String string,
+-                                String kind,
++                                CompileMode kind,
+                                 String filename,
+                                 CompilerFlags cflags) {
+         ExpectedEncodingBufferedReader bufReader = null;
+@@ -166,7 +156,7 @@
+     }
+ 
+     public static mod partialParse(String string,
+-                                       String kind,
++                                       CompileMode kind,
+                                        String filename,
+                                        CompilerFlags cflags,
+                                        boolean stdprompt) {
+@@ -186,7 +176,7 @@
+         }
+     }
+ 
+-    private static boolean validPartialSentence(BufferedReader bufreader, String kind, String filename) {
++    private static boolean validPartialSentence(BufferedReader bufreader, CompileMode kind, String filename) {
+         PythonLexer lexer = null;
+         try {
+             bufreader.reset();
+@@ -197,14 +187,16 @@
+             PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename);
+             tokens = new CommonTokenStream(indentedSource);
+             PythonPartial parser = new PythonPartial(tokens);
+-            if (kind.equals("single")) {
++            switch (kind) {
++            case single:
+                 parser.single_input();
+-            } else if (kind.equals("eval")) {
++                break;
++            case eval:
+                 parser.eval_input();
+-            } else {
++                break;
++            default:
+                 return false;
+             }
+-
+         } catch (Exception e) {
+             return lexer.eofWhileNested;
+         }
+diff --git a/jython/src/org/python/core/Pragma.java b/jython/src/org/python/core/Pragma.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/Pragma.java
+@@ -0,0 +1,46 @@
++package org.python.core;
++
++import org.python.antlr.ParseException;
++
++public interface Pragma {
++    void addTo(PragmaReceiver receiver);
++
++    public abstract class PragmaModule {
++        public final String name;
++
++        protected PragmaModule(String name) {
++            this.name = name;
++        }
++
++        public abstract Pragma getPragma(String name);
++
++        public abstract Pragma getStarPragma();
++    }
++
++    public final class ForbiddenPragmaModule extends PragmaModule {
++        private final String message;
++
++        public ForbiddenPragmaModule(String name) {
++            this(name, "pragma " + name + " is not allowed in this context.");
++        }
++
++        public ForbiddenPragmaModule(String name, String message) {
++            super(name);
++            this.message = message;
++        }
++
++        @Override
++        public Pragma getPragma(String name) {
++            throw new ParseException(message);
++        }
++
++        @Override
++        public Pragma getStarPragma() {
++            throw new ParseException(message);
++        }
++
++        public void addTo(PragmaReceiver receiver) {
++            throw new ParseException(message);
++        }
++    }
++}
+diff --git a/jython/src/org/python/core/PragmaReceiver.java b/jython/src/org/python/core/PragmaReceiver.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/PragmaReceiver.java
+@@ -0,0 +1,5 @@
++package org.python.core;
++
++public interface PragmaReceiver {
++    void add(Pragma pragma);
++}
+diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.java
+--- a/jython/src/org/python/core/Py.java
++++ b/jython/src/org/python/core/Py.java
+@@ -1218,7 +1218,7 @@
+             String contents = null;
+             if (o instanceof PyString) {
+                 if (o instanceof PyUnicode) {
+-                    flags |= PyBaseCode.PyCF_SOURCE_IS_UTF8;
++                    flags |= CompilerFlags.PyCF_SOURCE_IS_UTF8;
+                 }
+                 contents = o.toString();
+             } else if (o instanceof PyFile) {
+@@ -1231,7 +1231,7 @@
+                 throw Py.TypeError(
+                         "exec: argument 1 must be string, code or file object");
+             }
+-            code = (PyCode)Py.compile_flags(contents, "<string>", "exec",
++            code = (PyCode)Py.compile_flags(contents, "<string>", CompileMode.exec,
+                                             getCompilerFlags(flags, false));
+         }
+         Py.runCode(code, locals, globals);
+@@ -1603,26 +1603,15 @@
+     }
+ 
+     public static CompilerFlags getCompilerFlags() {
+-        return getCompilerFlags(0, false);
++        return CompilerFlags.getCompilerFlags();
+     }
+ 
+     public static CompilerFlags getCompilerFlags(int flags, boolean dont_inherit) {
+-        CompilerFlags cflags = null;
+-        if (dont_inherit) {
+-            cflags = new CompilerFlags(flags);
+-        } else {
+-            PyFrame frame = Py.getFrame();
+-            if (frame != null && frame.f_code != null) {
+-                cflags = new CompilerFlags(frame.f_code.co_flags | flags);
+-            } else {
+-                cflags = new CompilerFlags(flags);
+-            }
+-        }
+-        return cflags;
++        return CompilerFlags.getCompilerFlags(flags, dont_inherit);
+     }
+ 
+     // w/o compiler-flags
+-    public static PyObject compile(InputStream istream, String filename, String kind) {
++    public static PyCode compile(InputStream istream, String filename, CompileMode kind) {
+         return compile_flags(istream, filename, kind, new CompilerFlags());
+     }
+ 
+@@ -1640,13 +1629,10 @@
+      * @param cflags Compiler flags
+      * @return Code object for the compiled module
+      */
+-    public static PyObject compile_flags(mod node, String name, String filename,
++    public static PyCode compile_flags(mod node, String name, String filename,
+                                          boolean linenumbers, boolean printResults,
+                                          CompilerFlags cflags) {
+         try {
+-            if (cflags != null && cflags.only_ast) {
+-                return Py.java2py(node);
+-            }
+             ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+             Module.compile(node, ostream, name, filename, linenumbers, printResults, cflags);
+ 
+@@ -1658,17 +1644,17 @@
+         }
+     }
+ 
+-    public static PyObject compile_flags(mod node, String filename,
+-                                         String kind, CompilerFlags cflags) {
++    public static PyCode compile_flags(mod node, String filename,
++                                         CompileMode kind, CompilerFlags cflags) {
+         return Py.compile_flags(node, getName(), filename, true,
+-                                kind.equals("single"), cflags);
++                                kind == CompileMode.single, cflags);
+     }
+ 
+     /**
+      * Compiles python source code coming from a file or another external stream
+      */
+-    public static PyObject compile_flags(InputStream istream, String filename,
+-                                         String kind, CompilerFlags cflags) {
++    public static PyCode compile_flags(InputStream istream, String filename,
++                                         CompileMode kind, CompilerFlags cflags) {
+         mod node = ParserFacade.parse(istream, kind, filename, cflags);
+         return Py.compile_flags(node, filename, kind, cflags);
+     }
+@@ -1679,8 +1665,8 @@
+      * DO NOT use this for PyString input. Use
+      * {@link #compile_flags(byte[], String, String, CompilerFlags)} instead.
+      */
+-    public static PyObject compile_flags(String data, String filename,
+-                                         String kind, CompilerFlags cflags) {
++    public static PyCode compile_flags(String data, String filename,
++                                         CompileMode kind, CompilerFlags cflags) {
+         if (data.contains("\0")) {
+             throw Py.TypeError("compile() expected string without null bytes");
+         }
+@@ -1694,7 +1680,7 @@
+     }
+ 
+     public static PyObject compile_command_flags(String string, String filename,
+-            String kind, CompilerFlags cflags, boolean stdprompt) {
++            CompileMode kind, CompilerFlags cflags, boolean stdprompt) {
+         mod node = ParserFacade.partialParse(string + "\n", kind, filename,
+                                                  cflags, stdprompt);
+         if (node == null) {
+diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/core/PyBaseCode.java
+--- a/jython/src/org/python/core/PyBaseCode.java
++++ b/jython/src/org/python/core/PyBaseCode.java
+@@ -17,29 +17,6 @@
+     public int co_nlocals;
+     public boolean varargs,  varkwargs;
+ 
+-    final public static int CO_OPTIMIZED         = 0x0001;
+-    final public static int CO_NEWLOCALS       = 0x0002;
+-    final public static int CO_VARARGS           = 0x0004;
+-    final public static int CO_VARKEYWORDS       = 0x0008;
+-    final public static int CO_GENERATOR         = 0x0020;
+-
+-    // these are defined in __future__.py
+-    final public static int CO_NESTED                 = 0x0010;
+-    final public static int CO_GENERATOR_ALLOWED      = 0x0;
+-    final public static int CO_FUTUREDIVISION         = 0x2000;
+-    final public static int CO_FUTURE_ABSOLUTE_IMPORT = 0x4000;
+-    final public static int CO_WITH_STATEMENT         = 0x8000;
+-
+-    //XXX: I'm not positive that this is the right place for these constants.
+-    final public static int PyCF_SOURCE_IS_UTF8    = 0x0100;
+-    final public static int PyCF_DONT_IMPLY_DEDENT = 0x0200;
+-    final public static int PyCF_ONLY_AST          = 0x0400;
+-
+-    final public static int CO_ALL_FEATURES = PyCF_DONT_IMPLY_DEDENT|PyCF_ONLY_AST|
+-                                              PyCF_SOURCE_IS_UTF8|CO_NESTED|
+-                                              CO_GENERATOR_ALLOWED| CO_FUTUREDIVISION|
+-                                              CO_FUTURE_ABSOLUTE_IMPORT|CO_WITH_STATEMENT;
+-
+ 
+     public boolean hasFreevars() {
+         return co_freevars != null && co_freevars.length > 0;
+@@ -135,7 +112,7 @@
+             return call(Py.EmptyObjects, Py.NoKeywords, globals, defaults,
+                         closure);
+         PyFrame frame = new PyFrame(this, globals);
+-        if ((co_flags & CO_GENERATOR) != 0) {
++        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+             return new PyGenerator(frame, closure);
+         }
+         return call(frame, closure);
+@@ -149,7 +126,7 @@
+                         Py.NoKeywords, globals, defaults, closure);
+         PyFrame frame = new PyFrame(this, globals);
+         frame.f_fastlocals[0] = arg1;
+-        if ((co_flags & CO_GENERATOR) != 0) {
++        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+             return new PyGenerator(frame, closure);
+         }
+         return call(frame, closure);
+@@ -164,7 +141,7 @@
+         PyFrame frame = new PyFrame(this, globals);
+         frame.f_fastlocals[0] = arg1;
+         frame.f_fastlocals[1] = arg2;
+-        if ((co_flags & CO_GENERATOR) != 0) {
++        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+             return new PyGenerator(frame, closure);
+         }
+         return call(frame, closure);
+@@ -181,7 +158,7 @@
+         frame.f_fastlocals[0] = arg1;
+         frame.f_fastlocals[1] = arg2;
+         frame.f_fastlocals[2] = arg3;
+-        if ((co_flags & CO_GENERATOR) != 0) {
++        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+             return new PyGenerator(frame, closure);
+         }
+         return call(frame, closure);
+@@ -297,7 +274,7 @@
+                                              co_name, argcount));
+         }
+ 
+-        if ((co_flags & CO_GENERATOR) != 0) {
++        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+             return new PyGenerator(frame, closure);
+         }
+         return call(frame, closure);
+diff --git a/jython/src/org/python/core/PyBytecode.java b/jython/src/org/python/core/PyBytecode.java
+--- a/jython/src/org/python/core/PyBytecode.java
++++ b/jython/src/org/python/core/PyBytecode.java
+@@ -74,8 +74,8 @@
+         co_cellvars = cellvars;
+         co_freevars = freevars;
+         co_name = name;
+-        varargs = (flags & CO_VARARGS) != 0;
+-        varkwargs = (flags & CO_VARKEYWORDS) != 0;
++        varargs = CodeFlag.CO_VARARGS.isFlagBitSetIn(flags);
++        varkwargs = CodeFlag.CO_VARKEYWORDS.isFlagBitSetIn(flags);
+         co_flags |= flags;
+ 
+         co_stacksize = stacksize;
+@@ -414,10 +414,10 @@
+                         PyObject b = stack.pop();
+                         PyObject a = stack.pop();
+ 
+-                        if ((co_flags & CO_FUTUREDIVISION) == 0) {
++                        if (CodeFlag.CO_FUTURE_DIVISION.isFlagBitSetIn(co_flags)) {
++                            stack.push(a._truediv(b));
++                        } else {
+                             stack.push(a._div(b));
+-                        } else {
+-                            stack.push(a._truediv(b));
+                         }
+                         break;
+                     }
+@@ -524,10 +524,10 @@
+                     case Opcode.INPLACE_DIVIDE: {
+                         PyObject b = stack.pop();
+                         PyObject a = stack.pop();
+-                        if ((co_flags & CO_FUTUREDIVISION) == 0) {
++                        if (CodeFlag.CO_FUTURE_DIVISION.isFlagBitSetIn(co_flags)) {
++                            stack.push(a._itruediv(b));
++                        } else {
+                             stack.push(a._idiv(b));
+-                        } else {
+-                            stack.push(a._itruediv(b));
+                         }
+                         break;
+                     }
+@@ -1242,7 +1242,7 @@
+             throw ts.exception;
+         }
+ 
+-        if ((co_flags & CO_GENERATOR) != 0 && why == Why.RETURN && retval == Py.None) {
++        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags) && why == Why.RETURN && retval == Py.None) {
+             f.f_lasti = -1;
+         }
+ 
+diff --git a/jython/src/org/python/core/PyFrame.java b/jython/src/org/python/core/PyFrame.java
+--- a/jython/src/org/python/core/PyFrame.java
++++ b/jython/src/org/python/core/PyFrame.java
+@@ -68,7 +68,7 @@
+         // This needs work to be efficient with multiple interpreter states
+         if (locals == null && code != null) {
+             // ! f_fastlocals needed for arg passing too
+-            if ((code.co_flags & PyBaseCode.CO_OPTIMIZED) != 0 || code.nargs > 0) {
++            if (CodeFlag.CO_OPTIMIZED.isFlagBitSetIn(code.co_flags) || code.nargs > 0) {
+                 if (code.co_nlocals > 0) {
+                     // internal: may change
+                     f_fastlocals = new PyObject[code.co_nlocals - code.jy_npurecell];
+@@ -197,7 +197,7 @@
+                     PyObject o = f_fastlocals[i];
+                     if (o != null) f_locals.__setitem__(f_code.co_varnames[i], o);
+                 }
+-                if ((f_code.co_flags & PyBaseCode.CO_OPTIMIZED) == 0) {
++                if (!CodeFlag.CO_OPTIMIZED.isFlagBitSetIn(f_code.co_flags)) {
+                     f_fastlocals = null;
+                 }
+             }
+diff --git a/jython/src/org/python/core/PyTableCode.java b/jython/src/org/python/core/PyTableCode.java
+--- a/jython/src/org/python/core/PyTableCode.java
++++ b/jython/src/org/python/core/PyTableCode.java
+@@ -45,12 +45,12 @@
+         co_name = name;
+         if (varargs) {
+             co_argcount -= 1;
+-            co_flags |= CO_VARARGS;
++            co_flags |= CodeFlag.CO_VARARGS.flag;
+         }
+         this.varkwargs = varkwargs;
+         if (varkwargs) {
+             co_argcount -= 1;
+-            co_flags |= CO_VARKEYWORDS;
++            co_flags |= CodeFlag.CO_VARKEYWORDS.flag;
+         }
+         co_flags |= moreflags;
+         this.funcs = funcs;
+diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python/core/__builtin__.java
+--- a/jython/src/org/python/core/__builtin__.java
++++ b/jython/src/org/python/core/__builtin__.java
+@@ -527,7 +527,7 @@
+         PyCode code;
+ 
+         try {
+-            code = (PyCode)Py.compile_flags(file, name, "exec", cflags);
++            code = (PyCode)Py.compile_flags(file, name, CompileMode.exec, cflags);
+         } finally {
+             try {
+                 file.close();
+@@ -1524,28 +1524,41 @@
+         return compile(source, filename, mode, 0, false);
+     }
+ 
++
++
++    
+     public static PyObject compile(PyObject source, String filename, String mode, int flags,
+                                    boolean dont_inherit) {
+-        if ((flags & ~PyTableCode.CO_ALL_FEATURES) != 0) {
+-            throw Py.ValueError("compile(): unrecognised flags");
+-        }
+-        if (!mode.equals("exec") && !mode.equals("eval") && !mode.equals("single")) {
+-            throw Py.ValueError("compile() arg 3 must be 'exec' or 'eval' or 'single'");
++        CompilerFlags cflags = Py.getCompilerFlags(flags, dont_inherit);
++        CompileMode kind = CompileMode.getMode(mode);
++
++        mod ast = py2node(source);
++        if (ast == null) {
++            if (!(source instanceof PyString)) {
++                throw Py.TypeError("expected a readable buffer object");
++            }
++            if (source instanceof PyUnicode) {
++                cflags.source_is_utf8 = true;
++            }
++            
++            String data = ((PyString)source).toString();
++            
++            if (data.contains("\0")) {
++                throw Py.TypeError("compile() expected string without null bytes");
++            }
++            if (cflags != null && cflags.dont_imply_dedent) {
++                data += "\n";
++            } else {
++                data += "\n\n";
++            }
++            ast = ParserFacade.parse(data, kind, filename, cflags);
+         }
+ 
+-        mod ast = py2node(source);
+-        if (ast != null) {
+-            return Py.compile_flags(ast, filename, mode, Py.getCompilerFlags(flags, dont_inherit));
++        if (cflags.only_ast) {
++            return Py.java2py(ast);
++        } else {
++            return Py.compile_flags(ast, filename, kind, cflags);
+         }
+-
+-        if (!(source instanceof PyString)) {
+-            throw Py.TypeError("expected a readable buffer object");
+-        }
+-        if (source instanceof PyUnicode) {
+-            flags |= PyTableCode.PyCF_SOURCE_IS_UTF8;
+-        }
+-        return Py.compile_flags(((PyString)source).toString(), filename, mode,
+-                                Py.getCompilerFlags(flags, dont_inherit));
+     }
+ 
+     /**
+diff --git a/jython/src/org/python/core/imp.java b/jython/src/org/python/core/imp.java
+--- a/jython/src/org/python/core/imp.java
++++ b/jython/src/org/python/core/imp.java
+@@ -206,7 +206,7 @@
+             }
+             org.python.antlr.base.mod node;
+             try {
+-                node = ParserFacade.parse(fp, "exec", filename, new CompilerFlags());
++                node = ParserFacade.parse(fp, CompileMode.exec, filename, new CompilerFlags());
+             } finally {
+                 fp.close();
+             }
+diff --git a/jython/src/org/python/util/InteractiveInterpreter.java b/jython/src/org/python/util/InteractiveInterpreter.java
+--- a/jython/src/org/python/util/InteractiveInterpreter.java
++++ b/jython/src/org/python/util/InteractiveInterpreter.java
+@@ -39,14 +39,14 @@
+      * whether to use sys.ps1 or sys.ps2 to prompt the next line.
+      **/
+     public boolean runsource(String source) {
+-        return runsource(source, "<input>", "single");
++        return runsource(source, "<input>", CompileMode.single);
+     }
+ 
+     public boolean runsource(String source, String filename) {
+-        return runsource(source, filename, "single");
++        return runsource(source, filename, CompileMode.single);
+     }
+ 
+-    public boolean runsource(String source, String filename, String kind) {
++    public boolean runsource(String source, String filename, CompileMode kind) {
+         PyObject code;
+         try {
+             code = Py.compile_command_flags(source, filename, kind, cflags, true);
+diff --git a/jython/src/org/python/util/PythonInterpreter.java b/jython/src/org/python/util/PythonInterpreter.java
+--- a/jython/src/org/python/util/PythonInterpreter.java
++++ b/jython/src/org/python/util/PythonInterpreter.java
+@@ -2,6 +2,7 @@
+ 
+ import java.util.Properties;
+ 
++import org.python.core.CompileMode;
+ import org.python.core.CompilerFlags;
+ import org.python.core.Py;
+ import org.python.core.PyCode;
+@@ -121,7 +122,7 @@
+      */
+     public void exec(String s) {
+         setState();
+-        Py.exec(Py.compile_flags(s, "<string>", "exec", cflags), locals, locals);
++        Py.exec(Py.compile_flags(s, "<string>", CompileMode.exec, cflags), locals, locals);
+         Py.flushLine();
+     }
+ 
+@@ -149,7 +150,7 @@
+ 
+     public void execfile(java.io.InputStream s, String name) {
+         setState();
+-        Py.runCode((PyCode)Py.compile_flags(s, name, "exec", cflags), locals, locals);
++        Py.runCode((PyCode)Py.compile_flags(s, name, CompileMode.exec, cflags), locals, locals);
+         Py.flushLine();
+     }
+ 
+diff --git a/jython/src/org/python/util/jython.java b/jython/src/org/python/util/jython.java
+--- a/jython/src/org/python/util/jython.java
++++ b/jython/src/org/python/util/jython.java
+@@ -12,6 +12,8 @@
+ import java.util.zip.ZipFile;
+ 
+ import org.python.Version;
++import org.python.core.CodeFlag;
++import org.python.core.CompileMode;
+ import org.python.core.Options;
+ import org.python.core.Py;
+ import org.python.core.PyCode;
+@@ -98,7 +100,7 @@
+             InputStream file = zip.getInputStream(runit);
+             PyCode code;
+             try {
+-                code = (PyCode)Py.compile(file, "__run__", "exec");
++                code = (PyCode)Py.compile(file, "__run__", CompileMode.exec);
+             } finally {
+                 file.close();
+             }
+@@ -181,7 +183,7 @@
+                 Options.divisionWarning = 2;
+             else if ("new".equals(opts.division)) {
+                 Options.Qnew = true;
+-                interp.cflags.division = true;
++                interp.cflags.setFlag(CodeFlag.CO_FUTURE_DIVISION);
+             }
+         }
+ 
+diff --git a/jython/tests/java/org/python/antlr/PythonTreeTester.java b/jython/tests/java/org/python/antlr/PythonTreeTester.java
+--- a/jython/tests/java/org/python/antlr/PythonTreeTester.java
++++ b/jython/tests/java/org/python/antlr/PythonTreeTester.java
+@@ -30,7 +30,7 @@
+         //ErrorHandler eh = new ListErrorHandler();
+         ErrorHandler eh = new FailFastHandler();
+         CharStream input = new ANTLRFileStream(args[0]);
+-        PythonLexer lexer = new ModuleParser.PyLexer(input);
++        PythonLexer lexer = new BaseParser.PyLexer(input);
+         lexer.setErrorHandler(eh);
+         CommonTokenStream tokens = new CommonTokenStream(lexer);
+         PythonTokenSource indentedSource = new PythonTokenSource(tokens, args[0]);

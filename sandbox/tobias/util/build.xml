@@ -1,0 +1,38 @@
+<project name="utilities" default="jar" basedir=".">
+  <property name="source.dir"     location="${basedir}/src"/>
+  <property name="build.dir"      location="${basedir}/build"/>
+  <property name="compile.dir"    location="${build.dir}/classes"/>
+  <property name="target.dir"     location="${build.dir}"/>
+  <property name="utilities.jar"  location="${target.dir}/util.jar"/>
+  <property name="debug"          value="true"/>
+  
+  <target name="build setup">
+    <fail unless="jython.jar" message="Jython jar unspecified."/>
+    <fail unless="frame.jar" message="Frame introspection jar unspecified."/>
+    <path id="build.classpath">
+      <pathelement path="${jython.jar}"/>
+      <pathelement path="${frame.jar}"/>
+    </path>
+  </target>
+
+  <target name="build" depends="build setup">
+    <mkdir dir="${compile.dir}"/>
+    <javac destdir="${compile.dir}"
+	   debug="${debug}"
+	   debuglevel="lines,vars,source"
+	   fork="true">
+      <src path="${source.dir}"/>
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="build">
+    <jar destfile="${utilities.jar}">
+      <fileset dir="${compile.dir}"/>
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+</project>
