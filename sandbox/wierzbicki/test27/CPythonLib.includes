@@ -16,6 +16,7 @@ _LWPCookieJar.py
 _MozillaCookieJar.py
 _strptime.py
 _threading_local.py
+abc.py
 aifc.py
 anydbm.py
 atexit.py

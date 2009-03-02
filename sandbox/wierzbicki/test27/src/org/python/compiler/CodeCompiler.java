@@ -2229,10 +2229,6 @@ public class CodeCompiler extends Visitor implements Opcodes, ClassConstants //,
 
     @Override
     public Object visitWith(With node) throws Exception {
-        if (!module.getFutures().withStatementSupported()) {
-            throw new ParseException("'with' will become a reserved keyword in Python 2.6", node);
-        }
-
         final Label label_body_start = new Label();
         final Label label_body_end = new Label();
         final Label label_catch = new Label();
