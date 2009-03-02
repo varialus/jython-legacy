@@ -521,7 +521,8 @@ class Sequence(Sized, Iterable, Container):
 
 Sequence.register(tuple)
 Sequence.register(basestring)
-Sequence.register(buffer)
+if not sys.platform.startswith('java'):
+    Sequence.register(buffer)
 Sequence.register(xrange)
 
 
