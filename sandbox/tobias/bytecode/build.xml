@@ -8,10 +8,8 @@
   
   <target name="build setup">
     <fail unless="jython.jar" message="Jython jar unspecified."/>
-    <fail unless="compiler.jar" message="Compiler jar unspecified."/>
     <path id="build.classpath">
       <pathelement path="${jython.jar}"/>
-      <pathelement path="${compiler.jar}"/>
     </path>
   </target>
 

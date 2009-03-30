@@ -12,10 +12,16 @@
     <fail unless="jython.jar">Path to jython jar not specified.</fail>
     <fail unless="agent.jar">Path to agent library not specified.</fail>
     <fail unless="util.jar">Path to utilities jar not specified.</fail>
+    <fail unless="bytecode.jar">Path to bytecode jar not specified.</fail>
+    <fail unless="antlr.jar">Path to antler jar not specified.</fail>
+    <fail unless="asm.jar">Path to asm jar not specified.</fail>
     <path id="build.classpath">
       <pathelement path="${jython.jar}"/>
       <pathelement path="${agent.jar}"/>
       <pathelement path="${util.jar}"/>
+      <pathelement path="${antlr.jar}"/>
+      <pathelement path="${asm.jar}"/>
+      <pathelement path="${bytecode.jar}"/>
       <pathelement path="${javalib.dir}/asm-${asm.version}.jar"/>
       <pathelement path="${javalib.dir}/asm-commons-${asm.version}.jar"/>
       <pathelement path="${javalib.dir}/asm-util-${asm.version}.jar"/>

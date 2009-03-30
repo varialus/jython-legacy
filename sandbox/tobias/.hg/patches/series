@@ -1,2 +1,5 @@
-types.patch	#+trunk		#-advanced
-decouple.patch	#+trunk		#-advanced
+types.patch	#-trunk		#-advanced
+grammar.patch	#-trunk		#-advanced
+decouple.patch	#-trunk		#-advanced
+frames.patch	#+trunk		#-advanced
+parrot.patch	#-trunk

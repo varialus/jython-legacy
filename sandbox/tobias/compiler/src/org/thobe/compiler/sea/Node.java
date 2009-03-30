@@ -1,5 +1,10 @@
 package org.thobe.compiler.sea;
 
-abstract class Node {
+public abstract class Node {
+
+    public void accept(GraphTraverser serializationTraverser) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

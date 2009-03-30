@@ -1,7 +1,7 @@
 package org.python.code;
 
+import org.python.core.PyBaseFrame;
 import org.python.core.PyCode;
-import org.python.core.PyFrame;
 import org.python.core.PyObject;
 
 public abstract class CodeTable extends PyCode {
@@ -13,7 +13,7 @@ public abstract class CodeTable extends PyCode {
     }
 
     @Override
-    public PyObject call(PyFrame frame, PyObject closure) {
+    public PyObject call(PyBaseFrame frame, PyObject closure) {
         // TODO Auto-generated method stub
         return null;
     }

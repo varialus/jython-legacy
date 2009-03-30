@@ -1,0 +1,1646 @@
+diff --git a/jython/src/org/python/compiler/ClassConstants.java b/jython/src/org/python/compiler/ClassConstants.java
+--- a/jython/src/org/python/compiler/ClassConstants.java
++++ b/jython/src/org/python/compiler/ClassConstants.java
+@@ -7,6 +7,7 @@
+     final static String $pyStr      = "Lorg/python/core/PyString;";
+     final static String $pyUnicode  = "Lorg/python/core/PyUnicode;";
+     final static String $pyExc      = "Lorg/python/core/PyException;";
++    final static String $pyBaseFrame= "Lorg/python/core/PyBaseFrame;";
+     final static String $pyFrame    = "Lorg/python/core/PyFrame;";
+     final static String $pyCode     = "Lorg/python/core/PyCode;";
+     final static String $pyInteger  = "Lorg/python/core/PyInteger;";
+diff --git a/jython/src/org/python/compiler/CodeCompiler.java b/jython/src/org/python/compiler/CodeCompiler.java
+--- a/jython/src/org/python/compiler/CodeCompiler.java
++++ b/jython/src/org/python/compiler/CodeCompiler.java
+@@ -164,7 +164,7 @@
+     }
+     
+     private void loadf_back() throws Exception {
+-        code.getfield("org/python/core/PyFrame", "f_back", $pyFrame);
++        code.getfield("org/python/core/PyFrame", "f_back", $pyBaseFrame);
+     }
+ 
+     public int storeTop() throws Exception {
+@@ -376,7 +376,7 @@
+             }
+             SymInfo symInfo = upTbl.get(scope.freevars.elementAt(i));
+             code.iconst(symInfo.env_index);
+-            code.invokevirtual("org/python/core/PyFrame", "getclosure", "(I)" + $pyObj);
++            code.invokevirtual("org/python/core/PyBaseFrame", "getclosure", "(I)" + $pyObj);
+             code.aastore();
+         }
+ 
+@@ -780,7 +780,7 @@
+                 asname = a.getInternalAsname();
+                 code.ldc(name);
+                 loadFrame();
+-                code.invokestatic("org/python/core/imp", "importOneAs", "(" + $str + $pyFrame + ")" + $pyObj);
++                code.invokestatic("org/python/core/imp", "importOneAs", "(" + $str + $pyBaseFrame + ")" + $pyObj);
+             } else {
+                 String name = a.getInternalName();
+                 asname = name;
+@@ -788,7 +788,7 @@
+                     asname = asname.substring(0, asname.indexOf('.'));
+                 code.ldc(name);
+                 loadFrame();
+-                code.invokestatic("org/python/core/imp", "importOne", "(" + $str + $pyFrame + ")" + $pyObj);
++                code.invokestatic("org/python/core/imp", "importOne", "(" + $str + $pyBaseFrame + ")" + $pyObj);
+             }
+             set(new Name(a, asname, expr_contextType.Store));
+         }
+@@ -826,7 +826,7 @@
+             }
+             
+             loadFrame();
+-            code.invokestatic("org/python/core/imp", "importAll", "(" + $str + $pyFrame + ")V");
++            code.invokestatic("org/python/core/imp", "importAll", "(" + $str + $pyBaseFrame + ")V");
+         } else {
+             java.util.List<String> fromNames = new ArrayList<String>();//[names.size()];
+             java.util.List<String> asnames = new ArrayList<String>();//[names.size()];
+@@ -851,7 +851,7 @@
+             } else {
+                 code.iconst(node.getInternalLevel());
+             }
+-            code.invokestatic("org/python/core/imp", "importFrom", "(" + $str + $strArr + $pyFrame + "I" + ")" + $pyObjArr);
++            code.invokestatic("org/python/core/imp", "importFrom", "(" + $str + $strArr + $pyBaseFrame + "I" + ")" + $pyObjArr);
+             int tmp = storeTop();
+             for (int i = 0; i < names.size(); i++) {
+                 code.aload(tmp);
+@@ -1188,7 +1188,7 @@
+         code.aload(excLocal);
+         loadFrame();
+ 
+-        code.invokestatic("org/python/core/Py", "addTraceback", "(" + $throwable + $pyFrame + ")V");
++        code.invokestatic("org/python/core/Py", "addTraceback", "(" + $throwable + $pyBaseFrame + ")V");
+ 
+         inlineFinally(inFinally);
+         code.aload(excLocal);
+@@ -1271,7 +1271,7 @@
+ 
+         loadFrame();
+ 
+-        code.invokestatic("org/python/core/Py", "setException", "(" + $throwable + $pyFrame + ")" + $pyExc);
++        code.invokestatic("org/python/core/Py", "setException", "(" + $throwable + $pyBaseFrame + ")" + $pyExc);
+ 
+         int exc = code.getFinallyLocal("java/lang/Throwable");
+         code.astore(exc);
+@@ -2315,7 +2315,7 @@
+         code.label(label_catch);
+ 
+         loadFrame();
+-        code.invokestatic("org/python/core/Py", "setException", "(" + $throwable + $pyFrame + ")" + $pyExc);
++        code.invokestatic("org/python/core/Py", "setException", "(" + $throwable + $pyBaseFrame + ")" + $pyExc);
+         code.pop();
+ 
+         code.invokestatic("org/python/core/Py", "getThreadState", "()Lorg/python/core/ThreadState;");
+diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/python/core/CompilerFlags.java
+--- a/jython/src/org/python/core/CompilerFlags.java
++++ b/jython/src/org/python/core/CompilerFlags.java
+@@ -83,7 +83,7 @@
+             | CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT.flag
+             | CodeFlag.CO_FUTURE_WITH_STATEMENT.flag;
+ 
+-    public static CompilerFlags getCompilerFlags(int flags, PyFrame frame) {
++    public static CompilerFlags getCompilerFlags(int flags, PyBaseFrame frame) {
+         if ((flags & ~CO_ALL_FEATURES) != 0) {
+             throw Py.ValueError("compile(): unrecognised flags");
+         }
+@@ -91,9 +91,9 @@
+     }
+ 
+     public static CompilerFlags getCompilerFlags(CompilerFlags flags,
+-            PyFrame frame) {
+-        if (frame != null && frame.f_code != null) {
+-            return frame.f_code.co_flags.combine(flags);
++            PyBaseFrame frame) {
++        if (frame != null && frame.getCode() != null) {
++            return frame.getCode().co_flags.combine(flags);
+         } else {
+             return flags;
+         }
+diff --git a/jython/src/org/python/core/FrameAccessor.java b/jython/src/org/python/core/FrameAccessor.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/FrameAccessor.java
+@@ -0,0 +1,51 @@
++package org.python.core;
++
++import java.util.Comparator;
++import java.util.SortedSet;
++import java.util.TreeSet;
++
++import org.python.util.ServiceLoader;
++
++public abstract class FrameAccessor {
++
++    protected abstract PyBaseFrame getFrame();
++
++    protected abstract void setFrame(PyBaseFrame frame);
++
++    public static abstract class Factory {
++        protected abstract FrameAccessor createAccessor();
++
++        @Override
++        public final boolean equals(Object other) {
++            return other != null && getClass().equals(other.getClass());
++        }
++
++        protected abstract boolean isAvailable();
++
++        @Override
++        public final int hashCode() {
++            return getClass().hashCode();
++        }
++    }
++
++    static Factory getFactory() {
++        return best_factory;
++    }
++
++    private static final Factory best_factory;
++    static {
++        SortedSet<Factory> factories = new TreeSet<Factory>(
++                new Comparator<Factory>() {
++                    public int compare(Factory one, Factory two) {
++                        throw new UnsupportedOperationException(
++                                /* TODO: */"Need a way to sort Frame Accessor factories.");
++                    }
++                });
++        for (Factory candidate : ServiceLoader.load(Factory.class)) {
++            if (candidate.isAvailable()) {
++                factories.add(candidate);
++            }
++        }
++        best_factory = factories.isEmpty() ? null : factories.first();
++    }
++}
+diff --git a/jython/src/org/python/core/NewCompilerResources.java b/jython/src/org/python/core/NewCompilerResources.java
+--- a/jython/src/org/python/core/NewCompilerResources.java
++++ b/jython/src/org/python/core/NewCompilerResources.java
+@@ -16,7 +16,7 @@
+      * Called from jython generated code when a statement like "from spam.eggs
+      * import *" is executed.
+      */
+-    public static void importAll(PyObject module, PyFrame frame) {
++    public static void importAll(PyObject module, PyBaseFrame frame) {
+         // System.out.println("importAll(" + mod + ")");
+         PyObject names;
+         boolean filter = true;
+diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.java
+--- a/jython/src/org/python/core/Py.java
++++ b/jython/src/org/python/core/Py.java
+@@ -925,11 +925,11 @@
+         printException(t, null, null);
+     }
+ 
+-    public static void printException(Throwable t, PyFrame f) {
++    public static void printException(Throwable t, PyBaseFrame f) {
+         printException(t, f, null);
+     }
+ 
+-    public static synchronized void printException(Throwable t, PyFrame f,
++    public static synchronized void printException(Throwable t, PyBaseFrame f,
+             PyObject file) {
+         StdoutWrapper stderr = Py.stderr;
+ 
+@@ -1122,12 +1122,12 @@
+     }
+ 
+     /* Helpers to implement finally clauses */
+-    public static void addTraceback(Throwable t, PyFrame frame) {
++    public static void addTraceback(Throwable t, PyBaseFrame frame) {
+         Py.JavaError(t).tracebackHere(frame, true);
+     }
+ 
+     /* Helpers to implement except clauses */
+-    public static PyException setException(Throwable t, PyFrame frame) {
++    public static PyException setException(Throwable t, PyBaseFrame frame) {
+         PyException pye = Py.JavaError(t);
+         pye.normalize();
+         pye.tracebackHere(frame);
+@@ -1203,7 +1203,7 @@
+         }
+ 
+         if (globals == null || globals == Py.None) {
+-            globals = Py.getFrame().f_globals;
++            globals = Py.getFrame().getGlobals();
+         }
+ 
+         PyTableCode tc = null;
+@@ -1275,16 +1275,16 @@
+     }
+ 
+     /* Get and set the current frame */
+-    public static PyFrame getFrame() {
++    public static PyBaseFrame getFrame() {
+         ThreadState ts = getThreadState();
+         if (ts == null) {
+             return null;
+         }
+-        return ts.frame;
++        return ts.getFrame();
+     }
+ 
+-    public static void setFrame(PyFrame f) {
+-        getThreadState().frame = f;
++    public static void setFrame(PyBaseFrame f) {
++        getThreadState().setFrame(f);
+     }
+ 
+     /* A collection of functions for implementing the print statement */
+@@ -1530,7 +1530,7 @@
+     public static PyObject makeClass(String name, PyObject[] bases,
+                                      PyCode code, PyObject doc,
+                                      PyObject[] closure_cells) {
+-        PyObject globals = getFrame().f_globals;
++        PyObject globals = getFrame().getGlobals();
+         PyObject dict = code.call(Py.EmptyObjects, Py.NoKeywords, globals, Py.EmptyObjects,
+                                   new PyTuple(closure_cells));
+         if (doc != null && dict.__finditem__("__doc__") == null) {
+@@ -1554,7 +1554,7 @@
+      * @return a new Python Class PyObject
+      */
+     public static PyObject makeClass(String name, PyObject[] bases, PyObject dict) {
+-        PyFrame frame = getFrame();
++        PyBaseFrame frame = getFrame();
+         if (dict.__finditem__("__module__") == null) {
+             PyObject module = frame.getglobal("__name__");
+             if (module != null) {
+@@ -1572,7 +1572,7 @@
+                     metaclass = base.getType();
+                 }
+             } else {
+-                PyObject globals = frame.f_globals;
++                PyObject globals = frame.getGlobals();
+                 if (globals != null) {
+                     metaclass = globals.__finditem__("__metaclass__");
+                 }
+@@ -1617,7 +1617,7 @@
+     }
+ 
+     public static CompilerFlags getCompilerFlags(int flags, boolean dont_inherit) {
+-        final PyFrame frame;
++        final PyBaseFrame frame;
+         if (dont_inherit) {
+             frame = null;
+         } else {
+@@ -1627,7 +1627,7 @@
+     }
+ 
+     public static CompilerFlags getCompilerFlags(CompilerFlags flags, boolean dont_inherit) {
+-        final PyFrame frame;
++        final PyBaseFrame frame;
+         if (dont_inherit) {
+             frame = null;
+         } else {
+@@ -1984,7 +1984,7 @@
+         }
+     }
+ 
+-    public PyObject call(PyFrame frame, PyObject closure) {
++    public PyObject call(PyBaseFrame frame, PyObject closure) {
+         //XXX: what the heck is this?  Looks like debug code, but it's
+         //     been here a long time...
+         System.out.println("call #1");
+diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/core/PyBaseCode.java
+--- a/jython/src/org/python/core/PyBaseCode.java
++++ b/jython/src/org/python/core/PyBaseCode.java
+@@ -22,8 +22,9 @@
+         return co_freevars != null && co_freevars.length > 0;
+     }
+ 
+-    public PyObject call(PyFrame frame, PyObject closure) {
++    public PyObject call(PyBaseFrame _frame, PyObject closure) {
+ //         System.err.println("tablecode call: "+co_name);
++        PyFrame frame = (PyFrame)_frame;
+         ThreadState ts = Py.getThreadState();
+         if (ts.systemState == null) {
+             ts.systemState = Py.defaultSystemState;
+@@ -34,26 +35,26 @@
+         PyException previous_exception = ts.exception;
+ 
+         // Push frame
+-        frame.f_back = ts.frame;
+-        if (frame.f_builtins == null) {
+-            if (frame.f_back != null) {
+-                frame.f_builtins = frame.f_back.f_builtins;
++        frame.setPrevious(ts.getFrame());
++        if (frame.getBuiltins() == null) {
++            if (frame.getPrevious() != null) {
++                frame.setBuiltins(frame.getPrevious().getBuiltins());
+             } else {
+                 //System.err.println("ts: "+ts);
+                 //System.err.println("ss: "+ts.systemState);
+-                frame.f_builtins = PySystemState.builtins;
++                frame.setBuiltins(PySystemState.builtins);
+             }
+         }
+         // nested scopes: setup env with closure
+         // this should only be done once, so let the frame take care of it
+         frame.setupEnv((PyTuple)closure);
+ 
+-        ts.frame = frame;
++        ts.setFrame(frame);
+ 
+         // Handle trace function for debugging
+         if (ts.tracefunc != null) {
+-            frame.f_lineno = co_firstlineno;
+-            frame.tracefunc = ts.tracefunc.traceCall(frame);
++            frame.setLineno(co_firstlineno);
++            frame.setTraceFunction(ts.tracefunc.traceCall(frame));
+         }
+ 
+         // Handle trace function for profiling
+@@ -69,10 +70,11 @@
+             PyException pye = Py.JavaError(t);
+             pye.tracebackHere(frame);
+ 
+-            frame.f_lasti = -1;
++            frame.setLastI(-1);
+ 
+-            if (frame.tracefunc != null) {
+-                frame.tracefunc.traceException(frame, pye);
++            TraceFunction tracefunc = frame.getTraceFunction();
++            if (tracefunc != null) {
++                tracefunc.traceException(frame, pye);
+             }
+             if (ts.profilefunc != null) {
+                 ts.profilefunc.traceException(frame, pye);
+@@ -80,12 +82,13 @@
+ 
+             // Rethrow the exception to the next stack frame
+             ts.exception = previous_exception;
+-            ts.frame = ts.frame.f_back;
++            ts.setFrame(ts.getFrame().getPrevious());
+             throw pye;
+         }
+ 
+-        if (frame.tracefunc != null) {
+-            frame.tracefunc.traceReturn(frame, ret);
++        TraceFunction tracefunc = frame.getTraceFunction();
++        if (tracefunc != null) {
++            tracefunc.traceReturn(frame, ret);
+         }
+         // Handle trace function for profiling
+         if (ts.profilefunc != null) {
+@@ -95,7 +98,7 @@
+         // Restore previously defined exception
+         ts.exception = previous_exception;
+ 
+-        ts.frame = ts.frame.f_back;
++        ts.setFrame(ts.getFrame().getPrevious());
+ 
+         // Check for interruption, which is used for restarting the interpreter
+         // on Jython
+@@ -288,7 +291,7 @@
+     protected abstract PyObject interpret(PyFrame f, ThreadState ts);
+ 
+     protected int getline(PyFrame f) {
+-         return f.f_lineno;
++         return f.getLineno();
+     }
+ 
+     // returns the augmented version of CompilerFlags (instead of just as a bit vector int)
+diff --git a/jython/src/org/python/core/PyBaseFrame.java b/jython/src/org/python/core/PyBaseFrame.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/core/PyBaseFrame.java
+@@ -0,0 +1,121 @@
++package org.python.core;
++
++public abstract class PyBaseFrame extends PyObject {
++
++    private static final String[] __members__ = {"f_back", "f_code", "f_locals", "f_globals",
++                                                     "f_lineno", "f_builtins", "f_trace"};
++
++    public PyBaseFrame(PyType objtype) {
++        super(objtype);
++    }
++
++    public PyBaseFrame(boolean ignored) {
++        super(ignored);
++    }
++
++    public abstract void setderef(int index, PyObject value);
++
++    public abstract PyObject getderef(int index);
++
++    public abstract PyObject getclosure(int index);
++
++    public abstract void delglobal(String index);
++
++    public abstract void dellocal(String index);
++
++    public abstract void dellocal(int index);
++
++    public abstract void setglobal(String index, PyObject value);
++
++    public abstract void setlocal(String index, PyObject value);
++
++    public abstract void setlocal(int index, PyObject value);
++
++    public abstract PyObject getglobal(String index);
++
++    public abstract PyObject getname_or_null(String index);
++
++    public abstract PyObject getname(String index);
++
++    public abstract PyObject getlocal(int index);
++
++    public abstract PyObject getLocals();
++
++    public abstract int getLastI();
++
++    public abstract void setLastI(int f_lasti);
++
++    public abstract PyObject getBuiltins();
++
++    public abstract int getLineno();
++
++    public abstract PyObject getGlobals();
++
++    public abstract PyBaseCode getCode();
++
++    public abstract PyBaseFrame getPrevious();
++    
++    public abstract TraceFunction getTraceFunction();
++    
++    public abstract void setTraceFunction(TraceFunction trace);
++
++    public PyBaseFrame() {
++        super();
++    }
++
++    public PyObject __dir__() {
++        PyString members[] = new PyString[__members__.length];
++        for (int i = 0; i < __members__.length; i++) {
++            members[i] = new PyString(__members__[i]);
++        }
++        return new PyList(members);
++    }
++
++    private void throwReadonly(String name) {
++        for (String member : __members__) {
++            if (member == name) {
++                throw Py.TypeError("readonly attribute");
++            }
++        }
++        throw Py.AttributeError(name);
++    }
++
++    public void __setattr__(String name, PyObject value) {
++        // In CPython, some of the frame's attributes are read/writeable
++        if (name == "f_trace") {
++            setTraceFunction(new PythonTraceFunction(value));
++        } else {
++            throwReadonly(name);
++        }
++        // not yet implemented:
++        // f_exc_type
++        // f_exc_value
++        // f_exc_traceback
++    }
++
++    public void __delattr__(String name) {
++        if (name == "f_trace") {
++            setTraceFunction(null);
++        } else {
++            throwReadonly(name);
++        }
++        // not yet implemented:
++        // f_exc_type
++        // f_exc_value
++        // f_exc_traceback
++    }
++
++    public PyObject __findattr_ex__(String name) {
++        if (name == "f_locals") {
++            return getLocals();
++        } else if (name == "f_trace") {
++            TraceFunction tracefunc = getTraceFunction();
++            if (tracefunc instanceof PythonTraceFunction) {
++                return ((PythonTraceFunction)tracefunc).tracefunc;
++            }
++            return Py.None;
++        }
++        return super.__findattr_ex__(name);
++    }
++
++}
+\ No newline at end of file
+diff --git a/jython/src/org/python/core/PyBytecode.java b/jython/src/org/python/core/PyBytecode.java
+--- a/jython/src/org/python/core/PyBytecode.java
++++ b/jython/src/org/python/core/PyBytecode.java
+@@ -204,11 +204,11 @@
+     }
+ 
+     private static String stringify_blocks(PyFrame f) {
+-        if (f.f_exits == null || f.f_lineno == 0) {
++        if (f.f_exits == null || f.getLineno() == 0) {
+             return "[]";
+         }
+         StringBuilder buf = new StringBuilder("[");
+-        int len = f.f_lineno;
++        int len = f.getLineno();
+         for (int i = 0; i < len; i++) {
+             buf.append(f.f_exits[i].toString());
+             if (i < len - 1) {
+@@ -222,7 +222,7 @@
+     private void print_debug(int count, int next_instr, int line, int opcode, int oparg, PyStack stack, PyFrame f) {
+         if (debug) {
+             System.err.println(co_name + " " + line + ":" +
+-                    count + "," + f.f_lasti + "> " +
++                    count + "," + f.getLastI() + "> " +
+                     get_opname().__getitem__(Py.newInteger(opcode)) +
+                     (opcode >= Opcode.HAVE_ARGUMENT ? " " + oparg : "") +
+                     ", stack: " + stack.toString() +
+@@ -270,7 +270,7 @@
+         // in a shadow version of the frame that we copy back to on entry/exit and downcalls
+ 
+         if (debug) {
+-            System.err.println(co_name + ":" + f.f_lasti + "/" + co_code.length +
++            System.err.println(co_name + ":" + f.getLastI() + "/" + co_code.length +
+                     ", cells:" + Arrays.toString(co_cellvars) + ", free:" + Arrays.toString(co_freevars));
+             int i = 0;
+             for (String cellvar : co_cellvars) {
+@@ -282,11 +282,11 @@
+             get_dis().invoke("disassemble", this);
+ 
+         }
+-        if (f.f_lasti >= co_code.length) {
++        if (f.getLastI() >= co_code.length) {
+             throw Py.SystemError(""); // XXX - chose an appropriate error!!!
+         }
+ 
+-        next_instr = f.f_lasti;
++        next_instr = f.getLastI();
+ 
+         // the restore stack aspects should occur ONLY after a yield
+         boolean checkGeneratorInput = false;
+@@ -301,7 +301,7 @@
+ 
+         while (!debug || (maxCount == -1 || count < maxCount)) { // XXX - replace with while(true)
+ 
+-            if (f.tracefunc != null || debug) {
++            if (f.getTraceFunction() != null || debug) {
+                 if (lineCache == null) {
+                     lineCache = new LineCache();
+                     if (debug) {
+@@ -334,7 +334,7 @@
+ 
+                 count += 1;
+                 next_instr += 1;
+-                f.f_lasti = next_instr;
++                f.setLastI(next_instr);
+ 
+                 switch (opcode) {
+                     case Opcode.NOP:
+@@ -702,7 +702,7 @@
+                         }
+ 
+                     case Opcode.LOAD_LOCALS:
+-                        stack.push(f.f_locals);
++                        stack.push(f.getf_locals());
+                         break;
+ 
+                     case Opcode.RETURN_VALUE:
+@@ -828,7 +828,7 @@
+                                     cell.ob_ref = f.f_fastlocals[i];
+                                 }
+                             } else {
+-                                cell.ob_ref = f.f_locals.__finditem__(name);
++                                cell.ob_ref = f.getf_locals().__finditem__(name);
+                             }
+                         }
+                         stack.push(cell);
+@@ -862,7 +862,7 @@
+                                     cell.ob_ref = f.f_fastlocals[i];
+                                 }
+                             } else {
+-                                cell.ob_ref = f.f_locals.__finditem__(name);
++                                cell.ob_ref = f.getf_locals().__finditem__(name);
+                             }
+                         }
+                         stack.push(cell.ob_ref);
+@@ -941,7 +941,7 @@
+                     }
+ 
+                     case Opcode.IMPORT_NAME: {
+-                        PyObject __import__ = f.f_builtins.__finditem__("__import__");
++                        PyObject __import__ = f.getBuiltins().__finditem__("__import__");
+                         if (__import__ == null) {
+                             throw Py.ImportError("__import__ not found");
+                         }
+@@ -950,9 +950,9 @@
+                         PyObject level = stack.pop();
+ 
+                         if (level.asInt() != -1) {
+-                            stack.push(__import__.__call__(new PyObject[]{name, f.f_globals, f.f_locals, fromlist, level}));
++                            stack.push(__import__.__call__(new PyObject[]{name, f.getGlobals(), f.getf_locals(), fromlist, level}));
+                         } else {
+-                            stack.push(__import__.__call__(new PyObject[]{name, f.f_globals, f.f_locals, fromlist}));
++                            stack.push(__import__.__call__(new PyObject[]{name, f.getGlobals(), f.getf_locals(), fromlist}));
+                         }
+                         break;
+                     }
+@@ -1118,7 +1118,7 @@
+                         if (code instanceof PyBytecode && ((PyBytecode) code).co_consts.length > 0) {
+                             doc = ((PyBytecode) code).co_consts[0];
+                         }
+-                        PyFunction func = new PyFunction(f.f_globals, defaults, code, doc);
++                        PyFunction func = new PyFunction(f.getGlobals(), defaults, code, doc);
+                         stack.push(func);
+                         break;
+                     }
+@@ -1131,7 +1131,7 @@
+                         if (code instanceof PyBytecode && ((PyBytecode) code).co_consts.length > 0) {
+                             doc = ((PyBytecode) code).co_consts[0];
+                         }
+-                        PyFunction func = new PyFunction(f.f_globals, defaults, code, doc, closure_cells);
++                        PyFunction func = new PyFunction(f.getGlobals(), defaults, code, doc, closure_cells);
+                         stack.push(func);
+                         break;
+                     }
+@@ -1154,7 +1154,7 @@
+                         Py.print(Py.getSystemState().stderr,
+                                 Py.newString(
+                                 String.format("XXX lineno: %d, opcode: %d\n",
+-                                f.f_lasti, opcode)));
++                                f.getLastI(), opcode)));
+                         throw Py.SystemError("unknown opcode");
+ 
+                 } // end switch
+@@ -1236,10 +1236,10 @@
+             f.f_savedlocals = stack.popN(stack.size());
+         }
+ 
+-        f.f_lasti = next_instr; // need to update on function entry, etc
++        f.setLastI(next_instr); // need to update on function entry, etc
+ 
+         if (debug) {
+-            System.err.println(count + "," + f.f_lasti + "> Returning from " + why + ": " + retval +
++            System.err.println(count + "," + f.getLastI() + "> Returning from " + why + ": " + retval +
+                     ", stack: " + stack.toString() +
+                     ", blocks: " + stringify_blocks(f));
+         }
+@@ -1249,7 +1249,7 @@
+         }
+ 
+         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR) && why == Why.RETURN && retval == Py.None) {
+-            f.f_lasti = -1;
++            f.setLastI(-1);
+         }
+ 
+         return retval;
+@@ -1503,7 +1503,7 @@
+ 
+     @Override
+     protected int getline(PyFrame f) {
+-        int addrq = f.f_lasti;
++        int addrq = f.getLastI();
+         int size = co_lnotab.length / 2;
+         int p = 0;
+         int line = co_firstlineno;
+diff --git a/jython/src/org/python/core/PyClass.java b/jython/src/org/python/core/PyClass.java
+--- a/jython/src/org/python/core/PyClass.java
++++ b/jython/src/org/python/core/PyClass.java
+@@ -62,9 +62,9 @@
+     protected void findModule(PyObject dict) {
+         PyObject module = dict.__finditem__("__module__");
+         if (module == null || module == Py.None) {
+-            PyFrame f = Py.getFrame();
++            PyBaseFrame f = Py.getFrame();
+             if (f != null) {
+-                PyObject nm = f.f_globals.__finditem__("__name__");
++                PyObject nm = f.getGlobals().__finditem__("__name__");
+                 if (nm != null) {
+                     dict.__setitem__("__module__", nm);
+                 }
+diff --git a/jython/src/org/python/core/PyCode.java b/jython/src/org/python/core/PyCode.java
+--- a/jython/src/org/python/core/PyCode.java
++++ b/jython/src/org/python/core/PyCode.java
+@@ -8,9 +8,9 @@
+ {
+     public String co_name;
+ 
+-    abstract public PyObject call(PyFrame frame, PyObject closure);
++    abstract public PyObject call(PyBaseFrame frame, PyObject closure);
+ 
+-    public PyObject call(PyFrame frame) {
++    public PyObject call(PyBaseFrame frame) {
+         return call(frame, null);
+     }
+ 
+diff --git a/jython/src/org/python/core/PyException.java b/jython/src/org/python/core/PyException.java
+--- a/jython/src/org/python/core/PyException.java
++++ b/jython/src/org/python/core/PyException.java
+@@ -136,7 +136,7 @@
+      *
+      * @param here the current PyFrame
+      */
+-    public void tracebackHere(PyFrame here) {
++    public void tracebackHere(PyBaseFrame here) {
+         tracebackHere(here, false);
+     }
+ 
+@@ -146,7 +146,7 @@
+      * @param here the current PyFrame
+      * @param isFinally whether caller is a Python finally block
+      */
+-    public void tracebackHere(PyFrame here, boolean isFinally) {
++    public void tracebackHere(PyBaseFrame here, boolean isFinally) {
+         if (!isReRaise && here != null) {
+             // the frame is either inapplicable or already registered (from a finally)
+             // during a re-raise
+diff --git a/jython/src/org/python/core/PyFrame.java b/jython/src/org/python/core/PyFrame.java
+--- a/jython/src/org/python/core/PyFrame.java
++++ b/jython/src/org/python/core/PyFrame.java
+@@ -4,11 +4,13 @@
+ /**
+  * A Python frame object.
+  */
+-public class PyFrame extends PyObject
++public class PyFrame extends PyBaseFrame
+ {
+-    public PyFrame f_back;
++    // These are public because they are accessed from generated code
++    
++    public PyBaseFrame f_back;
+ 
+-    public PyBaseCode f_code;
++    public final PyBaseCode f_code;
+ 
+     public PyObject f_locals;
+ 
+@@ -18,6 +20,10 @@
+ 
+     public PyObject f_builtins;
+ 
++    public int f_lasti;
++    
++    // Internal
++
+     public PyObject[] f_fastlocals;
+ 
+     /** nested scopes: cell + free env. */
+@@ -27,8 +33,6 @@
+ 
+     public int f_nfreevars;
+ 
+-    public int f_lasti;
+-
+     public Object[] f_savedlocals;
+ 
+     private int env_j = 0;
+@@ -36,11 +40,11 @@
+     private Object generatorInput = Py.None;
+ 
+     // with context exits - used by generated bytecode
+-    public PyObject[] f_exits;
++    public PyObject[] f_exits; // Impl.
+     
+     /** an interface to functions suitable for tracing, e.g. via
+      * sys.settrace(). */
+-    public TraceFunction tracefunc;
++    private TraceFunction tracefunc; // Publ.
+ 
+     private static final String NAME_ERROR_MSG = "name '%.200s' is not defined";
+ 
+@@ -49,8 +53,62 @@
+     private static final String UNBOUNDLOCAL_ERROR_MSG =
+             "local variable '%.200s' referenced before assignment";
+ 
+-    private static final String[] __members__ = {"f_back", "f_code", "f_locals", "f_globals",
+-                                                 "f_lineno", "f_builtins", "f_trace"};
++    @Override
++    public PyBaseFrame getPrevious() {
++        return f_back;
++    }
++
++    void setPrevious(PyBaseFrame f_back) {
++        this.f_back = f_back;
++    }
++
++    @Override
++    public PyBaseCode getCode() {
++        return f_code;
++    }
++
++    @Override
++    public PyObject getGlobals() {
++        return f_globals;
++    }
++
++    void setLineno(int f_lineno) {
++        this.f_lineno = f_lineno;
++    }
++
++    @Override
++    public int getLineno() {
++        return f_lineno;
++    }
++
++    void setBuiltins(PyObject f_builtins) {
++        this.f_builtins = f_builtins;
++    }
++
++    @Override
++    public PyObject getBuiltins() {
++        return f_builtins;
++    }
++
++    @Override
++    public void setLastI(int f_lasti) {
++        this.f_lasti = f_lasti;
++    }
++
++    @Override
++    public int getLastI() {
++        return f_lasti;
++    }
++    
++    @Override
++    public TraceFunction getTraceFunction() {
++        return tracefunc;
++    }
++    
++    @Override
++    public void setTraceFunction(TraceFunction trace) {
++        tracefunc = trace;
++    }
+ 
+     public PyFrame(PyBaseCode code, PyObject locals, PyObject globals,
+                    PyObject builtins)
+@@ -106,14 +164,6 @@
+         }
+     }
+ 
+-    public PyObject __dir__() {
+-        PyString members[] = new PyString[__members__.length];
+-        for (int i = 0; i < __members__.length; i++) {
+-            members[i] = new PyString(__members__[i]);
+-        }
+-        return new PyList(members);
+-    }
+-
+     void setGeneratorInput(Object value) {
+         generatorInput = value;
+     }
+@@ -128,58 +178,13 @@
+         return generatorInput;
+     }
+ 
+-    private void throwReadonly(String name) {
+-        for (String member : __members__) {
+-            if (member == name) {
+-                throw Py.TypeError("readonly attribute");
+-            }
+-        }
+-        throw Py.AttributeError(name);
+-    }
+-
+-    public void __setattr__(String name, PyObject value) {
+-        // In CPython, some of the frame's attributes are read/writeable
+-        if (name == "f_trace") {
+-            tracefunc = new PythonTraceFunction(value);
+-        } else {
+-            throwReadonly(name);
+-        }
+-        // not yet implemented:
+-        // f_exc_type
+-        // f_exc_value
+-        // f_exc_traceback
+-    }
+-
+-    public void __delattr__(String name) {
+-        if (name == "f_trace") {
+-            tracefunc = null;
+-        } else {
+-            throwReadonly(name);
+-        }
+-        // not yet implemented:
+-        // f_exc_type
+-        // f_exc_value
+-        // f_exc_traceback
+-    }
+-
+-    public PyObject __findattr_ex__(String name) {
+-        if (name == "f_locals") {
+-            return getLocals();
+-        } else if (name == "f_trace") {
+-            if (tracefunc instanceof PythonTraceFunction) {
+-                return ((PythonTraceFunction)tracefunc).tracefunc;
+-            }
+-            return Py.None;
+-        }
+-        return super.__findattr_ex__(name);
+-    }
+-
+     /**
+      * Return the locals dict. First merges the fast locals into
+      * f_locals, then returns the updated f_locals.
+      *
+      * @return a PyObject mapping of locals
+      */
++    @Override
+     public PyObject getLocals() {
+         if (f_locals == null) {
+             f_locals = new PyStringMap();
+@@ -241,6 +246,7 @@
+         return f_code.getline(this);
+     }
+ 
++    @Override
+     public PyObject getlocal(int index) {
+         if (f_fastlocals != null) {
+             PyObject ret = f_fastlocals[index];
+@@ -259,6 +265,7 @@
+         throw Py.UnboundLocalError(String.format(UNBOUNDLOCAL_ERROR_MSG, name));
+     }
+ 
++    @Override
+     public PyObject getname(String index) {
+         PyObject ret;
+         if (f_locals == null || f_locals == f_globals) {
+@@ -276,6 +283,7 @@
+         throw Py.NameError(String.format(NAME_ERROR_MSG, index));
+     }
+ 
++    @Override
+     public PyObject getname_or_null(String index) {
+         PyObject ret;
+         if (f_locals == null || f_locals == f_globals) {
+@@ -290,6 +298,7 @@
+         return ret;
+     }
+     
++    @Override
+     public PyObject getglobal(String index) {
+         PyObject ret = doGetglobal(index);
+         if (ret != null) {
+@@ -311,6 +320,7 @@
+         return f_builtins.__finditem__(index);
+     }
+ 
++    @Override
+     public void setlocal(int index, PyObject value) {
+         if (f_fastlocals != null) {
+             f_fastlocals[index] = value;
+@@ -319,6 +329,7 @@
+         }
+     }
+ 
++    @Override
+     public void setlocal(String index, PyObject value) {
+         if (f_locals != null) {
+             f_locals.__setitem__(index, value);
+@@ -327,10 +338,12 @@
+         }
+     }
+ 
++    @Override
+     public void setglobal(String index, PyObject value) {
+         f_globals.__setitem__(index, value);
+     }
+ 
++    @Override
+     public void dellocal(int index) {
+         if (f_fastlocals != null) {
+             if (f_fastlocals[index] == null) {
+@@ -343,6 +356,7 @@
+         }
+     }
+ 
++    @Override
+     public void dellocal(String index) {
+         if (f_locals != null) {
+             try {
+@@ -358,6 +372,7 @@
+         }
+     }
+ 
++    @Override
+     public void delglobal(String index) {
+         try {
+             f_globals.__delitem__(index);
+@@ -371,10 +386,12 @@
+ 
+     // nested scopes helpers
+ 
++    @Override
+     public PyObject getclosure(int index) {
+         return f_env[index];
+     }
+ 
++    @Override
+     public PyObject getderef(int index) {
+         PyObject obj = f_env[index].ob_ref;
+         if (obj != null) {
+@@ -389,6 +406,7 @@
+         throw Py.UnboundLocalError(String.format(UNBOUNDLOCAL_ERROR_MSG, name));
+     }
+ 
++    @Override
+     public void setderef(int index, PyObject value) {
+         f_env[index].ob_ref = value;
+     }
+diff --git a/jython/src/org/python/core/PyObject.java b/jython/src/org/python/core/PyObject.java
+--- a/jython/src/org/python/core/PyObject.java
++++ b/jython/src/org/python/core/PyObject.java
+@@ -3459,7 +3459,7 @@
+                 }
+             } else {
+                 ThreadState ts = Py.getThreadState();
+-                if (ts.frame == null) {
++                if (ts.getFrame() == null) {
+                     Py.maybeSystemExit(e);
+                 }
+                 if (Options.showPythonProxyExceptions) {
+diff --git a/jython/src/org/python/core/PySystemState.java b/jython/src/org/python/core/PySystemState.java
+--- a/jython/src/org/python/core/PySystemState.java
++++ b/jython/src/org/python/core/PySystemState.java
+@@ -140,6 +140,8 @@
+     public PyObject __dict__;
+ 
+     private int recursionlimit = 1000;
++    
++    private final FrameAccessor.Factory frameAccessorFactory = FrameAccessor.getFactory();
+ 
+     public PySystemState() {
+         initialize();
+@@ -1157,21 +1159,42 @@
+         Py.getThreadState().exception = null;
+     }
+ 
+-    public static PyFrame _getframe() {
++    public static PyBaseFrame _getframe() {
+         return _getframe(-1);
+     }
+ 
+-    public static PyFrame _getframe(int depth) {
+-        PyFrame f = Py.getFrame();
++    public static PyBaseFrame _getframe(int depth) {
++        PyBaseFrame f = Py.getFrame();
+ 
+         while (depth > 0 && f != null) {
+-            f = f.f_back;
++            f = f.getPrevious();
+             --depth;
+         }
+         if (f == null)
+              throw Py.ValueError("call stack is not deep enough");
+         return f;
+     }
++
++    FrameAccessor newFrameAccessor() {
++        if (frameAccessorFactory != null) {
++            return frameAccessorFactory.createAccessor();
++        } else {
++            return new FrameStore();
++        }
++    }
++}
++
++final class FrameStore extends FrameAccessor {
++    private PyBaseFrame frame = null;
++    @Override
++    protected PyBaseFrame getFrame() {
++        return frame;
++    }
++
++    @Override
++    protected void setFrame(PyBaseFrame frame) {
++        this.frame = frame;
++    }
+ }
+ 
+ class PySystemStateFunctions extends PyBuiltinFunctionSet
+diff --git a/jython/src/org/python/core/PyTableCode.java b/jython/src/org/python/core/PyTableCode.java
+--- a/jython/src/org/python/core/PyTableCode.java
++++ b/jython/src/org/python/core/PyTableCode.java
+@@ -122,8 +122,9 @@
+     }
+ 
+     @Override
+-    public PyObject call(PyFrame frame, PyObject closure) {
++    public PyObject call(PyBaseFrame _frame, PyObject closure) {
+ //         System.err.println("tablecode call: "+co_name);
++        PyFrame frame = (PyFrame)_frame;
+         ThreadState ts = Py.getThreadState();
+         if (ts.systemState == null) {
+             ts.systemState = Py.defaultSystemState;
+@@ -134,26 +135,26 @@
+         PyException previous_exception = ts.exception;
+ 
+         // Push frame
+-        frame.f_back = ts.frame;
+-        if (frame.f_builtins == null) {
+-            if (frame.f_back != null) {
+-                frame.f_builtins = frame.f_back.f_builtins;
++        frame.setPrevious(ts.getFrame());
++        if (frame.getBuiltins() == null) {
++            if (frame.getPrevious() != null) {
++                frame.setBuiltins(frame.getPrevious().getBuiltins());
+             } else {
+                 //System.err.println("ts: "+ts);
+                 //System.err.println("ss: "+ts.systemState);
+-                frame.f_builtins = PySystemState.builtins;
++                frame.setBuiltins(PySystemState.builtins);
+             }
+         }
+         // nested scopes: setup env with closure
+         // this should only be done once, so let the frame take care of it
+         frame.setupEnv((PyTuple)closure);
+ 
+-        ts.frame = frame;
++        ts.setFrame(frame);
+ 
+         // Handle trace function for debugging
+         if (ts.tracefunc != null) {
+-            frame.f_lineno = co_firstlineno;
+-            frame.tracefunc = ts.tracefunc.traceCall(frame);
++            frame.setLineno(co_firstlineno);
++            frame.setTraceFunction(ts.tracefunc.traceCall(frame));
+         }
+ 
+         // Handle trace function for profiling
+@@ -169,10 +170,11 @@
+             PyException pye = Py.JavaError(t);
+             pye.tracebackHere(frame);
+ 
+-            frame.f_lasti = -1;
++            frame.setLastI(-1);
+ 
+-            if (frame.tracefunc != null) {
+-                frame.tracefunc.traceException(frame, pye);
++            TraceFunction tracefunc = frame.getTraceFunction();
++            if (tracefunc != null) {
++                tracefunc.traceException(frame, pye);
+             }
+             if (ts.profilefunc != null) {
+                 ts.profilefunc.traceException(frame, pye);
+@@ -180,12 +182,13 @@
+ 
+             // Rethrow the exception to the next stack frame
+             ts.exception = previous_exception;
+-            ts.frame = ts.frame.f_back;
++            ts.setFrame(ts.getFrame().getPrevious());
+             throw pye;
+         }
+ 
+-        if (frame.tracefunc != null) {
+-            frame.tracefunc.traceReturn(frame, ret);
++        TraceFunction tracefunc = frame.getTraceFunction();
++        if (tracefunc != null) {
++            tracefunc.traceReturn(frame, ret);
+         }
+         // Handle trace function for profiling
+         if (ts.profilefunc != null) {
+@@ -195,7 +198,7 @@
+         // Restore previously defined exception
+         ts.exception = previous_exception;
+ 
+-        ts.frame = ts.frame.f_back;
++        ts.setFrame(ts.getFrame().getPrevious());
+ 
+         // Check for interruption, which is used for restarting the interpreter
+         // on Jython
+diff --git a/jython/src/org/python/core/PyTraceback.java b/jython/src/org/python/core/PyTraceback.java
+--- a/jython/src/org/python/core/PyTraceback.java
++++ b/jython/src/org/python/core/PyTraceback.java
+@@ -17,27 +17,27 @@
+     public PyObject tb_next;
+ 
+     @ExposedGet
+-    public PyFrame tb_frame;
++    public PyBaseFrame tb_frame;
+ 
+     @ExposedGet
+     public int tb_lineno;
+ 
+-    public PyTraceback(PyTraceback next, PyFrame frame) {
++    public PyTraceback(PyTraceback next, PyBaseFrame frame) {
+         tb_next = next;
+         tb_frame = frame;
+-        tb_lineno = frame.getline();
++        tb_lineno = frame.getLineno();
+     }
+ 
+     private String tracebackInfo() {
+-        if (tb_frame == null || tb_frame.f_code == null) {
++        if (tb_frame == null || tb_frame.getCode() == null) {
+             return String.format("  (no code object) at line %s\n", tb_lineno);
+         }
+         String line = null;
+-        if (tb_frame.f_code.co_filename != null) {
+-            line = getLine(tb_frame.f_code.co_filename, tb_lineno);
++        if (tb_frame.getCode().co_filename != null) {
++            line = getLine(tb_frame.getCode().co_filename, tb_lineno);
+         }
+         return String.format("  File \"%.500s\", line %d, in %.500s\n%s",
+-                             tb_frame.f_code.co_filename, tb_lineno, tb_frame.f_code.co_name,
++                             tb_frame.getCode().co_filename, tb_lineno, tb_frame.getCode().co_name,
+                              line == null ? "" : "    " + line);
+     }
+ 
+@@ -57,7 +57,7 @@
+ 
+         PyFile pyFile;
+         try {
+-            pyFile = new PyFile(tb_frame.f_code.co_filename, "U", -1);
++            pyFile = new PyFile(tb_frame.getCode().co_filename, "U", -1);
+         } catch (PyException pye) {
+             return null;
+         }
+diff --git a/jython/src/org/python/core/PyType.java b/jython/src/org/python/core/PyType.java
+--- a/jython/src/org/python/core/PyType.java
++++ b/jython/src/org/python/core/PyType.java
+@@ -167,9 +167,9 @@
+         }
+ 
+         if (dict.__finditem__("__module__") == null) {
+-           PyFrame frame = Py.getFrame();
++           PyBaseFrame frame = Py.getFrame();
+            if (frame != null) {
+-               PyObject globals = frame.f_globals;
++               PyObject globals = frame.getGlobals();
+                PyObject modname;
+                if ((modname = globals.__finditem__("__name__")) != null) {
+                    dict.__setitem__("__module__", modname);
+diff --git a/jython/src/org/python/core/PythonTraceFunction.java b/jython/src/org/python/core/PythonTraceFunction.java
+--- a/jython/src/org/python/core/PythonTraceFunction.java
++++ b/jython/src/org/python/core/PythonTraceFunction.java
+@@ -10,7 +10,7 @@
+         this.tracefunc = tracefunc;
+     }
+ 
+-    private TraceFunction safeCall(PyFrame frame, String label, PyObject arg) {
++    private TraceFunction safeCall(PyBaseFrame frame, String label, PyObject arg) {
+         synchronized(imp.class) {
+             synchronized(this) {
+                 ThreadState ts = Py.getThreadState();
+@@ -23,7 +23,7 @@
+                     ts.tracing = true;
+                     ret = tracefunc.__call__(frame, new PyString(label), arg);
+                 } catch(PyException exc) {
+-                    frame.tracefunc = null;
++                    frame.setTraceFunction(null);
+                     ts.tracefunc = null;
+                     ts.profilefunc = null;
+                     throw exc;
+@@ -39,19 +39,19 @@
+         }
+     }
+ 
+-    public TraceFunction traceCall(PyFrame frame) {
++    public TraceFunction traceCall(PyBaseFrame frame) {
+         return safeCall(frame, "call", Py.None);
+     }
+ 
+-    public TraceFunction traceReturn(PyFrame frame, PyObject ret) {
++    public TraceFunction traceReturn(PyBaseFrame frame, PyObject ret) {
+         return safeCall(frame, "return", ret);
+     }
+ 
+-    public TraceFunction traceLine(PyFrame frame, int line) {
++    public TraceFunction traceLine(PyBaseFrame frame, int line) {
+         return safeCall(frame, "line", Py.None);
+     }
+ 
+-    public TraceFunction traceException(PyFrame frame, PyException exc) {
++    public TraceFunction traceException(PyBaseFrame frame, PyException exc) {
+         return safeCall(frame,
+                         "exception",
+                         new PyTuple(exc.type, exc.value, exc.traceback));
+diff --git a/jython/src/org/python/core/ThreadState.java b/jython/src/org/python/core/ThreadState.java
+--- a/jython/src/org/python/core/ThreadState.java
++++ b/jython/src/org/python/core/ThreadState.java
+@@ -7,8 +7,6 @@
+ 
+     public PySystemState systemState;
+ 
+-    public PyFrame frame;
+-
+     public PyException exception;
+ 
+     public Thread thread;
+@@ -29,6 +27,16 @@
+ 
+     private PyDictionary compareStateDict;
+ 
++    private final FrameAccessor frameAccessor;
++
++    public void setFrame(PyBaseFrame frame) {
++        frameAccessor.setFrame(frame);
++    }
++
++    public PyBaseFrame getFrame() {
++        return frameAccessor.getFrame();
++    }
++
+     public PyObject getInitializingProxy() {
+         if (initializingProxies == null) {
+             return null;
+@@ -50,9 +58,10 @@
+         initializingProxies.removeFirst();
+     }
+ 
+-    public ThreadState(Thread t, PySystemState systemState) {
++    ThreadState(Thread t, PySystemState systemState) {
+         this.systemState = systemState;
+         thread = t;
++        frameAccessor = systemState.newFrameAccessor();
+     }
+ 
+     public boolean enterRepr(PyObject obj) {
+diff --git a/jython/src/org/python/core/TraceFunction.java b/jython/src/org/python/core/TraceFunction.java
+--- a/jython/src/org/python/core/TraceFunction.java
++++ b/jython/src/org/python/core/TraceFunction.java
+@@ -2,11 +2,11 @@
+ package org.python.core;
+ 
+ public abstract class TraceFunction {
+-    public abstract TraceFunction traceCall(PyFrame frame);
++    public abstract TraceFunction traceCall(PyBaseFrame frame);
+ 
+-    public abstract TraceFunction traceReturn(PyFrame frame, PyObject ret);
++    public abstract TraceFunction traceReturn(PyBaseFrame frame, PyObject ret);
+ 
+-    public abstract TraceFunction traceLine(PyFrame frame, int line);
++    public abstract TraceFunction traceLine(PyBaseFrame frame, int line);
+ 
+-    public abstract TraceFunction traceException(PyFrame frame, PyException exc);
++    public abstract TraceFunction traceException(PyBaseFrame frame, PyException exc);
+ }
+diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python/core/__builtin__.java
+--- a/jython/src/org/python/core/__builtin__.java
++++ b/jython/src/org/python/core/__builtin__.java
+@@ -688,7 +688,7 @@
+     }
+ 
+     public static PyObject globals() {
+-        return Py.getFrame().f_globals;
++        return Py.getFrame().getGlobals();
+     }
+ 
+     public static boolean hasattr(PyObject obj, PyObject name) {
+@@ -1220,10 +1220,10 @@
+     }
+ 
+     public static PyObject __import__(String name, PyObject globals, PyObject locals, PyObject fromlist, int level) {
+-        PyFrame frame = Py.getFrame();
++        PyBaseFrame frame = Py.getFrame();
+         PyObject builtins;
+-        if (frame != null && frame.f_builtins != null) {
+-            builtins = frame.f_builtins;
++        if (frame != null && frame.getBuiltins() != null) {
++            builtins = frame.getBuiltins();
+         } else {
+             builtins = PySystemState.builtins;
+         }
+diff --git a/jython/src/org/python/core/exceptions.java b/jython/src/org/python/core/exceptions.java
+--- a/jython/src/org/python/core/exceptions.java
++++ b/jython/src/org/python/core/exceptions.java
+@@ -31,15 +31,15 @@
+         }
+         // Push frame
+         PyFrame frame = new PyFrame(null, new PyStringMap());
+-        frame.f_back = ts.frame;
+-        if (frame.f_builtins == null) {
+-            if (frame.f_back != null) {
+-                frame.f_builtins = frame.f_back.f_builtins;
++        frame.setPrevious(ts.getFrame());
++        if (frame.getBuiltins() == null) {
++            if (frame.getPrevious() != null) {
++                frame.setBuiltins(frame.getPrevious().getBuiltins());
+             } else {
+-                frame.f_builtins = PySystemState.getDefaultBuiltins();
++                frame.setBuiltins(PySystemState.getDefaultBuiltins());
+             }
+         }
+-        ts.frame = frame;
++        ts.setFrame(frame);
+ 
+         // XXX:
+         PyObject baseExcDict = PyBaseException.TYPE.fastGetDict();
+@@ -174,7 +174,7 @@
+         // needed immediately
+         zipimport.initClassExceptions(dict);
+ 
+-        ts.frame = ts.frame.f_back;
++        ts.setFrame(ts.getFrame().getPrevious());
+     }
+ 
+     public static PyObject SyntaxError() {
+diff --git a/jython/src/org/python/core/imp.java b/jython/src/org/python/core/imp.java
+--- a/jython/src/org/python/core/imp.java
++++ b/jython/src/org/python/core/imp.java
+@@ -757,8 +757,8 @@
+      * Called from jython generated code when a statement like "import spam" is
+      * executed.
+      */
+-    public static PyObject importOne(String mod, PyFrame frame) {
+-        PyObject module = __builtin__.__import__(mod, frame.f_globals, frame
++    public static PyObject importOne(String mod, PyBaseFrame frame) {
++        PyObject module = __builtin__.__import__(mod, frame.getGlobals(), frame
+                 .getLocals(), Py.None);
+         return module;
+     }
+@@ -767,8 +767,8 @@
+      * Called from jython generated code when a statement like "import spam as
+      * foo" is executed.
+      */
+-    public static PyObject importOneAs(String mod, PyFrame frame) {
+-        PyObject module = __builtin__.__import__(mod, frame.f_globals, frame
++    public static PyObject importOneAs(String mod, PyBaseFrame frame) {
++        PyObject module = __builtin__.__import__(mod, frame.getGlobals(), frame
+                 .getLocals(), Py.None);
+         int dot = mod.indexOf('.');
+         while (dot != -1) {
+@@ -790,7 +790,7 @@
+      * @deprecated use importFrom with level param.
+      */
+     public static PyObject[] importFrom(String mod, String[] names,
+-            PyFrame frame) {
++            PyBaseFrame frame) {
+         return importFromAs(mod, names, null, frame, DEFAULT_LEVEL);
+     }
+ 
+@@ -799,7 +799,7 @@
+      * import foo, bar" is executed.
+      */
+     public static PyObject[] importFrom(String mod, String[] names,
+-            PyFrame frame, int level) {
++            PyBaseFrame frame, int level) {
+         return importFromAs(mod, names, null, frame, level);
+     }
+ 
+@@ -808,7 +808,7 @@
+      * @deprecated use importFromAs with level param.
+      */
+     public static PyObject[] importFromAs(String mod, String[] names,
+-            PyFrame frame) {
++            PyBaseFrame frame) {
+         return importFromAs(mod, names, null, frame, DEFAULT_LEVEL);
+     }
+ 
+@@ -817,13 +817,13 @@
+      * import foo as spam" is executed.
+      */
+     public static PyObject[] importFromAs(String mod, String[] names,
+-            String[] asnames, PyFrame frame, int level) {
++            String[] asnames, PyBaseFrame frame, int level) {
+         PyObject[] pyNames = new PyObject[names.length];
+         for (int i = 0; i < names.length; i++) {
+             pyNames[i] = Py.newString(names[i]);
+         }
+ 
+-        PyObject module = __builtin__.__import__(mod, frame.f_globals, frame.getLocals(),
++        PyObject module = __builtin__.__import__(mod, frame.getGlobals(), frame.getLocals(),
+                                                  new PyTuple(pyNames), level);
+         PyObject[] submods = new PyObject[names.length];
+         for (int i = 0; i < names.length; i++) {
+@@ -842,8 +842,8 @@
+      * Called from jython generated code when a statement like "from spam.eggs
+      * import *" is executed.
+      */
+-    public static void importAll(String mod, PyFrame frame) {
+-        PyObject module = __builtin__.__import__(mod, frame.f_globals, frame
++    public static void importAll(String mod, PyBaseFrame frame) {
++        PyObject module = __builtin__.__import__(mod, frame.getGlobals(), frame
+                 .getLocals(), all);
+         PyObject names;
+         boolean filter = true;
+@@ -862,7 +862,7 @@
+         loadNames(names, module, frame.getLocals(), filter);
+     }
+ 
+-    public static void importAll(PyObject module, PyFrame frame) {
++    public static void importAll(PyObject module, PyBaseFrame frame) {
+         PyObject names;
+         boolean filter = true;
+         if (module instanceof PyJavaPackage) {
+diff --git a/jython/src/org/python/util/InteractiveInterpreter.java b/jython/src/org/python/util/InteractiveInterpreter.java
+--- a/jython/src/org/python/util/InteractiveInterpreter.java
++++ b/jython/src/org/python/util/InteractiveInterpreter.java
+@@ -119,8 +119,8 @@
+         TraceFunction breaker = new BreakTraceFunction();
+         TraceFunction oldTrace = ts.tracefunc;
+         ts.tracefunc = breaker;
+-        if (ts.frame != null)
+-            ts.frame.tracefunc = breaker;
++        if (ts.getFrame() != null)
++            ts.getFrame().setTraceFunction(breaker);
+         ts.tracefunc = oldTrace;
+         //ts.thread.join();
+     }
+@@ -132,22 +132,22 @@
+         //Thread.currentThread().interrupt();
+     }
+ 
+-    public TraceFunction traceCall(PyFrame frame) {
++    public TraceFunction traceCall(PyBaseFrame frame) {
+         doBreak();
+         return null;
+     }
+ 
+-    public TraceFunction traceReturn(PyFrame frame, PyObject ret) {
++    public TraceFunction traceReturn(PyBaseFrame frame, PyObject ret) {
+         doBreak();
+         return null;
+     }
+ 
+-    public TraceFunction traceLine(PyFrame frame, int line) {
++    public TraceFunction traceLine(PyBaseFrame frame, int line) {
+         doBreak();
+         return null;
+     }
+ 
+-    public TraceFunction traceException(PyFrame frame, PyException exc) {
++    public TraceFunction traceException(PyBaseFrame frame, PyException exc) {
+         doBreak();
+         return null;
+     }
+diff --git a/jython/src/org/python/util/ServiceLoader.java b/jython/src/org/python/util/ServiceLoader.java
+new file mode 100644
+--- /dev/null
++++ b/jython/src/org/python/util/ServiceLoader.java
+@@ -0,0 +1,78 @@
++package org.python.util;
++
++import java.lang.reflect.Method;
++import java.util.Arrays;
++import java.util.Iterator;
++
++public final class ServiceLoader<T> {
++    public static <T> Iterable<T> load(final Class<T> type) {
++        Iterable<T> result;
++        // First, try Java 6 API, since it is standardized.
++        try {
++            Class<?> loaderClass = Class.forName("java.util.ServiceLoader");
++            Method load = loaderClass.getMethod("load", Class.class);
++            @SuppressWarnings("unchecked")
++            Iterable<T> iter = (Iterable<T>) load.invoke(null, type);
++            result = iter;
++        } catch (Exception ex) {
++            @SuppressWarnings("unchecked")
++            final Iterable<T> empty = Arrays.asList();
++            // If that fails, try the SUN specific Java 5 implementation.
++            try {
++                Class<?> serviceClass = Class.forName("sun.misc.Service");
++                final Method providers = serviceClass.getMethod("providers",
++                        Class.class);
++                result = new Iterable<T>() {
++                    public Iterator<T> iterator() {
++                        try {
++                            final Iterator<?> iterator = (Iterator<?>) providers.invoke(
++                                    null, type);
++                            return new Iterator<T>() {
++                                T cached = null;
++
++                                public boolean hasNext() {
++                                    if (cached != null) {
++                                        return true;
++                                    } else
++                                        while (iterator.hasNext()) {
++                                            try {
++                                                cached = type.cast(iterator.next());
++                                                return true;
++                                            } catch (Exception ex) {
++                                                cached = null;
++                                            }
++                                        }
++                                    return false;
++                                }
++
++                                public T next() {
++                                    if (hasNext()) {
++                                        try {
++                                            return cached;
++                                        } finally {
++                                            cached = null;
++                                        }
++                                    } else {
++                                        throw new IllegalStateException();
++                                    }
++                                }
++
++                                public void remove() {
++                                    throw new UnsupportedOperationException();
++                                }
++                            };
++                        } catch (Exception ex) {
++                            return empty.iterator();
++                        }
++                    }
++                };
++            } catch (Exception e) {
++                result = empty;
++            }
++        }
++        return result;
++    }
++
++    private ServiceLoader() {
++    }
++}

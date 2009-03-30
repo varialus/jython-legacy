@@ -27,6 +27,10 @@
   </target>
 
   <target name="jar" depends="build">
+    <property name="services.dir" location="${compile.dir}/META-INF/services"/>
+    <mkdir dir="${services.dir}"/>
+    <echo file="${services.dir}/org.python.core.FrameAccessor$Factory"
+	  message="org.python.frame.JavaFrameAccessor$Factory"/>
     <jar destfile="${utilities.jar}">
       <fileset dir="${compile.dir}"/>
     </jar>

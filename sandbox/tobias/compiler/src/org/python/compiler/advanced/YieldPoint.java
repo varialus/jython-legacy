@@ -4,6 +4,7 @@ import org.python.bytecode.BytecodeVisitor;
 import org.python.bytecode.Instruction;
 import org.python.bytecode.Label;
 
+@Deprecated
 public class YieldPoint implements Instruction {
 
     public final Label label;

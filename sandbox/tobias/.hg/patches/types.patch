@@ -511,7 +511,7 @@ diff --git a/jython/src/org/python/compiler/Module.java b/jython/src/org/python/
  import org.python.core.CompilerFlags;
  import org.python.core.Py;
  import org.python.core.PyException;
-@@ -500,17 +501,17 @@
+@@ -506,17 +507,17 @@
          code.jy_npurecell = scope.jy_npurecell;
  
          if (compiler.optimizeGlobals) {
@@ -717,7 +717,14 @@ new file mode 100644
 diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/python/core/CompilerFlags.java
 --- a/jython/src/org/python/core/CompilerFlags.java
 +++ b/jython/src/org/python/core/CompilerFlags.java
-@@ -1,46 +1,84 @@
+@@ -1,77 +1,102 @@
+-// At some future point this will also be extended - in conjunction with Py#compileFlags - to add
+-// support for a compiler factory that user code can choose in place of the normal compiler.
++// At some future point this will also be extended - in conjunction with
++// Py#compileFlags - to add
++// support for a compiler factory that user code can choose in place of the
++// normal compiler.
+ // (Perhaps a better name might have been "CompilerOptions".)
  
  package org.python.core;
  
@@ -729,6 +736,12 @@ diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/pyth
 -
 -    private int co_flags;
 -
+-    public boolean optimized;
+-    public boolean newlocals;
+-    public boolean varargs;
+-    public boolean varkeywords;
+-    public boolean generator;
+-
 -    public boolean nested_scopes = true;
 -    public boolean division;
 -    public boolean generator_allowed = true;
@@ -736,9 +749,9 @@ diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/pyth
 -    public boolean absolute_import;
 -
 +    // These flags don't mean anything to the code, only to the compiler
-+    public static final int PyCF_SOURCE_IS_UTF8    = 0x0100;
++    public static final int PyCF_SOURCE_IS_UTF8 = 0x0100;
 +    public static final int PyCF_DONT_IMPLY_DEDENT = 0x0200;
-+    public static final int PyCF_ONLY_AST          = 0x0400;
++    public static final int PyCF_ONLY_AST = 0x0400;
      public boolean only_ast;
      public boolean dont_imply_dedent;
      public boolean source_is_utf8;
@@ -746,18 +759,25 @@ diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/pyth
      public String encoding;
 +    private final Set<CodeFlag> flags = Version.getDefaultCodeFlags();
  
-     public CompilerFlags() {}
+-    public CompilerFlags() {}
++    public CompilerFlags() {
++    }
  
      public CompilerFlags(int co_flags) {
 -        this.co_flags = co_flags;
--        nested_scopes = isEnabled(PyTableCode.CO_NESTED);
--        division = isEnabled(PyTableCode.CO_FUTUREDIVISION);
--        generator_allowed = isEnabled(PyTableCode.CO_GENERATOR_ALLOWED);
--        absolute_import = isEnabled(PyTableCode.CO_FUTURE_ABSOLUTE_IMPORT);
--        with_statement = isEnabled(PyTableCode.CO_WITH_STATEMENT);
--        only_ast = isEnabled(PyTableCode.PyCF_ONLY_AST);
--        dont_imply_dedent = isEnabled(PyTableCode.PyCF_DONT_IMPLY_DEDENT);
--        source_is_utf8 = isEnabled(PyTableCode.PyCF_SOURCE_IS_UTF8);
+-        optimized = isEnabled(PyBaseCode.CO_OPTIMIZED);
+-        newlocals = isEnabled(PyBaseCode.CO_NEWLOCALS);
+-        varargs = isEnabled(PyBaseCode.CO_VARARGS);
+-        varkeywords = isEnabled(PyBaseCode.CO_VARKEYWORDS);
+-        generator = isEnabled(PyBaseCode.CO_GENERATOR);
+-        nested_scopes = isEnabled(PyBaseCode.CO_NESTED);
+-        division = isEnabled(PyBaseCode.CO_FUTUREDIVISION);
+-        generator_allowed = isEnabled(PyBaseCode.CO_GENERATOR_ALLOWED);
+-        absolute_import = isEnabled(PyBaseCode.CO_FUTURE_ABSOLUTE_IMPORT);
+-        with_statement = isEnabled(PyBaseCode.CO_WITH_STATEMENT);
+-        only_ast = isEnabled(PyBaseCode.PyCF_ONLY_AST);
+-        dont_imply_dedent = isEnabled(PyBaseCode.PyCF_DONT_IMPLY_DEDENT);
+-        source_is_utf8 = isEnabled(PyBaseCode.PyCF_SOURCE_IS_UTF8);
 +        for (CodeFlag flag : CodeFlag.parse(co_flags)) {
 +            setFlag(flag);
 +        }
@@ -771,62 +791,87 @@ diff --git a/jython/src/org/python/core/CompilerFlags.java b/jython/src/org/pyth
          return (co_flags & codeConstant) != 0;
      }
  
--    public String toString() {
++    public int toBits() {
++        int bits = (only_ast ? PyCF_ONLY_AST : 0)
++                | (dont_imply_dedent ? PyCF_DONT_IMPLY_DEDENT : 0)
++                | (source_is_utf8 ? PyCF_SOURCE_IS_UTF8 : 0);
++        for (CodeFlag flag : flags) {
++            bits |= flag.flag;
++        }
++        return bits;
++    }
++
++    public void setFlag(CodeFlag flag) {
++        flags.add(flag);
++    }
++
++    public boolean isFlagSet(CodeFlag flag) {
++        return flags.contains(flag);
++    }
++
+     @Override
+     public String toString() {
 -        return String.format("CompilerFlags[division=%s nested_scopes=%s generators=%s "
 -                             + "with_statement=%s absolute_import=%s only_ast=%s "
 -                             + "dont_imply_dedent=%s  source_is_utf8=%s]", division, nested_scopes,
 -                             generator_allowed, with_statement, absolute_import, only_ast,
 -                             dont_imply_dedent, source_is_utf8);
-+    public void setFlag(CodeFlag flag) {
-+        flags.add(flag);
-     }
- 
-+    public boolean isFlagSet(CodeFlag flag) {
-+        return flags.contains(flag);
-+    }
-+
-+    public String toString() {
 +        return String.format(
-+        "CompilerFlags[division=%s nested_scopes=%s generators=%s "
++                "CompilerFlags[division=%s nested_scopes=%s generators=%s "
 +                        + "with_statement=%s absolute_import=%s only_ast=%s "
-+                        + "dont_imply_dedent=%s  source_is_utf8=%s]", 
-+        isFlagSet(CodeFlag.CO_FUTURE_DIVISION),
++                        + "dont_imply_dedent=%s  source_is_utf8=%s]",
++                isFlagSet(CodeFlag.CO_FUTURE_DIVISION),
 +                isFlagSet(CodeFlag.CO_NESTED),
 +                isFlagSet(CodeFlag.CO_GENERATOR_ALLOWED),
 +                isFlagSet(CodeFlag.CO_FUTURE_WITH_STATEMENT),
-+                isFlagSet(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT),
-+        only_ast, dont_imply_dedent, source_is_utf8);
-+    }
-+
++                isFlagSet(CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT), only_ast,
++                dont_imply_dedent, source_is_utf8);
+     }
+ 
+-    public int toBits() {
+-        return  (optimized ? PyBaseCode.CO_OPTIMIZED : 0) |
+-                (newlocals ? PyBaseCode.CO_NEWLOCALS : 0) |
+-                (varargs ? PyBaseCode.CO_VARARGS : 0) |
+-                (varkeywords ? PyBaseCode.CO_VARKEYWORDS : 0) |
+-                (generator ? PyBaseCode.CO_GENERATOR : 0) |
+-                (nested_scopes ? PyBaseCode.CO_NESTED : 0) |
+-                (division ? PyBaseCode.CO_FUTUREDIVISION : 0) |
+-                (generator_allowed ? PyBaseCode.CO_GENERATOR_ALLOWED : 0) |
+-                (absolute_import ? PyBaseCode.CO_FUTURE_ABSOLUTE_IMPORT : 0) |
+-                (with_statement ? PyBaseCode.CO_WITH_STATEMENT : 0) |
+-                (only_ast ? PyBaseCode.PyCF_ONLY_AST : 0) |
+-                (dont_imply_dedent ? PyBaseCode.PyCF_DONT_IMPLY_DEDENT : 0) |
+-                (source_is_utf8 ? PyBaseCode.PyCF_SOURCE_IS_UTF8 : 0);
 +    public static CompilerFlags getCompilerFlags() {
-+        return getCompilerFlags(0, false);
++        return getCompilerFlags(0, null);
 +    }
 +
 +    private static final int CO_ALL_FEATURES = CompilerFlags.PyCF_DONT_IMPLY_DEDENT
-+    | CompilerFlags.PyCF_ONLY_AST
-+    | CompilerFlags.PyCF_SOURCE_IS_UTF8
-+    | CodeFlag.CO_NESTED.flag
-+    | CodeFlag.CO_GENERATOR_ALLOWED.flag
-+    | CodeFlag.CO_FUTURE_DIVISION.flag
-+    | CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT.flag
-+    | CodeFlag.CO_FUTURE_WITH_STATEMENT.flag;
-+    
-+    public static CompilerFlags getCompilerFlags(int flags, boolean dont_inherit) {
++            | CompilerFlags.PyCF_ONLY_AST
++            | CompilerFlags.PyCF_SOURCE_IS_UTF8
++            | CodeFlag.CO_NESTED.flag
++            | CodeFlag.CO_GENERATOR_ALLOWED.flag
++            | CodeFlag.CO_FUTURE_DIVISION.flag
++            | CodeFlag.CO_FUTURE_ABSOLUTE_IMPORT.flag
++            | CodeFlag.CO_FUTURE_WITH_STATEMENT.flag;
++
++    public static CompilerFlags getCompilerFlags(int flags, PyFrame frame) {
 +        if ((flags & ~CO_ALL_FEATURES) != 0) {
 +            throw Py.ValueError("compile(): unrecognised flags");
 +        }
-+        CompilerFlags cflags = null;
-+        if (dont_inherit) {
-+            cflags = new CompilerFlags(flags);
-+        } else {
-+            PyFrame frame = Py.getFrame();
-+            if (frame != null && frame.f_code != null) {
-+                cflags = new CompilerFlags(frame.f_code.co_flags | flags);
-+            }
-+        }
-+        return cflags;
++        return getCompilerFlags(new CompilerFlags(flags), frame);
 +    }
- }
++
++    public static CompilerFlags getCompilerFlags(CompilerFlags flags,
++            PyFrame frame) {
++        if (frame != null && frame.f_code != null) {
++            return frame.f_code.co_flags.combine(flags);
++        } else {
++            return flags;
++        }
+     }
+ 
+     // this will not strictly be an OR once we have other options, like a compiler factory
 diff --git a/jython/src/org/python/core/FutureFeature.java b/jython/src/org/python/core/FutureFeature.java
 new file mode 100644
 --- /dev/null
@@ -1113,7 +1158,7 @@ diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.
                                              getCompilerFlags(flags, false));
          }
          Py.runCode(code, locals, globals);
-@@ -1603,26 +1603,15 @@
+@@ -1603,41 +1603,31 @@
      }
  
      public static CompilerFlags getCompilerFlags() {
@@ -1123,18 +1168,40 @@ diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.
  
      public static CompilerFlags getCompilerFlags(int flags, boolean dont_inherit) {
 -        CompilerFlags cflags = null;
--        if (dont_inherit) {
++        final PyFrame frame;
+         if (dont_inherit) {
 -            cflags = new CompilerFlags(flags);
--        } else {
++            frame = null;
+         } else {
 -            PyFrame frame = Py.getFrame();
 -            if (frame != null && frame.f_code != null) {
--                cflags = new CompilerFlags(frame.f_code.co_flags | flags);
+-                cflags = frame.f_code.co_flags.combine(flags);
 -            } else {
 -                cflags = new CompilerFlags(flags);
 -            }
--        }
++            frame = Py.getFrame();
+         }
 -        return cflags;
-+        return CompilerFlags.getCompilerFlags(flags, dont_inherit);
++        return CompilerFlags.getCompilerFlags(flags, frame);
+     }
+ 
+     public static CompilerFlags getCompilerFlags(CompilerFlags flags, boolean dont_inherit) {
+-        CompilerFlags cflags = null;
++        final PyFrame frame;
+         if (dont_inherit) {
+-            cflags = flags;
++            frame = null;
+         } else {
+-            PyFrame frame = Py.getFrame();
+-            if (frame != null && frame.f_code != null) {
+-                cflags = frame.f_code.co_flags.combine(flags);
+-            } else {
+-                cflags = flags;
+-            }
++            frame = Py.getFrame();
+         }
+-        return cflags;
++        return CompilerFlags.getCompilerFlags(flags, frame);
      }
  
      // w/o compiler-flags
@@ -1143,7 +1210,7 @@ diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.
          return compile_flags(istream, filename, kind, new CompilerFlags());
      }
  
-@@ -1640,13 +1629,10 @@
+@@ -1655,13 +1645,10 @@
       * @param cflags Compiler flags
       * @return Code object for the compiled module
       */
@@ -1158,7 +1225,7 @@ diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.
              ByteArrayOutputStream ostream = new ByteArrayOutputStream();
              Module.compile(node, ostream, name, filename, linenumbers, printResults, cflags);
  
-@@ -1658,17 +1644,17 @@
+@@ -1673,17 +1660,17 @@
          }
      }
  
@@ -1181,7 +1248,7 @@ diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.
          mod node = ParserFacade.parse(istream, kind, filename, cflags);
          return Py.compile_flags(node, filename, kind, cflags);
      }
-@@ -1679,8 +1665,8 @@
+@@ -1694,8 +1681,8 @@
       * DO NOT use this for PyString input. Use
       * {@link #compile_flags(byte[], String, String, CompilerFlags)} instead.
       */
@@ -1192,7 +1259,7 @@ diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.
          if (data.contains("\0")) {
              throw Py.TypeError("compile() expected string without null bytes");
          }
-@@ -1694,7 +1680,7 @@
+@@ -1709,7 +1696,7 @@
      }
  
      public static PyObject compile_command_flags(String string, String filename,
@@ -1238,8 +1305,8 @@ diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/
              return call(Py.EmptyObjects, Py.NoKeywords, globals, defaults,
                          closure);
          PyFrame frame = new PyFrame(this, globals);
--        if ((co_flags & CO_GENERATOR) != 0) {
-+        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+-        if (co_flags.generator) {
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
              return new PyGenerator(frame, closure);
          }
          return call(frame, closure);
@@ -1247,8 +1314,8 @@ diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/
                          Py.NoKeywords, globals, defaults, closure);
          PyFrame frame = new PyFrame(this, globals);
          frame.f_fastlocals[0] = arg1;
--        if ((co_flags & CO_GENERATOR) != 0) {
-+        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+-        if (co_flags.generator) {
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
              return new PyGenerator(frame, closure);
          }
          return call(frame, closure);
@@ -1256,8 +1323,8 @@ diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/
          PyFrame frame = new PyFrame(this, globals);
          frame.f_fastlocals[0] = arg1;
          frame.f_fastlocals[1] = arg2;
--        if ((co_flags & CO_GENERATOR) != 0) {
-+        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+-        if (co_flags.generator) {
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
              return new PyGenerator(frame, closure);
          }
          return call(frame, closure);
@@ -1265,8 +1332,8 @@ diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/
          frame.f_fastlocals[0] = arg1;
          frame.f_fastlocals[1] = arg2;
          frame.f_fastlocals[2] = arg3;
--        if ((co_flags & CO_GENERATOR) != 0) {
-+        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+-        if (co_flags.generator) {
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
              return new PyGenerator(frame, closure);
          }
          return call(frame, closure);
@@ -1274,80 +1341,70 @@ diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/
                                               co_name, argcount));
          }
  
--        if ((co_flags & CO_GENERATOR) != 0) {
-+        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags)) {
+-        if (co_flags.generator) {
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
              return new PyGenerator(frame, closure);
          }
          return call(frame, closure);
 diff --git a/jython/src/org/python/core/PyBytecode.java b/jython/src/org/python/core/PyBytecode.java
 --- a/jython/src/org/python/core/PyBytecode.java
 +++ b/jython/src/org/python/core/PyBytecode.java
-@@ -74,8 +74,8 @@
-         co_cellvars = cellvars;
+@@ -75,8 +75,8 @@
          co_freevars = freevars;
          co_name = name;
--        varargs = (flags & CO_VARARGS) != 0;
--        varkwargs = (flags & CO_VARKEYWORDS) != 0;
-+        varargs = CodeFlag.CO_VARARGS.isFlagBitSetIn(flags);
-+        varkwargs = CodeFlag.CO_VARKEYWORDS.isFlagBitSetIn(flags);
-         co_flags |= flags;
+         co_flags = new CompilerFlags(flags);
+-        varargs = co_flags.varargs;
+-        varkwargs = co_flags.varkeywords;
++        varargs = co_flags.isFlagSet(CodeFlag.CO_VARARGS);
++        varkwargs = co_flags.isFlagSet(CodeFlag.CO_VARKEYWORDS);
  
          co_stacksize = stacksize;
-@@ -414,10 +414,10 @@
+         co_consts = constants;
+@@ -420,7 +420,7 @@
                          PyObject b = stack.pop();
                          PyObject a = stack.pop();
  
--                        if ((co_flags & CO_FUTUREDIVISION) == 0) {
-+                        if (CodeFlag.CO_FUTURE_DIVISION.isFlagBitSetIn(co_flags)) {
-+                            stack.push(a._truediv(b));
-+                        } else {
+-                        if (!co_flags.division) {
++                        if (!co_flags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
                              stack.push(a._div(b));
--                        } else {
--                            stack.push(a._truediv(b));
-                         }
-                         break;
-                     }
-@@ -524,10 +524,10 @@
+                         } else {
+                             stack.push(a._truediv(b));
+@@ -530,7 +530,7 @@
                      case Opcode.INPLACE_DIVIDE: {
                          PyObject b = stack.pop();
                          PyObject a = stack.pop();
--                        if ((co_flags & CO_FUTUREDIVISION) == 0) {
-+                        if (CodeFlag.CO_FUTURE_DIVISION.isFlagBitSetIn(co_flags)) {
-+                            stack.push(a._itruediv(b));
-+                        } else {
+-                        if (!co_flags.division) {
++                        if (!co_flags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
                              stack.push(a._idiv(b));
--                        } else {
--                            stack.push(a._itruediv(b));
-                         }
-                         break;
-                     }
-@@ -1242,7 +1242,7 @@
+                         } else {
+                             stack.push(a._itruediv(b));
+@@ -1248,7 +1248,7 @@
              throw ts.exception;
          }
  
--        if ((co_flags & CO_GENERATOR) != 0 && why == Why.RETURN && retval == Py.None) {
-+        if (CodeFlag.CO_GENERATOR.isFlagBitSetIn(co_flags) && why == Why.RETURN && retval == Py.None) {
+-        if (co_flags.generator && why == Why.RETURN && retval == Py.None) {
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR) && why == Why.RETURN && retval == Py.None) {
              f.f_lasti = -1;
          }
  
 diff --git a/jython/src/org/python/core/PyFrame.java b/jython/src/org/python/core/PyFrame.java
 --- a/jython/src/org/python/core/PyFrame.java
 +++ b/jython/src/org/python/core/PyFrame.java
-@@ -68,7 +68,7 @@
+@@ -62,7 +62,7 @@
          // This needs work to be efficient with multiple interpreter states
          if (locals == null && code != null) {
              // ! f_fastlocals needed for arg passing too
--            if ((code.co_flags & PyBaseCode.CO_OPTIMIZED) != 0 || code.nargs > 0) {
-+            if (CodeFlag.CO_OPTIMIZED.isFlagBitSetIn(code.co_flags) || code.nargs > 0) {
+-            if (code.co_flags.optimized || code.nargs > 0) {
++            if (code.co_flags.isFlagSet(CodeFlag.CO_OPTIMIZED) || code.nargs > 0) {
                  if (code.co_nlocals > 0) {
                      // internal: may change
                      f_fastlocals = new PyObject[code.co_nlocals - code.jy_npurecell];
-@@ -197,7 +197,7 @@
+@@ -191,7 +191,7 @@
                      PyObject o = f_fastlocals[i];
                      if (o != null) f_locals.__setitem__(f_code.co_varnames[i], o);
                  }
--                if ((f_code.co_flags & PyBaseCode.CO_OPTIMIZED) == 0) {
-+                if (!CodeFlag.CO_OPTIMIZED.isFlagBitSetIn(f_code.co_flags)) {
+-                if (!f_code.co_flags.optimized) {
++                if (!f_code.co_flags.isFlagSet(CodeFlag.CO_OPTIMIZED)) {
                      f_fastlocals = null;
                  }
              }
@@ -1358,16 +1415,16 @@ diff --git a/jython/src/org/python/core/PyTableCode.java b/jython/src/org/python
          co_name = name;
          if (varargs) {
              co_argcount -= 1;
--            co_flags |= CO_VARARGS;
-+            co_flags |= CodeFlag.CO_VARARGS.flag;
+-            co_flags.varargs = true;
++            co_flags.setFlag(CodeFlag.CO_VARARGS);
          }
          this.varkwargs = varkwargs;
          if (varkwargs) {
              co_argcount -= 1;
--            co_flags |= CO_VARKEYWORDS;
-+            co_flags |= CodeFlag.CO_VARKEYWORDS.flag;
+-            co_flags.varkeywords = true;
++            co_flags.setFlag(CodeFlag.CO_VARKEYWORDS);
          }
-         co_flags |= moreflags;
+         co_flags = new CompilerFlags(co_flags.toBits() | moreflags);
          this.funcs = funcs;
 diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python/core/__builtin__.java
 --- a/jython/src/org/python/core/__builtin__.java
@@ -1381,16 +1438,11 @@ diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python
          } finally {
              try {
                  file.close();
-@@ -1524,28 +1524,41 @@
-         return compile(source, filename, mode, 0, false);
-     }
+@@ -1526,45 +1526,41 @@
  
-+
-+
-+    
      public static PyObject compile(PyObject source, String filename, String mode, int flags,
                                     boolean dont_inherit) {
--        if ((flags & ~PyTableCode.CO_ALL_FEATURES) != 0) {
+-        if ((flags & ~PyBaseCode.CO_ALL_FEATURES) != 0) {
 -            throw Py.ValueError("compile(): unrecognised flags");
 -        }
 -        if (!mode.equals("exec") && !mode.equals("eval") && !mode.equals("single")) {
@@ -1398,16 +1450,21 @@ diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python
 +        CompilerFlags cflags = Py.getCompilerFlags(flags, dont_inherit);
 +        CompileMode kind = CompileMode.getMode(mode);
 +
++        return compile(source, filename, kind, cflags, dont_inherit);
++    }
++
++    public static PyObject compile(PyObject source, String filename, CompileMode kind, CompilerFlags cflags,
++                                   boolean dont_inherit) {
++        cflags = Py.getCompilerFlags(cflags, dont_inherit);
++        
 +        mod ast = py2node(source);
 +        if (ast == null) {
 +            if (!(source instanceof PyString)) {
 +                throw Py.TypeError("expected a readable buffer object");
 +            }
-+            if (source instanceof PyUnicode) {
-+                cflags.source_is_utf8 = true;
-+            }
++            cflags.source_is_utf8 = source instanceof PyUnicode;
 +            
-+            String data = ((PyString)source).toString();
++            String data = source.toString();
 +            
 +            if (data.contains("\0")) {
 +                throw Py.TypeError("compile() expected string without null bytes");
@@ -1433,8 +1490,27 @@ diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python
 -            throw Py.TypeError("expected a readable buffer object");
 -        }
 -        if (source instanceof PyUnicode) {
--            flags |= PyTableCode.PyCF_SOURCE_IS_UTF8;
+-            flags |= PyBaseCode.PyCF_SOURCE_IS_UTF8;
 -        }
+-        return Py.compile_flags(((PyString)source).toString(), filename, mode,
+-                                Py.getCompilerFlags(flags, dont_inherit));
+-    }
+-
+-    public static PyObject compile(PyObject source, String filename, String mode, CompilerFlags flags,
+-                                   boolean dont_inherit) {
+-        if (!mode.equals("exec") && !mode.equals("eval") && !mode.equals("single")) {
+-            throw Py.ValueError("compile() arg 3 must be 'exec' or 'eval' or 'single'");
+-        }
+-
+-        mod ast = py2node(source);
+-        if (ast != null) {
+-            return Py.compile_flags(ast, filename, mode, Py.getCompilerFlags(flags, dont_inherit));
+-        }
+-
+-        if (!(source instanceof PyString)) {
+-            throw Py.TypeError("expected a readable buffer object");
+-        }
+-        flags.source_is_utf8 = source instanceof PyUnicode;
 -        return Py.compile_flags(((PyString)source).toString(), filename, mode,
 -                                Py.getCompilerFlags(flags, dont_inherit));
      }
@@ -1443,7 +1519,7 @@ diff --git a/jython/src/org/python/core/__builtin__.java b/jython/src/org/python
 diff --git a/jython/src/org/python/core/imp.java b/jython/src/org/python/core/imp.java
 --- a/jython/src/org/python/core/imp.java
 +++ b/jython/src/org/python/core/imp.java
-@@ -206,7 +206,7 @@
+@@ -228,7 +228,7 @@
              }
              org.python.antlr.base.mod node;
              try {
@@ -1484,7 +1560,7 @@ diff --git a/jython/src/org/python/util/PythonInterpreter.java b/jython/src/org/
  import org.python.core.CompilerFlags;
  import org.python.core.Py;
  import org.python.core.PyCode;
-@@ -121,7 +122,7 @@
+@@ -132,7 +133,7 @@
       */
      public void exec(String s) {
          setState();
@@ -1493,7 +1569,7 @@ diff --git a/jython/src/org/python/util/PythonInterpreter.java b/jython/src/org/
          Py.flushLine();
      }
  
-@@ -149,7 +150,7 @@
+@@ -160,7 +161,7 @@
  
      public void execfile(java.io.InputStream s, String name) {
          setState();

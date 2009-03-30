@@ -1,7 +1,6 @@
 package org.python.bytecode;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +8,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.python.core.PyObject;
-import org.python.compiler.advanced.YieldPoint;
-import org.python.compiler.bytecode.BytecodeCompiler;
+//import org.python.compiler.bytecode.BytecodeCompiler;
 
 /**
  * 
@@ -85,7 +83,7 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
 
     private int resumePoint = 0;
 
-    private List<YieldPoint> resumeTable = new LinkedList<YieldPoint>();
+    //private List<YieldPoint> resumeTable = new LinkedList<YieldPoint>();
 
     public ReferenceResolver(BytecodeVersion version,
                              ConstantStore store,
@@ -153,6 +151,7 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
      *            The visitor that should receive the instructions.
      */
     public void accept(BytecodeVisitor visitor) {
+        /*
         if (!resumeTable.isEmpty() && visitor instanceof BytecodeCompiler) {
             BytecodeCompiler compiler = (BytecodeCompiler)visitor;
             compiler.visitResumeTable(new Label(), new Iterable<Label>() {
@@ -177,6 +176,7 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
                 }
             });
         }
+        */
         for (Map.Entry<Integer, Instruction> mapping : instructions.entrySet()) {
             lnotab.visitInstruction(visitor, mapping.getKey());
             Label label = labels.get(mapping.getKey());
@@ -199,9 +199,9 @@ public class ReferenceResolver implements CharReader, RawBytecodeVisitor {
     }
 
     public void visitYield() {
-        YieldPoint yield = new YieldPoint(new Label(), ++resumePoint);
-        resumeTable.add(yield);
-        visitInstruction(yield);
+        //YieldPoint yield = new YieldPoint(new Label(), ++resumePoint);
+        //resumeTable.add(yield);
+        //visitInstruction(yield);
     }
 
     public void visitAbsouteJump(int addr) {
