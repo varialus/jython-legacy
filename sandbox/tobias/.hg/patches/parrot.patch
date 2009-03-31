@@ -1,7 +1,7 @@
 diff --git a/jython/src/org/python/core/PyGenerator.java b/jython/src/org/python/core/PyGenerator.java
 --- a/jython/src/org/python/core/PyGenerator.java
 +++ b/jython/src/org/python/core/PyGenerator.java
-@@ -26,13 +26,19 @@
+@@ -26,6 +26,12 @@
          // the generator
          generatorExit = Py.makeException(Py.GeneratorExit);
      }
@@ -14,55 +14,3 @@ diff --git a/jython/src/org/python/core/PyGenerator.java b/jython/src/org/python
  
      @ExposedMethod
      public PyObject send(PyObject value) {
-         if (gi_frame == null) {
-             throw Py.StopIteration("");
-         }
--        if (gi_frame.f_lasti == 0 && value != Py.None) {
-+        if (gi_frame.getLastI() == 0 && value != Py.None) {
-             throw Py.TypeError("can't send non-None value to a just-started generator");
-         }
-         gi_frame.setGeneratorInput(value);
-@@ -75,7 +81,7 @@
-     }
- 
-     private PyObject raiseException(PyException ex) {
--        if (gi_frame == null || gi_frame.f_lasti == 0) {
-+        if (gi_frame == null || gi_frame.getLastI() == 0) {
-             throw ex;
-         }
-         gi_frame.setGeneratorInput(ex);
-@@ -84,7 +90,7 @@
- 
-     @Override
-     protected void finalize() throws Throwable {
--        if (gi_frame == null || gi_frame.f_lasti == -1)
-+        if (gi_frame == null || gi_frame.getLastI() == -1)
-             return;
-         try {
-             close();
-@@ -114,14 +120,14 @@
-             return null;
-         }
- 
--        if (gi_frame.f_lasti == -1) {
-+        if (gi_frame.getLastI() == -1) {
-             gi_frame = null;
-             return null;
-         }
-         gi_running = true;
-         PyObject result = null;
-         try {
--            result = gi_frame.f_code.call(gi_frame, closure);
-+            result = gi_frame.getCode().call(gi_frame, closure);
-         } catch(PyException e) {
-             if (!(e.type == Py.StopIteration || e.type == Py.GeneratorExit)) {
-                 gi_frame = null;
-@@ -134,7 +140,7 @@
-         } finally {
-             gi_running = false;
-         }
--        if (result == Py.None && gi_frame.f_lasti == -1) {
-+        if (result == Py.None && gi_frame.getLastI() == -1) {
-             return null;
-         }
-         return result;

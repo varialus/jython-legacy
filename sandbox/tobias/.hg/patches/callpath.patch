@@ -1,0 +1,1133 @@
+diff --git a/jython/src/org/python/compiler/ClassConstants.java b/jython/src/org/python/compiler/ClassConstants.java
+--- a/jython/src/org/python/compiler/ClassConstants.java
++++ b/jython/src/org/python/compiler/ClassConstants.java
+@@ -8,6 +8,7 @@
+     final static String $pyUnicode  = "Lorg/python/core/PyUnicode;";
+     final static String $pyExc      = "Lorg/python/core/PyException;";
+     final static String $pyFrame    = "Lorg/python/core/PyFrame;";
++    final static String $threadState= "Lorg/python/core/ThreadState;";
+     final static String $pyCode     = "Lorg/python/core/PyCode;";
+     final static String $pyInteger  = "Lorg/python/core/PyInteger;";
+     final static String $pyLong     = "Lorg/python/core/PyLong;";
+diff --git a/jython/src/org/python/compiler/CodeCompiler.java b/jython/src/org/python/compiler/CodeCompiler.java
+--- a/jython/src/org/python/compiler/CodeCompiler.java
++++ b/jython/src/org/python/compiler/CodeCompiler.java
+@@ -135,7 +135,7 @@
+ 
+     int yield_count = 0;
+     
+-    private int stackDepth = 0;
++    private Stack<String> stack = new Stack<String>();
+ 
+     public CodeCompiler(Module module, boolean print_results) {
+         this.module = module;
+@@ -157,6 +157,10 @@
+         code.aload(1);
+     }
+ 
++    public void loadThreadState() throws Exception {
++        code.aload(2);
++    }
++
+     public void setLastI(int idx) throws Exception {
+         loadFrame();
+         code.iconst(idx);
+@@ -587,24 +591,30 @@
+     }
+     
+     private void stackProduce() {
+-        stackDepth++;
++        stackProduce("org/python/core/PyObject");
+     }
+     
++    private void stackProduce(String signature) {
++        stack.push(signature);
++    }
++
+     private void stackConsume() {
+-        stackDepth--;
++        stackConsume(1);
+     }
+     
+     private void stackConsume(int numItems) {
+-        stackDepth -= numItems;
++        for (int i = 0; i < numItems; i++) {
++            stack.pop();
++        }
+     }
+ 
+     private int saveStack() throws Exception {
+-        if (stackDepth > 0) {
+-            int array = code.getLocal("[Lorg/python/core/PyObject;");
+-            code.iconst(stackDepth);
+-            code.anewarray("org/python/core/PyObject");
++        if (stack.size() > 0) {
++            int array = code.getLocal("[Ljava/lang/Object;");
++            code.iconst(stack.size());
++            code.anewarray("java/lang/Object");
+             code.astore(array);
+-            for (int i = 0; i < stackDepth; i++) {
++            for (int i = 0; i < stack.size(); i++) {
+                 code.aload(array);
+                 // Stack: |- ... value array
+                 code.swap();
+@@ -621,13 +631,15 @@
+     }
+ 
+     private void restoreStack(int array) throws Exception {
+-        if (stackDepth > 0) {
+-            for (int i = stackDepth - 1; i >= 0; i--) {
++        if (stack.size() > 0) {
++            int i = stack.size() -1;
++            for (String signature : stack) {
+                 code.aload(array);
+                 // Stack: |- ... array
+                 code.iconst(i);
+                 code.aaload();
+                 // Stack: |- ... value
++                code.checkcast(signature);
+             }
+             code.freeLocal(array);
+         }
+@@ -1507,44 +1519,45 @@
+         visit(node.getInternalValue()); stackProduce();
+         code.ldc(name);
+         code.invokevirtual("org/python/core/PyObject", "__getattr__", "(" + $str + ")" + $pyObj);
++        loadThreadState(); stackProduce("org/python/core/ThreadState");
+ 
+         switch (values.size()) {
+         case 0:
+-            stackConsume(); // target
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "()" + $pyObj);
++            stackConsume(2); // target + ts
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + ")" + $pyObj);
+             break;
+         case 1:
+             visit(values.get(0));
+-            stackConsume(); // target
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + ")" + $pyObj);
++            stackConsume(2); // target + ts
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + ")" + $pyObj);
+             break;
+         case 2:
+             visit(values.get(0)); stackProduce();
+             visit(values.get(1));
+-            stackConsume(2); // target + arguments
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + $pyObj + ")" + $pyObj);
++            stackConsume(3); // target + ts + arguments
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + $pyObj + ")" + $pyObj);
+             break;
+         case 3:
+             visit(values.get(0)); stackProduce();
+             visit(values.get(1)); stackProduce();
+             visit(values.get(2));
+-            stackConsume(3); // target + arguments
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
++            stackConsume(4); // target + ts + arguments
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
+             break;
+         case 4:
+             visit(values.get(0)); stackProduce();
+             visit(values.get(1)); stackProduce();
+             visit(values.get(2)); stackProduce();
+             visit(values.get(3));
+-            stackConsume(4); // target + arguments
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
++            stackConsume(5); // target + ts + arguments
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
+             break;
+         default:
+             int argArray = makeArray(values);
+             code.aload(argArray);
+             code.freeLocal(argArray);
+-            stackConsume(); // target
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObjArr + ")" + $pyObj);
++            stackConsume(2); // target + ts
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObjArr + ")" + $pyObj);
+             break;
+         }
+         return null;
+@@ -1596,52 +1609,54 @@
+ 
+             code.invokevirtual("org/python/core/PyObject", "_callextra", "(" + $pyObjArr + $strArr + $pyObj + $pyObj + ")" + $pyObj);
+         } else if (keys.size() > 0) {
++            loadThreadState(); stackProduce("org/python/core/ThreadState");
+             int argArray = makeArray(values);
+             int strArray = makeStrings(code, keys);
+             code.aload(argArray);
+             code.aload(strArray);
+             code.freeLocal(argArray);
+             code.freeLocal(strArray);
+-            stackConsume(); // target
+-            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObjArr + $strArr + ")" + $pyObj);
++            stackConsume(2); // target + ts
++            code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObjArr + $strArr + ")" + $pyObj);
+         } else {
++            loadThreadState(); stackProduce("org/python/core/ThreadState");
+             switch (values.size()) {
+             case 0:
+-                stackConsume(); // target
+-                code.invokevirtual("org/python/core/PyObject", "__call__", "()" + $pyObj);
++                stackConsume(2); // target + ts
++                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + ")" + $pyObj);
+                 break;
+             case 1:
+                 visit(values.get(0));
+-                stackConsume(); // target
+-                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + ")" + $pyObj);
++                stackConsume(2); // target + ts
++                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + ")" + $pyObj);
+                 break;
+             case 2:
+                 visit(values.get(0)); stackProduce();
+                 visit(values.get(1));
+-                stackConsume(2); // target + arguments
+-                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + $pyObj + ")" + $pyObj);
++                stackConsume(3); // target + ts + arguments
++                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + $pyObj + ")" + $pyObj);
+                 break;
+             case 3:
+                 visit(values.get(0)); stackProduce();
+                 visit(values.get(1)); stackProduce();
+                 visit(values.get(2));
+-                stackConsume(3); // target + arguments
+-                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
++                stackConsume(4); // target + ts + arguments
++                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
+                 break;
+             case 4:
+                 visit(values.get(0)); stackProduce();
+                 visit(values.get(1)); stackProduce();
+                 visit(values.get(2)); stackProduce();
+                 visit(values.get(3));
+-                stackConsume(4); // target + arguments
+-                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
++                stackConsume(5); // target + ts + arguments
++                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + $pyObj + $pyObj + $pyObj + ")" + $pyObj);
+                 break;
+             default:
+                 int argArray = makeArray(values);
+                 code.aload(argArray);
+                 code.freeLocal(argArray);
+-                stackConsume(); // target
+-                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObjArr + ")" + $pyObj);
++                stackConsume(2); // target + ts
++                code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObjArr + ")" + $pyObj);
+                 break;
+             }
+         }
+@@ -1677,9 +1692,9 @@
+                 saveAugTmps(node, 4);
+                 ctx = expr_contextType.Load;
+             }
++            stackConsume(4);
+         }
+ 
+-        stackConsume(4);
+         switch (ctx) {
+         case Del:
+             code.invokevirtual("org/python/core/PyObject", "__delslice__", "(" + $pyObj + $pyObj + $pyObj + ")V");
+@@ -1711,6 +1726,7 @@
+         } else {
+             visit(node.getInternalValue()); stackProduce();
+             visit(node.getInternalSlice());
++            stackConsume();
+ 
+             if (node.getInternalCtx() == expr_contextType.AugStore && augmode == expr_contextType.Load) {
+                 saveAugTmps(node, 2);
+@@ -1718,7 +1734,6 @@
+             }
+         }
+ 
+-        stackConsume();
+         switch (ctx) {
+         case Del:
+             code.invokevirtual("org/python/core/PyObject", "__delitem__", "(" + $pyObj + ")V");
+@@ -2222,7 +2237,9 @@
+         code.freeLocal(genExp);
+         code.swap();
+         code.invokevirtual("org/python/core/PyObject", "__iter__", "()Lorg/python/core/PyObject;");
+-        code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $pyObj + ")" + $pyObj);
++        loadThreadState();
++        code.swap();
++        code.invokevirtual("org/python/core/PyObject", "__call__", "(" + $threadState + $pyObj + ")" + $pyObj);
+ 
+         return null;
+     }
+@@ -2239,8 +2256,8 @@
+         final Label label_end = new Label();
+ 
+         final Method getattr = Method.getMethod("org.python.core.PyObject __getattr__ (String)");
+-        final Method call = Method.getMethod("org.python.core.PyObject __call__ ()");
+-        final Method call3 = Method.getMethod("org.python.core.PyObject __call__ (org.python.core.PyObject,org.python.core.PyObject,org.python.core.PyObject)");
++        final Method call = Method.getMethod("org.python.core.PyObject __call__ (org.python.core.ThreadState)");
++        final Method call3 = Method.getMethod("org.python.core.PyObject __call__ (org.python.core.ThreadState,org.python.core.PyObject,org.python.core.PyObject,org.python.core.PyObject)");
+ 
+         // mgr = (EXPR)
+         visit(node.getInternalContext_expr());
+@@ -2254,6 +2271,7 @@
+         // value = mgr.__enter__()
+         code.ldc("__enter__");
+         code.invokevirtual(Type.getType(PyObject.class).getInternalName(), getattr.getName(), getattr.getDescriptor());
++        loadThreadState();
+         code.invokevirtual(Type.getType(PyObject.class).getInternalName(), call.getName(), call.getDescriptor());
+         int value_tmp = code.getLocal("org/python/core/PyObject");
+         code.astore(value_tmp);
+@@ -2273,6 +2291,7 @@
+             @Override
+             public void finalBody(CodeCompiler compiler) throws Exception {
+                 compiler.code.aload(__exit__);
++                loadThreadState();
+                 compiler.getNone();
+                 compiler.code.dup();
+                 compiler.code.dup();
+@@ -2317,8 +2336,7 @@
+         loadFrame();
+         code.invokestatic("org/python/core/Py", "setException", "(" + $throwable + $pyFrame + ")" + $pyExc);
+         code.pop();
+-
+-        code.invokestatic("org/python/core/Py", "getThreadState", "()Lorg/python/core/ThreadState;");
++        loadThreadState();
+         code.getfield("org/python/core/ThreadState", "exception", $pyExc);
+         int ts_tmp = storeTop();
+ 
+@@ -2326,11 +2344,13 @@
+         // exc = False # implicit
+         // if not exit(*sys.exc_info()):
+         code.aload(__exit__);
++        loadThreadState();
+         code.aload(ts_tmp);
+         code.getfield("org/python/core/PyException", "type", $pyObj);
+         code.aload(ts_tmp);
+         code.getfield("org/python/core/PyException", "value", $pyObj);
+         code.aload(ts_tmp);
++        code.freeLocal(ts_tmp);
+         code.getfield("org/python/core/PyException", "traceback", "Lorg/python/core/PyTraceback;");
+         code.checkcast("org/python/core/PyObject");
+         code.invokevirtual(Type.getType(PyObject.class).getInternalName(), call3.getName(), call3.getDescriptor());
+@@ -2341,7 +2361,6 @@
+         code.invokestatic("org/python/core/Py", "makeException", "()Lorg/python/core/PyException;");
+         code.checkcast("java/lang/Throwable");
+         code.athrow();
+-        code.freeLocal(ts_tmp);
+ 
+         code.label(label_end);
+         code.freeLocal(__exit__);
+diff --git a/jython/src/org/python/compiler/Module.java b/jython/src/org/python/compiler/Module.java
+--- a/jython/src/org/python/compiler/Module.java
++++ b/jython/src/org/python/compiler/Module.java
+@@ -432,7 +432,7 @@
+ 
+         Code c = classfile.addMethod(
+             code.fname,
+-            "(" + $pyFrame + ")" + $pyObj,
++            "(" + $pyFrame + $threadState + ")" + $pyObj,
+             ACC_PUBLIC);
+ 
+         CodeCompiler compiler = new CodeCompiler(this, printResults);
+@@ -595,11 +595,12 @@
+     public void addFunctions() throws IOException {
+         Code code = classfile.addMethod(
+             "call_function",
+-            "(I" + $pyFrame + ")" + $pyObj,
++            "(I" + $pyFrame + $threadState + ")" + $pyObj,
+             ACC_PUBLIC);
+ 
+-        code.aload(0);
+-        code.aload(2);
++        code.aload(0); // this
++        code.aload(2); // frame
++        code.aload(3); // thread state
+         Label def = new Label();
+         Label[] labels = new Label[codes.size()];
+         int i;
+@@ -611,7 +612,7 @@
+         code.tableswitch(0, labels.length - 1, def, labels);
+         for(i=0; i<labels.length; i++) {
+             code.label(labels[i]);
+-            code.invokevirtual(classfile.name, ((PyCodeConstant)codes.get(i)).fname, "(" + $pyFrame + ")" + $pyObj);
++            code.invokevirtual(classfile.name, ((PyCodeConstant)codes.get(i)).fname, "(" + $pyFrame + $threadState + ")" + $pyObj);
+             code.areturn();
+         }
+         code.label(def);
+diff --git a/jython/src/org/python/core/Py.java b/jython/src/org/python/core/Py.java
+--- a/jython/src/org/python/core/Py.java
++++ b/jython/src/org/python/core/Py.java
+@@ -1194,16 +1194,17 @@
+     public static PyObject runCode(PyCode code, PyObject locals,
+             PyObject globals) {
+         PyFrame f;
++        ThreadState ts = getThreadState();
+         if (locals == null || locals == Py.None) {
+             if (globals != null && globals != Py.None) {
+                 locals = globals;
+             } else {
+-                locals = Py.getFrame().getLocals();
++                locals = ts.frame.getLocals();
+             }
+         }
+ 
+         if (globals == null || globals == Py.None) {
+-            globals = Py.getFrame().f_globals;
++            globals = ts.frame.f_globals;
+         }
+ 
+         PyTableCode tc = null;
+@@ -1213,7 +1214,7 @@
+ 
+         f = new PyFrame(tc, locals, globals,
+                 Py.getSystemState().getBuiltins());
+-        return code.call(f);
++        return code.call(ts, f);
+     }
+ 
+     public static void exec(PyObject o, PyObject globals, PyObject locals) {
+@@ -1543,9 +1544,9 @@
+     public static PyObject makeClass(String name, PyObject[] bases,
+                                      PyCode code, PyObject doc,
+                                      PyObject[] closure_cells) {
+-        PyObject globals = getFrame().f_globals;
+-        PyObject dict = code.call(Py.EmptyObjects, Py.NoKeywords, globals, Py.EmptyObjects,
+-                                  new PyTuple(closure_cells));
++        ThreadState state = getThreadState();
++        PyObject dict = code.call(state, Py.EmptyObjects, Py.NoKeywords,
++                state.frame.f_globals, Py.EmptyObjects, new PyTuple(closure_cells));
+         if (doc != null && dict.__finditem__("__doc__") == null) {
+             dict.__setitem__("__doc__", doc);
+         }
+@@ -1997,45 +1998,51 @@
+         }
+     }
+ 
+-    public PyObject call(PyFrame frame, PyObject closure) {
++    public PyObject call(ThreadState state, PyFrame frame, PyObject closure) {
+         //XXX: what the heck is this?  Looks like debug code, but it's
+         //     been here a long time...
+         System.out.println("call #1");
+         return Py.None;
+     }
+ 
+-    public PyObject call(PyObject args[], String keywords[],
++    public PyObject call(ThreadState state, PyObject args[], String keywords[],
+             PyObject globals, PyObject[] defaults,
+             PyObject closure) {
+         return func.__call__(args, keywords);
+     }
+ 
+-    public PyObject call(PyObject self, PyObject args[], String keywords[],
++    public PyObject call(ThreadState state, PyObject self, PyObject args[], String keywords[],
+             PyObject globals, PyObject[] defaults,
+             PyObject closure) {
+         return func.__call__(self, args, keywords);
+     }
+ 
+-    public PyObject call(PyObject globals, PyObject[] defaults,
++    public PyObject call(ThreadState state, PyObject globals, PyObject[] defaults,
+             PyObject closure) {
+         return func.__call__();
+     }
+ 
+-    public PyObject call(PyObject arg1, PyObject globals,
++    public PyObject call(ThreadState state, PyObject arg1, PyObject globals,
+             PyObject[] defaults, PyObject closure) {
+         return func.__call__(arg1);
+     }
+ 
+-    public PyObject call(PyObject arg1, PyObject arg2, PyObject globals,
++    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject globals,
+             PyObject[] defaults, PyObject closure) {
+         return func.__call__(arg1, arg2);
+     }
+ 
+-    public PyObject call(PyObject arg1, PyObject arg2, PyObject arg3,
++    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject arg3,
+             PyObject globals, PyObject[] defaults,
+             PyObject closure) {
+         return func.__call__(arg1, arg2, arg3);
+     }
++    
++    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2,
++            PyObject arg3, PyObject arg4, PyObject globals,
++            PyObject[] defaults, PyObject closure) {
++        return func.__call__(arg1, arg2, arg3, arg4);
++    }
+ }
+ 
+ /**
+diff --git a/jython/src/org/python/core/PyBaseCode.java b/jython/src/org/python/core/PyBaseCode.java
+--- a/jython/src/org/python/core/PyBaseCode.java
++++ b/jython/src/org/python/core/PyBaseCode.java
+@@ -22,9 +22,8 @@
+         return co_freevars != null && co_freevars.length > 0;
+     }
+ 
+-    public PyObject call(PyFrame frame, PyObject closure) {
++    public PyObject call(ThreadState ts, PyFrame frame, PyObject closure) {
+ //         System.err.println("tablecode call: "+co_name);
+-        ThreadState ts = Py.getThreadState();
+         if (ts.systemState == null) {
+             ts.systemState = Py.defaultSystemState;
+         }
+@@ -105,38 +104,38 @@
+         return ret;
+     }
+ 
+-    public PyObject call(PyObject globals, PyObject[] defaults,
++    public PyObject call(ThreadState state, PyObject globals, PyObject[] defaults,
+                          PyObject closure)
+     {
+         if (co_argcount != 0 || varargs || varkwargs)
+-            return call(Py.EmptyObjects, Py.NoKeywords, globals, defaults,
++            return call(state, Py.EmptyObjects, Py.NoKeywords, globals, defaults,
+                         closure);
+         PyFrame frame = new PyFrame(this, globals);
+         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+             return new PyGenerator(frame, closure);
+         }
+-        return call(frame, closure);
++        return call(state, frame, closure);
+     }
+ 
+-    public PyObject call(PyObject arg1, PyObject globals, PyObject[] defaults,
++    public PyObject call(ThreadState state, PyObject arg1, PyObject globals, PyObject[] defaults,
+                          PyObject closure)
+     {
+         if (co_argcount != 1 || varargs || varkwargs)
+-            return call(new PyObject[] {arg1},
++            return call(state, new PyObject[] {arg1},
+                         Py.NoKeywords, globals, defaults, closure);
+         PyFrame frame = new PyFrame(this, globals);
+         frame.f_fastlocals[0] = arg1;
+         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+             return new PyGenerator(frame, closure);
+         }
+-        return call(frame, closure);
++        return call(state, frame, closure);
+     }
+ 
+-    public PyObject call(PyObject arg1, PyObject arg2, PyObject globals,
++    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject globals,
+                          PyObject[] defaults, PyObject closure)
+     {
+         if (co_argcount != 2 || varargs || varkwargs)
+-            return call(new PyObject[] {arg1, arg2},
++            return call(state, new PyObject[] {arg1, arg2},
+                         Py.NoKeywords, globals, defaults, closure);
+         PyFrame frame = new PyFrame(this, globals);
+         frame.f_fastlocals[0] = arg1;
+@@ -144,15 +143,15 @@
+         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+             return new PyGenerator(frame, closure);
+         }
+-        return call(frame, closure);
++        return call(state, frame, closure);
+     }
+ 
+-    public PyObject call(PyObject arg1, PyObject arg2, PyObject arg3,
++    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject arg3,
+                          PyObject globals, PyObject[] defaults,
+                          PyObject closure)
+     {
+         if (co_argcount != 3 || varargs || varkwargs)
+-            return call(new PyObject[] {arg1, arg2, arg3},
++            return call(state, new PyObject[] {arg1, arg2, arg3},
+                         Py.NoKeywords, globals, defaults, closure);
+         PyFrame frame = new PyFrame(this, globals);
+         frame.f_fastlocals[0] = arg1;
+@@ -161,20 +160,38 @@
+         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+             return new PyGenerator(frame, closure);
+         }
+-        return call(frame, closure);
++        return call(state, frame, closure);
++    }
++    
++    @Override
++    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2,
++            PyObject arg3, PyObject arg4, PyObject globals,
++            PyObject[] defaults, PyObject closure) {
++        if (co_argcount != 4 || varargs || varkwargs)
++            return call(state, new PyObject[]{arg1, arg2, arg3, arg4},
++                        Py.NoKeywords, globals, defaults, closure);
++        PyFrame frame = new PyFrame(this, globals);
++        frame.f_fastlocals[0] = arg1;
++        frame.f_fastlocals[1] = arg2;
++        frame.f_fastlocals[2] = arg3;
++        frame.f_fastlocals[3] = arg4;
++        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
++            return new PyGenerator(frame, closure);
++        }
++        return call(state, frame, closure);
+     }
+ 
+-    public PyObject call(PyObject self, PyObject args[],
++    public PyObject call(ThreadState state, PyObject self, PyObject args[],
+                          String keywords[], PyObject globals,
+                          PyObject[] defaults, PyObject closure)
+     {
+         PyObject[] os = new PyObject[args.length+1];
+         os[0] = self;
+         System.arraycopy(args, 0, os, 1, args.length);
+-        return call(os, keywords, globals, defaults, closure);
++        return call(state, os, keywords, globals, defaults, closure);
+     }
+ 
+-    public PyObject call(PyObject args[], String kws[], PyObject globals, PyObject[] defs,
++    public PyObject call(ThreadState state, PyObject args[], String kws[], PyObject globals, PyObject[] defs,
+                           PyObject closure) {
+         PyFrame frame = new PyFrame(this, globals);
+         int argcount = args.length - kws.length;
+@@ -277,7 +294,7 @@
+         if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+             return new PyGenerator(frame, closure);
+         }
+-        return call(frame, closure);
++        return call(state, frame, closure);
+     }
+ 
+     public String toString() {
+diff --git a/jython/src/org/python/core/PyCode.java b/jython/src/org/python/core/PyCode.java
+--- a/jython/src/org/python/core/PyCode.java
++++ b/jython/src/org/python/core/PyCode.java
+@@ -8,32 +8,43 @@
+ {
+     public String co_name;
+ 
+-    abstract public PyObject call(PyFrame frame, PyObject closure);
++    abstract public PyObject call(ThreadState state, PyFrame frame, PyObject closure);
+ 
+-    public PyObject call(PyFrame frame) {
+-        return call(frame, null);
++    public PyObject call(ThreadState state, PyFrame frame) {
++        return call(state, frame, null);
+     }
+ 
+-    abstract public PyObject call(PyObject args[], String keywords[],
++    abstract public PyObject call(ThreadState state,
++                                  PyObject args[], String keywords[],
+                                   PyObject globals, PyObject[] defaults,
+                                   PyObject closure);
+ 
+-    abstract public PyObject call(PyObject self, PyObject args[],
++    abstract public PyObject call(ThreadState state,
++                                  PyObject self, PyObject args[],
+                                   String keywords[],
+                                   PyObject globals, PyObject[] defaults,
+                                   PyObject closure);
+ 
+-    abstract public PyObject call(PyObject globals, PyObject[] defaults,
+-                                  PyObject closure);
+-
+-    abstract public PyObject call(PyObject arg1, PyObject globals,
+-                                  PyObject[] defaults, PyObject closure);
+-
+-    abstract public PyObject call(PyObject arg1, PyObject arg2,
++    abstract public PyObject call(ThreadState state,
+                                   PyObject globals, PyObject[] defaults,
+                                   PyObject closure);
+ 
+-    abstract public PyObject call(PyObject arg1, PyObject arg2, PyObject arg3,
++    abstract public PyObject call(ThreadState state,
++                                  PyObject arg1, PyObject globals,
++                                  PyObject[] defaults, PyObject closure);
++
++    abstract public PyObject call(ThreadState state,
++                                  PyObject arg1, PyObject arg2,
++                                  PyObject globals, PyObject[] defaults,
++                                  PyObject closure);
++
++    abstract public PyObject call(ThreadState state,
++                                  PyObject arg1, PyObject arg2, PyObject arg3,
++                                  PyObject globals, PyObject[] defaults,
++                                  PyObject closure);
++
++    abstract public PyObject call(ThreadState state,
++                                  PyObject arg1, PyObject arg2, PyObject arg3, PyObject arg4,
+                                   PyObject globals, PyObject[] defaults,
+                                   PyObject closure);
+ 
+diff --git a/jython/src/org/python/core/PyFunction.java b/jython/src/org/python/core/PyFunction.java
+--- a/jython/src/org/python/core/PyFunction.java
++++ b/jython/src/org/python/core/PyFunction.java
+@@ -299,38 +299,90 @@
+ 
+     @Override
+     public PyObject __call__() {
+-        return func_code.call(func_globals, func_defaults, func_closure);
++        return __call__(Py.getThreadState());
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state) {
++        return func_code.call(state, func_globals, func_defaults, func_closure);
+     }
+ 
+     @Override
+     public PyObject __call__(PyObject arg) {
+-        return func_code.call(arg, func_globals, func_defaults, func_closure);
++        return __call__(Py.getThreadState(), arg);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0) {
++        return func_code.call(state, arg0, func_globals, func_defaults, func_closure);
+     }
+ 
+     @Override
+     public PyObject __call__(PyObject arg1, PyObject arg2) {
+-        return func_code.call(arg1, arg2, func_globals, func_defaults, func_closure);
++        return __call__(Py.getThreadState(), arg1, arg2);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1) {
++        return func_code.call(state, arg0, arg1, func_globals, func_defaults, func_closure);
+     }
+ 
+     @Override
+     public PyObject __call__(PyObject arg1, PyObject arg2, PyObject arg3) {
+-        return func_code.call(arg1, arg2, arg3, func_globals, func_defaults,
+-                              func_closure);
++        return __call__(Py.getThreadState(), arg1, arg2, arg3);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1,
++            PyObject arg2) {
++        return func_code.call(state, arg0, arg1, arg2, func_globals, func_defaults, func_closure);
++    }
++    
++    @Override
++    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2,
++            PyObject arg3) {
++        return __call__(Py.getThreadState(), arg0, arg1, arg2, arg3);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1,
++            PyObject arg2, PyObject arg3) {
++        return func_code.call(state, arg0, arg1, arg2, arg3, func_globals, func_defaults, func_closure);
++    }
++    
++    @Override
++    public PyObject __call__(PyObject[] args) {
++        return __call__(Py.getThreadState(), args);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject[] args) {
++        return __call__(state, args, Py.NoKeywords);
+     }
+ 
+     @Override
+     public PyObject __call__(PyObject[] args, String[] keywords) {
+         return function___call__(args, keywords);
+     }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject[] args, String[] keywords) {
++        return func_code.call(state, args, keywords, func_globals, func_defaults, func_closure);
++    }
+ 
+     @ExposedMethod(doc = BuiltinDocs.function___call___doc)
+     final PyObject function___call__(PyObject[] args, String[] keywords) {
+-        return func_code.call(args, keywords, func_globals, func_defaults, func_closure);
++        return __call__(Py.getThreadState(), args, keywords);
+     }
+ 
+     @Override
+     public PyObject __call__(PyObject arg1, PyObject[] args, String[] keywords) {
+-        return func_code.call(arg1, args, keywords, func_globals, func_defaults, func_closure);
++        return __call__(Py.getThreadState(), arg1, args, keywords);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg1, PyObject[] args, String[] keywords) {
++        return func_code.call(state, arg1, args, keywords, func_globals, func_defaults, func_closure);
+     }
+ 
+     @Override
+diff --git a/jython/src/org/python/core/PyFunctionTable.java b/jython/src/org/python/core/PyFunctionTable.java
+--- a/jython/src/org/python/core/PyFunctionTable.java
++++ b/jython/src/org/python/core/PyFunctionTable.java
+@@ -10,5 +10,5 @@
+  */
+ 
+ public abstract class PyFunctionTable {
+-    abstract public PyObject call_function(int index, PyFrame frame);
++    abstract public PyObject call_function(int index, PyFrame frame, ThreadState ts);
+ }
+diff --git a/jython/src/org/python/core/PyGenerator.java b/jython/src/org/python/core/PyGenerator.java
+--- a/jython/src/org/python/core/PyGenerator.java
++++ b/jython/src/org/python/core/PyGenerator.java
+@@ -106,8 +106,13 @@
+             super.finalize();
+         }
+     }
++    
++    @Override
++    public PyObject __iternext__() {
++        return __iternext__(Py.getThreadState());
++    }
+ 
+-    public PyObject __iternext__() {
++    public PyObject __iternext__(ThreadState state) {
+         if (gi_running)
+             throw Py.ValueError("generator already executing");
+         if (gi_frame == null) {
+@@ -121,7 +126,7 @@
+         gi_running = true;
+         PyObject result = null;
+         try {
+-            result = gi_frame.f_code.call(gi_frame, closure);
++            result = gi_frame.f_code.call(state, gi_frame, closure);
+         } catch(PyException e) {
+             if (!(e.type == Py.StopIteration || e.type == Py.GeneratorExit)) {
+                 gi_frame = null;
+diff --git a/jython/src/org/python/core/PyMethod.java b/jython/src/org/python/core/PyMethod.java
+--- a/jython/src/org/python/core/PyMethod.java
++++ b/jython/src/org/python/core/PyMethod.java
+@@ -93,21 +93,143 @@
+             return this;
+         }
+     }
+-
++    /*// This has been disabled since JavaFunc expects to be called with self + boxed args
++    @Override
++    public PyObject __call__() {
++        return __call__(Py.getThreadState());
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state) {
++        PyObject self = checkSelf(null, null);
++        if (self == null) {
++            return im_func.__call__(state);
++        } else {
++            return im_func.__call__(state, self);
++        }
++    }
++    
++    @Override
++    public PyObject __call__(PyObject arg0) {
++        return __call__(Py.getThreadState(), arg0);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0) {
++        PyObject self = checkSelf(arg0, null);
++        if (self == null) {
++            return im_func.__call__(state, arg0);
++        } else {
++            return im_func.__call__(state, self, arg0);
++        }
++    }
++    
++    @Override
++    public PyObject __call__(PyObject arg0, PyObject arg1) {
++        return __call__(Py.getThreadState(), arg0, arg1);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1) {
++        PyObject self = checkSelf(arg0, null);
++        if (self == null) {
++            return im_func.__call__(state, arg0, arg1);
++        } else {
++            return im_func.__call__(state, self, arg0, arg1);
++        }
++    }
++    
++    @Override
++    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2) {
++        return __call__(Py.getThreadState(), arg0, arg1, arg2);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1,
++            PyObject arg2) {
++        PyObject self = checkSelf(arg0, null);
++        if (self == null) {
++            return im_func.__call__(state, arg0, arg1, arg2);
++        } else {
++            return im_func.__call__(state, self, arg0, arg1, arg2);
++        }
++    }
++    
++    @Override
++    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
++        return __call__(Py.getThreadState(), arg0, arg1, arg2, arg3);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1,
++            PyObject arg2, PyObject arg3) {
++        PyObject self = checkSelf(arg0, null);
++        if (self == null) {
++            return im_func.__call__(state, arg0, arg1, arg2, arg3);
++        } else {
++            return im_func.__call__(state, self, new PyObject[]{arg0, arg1, arg2, arg3}, Py.NoKeywords);
++        }
++    }
++    
++    
++    @Override
++    public PyObject __call__(PyObject arg1, PyObject[] args, String[] keywords) {
++        return __call__(Py.getThreadState(), arg1, args, keywords);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject arg1, PyObject[] args,
++            String[] keywords) {
++        PyObject self = checkSelf(arg1, args);
++        if (self == null) {
++            return im_func.__call__(state, arg1, args, keywords);
++        } else {
++            PyObject[] new_args = new PyObject[args.length+1];
++            System.arraycopy(args, 0, new_args, 1, args.length);
++            new_args[0] = arg1;
++            return im_func.__call__(state, self, new_args, keywords);
++        }
++    }
++    
++    @Override
++    public PyObject __call__(PyObject[] args) {
++        return __call__(Py.getThreadState(), args);
++    }
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject[] args) {
++        return __call__(state, args, Py.NoKeywords);
++    }
++    */
+     @Override
+     public PyObject __call__(PyObject[] args, String[] keywords) {
+         return instancemethod___call__(args, keywords);
+     }
+-
++    
++    @Override
++    public PyObject __call__(ThreadState state, PyObject[] args, String[] keywords) {
++        PyObject self = checkSelf(null, args);
++        if (self == null) {
++            return im_func.__call__(state, args, keywords);
++        } else {
++            return im_func.__call__(state, self, args, keywords);
++        }
++    }
++    
+     @ExposedMethod(doc = BuiltinDocs.instancemethod___call___doc)
+     final PyObject instancemethod___call__(PyObject[] args, String[] keywords) {
++        return __call__(Py.getThreadState(), args, keywords);
++    }
++
++    private PyObject checkSelf(PyObject arg, PyObject[] args) {
+         PyObject self = im_self;
+-
+         if (self == null) {
+             // Unbound methods must be called with an instance of the
+             // class (or a derived class) as first argument
+             boolean ok;
+-            if (args.length >= 1) {
++            if (arg != null) {
++                self = arg;
++            } else if (args != null && args.length >= 1) {
+                 self = args[0];
+             }
+             if (self == null) {
+@@ -125,9 +247,9 @@
+                                            self == null ? "" : " instance");
+                 throw Py.TypeError(msg);
+             }
+-            return im_func.__call__(args, keywords);
++            return null;
+         } else {
+-            return im_func.__call__(self, args, keywords);
++            return self;
+         }
+     }
+ 
+diff --git a/jython/src/org/python/core/PyObject.java b/jython/src/org/python/core/PyObject.java
+--- a/jython/src/org/python/core/PyObject.java
++++ b/jython/src/org/python/core/PyObject.java
+@@ -314,6 +314,10 @@
+     public PyObject __call__(PyObject args[], String keywords[]) {
+         throw Py.TypeError(String.format("'%s' object is not callable", getType().fastGetName()));
+     }
++    
++    public PyObject __call__(ThreadState state, PyObject args[], String keywords[]) {
++        return __call__(args, keywords);
++    }
+ 
+     /**
+      * A variant of the __call__ method with one extra initial argument.
+@@ -329,15 +333,16 @@
+      *                 keyword arguments).
+      * @param keywords the keywords used for all keyword arguments.
+      **/
+-    public PyObject __call__(
+-        PyObject arg1,
+-        PyObject args[],
+-        String keywords[]) {
++    public PyObject __call__(PyObject arg1, PyObject args[], String keywords[]) {
+         PyObject[] newArgs = new PyObject[args.length + 1];
+         System.arraycopy(args, 0, newArgs, 1, args.length);
+         newArgs[0] = arg1;
+         return __call__(newArgs, keywords);
+     }
++    
++    public PyObject __call__(ThreadState state, PyObject arg1, PyObject args[], String keywords[]) {
++        return __call__(arg1, args, keywords);
++    }
+ 
+     /**
+      * A variant of the __call__ method when no keywords are passed.  The
+@@ -350,6 +355,10 @@
+     public PyObject __call__(PyObject args[]) {
+         return __call__(args, Py.NoKeywords);
+     }
++    
++    public PyObject __call__(ThreadState state, PyObject args[]) {
++        return __call__(args);
++    }
+ 
+     /**
+      * A variant of the __call__ method with no arguments.  The default
+@@ -360,6 +369,10 @@
+     public PyObject __call__() {
+         return __call__(Py.EmptyObjects, Py.NoKeywords);
+     }
++    
++    public PyObject __call__(ThreadState state) {
++        return __call__();
++    }
+ 
+     /**
+      * A variant of the __call__ method with one argument.  The default
+@@ -372,6 +385,10 @@
+     public PyObject __call__(PyObject arg0) {
+         return __call__(new PyObject[] { arg0 }, Py.NoKeywords);
+     }
++    
++    public PyObject __call__(ThreadState state, PyObject arg0) {
++        return __call__(arg0);
++    }
+ 
+     /**
+      * A variant of the __call__ method with two arguments.  The default
+@@ -386,6 +403,10 @@
+         return __call__(new PyObject[] { arg0, arg1 }, Py.NoKeywords);
+     }
+ 
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1) {
++        return __call__(arg0, arg1);
++    }
++
+     /**
+      * A variant of the __call__ method with three arguments.  The default
+      * behavior is to invoke <code>__call__(args, keywords)</code> with the
+@@ -399,6 +420,10 @@
+     public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2) {
+         return __call__(new PyObject[] { arg0, arg1, arg2 }, Py.NoKeywords);
+     }
++    
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1, PyObject arg2) {
++        return __call__(arg0, arg1, arg2);
++    }
+ 
+     /**
+      * A variant of the __call__ method with four arguments.  The default
+@@ -411,15 +436,15 @@
+      * @param arg2     the third argument to the function.
+      * @param arg3     the fourth argument to the function.
+      **/
+-    public PyObject __call__(
+-        PyObject arg0,
+-        PyObject arg1,
+-        PyObject arg2,
+-        PyObject arg3) {
++    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
+         return __call__(
+             new PyObject[] { arg0, arg1, arg2, arg3 },
+             Py.NoKeywords);
+     }
++    
++    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
++        return __call__(arg0, arg1, arg2, arg3);
++    }
+ 
+     /** @deprecated **/
+     public PyObject _callextra(PyObject[] args,
+diff --git a/jython/src/org/python/core/PyReflectedFunction.java b/jython/src/org/python/core/PyReflectedFunction.java
+--- a/jython/src/org/python/core/PyReflectedFunction.java
++++ b/jython/src/org/python/core/PyReflectedFunction.java
+@@ -180,7 +180,14 @@
+     }
+ 
+     public PyObject __call__(PyObject[] args, String[] keywords) {
+-        return __call__(null, args, keywords);
++        PyObject self = null;
++        /*
++        PyObject[] new_args = new PyObject[args.length - 1];
++        System.arraycopy(args, 1, new_args, 0, new_args.length);
++        self = args[0];
++        args = new_args;
++        */
++        return __call__(self, args, keywords);
+     }
+ 
+     // A bunch of code to make error handling prettier
+diff --git a/jython/src/org/python/core/PyTableCode.java b/jython/src/org/python/core/PyTableCode.java
+--- a/jython/src/org/python/core/PyTableCode.java
++++ b/jython/src/org/python/core/PyTableCode.java
+@@ -122,9 +122,8 @@
+     }
+ 
+     @Override
+-    public PyObject call(PyFrame frame, PyObject closure) {
++    public PyObject call(ThreadState ts, PyFrame frame, PyObject closure) {
+ //         System.err.println("tablecode call: "+co_name);
+-        ThreadState ts = Py.getThreadState();
+         if (ts.systemState == null) {
+             ts.systemState = Py.defaultSystemState;
+         }
+@@ -163,7 +162,7 @@
+ 
+         PyObject ret;
+         try {
+-            ret = funcs.call_function(func_id, frame);
++            ret = funcs.call_function(func_id, frame, ts);
+         } catch (Throwable t) {
+             // Convert exceptions that occured in Java code to PyExceptions
+             PyException pye = Py.JavaError(t);
+diff --git a/jython/src/org/python/core/ReflectedArgs.java b/jython/src/org/python/core/ReflectedArgs.java
+--- a/jython/src/org/python/core/ReflectedArgs.java
++++ b/jython/src/org/python/core/ReflectedArgs.java
+@@ -52,10 +52,11 @@
+         if (this.isStatic) {
+             if (self != null) {
+                 /*
+-                 * PyObject[] newArgs = new PyObject[pyArgs.length+1];
+-                 * System.arraycopy(pyArgs, 0, newArgs, 1, pyArgs.length);
+-                 * newArgs[0] = self; pyArgs = newArgs;
+-                 */
++                PyObject[] newArgs = new PyObject[pyArgs.length+1];
++                System.arraycopy(pyArgs, 0, newArgs, 1, pyArgs.length);
++                newArgs[0] = self;
++                pyArgs = newArgs;
++                //*/
+                 self = null;
+             }
+         } else {
+diff --git a/jython/src/org/python/core/imp.java b/jython/src/org/python/core/imp.java
+--- a/jython/src/org/python/core/imp.java
++++ b/jython/src/org/python/core/imp.java
+@@ -313,7 +313,7 @@
+ 
+         try {
+             PyFrame f = new PyFrame(code, module.__dict__, module.__dict__, null);
+-            code.call(f);
++            code.call(Py.getThreadState(), f);
+         } catch (RuntimeException t) {
+             removeModule(name);
+             throw t;
