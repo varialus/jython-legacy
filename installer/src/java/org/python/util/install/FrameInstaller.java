@@ -42,6 +42,7 @@ public class FrameInstaller {
         if (commandLine.hasJavaHomeOption()) {
             setJavaHomeHandler(commandLine.getJavaHomeHandler());
         }
+        initDefaultJava();
         Wizard wizard = new Wizard(jarInfo, autotest);
         wizard.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
@@ -154,6 +155,12 @@ public class FrameInstaller {
 
     protected static boolean isAccept() {
         return TRUE.equals(getProperty(TextKeys.ACCEPT_PROPERTY, FALSE));
+    }
+
+    protected static void initDefaultJava() {
+        JavaVersionInfo javaVersionInfo = new JavaVersionInfo();
+        Installation.fillJavaVersionInfo(javaVersionInfo, System.getProperties());
+        FrameInstaller.setJavaVersionInfo(javaVersionInfo);
     }
 
     private class SimpleWizardListener implements WizardListener {

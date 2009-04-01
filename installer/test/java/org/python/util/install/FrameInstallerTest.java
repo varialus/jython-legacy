@@ -6,6 +6,21 @@ import junit.framework.TestCase;
 
 public class FrameInstallerTest extends TestCase {
 
+    public void testInitDefaultJava() {
+        FrameInstaller.initDefaultJava();
+        JavaVersionInfo vInfo = FrameInstaller.getJavaVersionInfo();
+        assertNotNull(vInfo);
+        String version = vInfo.getVersion();
+        assertNotNull(version);
+        assertTrue(version.length() > 0);
+        String specificationVersion = vInfo.getSpecificationVersion();
+        assertNotNull(specificationVersion);
+        assertTrue(specificationVersion.length() > 0);
+        String vendor = vInfo.getVendor();
+        assertNotNull(vendor);
+        assertTrue(vendor.length() > 0);
+    }
+    
     public void testJavaVersionInfo() {
         String version = "1;2;3";
         String vendor = "jython [macrosystems]";
