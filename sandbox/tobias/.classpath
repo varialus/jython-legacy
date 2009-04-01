@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="com/ziclix/python/sql/|com/ziclix/python/sql/connect/|com/ziclix/python/sql/handler/|com/ziclix/python/sql/pipe/|com/ziclix/python/sql/pipe/csv/|com/ziclix/python/sql/pipe/db/|com/ziclix/python/sql/procedure/|com/ziclix/python/sql/resource/|com/ziclix/python/sql/util/" kind="src" path="jython/src"/>
+	<classpathentry kind="src" path="ssa/src"/>
 	<classpathentry excluding="org/python/compiler/advanced/ast/" kind="src" path="compiler/src"/>
-	<classpathentry kind="src" path="util/src"/>
+	<classpathentry excluding="org/python/code/CodeTable.java|org/python/code/SpecializedCode.java|org/python/frame/JavaFrameAccessor.java" kind="src" path="util/src"/>
 	<classpathentry kind="src" path="bytecode/src"/>
 	<classpathentry kind="src" path="agent/src"/>
 	<classpathentry kind="src" path="frame/src"/>

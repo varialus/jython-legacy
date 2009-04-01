@@ -56,7 +56,7 @@
   <target name="setup target">
     <mkdir dir="${target.dir}"/>
   </target>
-  <target name="clean" depends="clean jython,clean compiler,clean agent,clean bytecode,clean util,clean frame">
+  <target name="clean" depends="clean jython,clean compiler,clean ssa,clean agent,clean bytecode,clean util,clean frame">
     <delete dir="${target.dir}"/>
   </target>
 
@@ -79,10 +79,23 @@
     </ant>
   </target>
 
-  <target name="compiler" depends="setup target,jython,agent,util,bytecode">
+  <target name="ssa">
+    <echo>Building the SSA subproject</echo>
+    <ant dir="${basedir}/ssa" inheritAll="false">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+  <target name="clean ssa">
+    <ant dir="${basedir}/ssa" inheritAll="false" target="clean">
+      <property name="target.dir" location="${target.dir}"/>
+    </ant>
+  </target>
+
+  <target name="compiler" depends="setup target,jython,ssa,agent,util,bytecode">
     <echo>Building the compiler subproject</echo>
     <ant dir="${basedir}/compiler" inheritAll="false">
       <property name="jython.jar" location="${target.dir}/dist/jython-dev.jar"/>
+      <property name="ssa.jar" location="${target.dir}/ssa.jar"/>
       <property name="agent.jar" location="${target.dir}/agent-user.jar"/>
       <property name="antlr.jar"
 		location="${target.dir}/dist/javalib/antlr-runtime-3.1.2.jar"/>
