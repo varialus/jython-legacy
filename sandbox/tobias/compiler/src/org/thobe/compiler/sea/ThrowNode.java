@@ -1,9 +1,24 @@
 package org.thobe.compiler.sea;
 
-public class ThrowNode extends Node {
+class ThrowNode extends Node {
+    private final ExceptionValue exception;
 
     ThrowNode(ExceptionValue exception) {
-        // TODO Auto-generated constructor stub
+        this.exception = exception;
     }
 
+    @Override
+    ThrowNode accept(GraphTraverser traverser) {
+        return traverser.raiseException(this, exception);
+    }
+
+    @Override
+    NodeSuccession succession() {
+        return NodeSuccession.DUMMY;
+    }
+
+    @Override
+    public String toString() {
+        return "ThrowNode[" + exception + "]";
+    }
 }

@@ -120,9 +120,9 @@ abstract class SeaScope implements NamespacePopulator {
         };
     }
 
-    public static SeaScope forFunction(String name, String[] parameters,
-            String[] locals, String[] globals, final String[] free,
-            String[] cell, boolean hasStarImport) {
+    public static SeaScope forFunction(String name, final String[] parameters,
+            final String[] locals, final String[] globals, final String[] free,
+            final String[] cell, boolean hasStarImport) {
         return new SeaScope() {
             @Override
             public GraphBuilder builder(SuperGraph ocean, CompilerFlags flags) {
@@ -137,8 +137,13 @@ abstract class SeaScope implements NamespacePopulator {
             }
 
             public void populate(VariableFactory factory) {
-                // TODO Auto-generated method stub
-
+                for (String var : parameters) {
+                    factory.createParameter(var);
+                }
+                for (String var : locals) {
+                    factory.createLocalVariable(var);
+                }
+                // TODO: more stuff
             }
 
             @Override
@@ -233,7 +238,7 @@ abstract class SeaScope implements NamespacePopulator {
         }
 
         @Override
-        public void returnValue(Value value) {
+        public void returnPythonValue(Value value) {
             scope.returnValue(this, value);
         }
 

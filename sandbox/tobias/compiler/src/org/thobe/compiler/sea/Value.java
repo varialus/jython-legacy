@@ -1,7 +1,9 @@
 package org.thobe.compiler.sea;
 
+public abstract class Value {
+    Value() {
+    }
 
-public class Value {
     public static Value integer(int integer) {
         // TODO Auto-generated method stub
         return null;
@@ -12,4 +14,6 @@ public class Value {
         return null;
     }
 
+    @Override
+    public abstract String toString();
 }

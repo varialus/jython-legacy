@@ -1,7 +1,7 @@
 package org.python.compiler.advanced.sea;
 
 import org.thobe.compiler.sea.Value;
-import org.python.compiler.sea.Variable;
+import org.thobe.compiler.sea.Variable;
 
 abstract class ValueCarrier {
     private final Variable[] closure;

@@ -6,12 +6,13 @@ import org.python.antlr.ast.unaryopType;
 import org.python.core.CodeFlag;
 import org.python.core.CompilerFlags;
 import org.thobe.compiler.sea.ArrayValue;
-import org.thobe.compiler.sea.Continuation;
+import org.thobe.compiler.sea.NodeSuccession;
 import org.thobe.compiler.sea.ExceptionValue;
 import org.thobe.compiler.sea.NamespacePopulator;
 import org.thobe.compiler.sea.InvocationType;
 import org.thobe.compiler.sea.Selection;
 import org.thobe.compiler.sea.Value;
+import org.thobe.compiler.sea.Variable;
 
 public abstract class GraphBuilder extends org.thobe.compiler.sea.GraphBuilder {
     private final CallStrategy call;
@@ -79,8 +80,7 @@ public abstract class GraphBuilder extends org.thobe.compiler.sea.GraphBuilder {
      * @param line the line number to set.
      */
     public final void linenumber(int line) {
-        // TODO Auto-generated method stub
-
+        // FIXME: implement this somehow
     }
 
     // --- Handle ---
@@ -125,7 +125,7 @@ public abstract class GraphBuilder extends org.thobe.compiler.sea.GraphBuilder {
      * @return a Python string with the supplied content.
      */
     public Value string(String string) {
-        // TODO Auto-generated method stub
+        // TODO: implement this
         return null;
     }
 
@@ -155,36 +155,36 @@ public abstract class GraphBuilder extends org.thobe.compiler.sea.GraphBuilder {
         // phi verify that each value comes from different paths?
         // Does it have to? 
         Selection select = something();// TODO: design API like: selection(types.isTrue(), result);
-        replaceContinuation(select.onTrue());
+        replaceSuccession(select.onTrue());
         Value on_true = schedule(selection.onTrue()); // schedule artificial node
-        Continuation after_true = replaceContinuation(select.onFalse());
+        NodeSuccession after_true = replaceSuccession(select.onFalse());
         Value on_false = schedule(selection.onFalse()); // schedule artificial node
-        Continuation after_false = currentContinuation();
-        replaceContinuation(merge(after_true, after_false));
-        return super.phiOrNull(on_true, on_false);
+        NodeSuccession after_false = currentSuccession();
+        replaceSuccession(merge(after_true, after_false));
+        return phiOrNull(on_true, on_false);
     }
 
     public void loop(LoopCallback loop) throws Exception {
         // TODO: this has issues for the same reasons as selection does.
-        final Continuation start = currentContinuation();
-        final Continuation after = newContinuation();
+        final NodeSuccession start = currentSuccession();
+        final NodeSuccession after = newSuccession();
         StateCarrier state = loop.head();
-        replaceContinuation(state.onTrue());
+        replaceSuccession(state.onTrue());
         loop.body(state.payload(), new LoopHandle() {
             @Override
             public void breakLoop() {
-                nextContinuation(after);
+                nextSuccession(after);
             }
 
             @Override
             public void continueLoop() {
-                nextContinuation(start);
+                nextSuccession(start);
             }
         });
-        replaceContinuation(state.onFalse());
+        replaceSuccession(state.onFalse());
         loop.orelse();
-        nextContinuation(after);
-        replaceContinuation(after);
+        nextSuccession(after);
+        replaceSuccession(after);
     }
 
     public void tryBlock(BlockCallback block) {
@@ -724,7 +724,7 @@ public abstract class GraphBuilder extends org.thobe.compiler.sea.GraphBuilder {
 
     // --- Exit ---
 
-    public abstract void returnValue(Value evaluate);
+    public abstract void returnPythonValue(Value evaluate);
 
     public abstract Value yeildValue(Value value);
 

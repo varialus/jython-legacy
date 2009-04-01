@@ -1,54 +1,71 @@
 package org.thobe.compiler.sea;
 
-import org.python.compiler.sea.Variable;
-
 public abstract class GraphBuilder {
+    private final GraphReferenceNode entry;
+    private NodeSuccession succession;
+
     protected GraphBuilder(NamespacePopulator populator) {
-        populator.populate(new VariableFactory(){});
+        populator.populate(new VariableFactory() {
+        });
+        entry = new GraphReferenceNode();
+        succession = entry.succession();
     }
 
-    protected InvocationNode invoke(InvocationType invocation,
+    public final Graph build() {
+        return new Graph(entry);
+    }
+
+    protected ValueNode invoke(InvocationType invocation,
             Value... arguments) {
         return new InvocationNode(invocation, arguments);
     }
 
-    protected ArrayNode array(Value[] content) {
+    protected ValueNode array(Value[] content) {
         return new ArrayNode(content);
     }
 
     protected <N extends Node> N schedule(N node) {
-        // TODO Auto-generated method stub
+        succession = succession.setNext(node);
         return node;
     }
 
     protected <V extends Value> V schedule(V value) {
-        // TODO Auto-generated method stub
+        schedule(ValueNode.repeat(value));
         return value;
     }
 
-    protected Continuation replaceContinuation(Continuation progression) {
+    protected NodeSuccession replaceSuccession(NodeSuccession succession) {
+        try {
+            return this.succession;
+        } finally {
+            this.succession = succession;
+        }
+    }
+
+    protected NodeSuccession currentSuccession() {
+        return succession;
+    }
+
+    protected void nextSuccession(NodeSuccession start) {
+        // TODO Auto-generated method stub
+
+    }
+
+    protected NodeSuccession newSuccession() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    protected Continuation currentContinuation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    protected void nextContinuation(Continuation start) {
-        // TODO Auto-generated method stub
-
-    }
-
-    protected Continuation newContinuation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    protected Continuation merge(Continuation... progressions) {
-        // TODO Auto-generated method stub
-        return null;
+    protected NodeSuccession merge(final NodeSuccession... previous) {
+        return new NodeSuccession(){
+            @Override
+            NodeSuccession setNext(Node node) {
+                for (NodeSuccession prev : previous) {
+                    prev.setNext(node);
+                }
+                return node.succession();
+            }
+        };
     }
 
     protected Value phi(Value... values) {
@@ -77,6 +94,10 @@ public abstract class GraphBuilder {
         } else {
             return phi(values);
         }
+    }
+
+    protected final Node returnValue(Value value) {
+        return new ReturnNode(value);
     }
 
     protected final ValueNode loadVariable(Variable variable) {

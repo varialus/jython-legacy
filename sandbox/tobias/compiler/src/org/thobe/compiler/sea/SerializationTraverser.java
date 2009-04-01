@@ -1,6 +1,6 @@
 package org.thobe.compiler.sea;
 
-class SerializationTraverser extends GraphTraverser {
+abstract class SerializationTraverser extends GraphTraverser {
     public SerializationTraverser() {
         throw new UnsupportedOperationException(
                 "Graph serialization is not implemented.");

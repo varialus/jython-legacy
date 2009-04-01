@@ -1,5 +1,7 @@
 package org.python.compiler.sea;
 
-public interface SupergraphVisitor {
+import org.thobe.compiler.sea.GraphVisitor;
 
+public interface SupergraphVisitor {
+    GraphVisitor visitGraph();
 }

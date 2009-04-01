@@ -1,10 +1,33 @@
 package org.thobe.compiler.sea;
 
-import org.python.compiler.sea.Variable;
-
-public class StoreNode extends OpNode {
+class StoreNode extends Node {
+    private Node next;
+    private final Variable variable;
+    private final Value value;
 
     StoreNode(Variable variable, Value value) {
-        // TODO Auto-generated constructor stub
+        this.variable = variable;
+        this.value = value;
+    }
+
+    @Override
+    StoreNode accept(GraphTraverser traverser) {
+        return traverser.store(this, variable, value);
+    }
+
+    @Override
+    NodeSuccession succession() {
+        return new NodeSuccession() {
+            @Override
+            NodeSuccession setNext(Node node) {
+                next = node;
+                return node.succession();
+            }
+        };
+    }
+
+    @Override
+    public String toString() {
+        return "StoreNode[" + variable + " <- " + value + "]";
     }
 }

@@ -12,4 +12,9 @@ public abstract class VariableFactory {
         
     }
 
+    public void createParameter(String param) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

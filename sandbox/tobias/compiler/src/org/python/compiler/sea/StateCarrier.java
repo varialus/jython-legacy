@@ -1,6 +1,6 @@
 package org.python.compiler.sea;
 
-import org.thobe.compiler.sea.Continuation;
+import org.thobe.compiler.sea.NodeSuccession;
 import org.thobe.compiler.sea.Value;
 
 public class StateCarrier {
@@ -15,12 +15,12 @@ public class StateCarrier {
         return payload;
     }
 
-    Continuation onTrue() {
+    NodeSuccession onTrue() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    Continuation onFalse() {
+    NodeSuccession onFalse() {
         // TODO Auto-generated method stub
         return null;
     }

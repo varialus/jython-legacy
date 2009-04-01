@@ -70,9 +70,9 @@ import org.python.compiler.sea.LoopHandle;
 import org.python.compiler.sea.SelectionCallback;
 import org.python.compiler.sea.StateCarrier;
 import org.python.compiler.sea.UnrollerCallback;
-import org.python.compiler.sea.Variable;
 import org.thobe.compiler.sea.ExceptionValue;
 import org.thobe.compiler.sea.Value;
+import org.thobe.compiler.sea.Variable;
 
 /**
  * Intermediate code generator that generates a Sea of Nodes type of SSA IR.
@@ -112,7 +112,7 @@ final class NodeSeaGenerator extends
     public Value loadConstant(Constant token) {
         final Value constant = constants.get(token);
         if (constant == null) {
-            throw new IllegalArgumentException("No such constant: " + token);
+            throw new IllegalArgumentException("No such constant: " + token + " in " + constants);
         }
         return constant;
     }
@@ -408,7 +408,7 @@ final class NodeSeaGenerator extends
     @Override
     public Value visitLambda(Lambda node) throws Exception {
         linenumber(node);
-        generate.returnValue(evaluate(node.getInternalBody()));
+        generate.returnPythonValue(evaluate(node.getInternalBody()));
         return generate.graph();
     }
 
@@ -721,7 +721,7 @@ final class NodeSeaGenerator extends
     @Override
     public Value visitReturn(Return node) throws Exception {
         linenumber(node);
-        generate.returnValue(evaluate(node.getInternalValue()));
+        generate.returnPythonValue(evaluate(node.getInternalValue()));
         return null;
     }
 

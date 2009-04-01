@@ -2,12 +2,12 @@ package org.thobe.compiler.sea;
 
 public class Selection {
 
-    public Continuation onTrue() {
+    public NodeSuccession onTrue() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Continuation onFalse() {
+    public NodeSuccession onFalse() {
         // TODO Auto-generated method stub
         return null;
     }

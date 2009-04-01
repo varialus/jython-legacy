@@ -1,12 +1,44 @@
 package org.thobe.compiler.sea;
 
-public class ValueNode extends OpNode {
+public abstract class ValueNode extends Node {
+    static ValueNode repeat(final Value value) {
+        return new ValueNode() {
+            @Override
+            public Value result() {
+                return value;
+            }
+
+            @Override
+            ValueNode accept(GraphTraverser traverser) {
+                throw new UnsupportedOperationException("Needs fixing!");
+            }
+
+            @Override
+            public String toString() {
+                return "RepeatedValueNode[" + value + "]";
+            }
+        };
+    }
+
+    private Node next;
+
     ValueNode() {
         // TODO Auto-generated constructor stub
     }
 
-    public Value result() {
-        // TODO Auto-generated method stub
-        return null;
+    public abstract Value result();
+
+    @Override
+    abstract ValueNode accept(GraphTraverser traverser);
+
+    @Override
+    NodeSuccession succession() {
+        return new NodeSuccession() {
+            @Override
+            NodeSuccession setNext(Node node) {
+                next = node;
+                return node.succession();
+            }
+        };
     }
 }

@@ -7,8 +7,8 @@ import org.thobe.compiler.sea.Value;
 import org.thobe.compiler.sea.VariableFactory;
 
 public class SuperGraph {
-    private final Graph constants = null;
-    private final Graph module = null;
+    private Graph constants;
+    private Graph module;
 
     public GraphBuilder constants() {
         // TODO: capture this graph...
@@ -28,7 +28,7 @@ public class SuperGraph {
             }
 
             @Override
-            public void returnValue(Value evaluate) {
+            public void returnPythonValue(Value evaluate) {
                 throw new UnsupportedOperationException();
             }
 
@@ -40,7 +40,8 @@ public class SuperGraph {
     }
 
     public void accept(NodeSorter sort, SupergraphVisitor visitor) {
-        // TODO Auto-generated method stub
-
+        // TODO: replace this method
+        constants.serialize(visitor.visitGraph());
+        module.serialize(visitor.visitGraph());
     }
 }
