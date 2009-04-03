@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scripting Java with Jython</title>
+<LINK href="talk.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<div id="header">
+org.python.util.PythonIntepreter
+</div>
+<div id="leftbar">
+<!-- LEFTBAR -->
+<ol>
+<li><a href='index.html' >*</a></li>
+<li><a href='intro0.html' >Introduction</a></li>
+<li><a href='intro1.html' >Introduction (1)</a></li>
+<li><a href='intro2.html' >Introduction (2)</a></li>
+<li><a href='search_snpt.html' >Search Snippet</a></li>
+<li><a href='tasks_snpt.html' >Tasks Snippet</a></li>
+<li><a href='pinterp1.html' >Intepreter</a></li>
+<li><a href='ijyside.html' >IJythonSide</a></li>
+<li><a href='glue.html' >Jython Side</a></li>
+<li><a href='import.html' >Importing</a></li>
+<li><a href='doctest.html' >Doctest</a></li>
+<li><a href='doctest_out.html' >Doctest run</a></li>
+</ol>
+<!-- /LEFTBAR -->
+</div>
+<div id="main">
+<pre>
+import org.python.util.PythonInterpreter
+
+...
+Properties props = new Properties(System.getProperties());
+props.setProperty("python.home",homedir);
+            
+// initialize(Properties preProps,Properties postProps,argv)
+PythonInterpreter.initialize(props,null,new String[0]);
+
+//  PythonInterpreter([PyObject dict [, PySystemState systemState]])
+PythonInterpreter interp = new PythonIntepreter();
+
+String libdir = new Path(getDescriptor().find(new Path("lib")).getFile())
+                         .toFile().getAbsolutePath(); // eclipse
+interp.set("libdir",libdir); // set(String name, Object value)
+                            
+interp.exec("import sys\n"+
+            "sys.path.append(libdir)\n"+
+            "from inside import glue\n"
+            );
+
+IJythonSide jythonSide 
+ = (IJythonSide)interp.get("glue",IJythonSide.class);
+// get(String name, Class javaclass)
+                                
+jythonSide.action("init",new Object [0]);
+
+</pre>
+</div>
+
+</body>
+</html>

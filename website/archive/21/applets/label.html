@@ -1,0 +1,184 @@
+<HTML>
+<!-- THIS PAGE IS AUTOMATICALLY GENERATED.  DO NOT EDIT. -->
+<!-- Tue May 14 16:15:50 2002 -->
+<!-- USING HT2HTML 1.1 -->
+<!-- SEE http://www.python.org/~bwarsaw/software/pyware.html -->
+<!-- User-specified headers:
+Title: Label Example
+
+-->
+
+<HEAD>
+<TITLE>Label Example</TITLE>
+
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000"
+      TOPMARGIN="0" LEFTMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0"
+      LINK="#0000bb"  VLINK="#000000"
+      ALINK="#ff0000">
+<!-- start of page table -->
+<TABLE WIDTH="100%" BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<!-- start of banner row -->
+<TR>
+<!-- start of corner cells -->
+<TD WIDTH=150 VALIGN=CENTER BGCOLOR="#cccccc">
+
+<center>
+    <a href="../">
+    <img border=0 src="../images/jython-new-small.gif"></a></center> </TD>
+<TD WIDTH=15 BGCOLOR="#cccccc">&nbsp;&nbsp;</TD><!--spacer-->
+<!-- end of corner cells -->
+<!-- start of banner -->
+<TD WIDTH="90%" BGCOLOR="#cccccc">
+<!-- start of site links table -->
+<TABLE WIDTH="100%" BORDER=0
+CELLSPACING=0 CELLPADDING=2
+       COLS=2 ROWS=2 BGCOLOR="#ffffff">
+<TR>
+    <TD BGCOLOR="#cccccc">
+<a href="../index.html">Home</a>
+    </TD>
+    <TD BGCOLOR="#cccccc">
+<a href="http://www.python.org/">www.python.org</a>
+    </TD>
+</TR><TR>
+    <TD BGCOLOR="#cccccc">
+<a href="../download.html">Download</a>
+    </TD>
+    <TD BGCOLOR="#cccccc">
+<a href="../docs/index.html">Documentation</a>
+    </TD>
+</TR>
+</TABLE><!-- end of site links table -->
+
+</TD><!-- end of banner -->
+</TR><!-- end of banner row -->
+<TR><!-- start of sidebar/body row -->
+<!-- start of sidebar cells -->
+<TD WIDTH=150 VALIGN=TOP BGCOLOR="#cccccc">
+<!-- start of sidebar table -->
+<TABLE WIDTH="100%" BORDER=0 CELLSPACING=0 CELLPADDING=3
+       BGCOLOR="#ffffff">
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Home
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../index.html">Overview</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../license.html">License</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=21045">Jython 2.0</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../download.html">Jython 2.1</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../install.html">Installing</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../platform.html">JVM Compatibility</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">&nbsp;
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Applets
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="index.html">Demos</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="button.html">ButtonDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="checkbox.html">CheckboxDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="choice.html">ChoiceDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<b>LabelDemo</b>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="list.html">ListDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="coordinates.html">CoordinatesDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="converter.html">ConvertDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">&nbsp;
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Applet Problems
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="problems.html">Here's what to do</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="issues.html">Other applet issues</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">&nbsp;
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Email Us
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="mailto:jython-dev@lists.sourceforge.net">jython-dev@lists.sourceforge.net</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+&nbsp;
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="http://www.python.org/">
+<center>
+    <img border=0 src="../images/PythonPoweredSmall.gif"></center>
+</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+&nbsp;
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="http://sourceforge.net">
+<center><IMG src="http://sourceforge.net/sflogo.php?group_id=12867" width="88" height="31" border="0" alt="SourceForge Logo"></center>
+</A>
+</TD></TR>
+</TABLE><!-- end of sidebar table -->
+
+</TD>
+<TD WIDTH=15>&nbsp;&nbsp;</TD><!--spacer-->
+<!-- end of sidebar cell -->
+<!-- start of body cell -->
+<TD VALIGN=TOP WIDTH="90%"><BR>
+<h3>Using Labels</h3>
+
+<p>This example shows how to use Labels from Jython.
+<p>
+<applet code="LabelDemo" archive="appletdemo.jar" width = 150 height = 100
+        alt="This browser doesn't support JDK 1.1 applets.">
+<h3>Something has gone wrong loading this applet.</h3>
+</applet>
+
+<p>The complete source code for this example is included below.
+
+<blockquote><pre><hr>
+from java import applet
+from java.awt import Label, GridLayout
+
+class LabelDemo(applet.Applet):
+    def init(self):
+        self.setLayout(GridLayout(0,1))
+        self.add(Label('Left'))
+        self.add(Label('Center', Label.CENTER))
+        self.add(Label('Right', Label.RIGHT))
+<hr></pre></blockquote>
+
+
+Three labels are created with different alignments.  The first has 
+the default left alignment and the other two are centered and right 
+aligned.
+
+<p>
+</TD><!-- end of body cell -->
+</TR><!-- end of sidebar/body row -->
+</TABLE><!-- end of page table -->
+</BODY></HTML>

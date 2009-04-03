@@ -1,0 +1,256 @@
+<HTML>
+<!-- THIS PAGE IS AUTOMATICALLY GENERATED.  DO NOT EDIT. -->
+<!-- Tue May 14 16:15:50 2002 -->
+<!-- USING HT2HTML 1.1 -->
+<!-- SEE http://www.python.org/~bwarsaw/software/pyware.html -->
+<!-- User-specified headers:
+Title: Simple Drawing Example
+
+-->
+
+<HEAD>
+<TITLE>Simple Drawing Example</TITLE>
+
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000"
+      TOPMARGIN="0" LEFTMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0"
+      LINK="#0000bb"  VLINK="#000000"
+      ALINK="#ff0000">
+<!-- start of page table -->
+<TABLE WIDTH="100%" BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<!-- start of banner row -->
+<TR>
+<!-- start of corner cells -->
+<TD WIDTH=150 VALIGN=CENTER BGCOLOR="#cccccc">
+
+<center>
+    <a href="../">
+    <img border=0 src="../images/jython-new-small.gif"></a></center> </TD>
+<TD WIDTH=15 BGCOLOR="#cccccc">&nbsp;&nbsp;</TD><!--spacer-->
+<!-- end of corner cells -->
+<!-- start of banner -->
+<TD WIDTH="90%" BGCOLOR="#cccccc">
+<!-- start of site links table -->
+<TABLE WIDTH="100%" BORDER=0
+CELLSPACING=0 CELLPADDING=2
+       COLS=2 ROWS=2 BGCOLOR="#ffffff">
+<TR>
+    <TD BGCOLOR="#cccccc">
+<a href="../index.html">Home</a>
+    </TD>
+    <TD BGCOLOR="#cccccc">
+<a href="http://www.python.org/">www.python.org</a>
+    </TD>
+</TR><TR>
+    <TD BGCOLOR="#cccccc">
+<a href="../download.html">Download</a>
+    </TD>
+    <TD BGCOLOR="#cccccc">
+<a href="../docs/index.html">Documentation</a>
+    </TD>
+</TR>
+</TABLE><!-- end of site links table -->
+
+</TD><!-- end of banner -->
+</TR><!-- end of banner row -->
+<TR><!-- start of sidebar/body row -->
+<!-- start of sidebar cells -->
+<TD WIDTH=150 VALIGN=TOP BGCOLOR="#cccccc">
+<!-- start of sidebar table -->
+<TABLE WIDTH="100%" BORDER=0 CELLSPACING=0 CELLPADDING=3
+       BGCOLOR="#ffffff">
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Home
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../index.html">Overview</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../license.html">License</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=12867&release_id=21045">Jython 2.0</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../download.html">Jython 2.1</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../install.html">Installing</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="../platform.html">JVM Compatibility</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">&nbsp;
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Applets
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="index.html">Demos</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="button.html">ButtonDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="checkbox.html">CheckboxDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="choice.html">ChoiceDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="label.html">LabelDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="list.html">ListDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<b>CoordinatesDemo</b>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="converter.html">ConvertDemo</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">&nbsp;
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Applet Problems
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="problems.html">Here's what to do</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="issues.html">Other applet issues</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">&nbsp;
+<TR><TD BGCOLOR="#666699"><B><FONT COLOR="#ffffff">
+Email Us
+</FONT></B></TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="mailto:jython-dev@lists.sourceforge.net">jython-dev@lists.sourceforge.net</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+&nbsp;
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="http://www.python.org/">
+<center>
+    <img border=0 src="../images/PythonPoweredSmall.gif"></center>
+</A>
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+&nbsp;
+</TD></TR>
+<TR><TD BGCOLOR="#cccccc">
+<A HREF="http://sourceforge.net">
+<center><IMG src="http://sourceforge.net/sflogo.php?group_id=12867" width="88" height="31" border="0" alt="SourceForge Logo"></center>
+</A>
+</TD></TR>
+</TABLE><!-- end of sidebar table -->
+
+</TD>
+<TD WIDTH=15>&nbsp;&nbsp;</TD><!--spacer-->
+<!-- end of sidebar cell -->
+<!-- start of body cell -->
+<TD VALIGN=TOP WIDTH="90%"><BR>
+<h3>Drawing to a Canvas</h3>
+
+<p>This example shows how to draw to a Canvas from Jython.
+This is low level drawing using the basic Java Graphics API's.
+
+<p>
+<applet code="CoordinatesDemo" archive="appletdemo.jar" width = 300 height = 200
+        alt="This browser doesn't support JDK 1.1 applets.">
+<param name=cabbase0 value="appletdemo.cab">
+<h3>Something has gone wrong loading this applet.</h3>
+</applet>
+
+<p>The complete source code for this example is included below.
+
+<blockquote><pre><hr>
+from java import applet, awt
+from pawt import GridBag
+
+class CoordinatesDemo(applet.Applet):
+    def init(self):
+        bag = GridBag(self)
+
+        self.framedArea = FramedArea(self)
+        bag.addRow(self.framedArea, weighty=1.0, fill='BOTH')
+
+        self.label = awt.Label('Click within the framed area')
+        bag.addRow(self.label, weightx=1.0, weighty=0.0, fill='HORIZONTAL')
+
+    def updateLabel(self, point):
+        text = 'Click occurred at coordinate (%d, %d).'
+        self.label.text = text % (point.x, point.y)
+
+class FramedArea(awt.Panel):
+    def __init__(self, controller):
+        awt.Panel.__init__(self)
+        self.background = awt.Color.lightGray
+        self.setLayout(awt.GridLayout(1,0))
+
+        self.add(CoordinateArea(controller))
+
+    def getInsets(self):
+        return awt.Insets(4,4,5,5)
+
+    def paint(self, g):
+        d = self.size
+
+        g.color = self.background
+        g.draw3DRect(0, 0, d.width-1, d.height-1, 1)
+        g.draw3DRect(3, 3, d.width-7, d.height-7, 1)
+
+class CoordinateArea(awt.Canvas):
+    def __init__(self, controller):
+        awt.Canvas.__init__(self)
+        self.mousePressed = self.push
+        self.controller = controller
+
+    def push(self, e):
+        try:
+            self.point.x = e.x
+            self.point.y = e.y
+        except AttributeError:
+            self.point = awt.Point(e.x, e.y)
+
+        self.repaint()
+
+    def paint(self, g):
+        if hasattr(self, 'point'):
+            self.controller.updateLabel(self.point)
+            g.fillRect(self.point.x-1, self.point.y-1, 2, 2)
+<hr></pre></blockquote>
+
+
+This example defines three classes.  The first is the actual applet, 
+CoordinatesDemo sets up the label where text is displayed, and the 
+FramedArea panel where drawing takes place.
+This is an example of using the GridBag utility class provided with 
+Jython to make using the GridBagLayout style easier.  
+This is a very powerful layout manager, and I strongly encourage 
+you to consider using it for your own applications.  
+Hopefully the GridBag utility class will make this powerful layout 
+manager much easier to use in Jython.
+
+<p>
+The second class is a very simple framed area.  
+It simply draws a border around an interior CoordinateArea.
+
+<p>
+The final class is the CoordinateArea which does the actual drawing. 
+At creation time, this class sets up the callback so that its push 
+method will be invoked when the user presses the mouse within its frame.
+The push method simply updates the current location of the point
+(setting it if it hasn't been defined yet).
+
+<p>
+The paint method does the actual drawing (only if the user has 
+clicked on some point). 
+It first updates its controller's label widget with the current 
+coordinates, and then it draws the point the user has selected 
+using the fillRect method on the Graphics object.
+
+<p>
+</TD><!-- end of body cell -->
+</TR><!-- end of sidebar/body row -->
+</TABLE><!-- end of page table -->
+</BODY></HTML>
