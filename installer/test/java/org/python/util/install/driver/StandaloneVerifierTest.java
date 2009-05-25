@@ -51,7 +51,9 @@ public class StandaloneVerifierTest extends TestCase {
                 .concat("bin")
                 .concat(File.separator)
                 .concat("java");
-        if (Installation.isWindows()) {}
+        if (Installation.isWindows()) {
+            expectedCommand = expectedCommand.concat(".exe");
+        }
         String expectedArgument = prefix.concat("autotest.py");
         _verifier.setTargetDir(targetDir);
         String[] command = _verifier.getSimpleCommand();
