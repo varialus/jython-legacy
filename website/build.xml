@@ -54,6 +54,16 @@
             <fileset dir="redirects">
             </fileset>
         </copy>
+        <copy todir="dist/archive/22">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/applets">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
         <apply verbose="true" executable="${rst2jysite.command}" dest="dist">
             <arg line="--link-stylesheet" />
             <arg line="--stylesheet=../css/html4css1.css" />
