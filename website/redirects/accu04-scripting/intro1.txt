@@ -1,0 +1,7 @@
+This page has been retired for versions of Jython older than 2.1.
+
+If you want the archived web page:
+
+`2.1 accu04-scripting/intro1`_
+
+.. _2.1 accu04-scripting/intro1: ../archive/21/accu04-scripting/intro1.html

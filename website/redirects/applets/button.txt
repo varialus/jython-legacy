@@ -1,0 +1,7 @@
+This page has been retired for versions of Jython older than 2.1.
+
+If you want the archived web page:
+
+`2.1 applets/button`_
+
+.. _2.1 applets/button: ../archive/21/applets/button.html

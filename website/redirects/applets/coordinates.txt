@@ -1,0 +1,7 @@
+This page has been retired for versions of Jython older than 2.1.
+
+If you want the archived web page:
+
+`2.1 applets/coordinates`_
+
+.. _2.1 applets/coordinates: ../archive/21/applets/coordinates.html
