@@ -3,12 +3,15 @@ The Jython Project
 ==================
 .. admonition:: Latest News
 
-  The Jython development team is proud to announce the release of Jython 2.5.0!  `Jython 2.5.0! <http://downloads.sourceforge.net/jython/jython_installer-2.5.0.jar>`__
+  The Jython development team is proud to announce the release of Jython 2.5rc3!  `Jython 2.5.0! <http://downloads.sourceforge.net/jython/jython_installer-2.5rc3.jar>`__
 
-2.5 Docs Being Developed on Our Wiki
-====================================
+Jython 2.5 Documentation
+========================
 
-The best documentation for Jython 2.5 is currently on our wiki_.  Please help Jython by updating the wiki. As the wiki content matures for 2.5 it will be pulled back onto this website. Archived versions of the old webpages are available below
+The documentation for Jython 2.5 is being developed on our wiki_.  Please help
+Jython by adding content and updating our wiki. As the content matures for 2.5
+it will be pulled back into this website. Archived versions of the old webpages
+are available below:
 
 * Old website for `Jython 2.2`_
 * Old website for `Jython 2.1`_.

@@ -33,7 +33,7 @@
             </fileset>
         </copy>
         <copy todir="dist/Project">
-            <fileset dir="Project">
+            <fileset dir=".">
                 <include name="*.txt"/>
             </fileset>
             <fileset dir=".">
