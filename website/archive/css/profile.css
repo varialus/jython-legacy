@@ -1,0 +1,161 @@
+
+
+/* ==================== aural ============================ */
+
+@media aural {
+  h1, h2, h3, h4, h5, h6 { voice-family: paul, male; stress: 20; richness: 90 }
+  h1 { pitch: x-low; pitch-range: 90 }
+  h2 { pitch: x-low; pitch-range: 80 }
+  h3 { pitch: low; pitch-range: 70 }
+  h4 { pitch: medium; pitch-range: 60 }
+  h5 { pitch: medium; pitch-range: 50 }
+  h6 { pitch: medium; pitch-range: 40 }
+  li, dt, dd { pitch: medium; richness: 60 }
+  dt { stress: 80 }
+  pre, code, tt { pitch: medium; pitch-range: 0; stress: 0; richness: 80 }
+  em { pitch: medium; pitch-range: 60; stress: 60; richness: 50 }
+  strong { pitch: medium; pitch-range: 60; stress: 90; richness: 90 }
+  dfn { pitch: high; pitch-range: 60; stress: 60 }
+  s, strike { richness: 0 }
+  i { pitch: medium; pitch-range: 60; stress: 60; richness: 50 }
+  b { pitch: medium; pitch-range: 60; stress: 90; richness: 90 }
+  u { richness: 0 }
+  
+  :link { voice-family: harry, male }
+  :visited { voice-family: betty, female }
+  :active { voice-family: betty, female; pitch-range: 80; pitch: x-high }
+}
+  
+#top          { background-color: #ffffff;}  
+#top .grouplogo {padding: 0;} 
+#top .header .current { background-color: #f5f6b5;} 
+#top .header .current a:link {  color: #000000;  }
+#top .header .current a:visited { color: #000000; }
+#top .header .current a:hover { color: #000000; }
+ 
+#tabs {
+    clear: none;
+    padding-top: 45px;
+    padding-left: 0;
+} 
+#tabs li      { background-color: #f5f5dc ;} 
+#tabs li a:link {  color: #000000;  }
+#tabs li a:visited { color: #000000; }
+#tabs li a:hover { color: #000000; }
+
+#level2tabs       { background-color: #000000 ;} 
+#level2tabs a:link {  color: #000000;  }
+#level2tabs a:visited { color: #000000; }
+#level2tabs a:hover { color: #000000; }
+
+#main {
+    border-top: solid 18px #f5f6b5;
+}
+
+.heading { background-color: #f5f6b5;} 
+
+.boxed { background-color: #000000;} 
+.underlined_5 	{border-bottom: solid 5px #000000;}
+.underlined_10 	{border-bottom: solid 10px #000000;}
+table caption { 
+background-color: #000000; 
+color: #ffffff;
+}
+
+#publishedStrip { 
+color: #000000;
+background: #f5f6b5; 
+}
+
+#menu .menupage {
+    margin: 0;
+    padding: 0;
+}
+
+#menu .menupageitem {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+    margin-left: 1em;
+    padding: 0;
+}
+
+#menu .menupagetitle  {
+    background-color: #9ac926;
+    padding: 0;
+    margin: 0;
+    border-style: none;
+    border-width: 0;
+}
+
+#menu {
+    border-color: #999999;
+    top: 0;
+    width: 12em;
+    font-size: 100%;
+}
+
+#menu .menupagetitle  { border-color: #999999;}
+
+#menu .menupageitemgroup  { border-color: #999999;}
+
+#menu { background-color: #f5f6b5;} 
+#menu {  color: #000000;} 
+#menu a:link {  color: #000000;} 
+#menu a:visited {  color: #000000;} 
+#menu a:hover {  
+background-color: #f5f6b5;
+color: #000000;} 
+ 
+#menu .menupagetitle  { color: #000000;}    
+#menu .menupageitemgroup     { 
+background-color: #CFDCED;
+}
+#menu .menupageitem {
+color: #000000;
+} 
+#menu .menupageitem a:link {  color: #0000ff;} 
+#menu .menupageitem a:visited {  color: #0000ff;} 
+#menu .menupageitem a:hover {  
+background-color: #CFDCED;
+color: #0000ff;
+}
+
+#content {
+    padding: 20px 20px 20px 16em;
+}
+
+body{ 
+background-color: #ffffff;
+color: #000000;
+} 
+a:link { color:#0000ff} 
+a:visited { color:#0000ff} 
+a:hover { color:#0000ff} 
+
+ 
+.ForrestTable      { background-color: #ccc;} 
+ 
+.ForrestTable td   { background-color: #ffffff;} 
+ 
+.highlight        { background-color: #ffff00;} 
+ 
+.fixme        { border-color: #cc6600;} 
+ 
+.note         { border-color: #006699;} 
+ 
+.warning         { border-color: #990000;} 
+ 
+.code         { border-color: #003366;} 
+ 
+#footer       { background-color: #f5f6b5;} 
+
+#menu h1 {
+color: #000000;
+background-color: #cfdced;
+}   
+ 
+#top .searchbox { 
+background-color: #f5f6b5 ;
+color: #000000; 
+} 

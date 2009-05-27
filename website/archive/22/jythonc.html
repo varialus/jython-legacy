@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>jythonc Guide</title>
+<link rel="stylesheet" href="../css/html4css1.css" type="text/css" />
+<link type="text/css" href="../css/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../css/screen.css" rel="stylesheet"> 
+<link media="print" type="text/css" href="../css/print.css" rel="stylesheet"> 
+<link type="text/css" href="../css/profile.css" rel="stylesheet"> 
+<!--[if lt IE 7]>
+<script defer type="text/javascript" src="../css/pngfix.js"></script>
+<![endif]-->
+</head>
+<body>
+<div id="top">
+<div class="header">
+<div class="grouplogo">
+<a href="./" ><img class="logoImage" alt="Jython" src="../css/jython.png" title="Jython"></a>
+</div>
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="www.jython.org" name="sitesearch" type="hidden"><input size="25" name="q" id="query" type="text">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+</div>
+</div>
+<div id="main"><div id="menu"><div class="menupage">
+<div class="menupagetitle">About</div>
+<div class="menupageitem"><a href="./index.html">Welcome</a></div> 
+<div class="menupageitem"><a href="./license.html">License</a></div> 
+<div class="menupageitem"><a href="./installation.html">Installation</a></div> 
+<div class="menupageitem"><a href="./userfaq.html">FAQ</a></div> 
+<div class="menupageitem"><a href="./news.html">News</a></div> 
+<div class="menupageitem"><a href="./history.html">History</a></div> 
+<div class="menupageitem"><a href="./download.html">Download</a></div> 
+<div class="menupageitem"><a href="./userguide.html">User Guide</a></div> 
+<div class="menupageitem"><a href="../21/index.html">Old Website</a></div> 
+<div class="menupagetitle">Community</div>
+<div class="menupageitem"><a href="http://wiki.python.org/jython/">Wiki</a></div> 
+<div class="menupageitem"><a href="./bugs.html">Reporting Bugs</a></div> 
+<div class="menupageitem"><a href="http://sourceforge.net/mail/?group_id=12867">Mailing Lists</a></div> 
+<div class="menupageitem"><a href="./devfaq.html">Developer FAQ</a></div> 
+<div class="menupageitem"><a href="http://wiki.python.org/jython/JythonDeveloperGuide">Developer Guide</a></div> 
+<div class="menupageitem"><a href="./roadmap.html">Jython Roadmap</a></div> 
+<div class="menupageitem"><a href="./contributors.html">Contributors</a></div> 
+<div class="menupagetitle"></div>
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://www.python.org"><img src="../css/PythonPoweredSmall.gif" /></a></div> 
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=12867" /></a></div> 
+</div>
+</div>
+</div>
+<div id="content"><div class="document" id="jythonc-guide">
+<h1 class="title">jythonc Guide</h1>
+<div class="contents topic">
+<p class="topic-title first"><a id="table-of-contents" name="table-of-contents">Table of Contents</a></p>
+<ul class="simple">
+<li><a class="reference" href="#what-is-jythonc" id="id1" name="id1">What is jythonc</a></li>
+<li><a class="reference" href="#using-jythonc" id="id2" name="id2">Using jythonc</a><ul>
+<li><a class="reference" href="#compiling-python-methods-to-java-methods" id="id3" name="id3">Compiling python methods to java methods</a></li>
+<li><a class="reference" href="#examples" id="id4" name="id4">Examples</a></li>
+<li><a class="reference" href="#freezing-modules" id="id5" name="id5">Freezing modules</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id1" id="what-is-jythonc" name="what-is-jythonc">What is jythonc</a></h1>
+<p>jythonc transforms Python source code into Java source code then invokes a Java
+compiler to turn it into .class files.  This allows Python to be integrated
+into Java in several places that regular Jython currently doesn't support.  It
+also processes special annotations in docstrings on methods in Python code to
+determine the static type information to expose when turning a dynmically typed
+Python method into a statically typed Java method.</p>
+<p><strong>jythonc is unmaintained and will not be present in its current form
+in Jython 2.5</strong>.  While jythonc handles all the language features of
+Python 2.2, it doesn't support Python 2.3 and later features such as
+generators.  As such, we cannot maintain the current jythonc going
+forward; however, Jython 2.5 will include a replacement (likely also
+called jythonc) which produces class files directly instead of
+generating Java source files.  The current jythonc is included in
+Jython 2.2.x to support existing users and for these features:</p>
+<ol class="arabic simple">
+<li>Running in a JVM with a classloader that will not load dynamically created classes</li>
+<li>Declaring Java method signatures in Python code</li>
+<li>Loading Python classes dynamically from Java with Class.forName</li>
+</ol>
+<p>Most uses of the second feature, adding method declarations to
+docstrings, can be handled by declaring a Java interface to implement
+with a Python class.  Each implementing Python method inherits its
+type signature from the corresponding method in the Java interface.
+Exposing the Python class as an instance of that type to Java code is
+explained in <a class="reference" href="http://wiki.python.org/jython/JythonMonthly/Articles/September2006/1">Accessing Jython from Java Without Using jythonc</a> and
+its followup, <a class="reference" href="http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3">Simple and Efficient Jython Object Factories</a>.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id2" id="using-jythonc" name="using-jythonc">Using jythonc</a></h1>
+<p>A script called <tt class="docutils literal"><span class="pre">jythonc</span></tt> should have been installed in the Jython
+installation directory when you installed the package. If it was not,
+it can be invoked as follows: <tt class="docutils literal"><span class="pre">jython</span> <span class="pre">Tools\jythonc\jythonc.py</span></tt>.</p>
+<p>The jythonc tool generates actual Java source code, and then invokes a
+Java compiler over this source code to create the .class files. Thus,
+you will need access to a Java compiler in order to use jythonc. It
+is recommended that you use Sun's standard javac compiler, or IBM's
+excellent jikes compiler. Specifically, the Microsoft SDK jvc compiler
+is not recommended.</p>
+<p>Invoke jythonc like this:</p>
+<pre class="literal-block">
+jythonc [options] [module]*
+</pre>
+<p>Options are given in the table below. Note that jythonc now uses the
+standard Python getopt module, meaning that both long and short forms
+of the options are available. The old option names still work, and are
+described below, but noted as deprecated and will be removed in a future
+version.</p>
+<pre class="literal-block">
+--package package
+-p package
+-package package      Put all compiled code into the named Java package.
+--jar jarfile
+-j jarfile
+-jar jarfile  Specifies a .jar file to create and put the results of
+the freeze into. Implies the --deep option.
+--deep
+-d
+-deep         Compile all Python dependencies of the module. This is
+used for creating applets.
+--core
+-c
+-core         Include the core Jython libraries (about 130K). Needed for
+applets since Netscape doesn't yet support multiple archives. Implies
+the --deep option.
+--all
+-a
+-all  Include all of the Jython libraries (everything in core +
+compiler and parser). Implies the --deep option.
+--bean jarfile
+-b jarfile
+-bean jarfile         Compile into jarfile, including the correct
+manifest for the bean.
+--addpackages pkgs
+-A pkgs
+-addpackages pkgs     Include Java dependencies from this list of
+packages. Default is org.python.modules and org.apache.oro.text.regex.
+--workdir directory
+-w directory
+-workdir directory    Specify the working directory where the generated
+Java source code is placed. Default is &quot;./jpywork&quot;
+--skip modules
+-s modules
+-skip modules         Don't include any of these modules in
+compilation. This is a comma-separated list of modules.
+--compiler path
+-C path
+-compiler path        Use a different compiler than `standard'
+javac. If this is set to &quot;NONE&quot; then compile ends with the generation
+of the Java source file. Alternatively, you can set the property
+python.jythonc.compiler in the registry.
+--compileropts options
+-J options    Options passed directly to the Java
+compiler. Alternatively, you can set the property
+python.jythonc.compileropts in the registry.
+--falsenames names
+-f names
+-falsenames names     A comma-separated list of names that are always
+false. Can be used to short-circuit if clauses.
+--help
+-h    Print a usage message and exit.
+[module]*     A list of Python modules to freeze. Can be either modules
+names that are on the python.path or .py files
+</pre>
+<p>In order to create real java class, the Python module must contain a
+Python class with the same name as the module, and that Python class
+must subclass exactly one Java class or interface. The real Java class
+created will be a subclass of whatever Java class is subclassed.</p>
+<div class="section">
+<h2><a class="toc-backref" href="#id3" id="compiling-python-methods-to-java-methods" name="compiling-python-methods-to-java-methods">Compiling python methods to java methods</a></h2>
+<p>Normally, compiled python methods are not directly callable from
+java. There is simple not sufficient information in a python method
+definition to create a useable java method. There are however two ways a
+python method be made into real java method. Both ways require that the
+python class have a java class or a java interface as its base classes.</p>
+<ul>
+<li><p class="first">Overriding / Implementing a java method.</p>
+<blockquote>
+<p>By overriding a java method, the overridden method's signature is
+used for the real java class. That includes return type, privacy
+modifier, arguments, argument types and throws clauses.</p>
+</blockquote>
+</li>
+<li><p class="first">Adding java method signature to python methods docstrings.</p>
+<blockquote>
+<p>Using a special convention in the method docstring allow for
+the creation of a corresponding java method. The signature must
+be written on one line and must start with the text &quot;&#64;sig&quot;. All
+class names (except those ion java.lang) must be specified as
+fully qualified class names. Example:</p>
+<pre class="literal-block">
+def setExpression(self, e):
+    &quot;&#64;sig public void setExpression(java.lang.String e)&quot;
+</pre>
+</blockquote>
+</li>
+</ul>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id4" id="examples" name="examples">Examples</a></h2>
+<p>On my Windows NT machine, I used the following command to create the
+file appletdemo.jar (containing all of the applet demos on the web site,
+as well as the core Jython libraries):</p>
+<pre class="literal-block">
+c:\jython\Demo\applet&gt; jythonc --core --deep --jar appletdemo.jar *.py
+</pre>
+<p>Note: One special thing to consider when building applets is the java VM
+version used when compiling the sources must usually be the same as the
+VM version used by the browser. If a newer JVM is used when compiling
+the applets, the compiled code may have references to classes that does
+not exists in older JVM's.</p>
+<p>To generate a skeleton class to allow a Python class to be used as
+java.awt.Component in a Java gui program, I used the following command:</p>
+<pre class="literal-block">
+c:\jython\Demo\javaclasses&gt; jythonc Graph.py
+</pre>
+<p>To generate a Jython-based bean I do the following:</p>
+<pre class="literal-block">
+c:\jython\Demo\bean&gt; jythonc --deep --bean f2c.jar
+conversion.FahrenheitToCelsius
+</pre>
+<p>To use this with SUN's BDK, I do the following (the important steps are
+to make the bean and the Jython libraries known to the tool).</p>
+<ol class="arabic simple">
+<li>modify BDKbeanboxrun.bat (or run.sh) to include the jythonJavaCode
+in the CLASSPATH</li>
+<li>copy f2c.jar to BDKjars</li>
+</ol>
+<p>You should now be able to access the FahrenheitToCelsius bean from SUN's
+BeanBox (or other Bean-aware tool).</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id5" id="freezing-modules" name="freezing-modules">Freezing modules</a></h2>
+<p>jythonc can also be used to freeze a python application. The frozen
+application can then be distributed and deployed as any other java
+application.</p>
+<p>Some diffrences between an interpreted application and a frozen
+application exists:</p>
+<ul class="simple">
+<li>Properties are diffrent</li>
+<li>sys.argv[0]</li>
+<li>loading of python classes</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="jythonc.txt">View document source</a>.
+
+</div>
+
+</div></div></body>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Installation</title>
+<link rel="stylesheet" href="../css/html4css1.css" type="text/css" />
+<link type="text/css" href="../css/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../css/screen.css" rel="stylesheet"> 
+<link media="print" type="text/css" href="../css/print.css" rel="stylesheet"> 
+<link type="text/css" href="../css/profile.css" rel="stylesheet"> 
+<!--[if lt IE 7]>
+<script defer type="text/javascript" src="../css/pngfix.js"></script>
+<![endif]-->
+</head>
+<body>
+<div id="top">
+<div class="header">
+<div class="grouplogo">
+<a href="./" ><img class="logoImage" alt="Jython" src="../css/jython.png" title="Jython"></a>
+</div>
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="www.jython.org" name="sitesearch" type="hidden"><input size="25" name="q" id="query" type="text">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+</div>
+</div>
+<div id="main"><div id="menu"><div class="menupage">
+<div class="menupagetitle">About</div>
+<div class="menupageitem"><a href="./index.html">Welcome</a></div> 
+<div class="menupageitem"><a href="./license.html">License</a></div> 
+<div class="menupageitem"><a href="./installation.html">Installation</a></div> 
+<div class="menupageitem"><a href="./userfaq.html">FAQ</a></div> 
+<div class="menupageitem"><a href="./news.html">News</a></div> 
+<div class="menupageitem"><a href="./history.html">History</a></div> 
+<div class="menupageitem"><a href="./download.html">Download</a></div> 
+<div class="menupageitem"><a href="./userguide.html">User Guide</a></div> 
+<div class="menupageitem"><a href="../21/index.html">Old Website</a></div> 
+<div class="menupagetitle">Community</div>
+<div class="menupageitem"><a href="http://wiki.python.org/jython/">Wiki</a></div> 
+<div class="menupageitem"><a href="./bugs.html">Reporting Bugs</a></div> 
+<div class="menupageitem"><a href="http://sourceforge.net/mail/?group_id=12867">Mailing Lists</a></div> 
+<div class="menupageitem"><a href="./devfaq.html">Developer FAQ</a></div> 
+<div class="menupageitem"><a href="http://wiki.python.org/jython/JythonDeveloperGuide">Developer Guide</a></div> 
+<div class="menupageitem"><a href="./roadmap.html">Jython Roadmap</a></div> 
+<div class="menupageitem"><a href="./contributors.html">Contributors</a></div> 
+<div class="menupagetitle"></div>
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://www.python.org"><img src="../css/PythonPoweredSmall.gif" /></a></div> 
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=12867" /></a></div> 
+</div>
+</div>
+</div>
+<div id="content"><div class="document" id="installation">
+<h1 class="title">Installation</h1>
+<div class="contents topic">
+<p class="topic-title first"><a id="contents" name="contents">Contents</a></p>
+<ul class="simple">
+<li><a class="reference" href="#jython-2-2-1" id="id1" name="id1">Jython 2.2.1</a><ul>
+<li><a class="reference" href="#basic-install" id="id2" name="id2">Basic Install</a></li>
+<li><a class="reference" href="#standalone-mode" id="id3" name="id3">Standalone mode</a></li>
+<li><a class="reference" href="#installation-options" id="id4" name="id4">Installation options</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#jython-2-1" id="id5" name="id5">Jython 2.1</a></li>
+<li><a class="reference" href="#what-can-go-wrong" id="id6" name="id6">What Can Go Wrong</a><ul>
+<li><a class="reference" href="#can-t-access-standard-python-modules" id="id7" name="id7">Can't Access Standard Python Modules</a></li>
+<li><a class="reference" href="#other-problems" id="id8" name="id8">Other Problems</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id1" id="jython-2-2-1" name="jython-2-2-1">Jython 2.2.1</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id2" id="basic-install" name="basic-install">Basic Install</a></h2>
+<p>Jython 2.2.1 is distributed as an executable jar file installer.  After
+<a class="reference" href="download.html">downloading</a> it, either double click the
+jython_installer-2.2.1.jar or run java with the -jar option</p>
+<pre class="literal-block">
+java -jar jython_installer-2.2.1.jar
+</pre>
+<p>This will start the regular GUI installer on most systems, or a
+consoler installer on headless systems.  To force the installer to
+work in headless mode invoke the installer with a console switch</p>
+<pre class="literal-block">
+java -jar jython_installer-2.2.1.jar --console
+</pre>
+<p>The installer will then walk through a similar set of steps in
+graphical or console mode: showing the license, selecting an install
+directory and JVM and actually copying Jython to the filesystem.
+After this completes, Jython is installed in the directory you
+selected.  There's a script in the install directory, jython on Unix
+like systems or jython.bat on Windows, that will start up the Jython
+console which can be used to dynamically explore Jython and the Java
+runtime.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id3" id="standalone-mode" name="standalone-mode">Standalone mode</a></h2>
+<p>The standalone option does no caching and so avoids the startup overhead (most likely at the cost of some speed in calling Java classes, but I have not profiled it)</p>
+<p>You can try it out by downloading the installer from <a class="reference" href="http://downloads.sourceforge.net/jython/jython_installer-2.2.1.jar">here</a></p>
+<p>running it like so:</p>
+<pre class="literal-block">
+$ java -jar jython_installer-2.2.1.jar
+</pre>
+<p>And when you come to the &quot;Installation type&quot; page, select &quot;Standalone&quot;.</p>
+<p>When the installation is done, you will have a jython.jar with the /Lib files included that can be run like this:</p>
+<pre class="literal-block">
+$ java -jar jython.jar
+</pre>
+<p>You will get a jython prompt with no caching.  Of course you can run scripts just by calling them as you might expect:</p>
+<pre class="literal-block">
+$ java -jar jython.jar script.py
+</pre>
+<p>And you can add this jar to the classpath of your app, which will allow standard imports.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id4" id="installation-options" name="installation-options">Installation options</a></h2>
+<p>You can get a list of the installer options by running:</p>
+<pre class="literal-block">
+$ java -jar jython_installer-2.2.1.jar --help
+</pre>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id5" id="jython-2-1" name="jython-2-1">Jython 2.1</a></h1>
+<p>Jython 2.1 is distributed as a self-extracting .class file created by
+LiftOff.  It is known to have problems running on Java 6, so if you
+want to use Jython with that JVM either install Jython-2.1 with an earlier
+JVM or use Jython-2.2.1.</p>
+<p>To install Jython, open the command line to the directory in which you have placed the jython-21.class file and then type:</p>
+<blockquote>
+&lt;java interpreter&gt; jython-21</blockquote>
+<p>You will probably type one of the following three lines, depending on your system. Be sure not to put &quot;.class&quot; at the end of the file name.</p>
+<blockquote>
+<p>java jython-21</p>
+<p>jre jython-21</p>
+<p>jview jython-21</p>
+</blockquote>
+<p>It can be necessay to set the CLASSPATH to include the current directory</p>
+<blockquote>
+<p>env CLASSPATH=. java jython-21</p>
+<p>java -cp . jython-21</p>
+<p>java -classpath . jython-21</p>
+<p>jview /cp:. jython-21</p>
+</blockquote>
+<p>Which command to use depends on your operating system and java version. If you have more than one java installed, you may have to supply an explicit path the java command.</p>
+<p>If you do not have a GUI, then add -o dir_to_install_to to the command above. Jython will install to the specified directory without bringing up the graphical installer. E.g. to install all modules to a Jython-2.1 subdirectory in the current directory do:</p>
+<blockquote>
+&lt;java interpreter&gt; jython-21 -o Jython-2.1 demo lib source</blockquote>
+<p>After completing installation, you should be able to run Jython by typing:</p>
+<blockquote>
+jython</blockquote>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id6" id="what-can-go-wrong" name="what-can-go-wrong">What Can Go Wrong</a></h1>
+<p>You should check out this section if your Jython installation doesn't
+quite work right. It will contain tips for solving the most common
+problems.</p>
+<div class="section">
+<h2><a class="toc-backref" href="#id7" id="can-t-access-standard-python-modules" name="can-t-access-standard-python-modules">Can't Access Standard Python Modules</a></h2>
+<p>Not all the modules form CPython is available in Jython. Some modules require a C language dynamic link library that doesn't exists in java. Other modules are missing from Jython just because nobody have had a need for it before and no-one have tested the CPython module with Jython. If you discover that you are missing a module, try to copy the .py file from a CPython distribution to a directory on your Jython sys.path. If that works you are set. If it doesn't work, try asking on jython-users mailing list.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id8" id="other-problems" name="other-problems">Other Problems</a></h2>
+<p>Any other problems with the installation should be reported to jython-dev.</p>
+<p>As a workaround you can extract the jython-21.class manually. The class file is basicly a .zip file and most unzip programs can manage to extract the contents of the class into a directory. After doing that, you must</p>
+<blockquote>
+<ul class="simple">
+<li>Remove the net directory. It isn't needed.</li>
+<li>Create the startup script by hand. Use the installer/template* files as a starting point in doing so.</li>
+</ul>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="installation.txt">View document source</a>.
+
+</div>
+
+</div></div></body>

@@ -1,0 +1,4 @@
+This page has been retired. Please see the NEWS_ file from our repository.
+
+.. _NEWS: https://jython.svn.sourceforge.net/svnroot/jython/trunk/jython/NEWS
+

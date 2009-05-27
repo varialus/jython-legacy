@@ -1,0 +1,1555 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Jython User Guide</title>
+<link rel="stylesheet" href="../css/html4css1.css" type="text/css" />
+<link type="text/css" href="../css/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../css/screen.css" rel="stylesheet"> 
+<link media="print" type="text/css" href="../css/print.css" rel="stylesheet"> 
+<link type="text/css" href="../css/profile.css" rel="stylesheet"> 
+<!--[if lt IE 7]>
+<script defer type="text/javascript" src="../css/pngfix.js"></script>
+<![endif]-->
+</head>
+<body>
+<div id="top">
+<div class="header">
+<div class="grouplogo">
+<a href="./" ><img class="logoImage" alt="Jython" src="../css/jython.png" title="Jython"></a>
+</div>
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="www.jython.org" name="sitesearch" type="hidden"><input size="25" name="q" id="query" type="text">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+</div>
+</div>
+<div id="main"><div id="menu"><div class="menupage">
+<div class="menupagetitle">About</div>
+<div class="menupageitem"><a href="./index.html">Welcome</a></div> 
+<div class="menupageitem"><a href="./license.html">License</a></div> 
+<div class="menupageitem"><a href="./installation.html">Installation</a></div> 
+<div class="menupageitem"><a href="./userfaq.html">FAQ</a></div> 
+<div class="menupageitem"><a href="./news.html">News</a></div> 
+<div class="menupageitem"><a href="./history.html">History</a></div> 
+<div class="menupageitem"><a href="./download.html">Download</a></div> 
+<div class="menupageitem"><a href="./userguide.html">User Guide</a></div> 
+<div class="menupageitem"><a href="../21/index.html">Old Website</a></div> 
+<div class="menupagetitle">Community</div>
+<div class="menupageitem"><a href="http://wiki.python.org/jython/">Wiki</a></div> 
+<div class="menupageitem"><a href="./bugs.html">Reporting Bugs</a></div> 
+<div class="menupageitem"><a href="http://sourceforge.net/mail/?group_id=12867">Mailing Lists</a></div> 
+<div class="menupageitem"><a href="./devfaq.html">Developer FAQ</a></div> 
+<div class="menupageitem"><a href="http://wiki.python.org/jython/JythonDeveloperGuide">Developer Guide</a></div> 
+<div class="menupageitem"><a href="./roadmap.html">Jython Roadmap</a></div> 
+<div class="menupageitem"><a href="./contributors.html">Contributors</a></div> 
+<div class="menupagetitle"></div>
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://www.python.org"><img src="../css/PythonPoweredSmall.gif" /></a></div> 
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=12867" /></a></div> 
+</div>
+</div>
+</div>
+<div id="content"><div class="document" id="jython-user-guide">
+<h1 class="title">Jython User Guide</h1>
+<div class="contents topic">
+<p class="topic-title first"><a id="table-of-contents" name="table-of-contents">Table of Contents</a></p>
+<ul class="simple">
+<li><a class="reference" href="#intro" id="id3" name="id3">Intro</a><ul>
+<li><a class="reference" href="#general-python-documentation" id="id4" name="id4">General Python Documentation</a></li>
+<li><a class="reference" href="#other-useful-links" id="id5" name="id5">Other Useful Links</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#invoking-the-jython-interpreter" id="id6" name="id6">Invoking the Jython Interpreter</a><ul>
+<li><a class="reference" href="#making-jython-scripts-executable" id="id7" name="id7">Making Jython Scripts Executable</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#the-jython-registry" id="id8" name="id8">The Jython Registry</a><ul>
+<li><a class="reference" href="#registry-properties" id="id9" name="id9">Registry Properties</a></li>
+<li><a class="reference" href="#finding-the-registry-file" id="id10" name="id10">Finding the Registry File</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#interaction-with-java-packages" id="id11" name="id11">Interaction with Java Packages</a><ul>
+<li><a class="reference" href="#accessing-java-from-jython" id="id12" name="id12">Accessing Java from Jython</a></li>
+<li><a class="reference" href="#more-details" id="id13" name="id13">More Details</a></li>
+<li><a class="reference" href="#importing" id="id14" name="id14">Importing</a></li>
+<li><a class="reference" href="#creating-class-instances" id="id15" name="id15">Creating Class Instances</a></li>
+<li><a class="reference" href="#calling-java-methods-and-functions" id="id16" name="id16">Calling Java Methods and Functions</a></li>
+<li><a class="reference" href="#overloaded-java-method-signatures" id="id17" name="id17">Overloaded Java Method Signatures</a></li>
+<li><a class="reference" href="#naming-conflicts-with-python-keywords" id="id18" name="id18">Naming Conflicts with Python Keywords</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#javabean-properties" id="id19" name="id19">JavaBean Properties</a><ul>
+<li><a class="reference" href="#properties" id="id20" name="id20">Properties</a></li>
+<li><a class="reference" href="#tuples" id="id21" name="id21">Tuples</a></li>
+<li><a class="reference" href="#event-properties" id="id22" name="id22">Event Properties</a></li>
+<li><a class="reference" href="#methods-properties-and-event-properties" id="id23" name="id23">Methods, Properties and Event Properties</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#java-arrays" id="id24" name="id24">Java Arrays</a></li>
+<li><a class="reference" href="#subclassing-java-classes-in-jython" id="id25" name="id25">Subclassing Java Classes in Jython</a><ul>
+<li><a class="reference" href="#a-short-example" id="id26" name="id26">A Short Example</a></li>
+<li><a class="reference" href="#calling-methods-in-your-superclass" id="id27" name="id27">Calling Methods in Your Superclass</a></li>
+<li><a class="reference" href="#example" id="id28" name="id28">Example</a></li>
+<li><a class="reference" href="#example-continued" id="id29" name="id29">Example Continued</a></li>
+<li><a class="reference" href="#invoking-your-superclass-s-constructor" id="id30" name="id30">Invoking Your Superclass's Constructor</a></li>
+<li><a class="reference" href="#id1" id="id31" name="id31">Example</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#embedding-jython" id="id32" name="id32">Embedding Jython</a><ul>
+<li><a class="reference" href="#using-jsr-223" id="id33" name="id33">Using JSR 223</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#java-reload-experimental-simple-support-jreload" id="id34" name="id34">Java Reload (experimental) simple Support - JReload</a><ul>
+<li><a class="reference" href="#id2" id="id35" name="id35">Example</a></li>
+<li><a class="reference" href="#java-classes-unloading" id="id36" name="id36">Java Classes Unloading</a></li>
+<li><a class="reference" href="#java-1-1" id="id37" name="id37">Java 1.1</a></li>
+<li><a class="reference" href="#jreload-example-source-files" id="id38" name="id38">JReload Example Source Files</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#database-connectivity-in-jython" id="id39" name="id39">Database connectivity in Jython</a><ul>
+<li><a class="reference" href="#using-a-datasource-or-connectionpooleddatasource" id="id40" name="id40">Using a DataSource (or ConnectionPooledDataSource)</a></li>
+<li><a class="reference" href="#using-a-jndi-lookup" id="id41" name="id41">Using a JNDI lookup</a></li>
+<li><a class="reference" href="#getting-a-cursor" id="id42" name="id42">Getting a Cursor</a><ul>
+<li><a class="reference" href="#sql-server" id="id43" name="id43">SQL Server</a></li>
+<li><a class="reference" href="#oracle" id="id44" name="id44">Oracle</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#datatype-mapping-callbacks-through-datahandler" id="id45" name="id45">Datatype mapping callbacks through DataHandler</a><ul>
+<li><a class="reference" href="#life-cycle" id="id46" name="id46">life cycle</a></li>
+<li><a class="reference" href="#developer-support" id="id47" name="id47">developer support</a></li>
+<li><a class="reference" href="#binding-prepared-statements" id="id48" name="id48">binding prepared statements</a></li>
+<li><a class="reference" href="#building-results" id="id49" name="id49">building results</a></li>
+<li><a class="reference" href="#callable-statement-support" id="id50" name="id50">callable statement support</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#dbexts" id="id51" name="id51">dbexts</a></li>
+<li><a class="reference" href="#configuration-file" id="id52" name="id52">Configuration file</a></li>
+<li><a class="reference" href="#api" id="id53" name="id53">API</a></li>
+<li><a class="reference" href="#example-session" id="id54" name="id54">Example session</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id3" id="intro" name="intro">Intro</a></h1>
+<!-- FIXME: need intro. -->
+<p>For a look at the Jython internal API see the generated
+<a class="reference" href="http://www.jython.org/docs/javadoc/index.html">JavaDoc documentation</a></p>
+<div class="section">
+<h2><a class="toc-backref" href="#id4" id="general-python-documentation" name="general-python-documentation">General Python Documentation</a></h2>
+<p>Since Jython is an implementation of Python for the JVM, most of
+the standard Python documentation applies.  Look in the following places for general information:</p>
+<ul class="simple">
+<li>The <a class="reference" href="http://www.python.org/doc/tut/tut.html">Python Tutorial</a> (start here)</li>
+<li>The <a class="reference" href="http://www.python.org/doc/lib/lib.html">Python Library Reference</a>. Although many of these modules are not
+yet implemented (those coded in C for CPython must be re-implemented
+in Java for Jython), those that are implemented follow the library
+reference as closely as possible.</li>
+<li>The <a class="reference" href="http://www.python.org/doc/current/ref/ref.html">Python Language Reference</a> (for language lawyers).</li>
+</ul>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id5" id="other-useful-links" name="other-useful-links">Other Useful Links</a></h2>
+<ul class="simple">
+<li>Jython and CPython are two different implementations of the
+same language. There are naturally some differences between the
+two implementations, sometimes reflecting undefined aspects of
+the Python language, sometimes reflecting quirks of the independent
+implementations.</li>
+<li>The <a class="reference" href="http://www.jython.org/Project/userfaq.html">Jython FAQ</a> may already contain the answer to your question.</li>
+<li>If it doesn't, then check  <a class="reference" href="http://sourceforge.net/mailarchive/forum.php?forum_id=5586">Jython-users mailing list archives</a>.</li>
+<li>If you are still stuck you can post a question to the <a class="reference" href="http://lists.sourceforge.net/lists/listinfo/jython-users">Jython-users mailing list</a></li>
+</ul>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id6" id="invoking-the-jython-interpreter" name="invoking-the-jython-interpreter">Invoking the Jython Interpreter</a></h1>
+<p>Jython is invoked using the &quot;jython&quot; script, a short script that invokes your local JVM, sets the Java
+property install.path to an appropriate value, and then runs the Java
+classfile org.python.util.jython.</p>
+<p>jython [options] [-jar jar | -c cmd | file | -] [args]</p>
+<dl class="docutils">
+<dt>options</dt>
+<dd>-i: Inspect interactively after running script; force prompts even if stdin is not a terminal.
+-S: Do not imply import site on initialization
+-Dprop=[value]: Set the jython property prop to value.</dd>
+<dt>-jar jar</dt>
+<dd>the program to run is read from the __run__.py file in the specified jar file</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-c <var>cmd</var></span></kbd></td>
+<td>program to run is passed in as the cmd string. This option terminates the options list file run file as the program script file</td></tr>
+</tbody>
+</table>
+<ul>
+<li><dl class="first docutils">
+<dt>program is read from standard-in (default; interactive mode is  used if on a tty).  This flag allows you to pipe a file into Jython and have it be treated correctly. For example:</dt>
+<dd><p class="first last">filter file | jython -</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="docutils">
+<dt>args</dt>
+<dd>arguments passed to the program in sys.argv[1:]</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--help</span></kbd></td>
+<td>print a usage message and exit</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--version</span></kbd></td>
+<td>print Jython version number and exit</td></tr>
+</tbody>
+</table>
+<div class="section">
+<h2><a class="toc-backref" href="#id7" id="making-jython-scripts-executable" name="making-jython-scripts-executable">Making Jython Scripts Executable</a></h2>
+<p>To make a jython &quot;.py&quot; file executable on a Unix system:</p>
+<ul class="simple">
+<li>Make sure that jython is on your standard PATH.</li>
+<li>Make the &quot;.py&quot; file executable.  Typically, this is done with the command chmod +x foo.py</li>
+<li>Add the following line to the top of the file:</li>
+</ul>
+<p>#! /usr/bin/env jython</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">&quot;#! &lt;...&gt;/jython&quot; will generally not work to make your script
+executable. This is because &quot;jython&quot; is itself a script, and  #!
+requires that the file to execute is a binary executable on most Unix
+variants. Using &quot;/usr/bin/env&quot; will get around this problem - and make
+your scripts more portable in the bargain.</p>
+</div>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id8" id="the-jython-registry" name="the-jython-registry">The Jython Registry</a></h1>
+<p>Because there is no good platform-independent equivalent of the Windows
+Registry or Unix environment variables, Java has its own environment
+variable namespace. Jython aquires its namespace from the following
+sources (later sources override defaults found in earlier places):</p>
+<ul class="simple">
+<li>The Java system properties, typically passed in on the command line
+as options to the java interpreter.</li>
+<li>The Jython &quot;registry&quot; file, containing prop=value pairs. See below
+for the algorithm Jython uses to find the registry file.</li>
+<li>The user's personal registry file, containing similarly formated
+prop/value pairs. The user's registry file can be found at  &quot;user.home&quot;+&quot;/.jython&quot;</li>
+<li>Jython properties specified on the command line as options to the
+jython class. See the -D option to the interpreter.</li>
+</ul>
+<div class="section">
+<h2><a class="toc-backref" href="#id9" id="registry-properties" name="registry-properties">Registry Properties</a></h2>
+<p>The following properties are recognized by Jython. There may be others
+that aren't documented here; consult the comments in registry file
+for details.</p>
+<dl class="docutils">
+<dt>python.path</dt>
+<dd>Equivalent to CPython's PYTHONPATH environment variable</dd>
+<dt>python.cachedir</dt>
+<dd>The directory to use for caches - currently just package
+information. This directory must be writable by the user. If the
+directory is an absolute path, it is used as given, otherwise it is
+interpreted as relative to sys.prefix.</dd>
+<dt>python.verbose</dt>
+<dd>Sets the verbosity level for varying degrees of informative
+messages. Valid values in order of increasing verbosity are &quot;error&quot;,
+&quot;warning&quot;, &quot;message&quot;, &quot;comment&quot;, &quot;debug&quot;</dd>
+<dt>python.security.respectJavaAccessibility</dt>
+<dd>Normally, Jython can only provide access to public members of
+classes. However if this property is set to false and you are
+using Java 1.2 then Jython can access non-public fields, methods,
+and constructors.</dd>
+<dt>python.jythonc.compiler</dt>
+<dd>The Java compiler to use with the jythonc tool, which now generates
+Java source code. This should be the absolute path to a Java compiler,
+or the name of a compiler on your standard PATH.</dd>
+<dt>python.jythonc.classpath</dt>
+<dd>Extensions to the standard java.class.path property for use with
+jythonc. This is useful if you use Jikes as your compiler.</dd>
+<dt>python.jythonc.compileropts</dt>
+<dd>Options to pass to the Java compiler when using jythonc.</dd>
+<dt>python.console</dt>
+<dd>The name of a console class. An alternative console class that
+supports GNU readline can be installed with this property. Jython
+already include such a console class and it can be enabled by setting
+this property to org.python.util.ReadlineConsole</dd>
+<dt>python.console.readlinelib</dt>
+<dd>Allow a choice of backing implementation for GNU readline support. Can
+be either GnuReadline or Editline. This property is only used when
+python.console is set to org.python.util.ReadlineConsole.</dd>
+</dl>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id10" id="finding-the-registry-file" name="finding-the-registry-file">Finding the Registry File</a></h2>
+<p>To find the Jython registry file and
+set the Python values for sys.prefix, you must first locate a root directory.</p>
+<ul class="simple">
+<li>If a &quot;python.home&quot; exists, it is used as the root directory by default.</li>
+<li>If &quot;python.home&quot; does not exist, &quot;install.root&quot; is used.</li>
+<li>If neither of these exist, then Jython searches for the
+file &quot;jython.jar&quot; on the Java classpath, as defined in the system
+property java.class.path. (The actual file system isn't searched, only
+the paths defined on the classpath and one of them must literally include
+&quot;jython.jar&quot;).</li>
+</ul>
+<p>Once the root directory is found, sys.prefix and sys.exec_prefix are set
+to this, and sys.path has rootdir/Lib appended to it. The registry file
+used is then rootdir/registry.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id11" id="interaction-with-java-packages" name="interaction-with-java-packages">Interaction with Java Packages</a></h1>
+<p>Most Jython applications will want to use the vast array of Java
+packages available. The following documentation helps you work with Java
+packages.</p>
+<ul class="simple">
+<li>Working with JavaBean properties, making all Java classes easier to
+use from Python.</li>
+<li>Special care is necessary to build and use Java arrays from Python.</li>
+<li>This document describes how to subclass Java classes in Python.</li>
+<li>The <a class="reference" href="jythonc.html">jythonc</a> utility compiles Python source code to real Java classes,
+and is used for building applets, servlets, beans, etc.</li>
+<li>Unloading of java classes and internalTablesImpl option.</li>
+<li>Reloading java classes.</li>
+</ul>
+<div class="section">
+<h2><a class="toc-backref" href="#id12" id="accessing-java-from-jython" name="accessing-java-from-jython">Accessing Java from Jython</a></h2>
+<p>One of the goals of Jython is to make it as simple as possible to use
+existing Java libraries from Python.
+Example</p>
+<p>The following example of an interactive session with Jython shows how
+a user could create an instance of the Java random number class (found
+in java.util.Random) and then interact with that instance.</p>
+<pre class="literal-block">
+C:\jython&gt;jython
+Jython 2.0 on java1.2.1
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from java.util import Random
+&gt;&gt;&gt; r = Random()
+&gt;&gt;&gt; r.nextInt()
+-790940041
+&gt;&gt;&gt; for i in range(5):
+...     print r.nextDouble()
+...
+0.23347681506123852
+0.8526595592189546
+0.3647833839988137
+0.3384865260567278
+0.5514469740469587
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id13" id="more-details" name="more-details">More Details</a></h2>
+<p>Hopefully, this example should make it clear that there are very few
+differences between using Java packages and using Python packages when
+working under Jython. There are a few things to keep in mind.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id14" id="importing" name="importing">Importing</a></h2>
+<pre class="literal-block">
+Jython 2.0 on java1.2.1
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from java.util import *
+&gt;&gt;&gt; Random
+&lt;jclass java.util.Random at 31702169&gt;
+&gt;&gt;&gt; Hashtable
+&lt;jclass java.util.Hashtable at 7538094&gt;
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id15" id="creating-class-instances" name="creating-class-instances">Creating Class Instances</a></h2>
+<p>You can create an instance of a Java class exactly the way you would
+create an instance of a Python class. You must &quot;call&quot; the class with
+a set of arguments that is appropriate for one of the Java class's
+constructors. See the section below for more details on what constitutes
+appropriate arguments.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id16" id="calling-java-methods-and-functions" name="calling-java-methods-and-functions">Calling Java Methods and Functions</a></h2>
+<p>Java classes have both static and instance methods this makes them
+behave much like a cross between a Python module and class. As a user,
+you should rarely need to be concerned with this difference.</p>
+<p>Java methods and functions are called just exactly like their Python
+counterparts. There is some automatic type coercion that goes on both for
+the types being passed in and for the value returned by the method. The
+following table shows how Python objects are coerced to Java objects
+when passed as arguments in a function call. The Java Types show the
+expected Java type for the argument, and the Allowed Python Types shows
+what Python objects can be converted to the given Java type. Notice the
+special behavior of String's when a java.lang.Object is expected. This
+behavior might change if it is shown to cause problems.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Java Types</th>
+<th class="head">Allowed Python Types</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>char</td>
+<td>String (must have length 1)</td>
+</tr>
+<tr><td>boolean</td>
+<td>Integer (true = nonzero)</td>
+</tr>
+<tr><td>byte, short, int, long</td>
+<td>Integer</td>
+</tr>
+<tr><td>float, double</td>
+<td>Float</td>
+</tr>
+<tr><td>java.lang.String, byte[], char[]</td>
+<td>String</td>
+</tr>
+<tr><td>java.lang.Class Class
+or JavaClass</td>
+<td>(only if class subclasses from exactly one Java class; mutiple inheritance from more than one Java
+class is now illegal)</td>
+</tr>
+<tr><td>Foo[]</td>
+<td>Array (must contain objects of class or subclass of Foo)</td>
+</tr>
+<tr><td>java.lang.Object</td>
+<td>String-&gt;java.lang.String, all others unchanged</td>
+</tr>
+<tr><td>org.python.core.PyObject</td>
+<td>All unchanged</td>
+</tr>
+<tr><td>Foo</td>
+<td>Instance-&gt;Foo (if Instance is subclass of Foo);
+JavaInstance -&gt; Foo (if JavaInstance is instance of Foo or subclass)</td>
+</tr>
+</tbody>
+</table>
+<p>Returned values from a Java method are also possibly coerced back to an
+object that is more readily usable in Python. The following table shows
+those coercions.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Java Type</th>
+<th class="head">Returned Python Type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>char</td>
+<td>String (of length 1)</td>
+</tr>
+<tr><td>boolean</td>
+<td>Integer (true = 1, false = 0)</td>
+</tr>
+<tr><td>byte, short, int, long</td>
+<td>Integer</td>
+</tr>
+<tr><td>float, double</td>
+<td>Float</td>
+</tr>
+<tr><td>java.lang.String</td>
+<td>String</td>
+</tr>
+<tr><td>java.lang.Class</td>
+<td>JavaClass which represents given Java class</td>
+</tr>
+<tr><td>Foo[]</td>
+<td>Array (containing objects of class or subclass of Foo)</td>
+</tr>
+<tr><td>org.python.core.PyObject (or subclass)</td>
+<td>Unchanged</td>
+</tr>
+<tr><td>Foo</td>
+<td>JavaInstance which represents the Java Class Foo</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id17" id="overloaded-java-method-signatures" name="overloaded-java-method-signatures">Overloaded Java Method Signatures</a></h2>
+<p>Java methods are allowed to be overloaded for different signatures (types
+and number of arguments). When different versions of the method differ
+in the number of arguments that they expect, the appropriate method can
+be easily determined from the number of arguments passed to the method.</p>
+<p>When the difference is instead in the types of the arguments, more
+work is required. The possible signatures are sorted in a consistent
+order that should ensure the appropriate method is chosen first. TBD:
+document this order!</p>
+<!-- FIXME - - really figure it out and document it. -->
+<p>If you need to call a Java method with a particular signature and this
+is not happening in the easy way, you can use the following workaround:</p>
+<p>Assume that foo has two methods, &quot;void foo(int x); void foo(byte x);&quot;. To
+call the second method you could write the following:</p>
+<pre class="literal-block">
+from java.lang import Byte
+foo(Byte(10))
+</pre>
+<p>I'm not convinced that any better solution to this problem is possible.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Look into IronPython's solution to this for ideas.</p>
+</div>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id18" id="naming-conflicts-with-python-keywords" name="naming-conflicts-with-python-keywords">Naming Conflicts with Python Keywords</a></h2>
+<p>Because Java has a different set of keywords than Python, there are
+many Java classes that have method and function names that conflict with
+Python's keyword set. Where the intent can be unambiguously determined,
+no identifier mangling is necessary, such as when keywords are used as
+attributes on objects. Thus you can naturally write:</p>
+<blockquote>
+java.lang.System.out.print(&quot;hi&quot;)</blockquote>
+<p>or</p>
+<blockquote>
+java.lang.Runtime.getRuntime().exec(cmd)</blockquote>
+<p>In the rare case where the conflict can't be resolved due to Python's
+grammar, you should modify the reserved word by appended an underscore
+to the end of it, e.g. <cite>print_</cite></p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id19" id="javabean-properties" name="javabean-properties">JavaBean Properties</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id20" id="properties" name="properties">Properties</a></h2>
+<p>Jython uses JavaBean properties to make it easier to interact with most Java classes. These properties can be used as normal object attributes, and can also be specified to the class constructor as keyword arguments (this idea is stolen from TkInter where it seems to work extremely well).</p>
+<p>These properties are generated automatically using the JavaBean Introspector which identifies properties either from common design patterns, or from explicitly specified BeanInfo.</p>
+<p>As a first example, consider the case where you wish to create a button that is disabled.</p>
+<p>The first example shows how you would do this in the typical Java fashion:</p>
+<pre class="literal-block">
+b = awt.Button()
+b.setEnabled(0)
+</pre>
+<p>The second example shows how enabled can be set as a property:</p>
+<pre class="literal-block">
+b = awt.Button()
+b.enabled = 0
+</pre>
+<p>The final example sets this property at instantiation time using a keyword argument:</p>
+<pre class="literal-block">
+b = awt.Button(enabled=0)
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id21" id="tuples" name="tuples">Tuples</a></h2>
+<p>If the value of a property is specified as a tuple, then the property will be created by applying the constructor for the type of the property to the tuple. This is particularly handy for specifying sizes:</p>
+<pre class="literal-block">
+frame = awt.Frame(size=(500,100))
+</pre>
+<p>It can also be handy for specifying color as an RGB triple:</p>
+<pre class="literal-block">
+frame.background = 255,255,0
+</pre>
+<p>will set the background color of the frame to yellow.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id22" id="event-properties" name="event-properties">Event Properties</a></h2>
+<p>In standard Java, the event handlers for a widget are specified by passing in an instance of a class that implements the appropriate interface. This is the only reasonable approach to take in a language that doesn't have first-class functions. In Jython, for every event listener supported by a class, there will be a property added to the class for each method supplied by the event listener class. These properties can be set to give a function to be called when the appropriate event occurs.</p>
+<p>The standard Java style for setting an event listener is shown below:</p>
+<pre class="literal-block">
+class action(awt.event.ActionListener):
+    def actionPerformed(self,event):
+        java.lang.System.exit(0)
+
+button = awt.Button(&quot;Close Me!&quot;)
+button.addActionListener(action())
+</pre>
+<p>This can be written in a more Pythonesque (and compact) style by using event properties as follows:</p>
+<pre class="literal-block">
+def exit(event):
+  java.lang.System.exit(0)
+
+button = awt.Button(&quot;Close Me!&quot;, actionPerformed=exit)
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id23" id="methods-properties-and-event-properties" name="methods-properties-and-event-properties">Methods, Properties and Event Properties</a></h2>
+<p>Jython have only one namespace for these three class attributes. Java can be seen as having a unique namespace for each of the three types. As a consequense, there can be conflicts between methods, properties and event properties. These conflicts are resolved so that:</p>
+<blockquote>
+properties &lt; event-properties &lt; fields &lt; methods</blockquote>
+<p>This means that a method will override a field with the same name. Some carefull handling of properties and static fields allow for the existence of, and access to, both an instance property and a static field with the same name.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id24" id="java-arrays" name="java-arrays">Java Arrays</a></h1>
+<p>Java Arrays in Jython - JArray
+Many Java methods require Java array objects as arguments. The way that these arguments are used means that they must correspond to fixed-length, mutable sequences, sometimes of primitive data types. The PyArray class is added to support these Java arrays and instances of this class will be automatically returned from any Java method call that produces an array. In addition, the &quot;jarray&quot; module is provided to allow users of Jython to create these arrays themselves, primarily for the purpose of passing them to a Java method.</p>
+<p>The jarray module exports two functions:</p>
+<pre class="literal-block">
+array(sequence, type)
+zeros(length, type)
+</pre>
+<p>array will create a new array of the same length as the input sequence and will populate it with the values in sequence. zeros will create a new array of the given length filled with zeros (or null's if appropriate).</p>
+<p>type can either be a single character typecode (using the same mappings as Python's array module) or it can be an instance of a JavaClass object. The valid typecodes are shown in the following table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Character Typecode</th>
+<th class="head">Corresponding Java Type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>z</td>
+<td>boolean</td>
+</tr>
+<tr><td>c</td>
+<td>char</td>
+</tr>
+<tr><td>b</td>
+<td>byte</td>
+</tr>
+<tr><td>h</td>
+<td>short</td>
+</tr>
+<tr><td>i</td>
+<td>int</td>
+</tr>
+<tr><td>l</td>
+<td>long</td>
+</tr>
+<tr><td>f</td>
+<td>float</td>
+</tr>
+<tr><td>d</td>
+<td>double</td>
+</tr>
+</tbody>
+</table>
+<p>A quick example:</p>
+<pre class="literal-block">
+from jarray import array
+a = array([ 1 ], 'i')
+print a
+from java.net import URL
+u = URL('http://jython.org')
+b = array([], URL)
+print b
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id25" id="subclassing-java-classes-in-jython" name="subclassing-java-classes-in-jython">Subclassing Java Classes in Jython</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id26" id="a-short-example" name="a-short-example">A Short Example</a></h2>
+<p>The example below should both demonstrate how this subclassing is
+performed and why it is useful. At first glance, the code looks exactly
+like subclassing any other Python class. The key difference in this
+example is that awt.event.ActionListener is a Java class, not a Python
+one. In the 4th line from the end, &quot;b.addListener(SpamListener())&quot;,
+a Java method is being called that requires an instance of the Java
+class ActionListener. By providing a Python subclass of this Java class,
+everybody is happy.</p>
+<pre class="literal-block">
+from java import awt
+
+class SpamListener(awt.event.ActionListener):
+    def actionPerformed(self,event):
+        if event.getActionCommand() == &quot;Spam&quot;:
+            print 'Spam and eggs!'
+
+f = awt.Frame(&quot;Subclassing Example&quot;)
+b = awt.Button(&quot;Spam&quot;)
+b.addActionListener(SpamListener())
+f.add(b, &quot;Center&quot;)
+f.pack()
+f.setVisible(1)
+</pre>
+<p>Note: This example can be accomplished much more elegantly by using
+JavaBeans properties (and event properties).</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id27" id="calling-methods-in-your-superclass" name="calling-methods-in-your-superclass">Calling Methods in Your Superclass</a></h2>
+<p>In Python, if I want to call the foo method in my superclass, I use the
+form:</p>
+<pre class="literal-block">
+SuperClass.foo(self)
+</pre>
+<p>This works with the majority of methods, but protected methods cannot
+be called from subclasses in this way. Instead you have to use the
+&quot;self.super__foo()&quot; call style.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id28" id="example" name="example">Example</a></h2>
+<p>The following example shows how the java.io.InputStream class can be
+effectively subclassed. What makes this class difficult is that the read
+method is overloaded for three different method signatures:</p>
+<ol class="arabic simple">
+<li>abstract int read()</li>
+<li>int read(byte[])</li>
+<li>int read(byte[], int, int)</li>
+</ol>
+<p>The first one of these methods must be overridden in a subclass. The
+other two versions can be ignored. Unfortunately, Python has no notion of
+method overloading based on type signatures (this might be related to the
+fact that Python doesn't have type signatures ;-) In order to implement
+a subclass of java.io.InputStream that overrides the &quot;read&quot; method,
+a Python method must be implemented that handles all three possible
+cases. The example below shows the easiest way to acheive this:</p>
+<pre class="literal-block">
+from java.io import InputStream
+
+class InfiniteOnes(InputStream):
+    def read(self, *args):
+        if len(args) &gt; 0:
+        # int read(byte[])
+        # int read(byte[], int, int)
+            return apply(InputStream.read, (self,)+args)
+        return 1
+
+io = InfiniteOnes()
+
+for i in range(10):
+    print io.read(),
+print
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id29" id="example-continued" name="example-continued">Example Continued</a></h2>
+<p>To continue the example above, this new instance of java.io.InputStream
+can be passed to any Java method that expects an InputStream as shown
+below:</p>
+<pre class="literal-block">
+from java.io import DataInputStream
+
+dp = DataInputStream(io)
+dp.skipBytes(1000)
+print dp.readByte()
+print dp.readShort()
+print dp.readInt()
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id30" id="invoking-your-superclass-s-constructor" name="invoking-your-superclass-s-constructor">Invoking Your Superclass's Constructor</a></h2>
+<p>You can explictly invoke your superclass's constructor using the standard
+Python syntax of explictly calling the &quot;__init__&quot; method on the superclass
+and passing in &quot;self&quot; as the first argument. If you wish to call your
+superclass's constructor, you must do so within your own &quot;__init__&quot;
+method. When your &quot;__init__&quot; method finishes, if your Java superclasses
+have not yet been explicitly initialized, their empty constructors will
+be called at this point.</p>
+<p>It's important to realize that your superclass is not initialized until
+you either explictly call it's &quot;__init__&quot; method, or your own &quot;__init__&quot;
+method terminates. You must do one of these two things before accessing
+any methods in your superclass.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id31" id="id1" name="id1">Example</a></h2>
+<pre class="literal-block">
+from java.util import Random
+
+class rand(Random):
+    def __init__(self, multiplier=1.0, seed=None):
+        self.multiplier = multiplier
+        if seed is None:
+            Random.__init__(self)
+        else:
+            Random.__init__(self, seed)
+
+    def nextDouble(self):
+        return Random.nextDouble(self) * self.multiplier
+
+r = rand(100, 23)
+
+for i in range(10):
+    print r.nextDouble()
+</pre>
+<p>This example shows how the superclass's constructor can be effectively
+called in order to explictly choose a non-empty version.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id32" id="embedding-jython" name="embedding-jython">Embedding Jython</a></h1>
+<p>There are two options for embedding Jython in a Java application.  You can make
+a real Java class out of a Python class, and then call it from your Java code,
+as previously described, or you can use the PythonInterpreter object</p>
+<p>Information on the PythonInterpreter can be found in the JavaDoc documentation for <a class="reference" href="http://www.jython.org/docs/javadoc/org/python/util/PythonInterpreter.html">org.python.util.PythonInterpreter</a>.</p>
+<p>The following example demonstrates how to use the PythonInterpreter to execute a simple Python program.</p>
+<p>The python program:</p>
+<pre class="literal-block">
+import sys
+print sys
+a = 42
+print a
+x = 2 + 2
+print &quot;x:&quot;,x
+</pre>
+<p>The java code required to execute the python program:</p>
+<pre class="literal-block">
+import org.python.core.PyException;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
+
+public class SimpleEmbedded {
+
+    public static void main(String[] args) throws PyException {
+        PythonInterpreter interp = new PythonInterpreter();
+        interp.exec(&quot;import sys&quot;);
+        interp.exec(&quot;print sys&quot;);
+        interp.set(&quot;a&quot;, new PyInteger(42));
+        interp.exec(&quot;print a&quot;);
+        interp.exec(&quot;x = 2+2&quot;);
+        PyObject x = interp.get(&quot;x&quot;);
+        System.out.println(&quot;x: &quot; + x);
+    }
+}
+</pre>
+<div class="section">
+<h2><a class="toc-backref" href="#id33" id="using-jsr-223" name="using-jsr-223">Using JSR 223</a></h2>
+<p>JSR 223, Scripting for the Java language, added the javax.script pacakge to
+Java 6.  It allows multiple scripting languages to be used through the same API
+as long as the language provides a script engine.  The <a class="reference" href="https://scripting.dev.java.net/">scripting project</a>
+contains such an engine for Jython.  It can be used to embed Jython in your
+application alongside many other languages that have script engines such as JRuby or Groovy.</p>
+<p>The usage of PythonInterpreter above translates to the following using JSR 223:</p>
+<pre class="literal-block">
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+public class JSR223 {
+
+    public static void main(String[] args) throws ScriptException {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName(&quot;python&quot;);
+        engine.eval(&quot;import sys&quot;);
+        engine.eval(&quot;print sys&quot;);
+        engine.put(&quot;a&quot;, 42);
+        engine.eval(&quot;print a&quot;);
+        engine.eval(&quot;x = 2 + 2&quot;);
+        Object x = engine.get(&quot;x&quot;);
+        System.out.println(&quot;x: &quot; + x);
+    }
+}
+</pre>
+<p>To use JSR 223 with Jython, <a class="reference" href="https://scripting.dev.java.net/servlets/ProjectDocumentList">download the engine</a> and add it to your classpath
+along with Jython.  Then use code like the above to create and use an engine.
+One difference between embedding with JSR 223 and using PythonInterpreter
+directly is that the scripting engine manages its own PySystemState per thread
+so it can always set the classloader to the thread's context classloader.  This
+means if you want to do anything Jython specific to PySystemState, like adding
+to sys.path or setting sys.stdin and sys.stdout, you should do it after
+creating the ScriptEngine.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id34" id="java-reload-experimental-simple-support-jreload" name="java-reload-experimental-simple-support-jreload">Java Reload (experimental) simple Support - JReload</a></h1>
+<p>Introduction and usage, plus some notes on java classes unloading and
+internalTablesImpl option</p>
+<p>The &quot;jreload&quot; module is not the definitive word about java classes
+reloading under jython. It is still experimental and its interface may
+improve or change to become more pythonic.</p>
+<p>&quot;jreload&quot; cannot cover all the possible reload-flavors, and its goal
+is to offer a simple interface for the most common cases, e.g. quick
+trial-and-error experimenting.</p>
+<p>Java classes reloading in jython is not enabled by &quot;jreload&quot;, some of
+the modifications occurred to jython run-time have made it possible. Now
+jython can deal with java classes with the same name (without clashes)
+and run-time supports unloading of java classes by different ways,
+which is a must feature for some uses of reloading</p>
+<p>[The expert user can now play directly with class-loaders and reloading
+as he would from java.]</p>
+<p>The main idea of the &quot;jreload&quot; interface is that of a load-set. A
+load-set is a package-like object that can host a complete hierarchy of
+java packages, which can be reloaded as a whole.</p>
+<p>Why there is no support for reloading a single class? Java classes are
+loaded through class-loaders, actually there is no support in java to
+redefine an already loaded class through its class-loader. In order to
+reload a class one should create a new class-loader, but classes from
+different class-loaders cannot interoperate, so we need to reload all
+related classes through the new class-loader. Note: The normal python
+reload built-in does nothing for java classes and simply returns the
+old version.</p>
+<p>The &quot;jreload&quot; module exports the following functions:</p>
+<pre class="literal-block">
+makeLoadSet(name, path)
+reload(loadSet)
+</pre>
+<p>makeLoadSet creates and returns a new load-set with the given name. The
+created load-set will behave like a package and import statement related
+to it can be issued. name should be a valid python identifier like any
+python module name and should not clash with any module that has been
+or will be imported. Internally the created load-set will be added to
+sys.modules, the same way it happens to modules on import. You can issue
+the same makeLoadSet from many places, it is idempotent like modules
+imports are.</p>
+<p>path should be a list of directory or jar paths. The created load-set will
+enable importing the classes present there. path should be disjoint from
+both sys.path and java classpath, otherwise one can get very confusing
+results.</p>
+<p>For example: if a load-set 'X' is created and its hierarchy contains
+java packages 'p' and 'p.q', then the following references can be used
+in import statements: 'X', 'X.p', 'X.p.q'.</p>
+<p>reload(loadSet) reloads all the classes in the package hierarchy hosted
+by loadSet and returns loadSet.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">The current version of &quot;jreload&quot; (jreload.__version__=='0.3')
+does not support removing or substituting jars on the fly.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id35" id="id2" name="id2">Example</a></h2>
+<p>The following example should help make things clearer: (its files should
+be present in the jython Demo dir)
+# Demo/jreload/example.jar contains example.Version (source) and
+example.PrintVer (source)
+# Demo/jreload/_xample contains a slightly modified version of
+example.Version (source)</p>
+<pre class="literal-block">
+&gt;&gt;&gt; import sys
+&gt;&gt;&gt; import os
+&gt;&gt;&gt; import jreload
+&gt;&gt;&gt; def xp(name): return os.path.join(sys.prefix,'Demo/jreload/'+name)
+# builds a path under 'Demo/jreload'
+...
+&gt;&gt;&gt; X=jreload.makeLoadSet('X',[xp('.'),xp('example.jar')])
+&gt;&gt;&gt; from X import example
+&gt;&gt;&gt; dir(example)
+['PrintVer', 'Version', '__name__']
+&gt;&gt;&gt; X.example.Version
+&lt;jclass example.Version at 6781345&gt;
+&gt;&gt;&gt; from X.example import * # works but in general import * from java
+pkgs is not for production code
+&gt;&gt;&gt; v=Version(1)
+&gt;&gt;&gt; PrintVer.print(v)
+version 1
+&gt;&gt;&gt; os.rename(xp('_xample'),xp('example')) # _xample becomes example,
+hiding and &quot;patching&quot; jar contents
+&gt;&gt;&gt; jreload.reload(X) # (re)loads example dir example.Version and
+jar example.PrintVer
+&lt;java load-set X&gt;
+&gt;&gt;&gt; nv2=example.Version(2)
+&gt;&gt;&gt; example.PrintVer.print(nv2)
+new version 2
+&gt;&gt;&gt; PrintVer.print(nv2)
+Traceback (innermost last):
+  File &quot;&lt;console&gt;&quot;, line 1, in ?
+TypeError: print(): 1st arg can't be coerced to example.Version
+&gt;&gt;&gt; example.PrintVer.print(v)
+Traceback (innermost last):
+  File &quot;&lt;console&gt;&quot;, line 1, in ?
+TypeError: print(): 1st arg can't be coerced to example.Version
+&gt;&gt;&gt; os.rename(xp('example'),xp('_xample'))
+</pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Differently from python packages reload, load-sets reload the
+complete hosted hierarchy.</p>
+</div>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Class versions across reloads are not interoperable.</p>
+</div>
+<p>Like for python classes and python reload, old versions are kept around,
+if there are still references to them. But what happens if they are no
+longer used?</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id36" id="java-classes-unloading" name="java-classes-unloading">Java Classes Unloading</a></h2>
+<p>One would expect that no longer referenced java classes would be unloaded,
+but the situation is not that simple.</p>
+<p>In order to give a python-class-like view on python side and for
+implementation reasons jython wraps java classes (in instances of
+org.python.core.PyJavaClass). Clearly the mapping from java classes to
+their wrapped version should be unique (e.g. to guarantee == and 'is'
+semantic). So jython keeps this mapping in an internal table. This is
+also good because building the wrappers is expensive.</p>
+<p>Note: Typically one should care about java classes unloading only for
+very dynamic applications, like IDEs or long-running apps, that would
+go out memory if old versions of reloaded classes would not be collected.</p>
+<p>Clearly the entries somehow block unloading. On the other hand java
+classes unloading is just a memory consumption optimization (and as such
+is it presented in Java Language Specification). Actual jvms clearly
+support this. JPython simply kept the entries in the table forever but
+Jython and &quot;jreload&quot; try to make unloading possible.</p>
+<p>Note: java never unloads system classes (java.* etc) nor classes from
+classpath. Further Jython cannot unload sys.path java classes. So
+the whole unload issue makes sense only with &quot;jreload&quot; or custom
+class-loaders.
+Java 2 and jython internalTablesImpl option</p>
+<p>Under java2 jython offers table implementations that exploit soft/weak
+references in order to discard entries (when this is OK) for unloading.</p>
+<p>A possible policy would be to keep an entry as long as the corresponding
+java class is still referenced outside the table (both by java or jython
+code). But this one cannot be implemented. [Tech.: One cannot add fields
+to final java class java.lang.Class!] So entries are kept as long as
+the wrapped version is still in use.
+These implementations can be chosen trough
+python.options.internalTablesImpl registry option. Note: they only
+influence classes unloading, there is no need and reason to use them,
+unless one depends on class unloading to avoid memory leakage.</p>
+<p>internalTablesImpl = weak -- Sets implementation using weak-refs. Table
+entries for not referenced (outside the table) wrapped versions are
+&quot;discarded&quot; at garbage collection points. If a class or some of its
+instances are continuously passed from java to jython side, but no
+long-living reference to it is kept from jython side, this can imply a
+performance penalty (rebuilding the wrapped version is expensive). On
+the other hand this is a good setting for testing if unloading actually
+happens or some references hunting around prevent it.</p>
+<p>[Note: With jdk 1.3 java -verbose:class can help tracking class unloads,
+and System.gc forces class unloading. With jdk 1.2 java -verbose:gc should
+give some information on class unloading, but unloading of classes happen
+at unpredictable points and System.gc does not trigger it. Also weak-refs
+allow testing for unloading and gc.]</p>
+<p>internalTablesImpl = soft --Sets implementation using soft-refs. Table
+entries for not referenced (outside the table) wrapped
+versions are &quot;discarded&quot; on memory shortage, given soft-reference
+definition. Soft-references behavior is not specified in full details,
+so the actual behavior will depend on the concrete jvm. But if actual
+(jvm) implementations are not too bad, this should be a good setting
+for production code, which relies on unloading to avoid out of memory
+failures.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id37" id="java-1-1" name="java-1-1">Java 1.1</a></h2>
+<p>To be honest the unloading support that jython can offer under java
+1.1 (given the absence of weak/soft-refs) is error-prone and anything
+serious would require &quot;too much&quot; caution, but this should not be a real
+issue. Support is offered only for &quot;jreload&quot; needs, in these forms:</p>
+<p># Before reload(X) one can issue X.unload(). X.unload() discards all the
+entries for the old versions of the classes in X. This is safe only if
+all python subclasses and all instances of them have been destroyed.
+# One can &quot;extract&quot; the information needed in order to discard the
+entries for the versions actually present in X at a later point (after
+a whole series of reloads):</p>
+<blockquote>
+u_t1=X.unload # extract unload info for time t1 versions
+... reloads ...
+u_t1() # discard entries for time t1 versions</blockquote>
+<p>u_t1() is safe only if at that point all subclasses/instances of the
+involved versions have been destroyed.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">these idioms work also with the standard internal tables
+implementation under java2, and for compatibility even with the weak/soft
+implementations.</p>
+</div>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id38" id="jreload-example-source-files" name="jreload-example-source-files">JReload Example Source Files</a></h2>
+<p>Jar example.Version</p>
+<pre class="literal-block">
+package example;
+
+public class Version {
+
+ private int ver;
+
+ public Version(int ver) {
+  this.ver = ver;
+ }
+
+ public String toString() {
+   return &quot;version &quot;+ver;
+ }
+
+}
+</pre>
+<p>example.PrintVer</p>
+<pre class="literal-block">
+package example;
+
+public class PrintVer {
+
+ static public void print(Version ver) {
+  System.out.println(ver);
+ }
+
+}
+</pre>
+<p>New example.Version</p>
+<pre class="literal-block">
+package example;
+
+public class Version {
+
+ private int ver;
+
+ public Version(int ver) {
+  this.ver = ver;
+ }
+
+ public String toString() {
+   return &quot;new version &quot;+ver;
+ }
+
+}
+</pre>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id39" id="database-connectivity-in-jython" name="database-connectivity-in-jython">Database connectivity in Jython</a></h1>
+<p>The zxJDBC package provides a nearly 100% Python <a class="reference" href="http://www.python.org/dev/peps/pep-0249/">DB API 2.0</a> compliant
+interface for database connectivity in Jython. It is implemented entirely
+in Java and makes use of the JDBC API. This means any database capable
+of being accessed through JDBC, either directly or using the JDBC-ODBC
+bridge, can be manipulated using zxJDBC.
+Getting a Connection</p>
+<p>First, make sure a valid JDBC driver is in your classpath. Then start
+Jython and import the zxJDBC connection factory.
+Using a Driver</p>
+<p>The most common way to establish a connection is through a Driver. Simply
+supply the database, username, password and JDBC driver classname to
+the connect method. If your driver requires special arguments, pass them
+into the connect method as standard Python keyword arguments. You will
+be returned a connection object.</p>
+<pre class="literal-block">
+Jython 2.1b1 on java1.4.0-beta3 (JIT: null)
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from com.ziclix.python.sql import zxJDBC
+&gt;&gt;&gt; d, u, p, v = &quot;jdbc:mysql://localhost/test&quot;, None, None,
+&quot;org.gjt.mm.mysql.Driver&quot;
+&gt;&gt;&gt; db = zxJDBC.connect(d, u, p, v)
+ optionally
+&gt;&gt;&gt; db = zxJDBC.connect(d, u, p, v, CHARSET='iso_1')
+&gt;&gt;&gt;
+</pre>
+<div class="section">
+<h2><a class="toc-backref" href="#id40" id="using-a-datasource-or-connectionpooleddatasource" name="using-a-datasource-or-connectionpooleddatasource">Using a DataSource (or ConnectionPooledDataSource)</a></h2>
+<p>The only required argument is the fully-qualified classname of the
+DataSource, all keywords will use JavaBeans reflection to set properties
+on the DataSource.</p>
+<pre class="literal-block">
+Jython 2.1b1 on java1.4.0-beta3 (JIT: null)
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from com.ziclix.python.sql import zxJDBC
+&gt;&gt;&gt; params = {}
+&gt;&gt;&gt; params['serverName'] = 'localhost'
+&gt;&gt;&gt; params['databaseName'] = 'ziclix'
+&gt;&gt;&gt; params['user'] = None
+&gt;&gt;&gt; params['password'] = None
+&gt;&gt;&gt; params['port'] = 3306
+&gt;&gt;&gt; db = apply(zxJDBC.connectx, (&quot;org.gjt.mm.mysql.MysqlDataSource&quot;,),
+params)
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id41" id="using-a-jndi-lookup" name="using-a-jndi-lookup">Using a JNDI lookup</a></h2>
+<p>It is possible for zxJDBC to use a Connection found through a JNDI
+lookup. This is particularly useful in an application server (such as when
+using PyServlet). The bound object can be either a String, Connection,
+DataSource or ConnectionPooledDataSource. The lookup will figure out
+the instance type and access the Connection accordingly,</p>
+<p>The only required argument is the JNDI lookup name. All keyword arguments
+will be converted to their proper Context field value if the keyword
+matches one of the constants. If a field name does not exist for the
+keyword, it will passed as declared. The resulting environment will be
+used to build the InitialContext.</p>
+<p>This example uses the simple Sun FileSystem JNDI reference
+implementation. Please consult the JNDI implementation you intend to use
+for the InitialContextFactory classname as well as the connection URL.</p>
+<pre class="literal-block">
+Jython 2.1b1 on java1.4.0-beta3 (JIT: null)
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from com.ziclix.python.sql import zxJDBC
+&gt;&gt;&gt; jndiName = &quot;/temp/jdbc/mysqldb&quot;
+&gt;&gt;&gt; factory = &quot;com.sun.jndi.fscontext.RefFSContextFactory&quot;
+&gt;&gt;&gt; db = zxJDBC.lookup(jndiName, INITIAL_CONTEXT_FACTORY=factory)
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id42" id="getting-a-cursor" name="getting-a-cursor">Getting a Cursor</a></h2>
+<p>In order execute any operation, a cursor is required from the
+connection. There are two different kinds of cursors: static and dynamic.</p>
+<p>The primary difference between the two is the way they manage the
+underlying ResultSet. In the static version, the entire ResultSet is
+iterated immediately, the data converted and stored with the cursor
+and the ResultSet closed. This allows the cursor to know the rowcount
+(not available otherwise within JDBC) and set the .rowcount attribute
+properly. The major disadvantage to this approach is the space/time
+constraints might be extraordinary.</p>
+<p>The solution to the problem are dynamic cursors which keep a handle to
+the open ResultSet and iterate as required. This drastically decreases
+memory consumption and increases perceived response time because no work
+is done until asked. The drawback is the .rowcount attribute can never
+be accurately set.</p>
+<p>To execute a query simply provide the SQL expression and call
+execute. The cursor now has a description attribute detailing the column
+information. To navigate the result set, call one of the fetch methods
+and a list of tuples will be returned.</p>
+<pre class="literal-block">
+&gt;&gt;&gt; c = db.cursor()   # this gets a static cursor
+ or
+&gt;&gt;&gt; c = db.cursor(1)  # this gets a dynamic cursor
+&gt;&gt;&gt; c.execute(&quot;select count(*) c from player&quot;)
+&gt;&gt;&gt; c.description
+[('c', 3, 17, None, 15, 0, 1)]
+&gt;&gt;&gt; for a in c.fetchall():
+...  print a
+...
+(13569,)
+&gt;&gt;&gt;
+</pre>
+<p>When finished, close the connections.</p>
+<pre class="literal-block">
+&gt;&gt;&gt; c.close()
+&gt;&gt;&gt; db.close()
+&gt;&gt;&gt;
+</pre>
+<p>To call a stored procedure or function provide the name and any params
+to callproc. The database engine must support stored procedures. The
+examples below have been tested with Oracle, SQLServer and Informix. Refer
+to the Python DP API spec for how OUT and INOUT parameters work.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">The name of the stored procedure can either be a string or
+tuple. This is NOT portable to other DB API implementations.</p>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id43" id="sql-server" name="sql-server">SQL Server</a></h3>
+<pre class="doctest-block">
+&gt;&gt;&gt; c = db.cursor() # open the database as in the examples above
+&gt;&gt;&gt; c.execute(&quot;use northwind&quot;)
+&gt;&gt;&gt; c.callproc((&quot;northwind&quot;, &quot;dbo&quot;, &quot;SalesByCategory&quot;), [&quot;Seafood&quot;,
+&quot;1998&quot;], maxrows=2)
+&gt;&gt;&gt; for a in c.description:
+...  print a
+...
+('ProductName', -9, 40, None, None, None, 0)
+('TotalPurchase', 3, 17, None, 38, 2, 1)
+&gt;&gt;&gt; for a in c.fetchall():
+...  print a
+...
+('Boston Crab Meat', 5318.0)
+('Carnarvon Tigers', 8497.0)
+&gt;&gt;&gt; c.nextset()
+1
+&gt;&gt;&gt; print c.fetchall()
+[(0,)]
+&gt;&gt;&gt; print c.description
+[('&#64;RETURN_VALUE', 4, -1, 4, 10, 0, 0)]
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id44" id="oracle" name="oracle">Oracle</a></h3>
+<pre class="doctest-block">
+&gt;&gt;&gt; c = db.cursor() # open the database as in the examples above
+&gt;&gt;&gt; c.execute(&quot;create or replace function funcout (y out varchar2)
+return varchar2 is begin y := 'tested'; return 'returned'; end;&quot;)
+&gt;&gt;&gt; params = [None]
+&gt;&gt;&gt; c.callproc(&quot;funcout&quot;, params)
+&gt;&gt;&gt; print params
+['tested']
+&gt;&gt;&gt; print c.description
+[(None, 12.0, -1, None, None, None, 1)]
+&gt;&gt;&gt; print c.fetchall()
+[('returned',)]
+&gt;&gt;&gt;
+</pre>
+<p>When finished, close the connections.</p>
+<pre class="doctest-block">
+&gt;&gt;&gt; c.close()
+&gt;&gt;&gt; db.close()
+&gt;&gt;&gt;
+</pre>
+<p>Standard extensions to the Python DB API</p>
+<ul class="simple">
+<li>connection.dbname: Same as DatabaseMetaData.getDatabaseProductName</li>
+<li>connection.dbversion: Same as DatabaseMetaData.getDatabaseProductVersion</li>
+<li>cursor.updatecount: The value obtained from calling Statement.getUpdateCount</li>
+<li>cursor.lastrowid: The value obtained from calling DataHandler.getRowId</li>
+<li>cursor.tables(qualifier,owner,table,type): Same as DatabaseMetaData.getTables</li>
+<li>cursor.columns(qualifier,owner,table,column): Same as DatabaseMetaData.getColumns</li>
+<li>cursor.foreignkeys(primary_qualifier,primary_owner,pimary_table, foreign_qualifier,foreign_owner,foreign_table): Same as DatabaseMetaData.getCrossReference</li>
+<li>cursor.primarykeys(qualifier,owner,table): Same as DatabaseMetaData.getPrimaryKeys</li>
+<li>cursor.procedures(qualifier,owner,procedure): Same as DatabaseMetaData.getProcedures</li>
+<li>cursor.procedurecolumns(qualifier,owner,procedure,column): Same as DatabaseMetaData.getProcedureColumns</li>
+<li>cursor.statistics(qualifier,owner,table,unique,accuracy): Same as DatabaseMetaData.getIndexInfo</li>
+</ul>
+</div>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id45" id="datatype-mapping-callbacks-through-datahandler" name="datatype-mapping-callbacks-through-datahandler">Datatype mapping callbacks through DataHandler</a></h2>
+<p>The DataHandler interface has three methods for handling type
+mappings. They are called at two different times, one when fetching and
+the other when binding objects for use in a prepared statement. I have
+chosen this architecture for type binding because I noticed a number
+of discrepancies in how different JDBC drivers handled database types,
+in particular the additional types available in later JDBC versions.</p>
+<div class="section">
+<h3><a class="toc-backref" href="#id46" id="life-cycle" name="life-cycle">life cycle</a></h3>
+<dl class="docutils">
+<dt>public void preExecute(Statement stmt) throws SQLException;</dt>
+<dd>A callback prior to each execution of the statement. If the statement
+is a PreparedStatement (created when parameters are sent to the
+execute method), all the parameters will have been set.</dd>
+<dt>public void postExecute(Statement stmt) throws SQLException;</dt>
+<dd>A callback after successfully executing the statement. This is
+particularly useful for cases such as auto-incrementing columns
+where the statement knows the inserted value.</dd>
+</dl>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id47" id="developer-support" name="developer-support">developer support</a></h3>
+<dl class="docutils">
+<dt>public String getMetaDataName(String name);</dt>
+<dd>A callback for determining the proper case of a name used in a
+DatabaseMetaData method, such as getTables(). This is particularly
+useful for Oracle which expects all names to be upper case.</dd>
+<dt>public PyObject getRowId(Statement stmt) throws SQLException;</dt>
+<dd>A callback for returning the row id of the last insert statement.</dd>
+</dl>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id48" id="binding-prepared-statements" name="binding-prepared-statements">binding prepared statements</a></h3>
+<dl class="docutils">
+<dt>public Object getJDBCObject(PyObject object, int type);</dt>
+<dd>This method is called when a PreparedStatement is created through
+use of the execute method. When the parameters are being bound to
+the statement, the DataHandler gets a callback to map the type. This
+is only called if type bindings are present.</dd>
+<dt>public Object getJDBCObject(PyObject object);</dt>
+<dd>This method is called when no type bindings are present during the
+execution of a PreparedStatement.</dd>
+</dl>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id49" id="building-results" name="building-results">building results</a></h3>
+<dl class="docutils">
+<dt>public PyObject getPyObject(ResultSet set, int col, int type);</dt>
+<dd>This method is called upon fetching data from the database. Given
+the JDBC type, return the appropriate PyObject subclass from the
+Java object at column col in the ResultSet set.</dd>
+</dl>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id50" id="callable-statement-support" name="callable-statement-support">callable statement support</a></h3>
+<pre class="literal-block">
+public PyObject getPyObject(CallableStatement stmt, int col, int type)
+throws SQLException;
+   This method is called upon fetching data from the database after
+   calling a stored procedure or function. Given the JDBC type, return
+   the appropriate PyObject subclass from the Java object at column
+   col in the CallableStatement.
+
+public void registerOut(CallableStatement statement, int index, int
+colType, int dataType, String dataTypeName) throws SQLException;
+   This method is called to register an OUT or INOUT parameter on the
+   stored procedure. The dataType comes from java.sql.Types while the
+   dataTypeName is a vendor specific string.
+
+public String getProcedureName(PyObject catalog, PyObject schema,
+PyObject name);
+   This method is called to build a stored procedure's name.
+</pre>
+<p>It is simple to use these callbacks to achieve the desired result for your
+database driver. In the majority of cases nothing needs to be done to get
+the correct datatype mapping. However, in the cases where drivers differ
+from the spec or handle values differently, the DataHandler callbacks
+should provide the solution.
+Example DataHandler for Informix booleans</p>
+<p>One such case where a driver needs a special mapping is Informix
+booleans. The are represented as the characters 't' and 'f' in the
+database and have their own type boolean. You can see from the example
+below, without the special DataHandler, the boolean type mapping fails.</p>
+<pre class="literal-block">
+Jython 2.1b1 on java1.4.0-beta3 (JIT: null)
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from com.ziclix.python.sql import zxJDBC
+&gt;&gt;&gt; zxJDBC.autocommit = 0
+&gt;&gt;&gt; d, u, p, v = &quot;database&quot;, &quot;user&quot;, &quot;password&quot;,
+&quot;com.informix.jdbc.IfxDriver&quot;
+&gt;&gt;&gt; db = zxJDBC.connect(d, u, p, v)
+&gt;&gt;&gt; c = db.cursor()
+&gt;&gt;&gt; c.execute(&quot;create table g (a boolean)&quot;)
+&gt;&gt;&gt; c.execute(&quot;insert into g values (?)&quot;, [1])
+Traceback (innermost last):
+File &quot;&lt;console&gt;&quot;, line 1, in ?
+Error: No cast from integer to boolean. [SQLCode: -9634]
+&gt;&gt;&gt; from com.ziclix.python.sql.informix import InformixDataHandler
+&gt;&gt;&gt; c.datahandler = InformixDataHandler(c.datahandler)
+&gt;&gt;&gt; c.execute(&quot;insert into g values (?)&quot;, [1], {0:zxJDBC.OTHER})
+&gt;&gt;&gt;
+</pre>
+<p>As you can see, the default handler fails to convert the Python 1 into
+an Informix boolean because the IfxDriver treats booleans as JDBC type
+OTHER. The InformixDataHandler is intimately aware of the IfxDriver
+mappings and understands how to interpret Python values as booleans when
+the JDBC type is OTHER.</p>
+<p>This functionality is also useful in handling the more advanced JDBC
+2.0 types CLOB, BLOB and Array.</p>
+<p>You can also implement the DataHandler from within Jython as in this
+simple example:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; class PyHandler(DataHandler):
+&gt;&gt;&gt;  def __init__(self, handler):
+&gt;&gt;&gt;   self.handler = handler
+&gt;&gt;&gt;  def getPyObject(self, set, col, datatype):
+&gt;&gt;&gt;   return self.handler.getPyObject(set, col, datatype)
+&gt;&gt;&gt;  def getJDBCObject(self, object, datatype):
+&gt;&gt;&gt;   print &quot;handling prepared statement&quot;
+&gt;&gt;&gt;   return self.handler.getJDBCObject(object, datatype)
+&gt;&gt;&gt;
+&gt;&gt;&gt; c.datahandler = PyHandler(c.datahandler)
+&gt;&gt;&gt; c.execute(&quot;insert into g values (?)&quot;, [1])
+handling prepared statement
+&gt;&gt;&gt;
+</pre>
+</div>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id51" id="dbexts" name="dbexts">dbexts</a></h2>
+<p>dbexts is a wrapper around DB API 2.0 compliant database modules. It
+currently supports zxJDBC and mxODBC but could easily be modified to
+support others. It allows developers to write scripts without knowledge
+of the implementation language of Python (either C or Java). It also
+greatly eases the burden of database coding as much of the functionality
+of the Python API is exposed through easier to use methods.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id52" id="configuration-file" name="configuration-file">Configuration file</a></h2>
+<p>dbexts needs a configuration file in order to create a connection. The
+configuration file has the following format:</p>
+<p>[default]
+name=mysql</p>
+<p>[jdbc]
+name=mysql
+url=jdbc:mysql://localhost/ziclix
+user=
+pwd=
+driver=org.gjt.mm.mysql.Driver
+datahandler=com.ziclix.python.sql.handler.MySQLDataHandler</p>
+<p>[jdbc]
+name=ora
+url=jdbc:oracle:thin:&#64;localhost:1521:ziclix
+user=ziclix
+pwd=ziclix
+driver=oracle.jdbc.driver.OracleDriver
+datahandler=com.ziclix.python.sql.handler.OracleDataHandler</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id53" id="api" name="api">API</a></h2>
+<p>dbexts will default to looking for a file named 'dbexts.ini' in the same
+directory as dbexts.py but can optionally be passed a filename to the
+cfg attribute.</p>
+<pre class="literal-block">
+__init__(self, dbname=None, cfg=None, resultformatter=format_resultset,
+autocommit=1)
+   The initialization method for the dbexts class. If dbname is None,
+   the default connection, as specified in the cfg file will be used.
+
+isql(self, sql, params=None, bindings=None, maxrows=None)
+   Interactively execute sql statement. If self.verbose is true, then
+   the results (if any) are displayed using the result formatting
+   method. If maxrows is specified, only maxrows are displayed.
+
+raw(self, sql, params=None, bindings=None, delim=None, comments=comments)
+   Executes the sql statement with params and bindings as
+   necessary. Returns a tuple consisting of (headers, results).
+
+schema(table, full=0, sort=1)
+   Displays the schema (indicies, foreign keys, primary keys and
+   columns) for the table parameter. If full is true, also compute
+   the exported (or referenced) keys. If sort is true (the default),
+   sort the column names.
+
+   &gt;&gt;&gt; d.schema(&quot;store&quot;)
+   Table
+     store
+
+   Primary Keys
+     store_id {store_3}
+
+   Imported (Foreign) Keys
+     location (city.city_id) {store_7}
+
+   Exported (Referenced) Keys
+     store_id (site_store.store_id) {site_store_8}
+
+   Columns
+     location           int(4), non-nullable
+     store_id           serial(4), non-nullable
+     store_name         varchar(32), non-nullable
+
+   Indices
+     unique index {523_8115} on (store_id)
+     unique index {store_ix_1} on (store_name)
+   &gt;&gt;&gt;
+
+table(table=None, types=(&quot;TABLE&quot;,), owner=None, schema=None)
+   If no table argument, displays a list of all tables. If a table
+   argument, displays the columns of the given table.
+
+proc(self, proc=None, owner=None, schema=None)
+   If no proc argument, displays a list of all procedures. If a proc
+   argument, displays the parameters of the given procedure.
+
+bcp(src, table, where='(1=1)', parameters=[], selective=[], ignorelist=[],
+   autobatch=0)
+   Bulk Copy from one database/table to another. The current instance
+   of dbexts is the source database to which the results of the query
+   on the foreign database will be inserted. An optional where clause
+   can narrow the number of rows to be copied.
+</pre>
+<p>The following are generally not called since isql and raw can handle
+almost all cases.</p>
+<dl class="docutils">
+<dt>begin(self)</dt>
+<dd>Creates a new cursor.</dd>
+<dt>rollback(self)</dt>
+<dd>Rollback all the statements since the creation of the cursor.</dd>
+<dt>commit(self, cursor=None, maxrows=None)</dt>
+<dd>Commit all the statements since the creation of the cursor.</dd>
+<dt>display(self)</dt>
+<dd>Display the results using the formatter.</dd>
+</dl>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id54" id="example-session" name="example-session">Example session</a></h2>
+<pre class="literal-block">
+Jython 2.1b1 on java1.4.0-beta3 (JIT: null)
+Type &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; from dbexts import dbexts
+&gt;&gt;&gt; d = dbexts()
+&gt;&gt;&gt; d.isql(&quot;create table store (store_id int, store_name varchar(32),
+location int)&quot;)
+&gt;&gt;&gt; d.isql(&quot;insert into store values (?, ?, ?)&quot;, [(1, &quot;amazon.com&quot;, 3),
+(2, &quot;egghead.com&quot;, 4)])
+&gt;&gt;&gt; d.isql(&quot;insert into store values (?, ?, ?)&quot;, [(15, &quot;800.com&quot;, 1),
+(19, &quot;fogdog.com&quot;, 3)])
+&gt;&gt;&gt; d.isql(&quot;insert into store values (?, ?, ?)&quot;, [(5, &quot;nike.com&quot;, 4)])
+&gt;&gt;&gt; d.isql(&quot;select * from store order by store_name&quot;)
+
+STORE_ID | STORE_NAME  | LOCATION
+---------------------------------
+15       | 800.com     | 1
+1        | amazon.com  | 3
+2        | egghead.com | 4
+19       | fogdog.com  | 3
+5        | nike.com    | 4
+
+5 rows affected
+
+&gt;&gt;&gt;
+</pre>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="userguide.txt">View document source</a>.
+
+</div>
+
+</div></div></body>

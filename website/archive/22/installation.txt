@@ -1,0 +1,140 @@
+.. include:: constants.txt
+
+============
+Installation
+============
+
+.. contents:: 
+
+------------
+Jython 2.2.1
+------------
+
+Basic Install
+=============
+
+Jython 2.2.1 is distributed as an executable jar file installer.  After
+`downloading <download.html>`__ it, either double click the
+|stable.installer.jar| or run java with the -jar option
+
+.. parsed-literal::
+
+    java -jar |stable.installer.jar|
+
+This will start the regular GUI installer on most systems, or a
+consoler installer on headless systems.  To force the installer to
+work in headless mode invoke the installer with a console switch
+
+.. parsed-literal::
+
+  java -jar |stable.installer.jar| --console
+
+The installer will then walk through a similar set of steps in
+graphical or console mode: showing the license, selecting an install
+directory and JVM and actually copying Jython to the filesystem.
+After this completes, Jython is installed in the directory you
+selected.  There's a script in the install directory, jython on Unix
+like systems or jython.bat on Windows, that will start up the Jython
+console which can be used to dynamically explore Jython and the Java
+runtime.
+
+Standalone mode
+===============
+
+The standalone option does no caching and so avoids the startup overhead (most likely at the cost of some speed in calling Java classes, but I have not profiled it)
+
+You can try it out by downloading the installer from here_
+
+.. _here: stable.download_
+
+running it like so:
+
+.. parsed-literal::
+
+    $ java -jar |stable.installer.jar|
+
+And when you come to the "Installation type" page, select "Standalone".
+
+When the installation is done, you will have a jython.jar with the /Lib files included that can be run like this: ::
+
+    $ java -jar jython.jar
+
+You will get a jython prompt with no caching.  Of course you can run scripts just by calling them as you might expect: ::
+
+    $ java -jar jython.jar script.py
+
+And you can add this jar to the classpath of your app, which will allow standard imports.
+
+Installation options
+====================
+
+You can get a list of the installer options by running:
+
+.. parsed-literal::
+
+	$ java -jar |stable.installer.jar| --help
+
+----------
+Jython 2.1
+----------
+
+Jython 2.1 is distributed as a self-extracting .class file created by
+LiftOff.  It is known to have problems running on Java 6, so if you
+want to use Jython with that JVM either install Jython-2.1 with an earlier
+JVM or use Jython-2.2.1.  
+
+To install Jython, open the command line to the directory in which you have placed the jython-21.class file and then type:
+
+    <java interpreter> jython-21
+
+You will probably type one of the following three lines, depending on your system. Be sure not to put ".class" at the end of the file name.
+
+    java jython-21
+
+    jre jython-21
+
+    jview jython-21 
+
+It can be necessay to set the CLASSPATH to include the current directory
+
+    env CLASSPATH=. java jython-21
+
+    java -cp . jython-21
+
+    java -classpath . jython-21
+
+    jview /cp:. jython-21 
+
+Which command to use depends on your operating system and java version. If you have more than one java installed, you may have to supply an explicit path the java command. 
+
+If you do not have a GUI, then add -o dir_to_install_to to the command above. Jython will install to the specified directory without bringing up the graphical installer. E.g. to install all modules to a Jython-2.1 subdirectory in the current directory do:
+
+    <java interpreter> jython-21 -o Jython-2.1 demo lib source 
+
+After completing installation, you should be able to run Jython by typing:
+
+    jython
+
+-----------------
+What Can Go Wrong
+-----------------
+
+You should check out this section if your Jython installation doesn't
+quite work right. It will contain tips for solving the most common
+problems.
+
+Can't Access Standard Python Modules
+====================================
+
+Not all the modules form CPython is available in Jython. Some modules require a C language dynamic link library that doesn't exists in java. Other modules are missing from Jython just because nobody have had a need for it before and no-one have tested the CPython module with Jython. If you discover that you are missing a module, try to copy the .py file from a CPython distribution to a directory on your Jython sys.path. If that works you are set. If it doesn't work, try asking on jython-users mailing list.
+
+Other Problems
+==============
+
+Any other problems with the installation should be reported to jython-dev.
+
+As a workaround you can extract the jython-21.class manually. The class file is basicly a .zip file and most unzip programs can manage to extract the contents of the class into a directory. After doing that, you must
+
+    * Remove the net directory. It isn't needed.
+    * Create the startup script by hand. Use the installer/template* files as a starting point in doing so. 
+

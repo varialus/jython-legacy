@@ -1,0 +1,4 @@
+This page has been retired. Please see the users_ wiki page.
+
+.. _users: http://wiki.python.org/jython/JythonUsers
+

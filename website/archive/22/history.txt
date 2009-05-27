@@ -1,0 +1,10 @@
+=======================
+HISTORY OF THE SOFTWARE
+=======================
+  
+JPython was created in late 1997 by Jim Hugunin. Jim was also the
+primary developer while he was at CNRI. In February 1999 Barry Warsaw
+took over as primary developer and released JPython version 1.1.
+In October 2000 Barry helped move the software to SourceForge
+where it was renamed to Jython.  Barry then made Finn Bock
+the primary maintainer.

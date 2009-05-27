@@ -1,0 +1,12 @@
+.. include:: constants.txt
+
+=========
+Downloads
+=========
+
+* jython-2.2.1__
+  [`MD5 <../checksums/jython_installer-2.2.1.jar.md5>`__]
+  [`SHA1 <../checksums/jython_installer-2.2.1.jar.sha1>`__]
+  - Released on August 22, 2007.  Requires Java 1.4.2 or later.
+
+__ stable.download_

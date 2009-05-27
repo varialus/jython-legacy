@@ -1,0 +1,11 @@
+This page has been retired for versions of Jython older than 2.1. Please see the download_ wiki page.
+
+If you want the archived web page:
+
+* `2.1 Download`_
+* `2.2 Download`_
+
+.. _download: http://wiki.python.org/jython/DownloadInstructions
+.. _2.1 Download: ./archive/21/download.html
+.. _2.2 Download: ./archive/22/download.html
+
