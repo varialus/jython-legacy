@@ -1,3 +1,0 @@
-.. |stable.installer.jar| replace:: jython_installer-2.2.1.jar
-
-.. _stable.download: http://downloads.sourceforge.net/jython/jython_installer-2.2.1.jar
