@@ -23,7 +23,8 @@ public class NormalVerifier implements Verifier {
 
     private static final String BAT_EXTENSION = ".bat";
 
-    private static final String JYTHON_UP = "jython up and running!";
+    //TODO:Oti re-add an exclamation mark as soon subprocess/jython.bat can handle it
+    private static final String JYTHON_UP = "jython up and running";
 
     private static final String JYTHON = "jython";
 
@@ -269,6 +270,23 @@ public class NormalVerifier implements Verifier {
         b.append("print '");
         b.append(JYTHON_UP);
         b.append("'\n");
+        b.append("# test subprocess if present\n");
+        b.append("try:\n");
+        b.append("  import subprocess\n");
+        b.append("  proceed=True\n");
+        b.append("except:\n");
+        b.append("  proceed=False\n");
+        b.append("if proceed:\n");
+        b.append("  print '");
+        b.append(VERIFYING);
+        b.append(" subprocess");
+        b.append("'\n");
+        b.append("  exitCode = subprocess.call([sys.executable, '-c', 'print ");
+        b.append('"');
+        b.append(JYTHON_UP);
+        b.append('"');
+        b.append("'])\n");
+        b.append("  assert exitCode==0\n");
         return b.toString();
     }
 
