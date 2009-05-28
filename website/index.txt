@@ -3,7 +3,7 @@ The Jython Project
 ==================
 .. admonition:: Latest News
 
-  The Jython development team is proud to announce the release of Jython 2.5rc3!  `Jython 2.5.0! <http://downloads.sourceforge.net/jython/jython_installer-2.5rc3.jar>`__
+  The Jython development team is proud to announce the release of `Jython 2.5rc3 <http://downloads.sourceforge.net/jython/jython_installer-2.5rc3.jar>`__!
 
 Jython 2.5 Documentation
 ========================

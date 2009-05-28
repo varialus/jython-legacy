@@ -32,7 +32,7 @@
                 <include name="left.nav"/>
             </fileset>
         </copy>
-        <copy todir="dist/Project">
+        <copy todir="dist">
             <fileset dir=".">
                 <include name="*.txt"/>
             </fileset>

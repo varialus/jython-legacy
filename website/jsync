@@ -1,0 +1,8 @@
+LOCAL_DIR=/Users/frank/svn/jython/trunk
+WEB_ADMIN=fwierzbicki
+SSH_COMMAND=/opt/local/bin/ssh
+
+rsync --progress --stats --compress --rsh=$SSH_COMMAND \
+      --recursive --links --delete \
+      --exclude "*bak" --exclude "*~" --exclude ".svn" \
+      $LOCAL_DIR/website/dist/ $WEB_ADMIN@dinsdale.python.org:/data/jython/
