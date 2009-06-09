@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _userguide: http://wiki.python.org/jython/UserGuide
 
-.. _2.2 userguide: ./archive/22/userguide.html
+.. _2.2 userguide: ../archive/22/userguide.html

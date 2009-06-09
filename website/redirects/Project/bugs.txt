@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _bugs: http://wiki.python.org/jython/ReportingBugs
 
-.. _2.2 bugs: ./archive/22/bugs.html
+.. _2.2 bugs: ../archive/22/bugs.html

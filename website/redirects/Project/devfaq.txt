@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _devfaq: http://wiki.python.org/jython/DeveloperFAQ
 
-.. _2.2 devfaq: ./archive/22/devfaq.html
+.. _2.2 devfaq: ../archive/22/devfaq.html

@@ -4,6 +4,6 @@ If you want the archived web page:
 
 `2.2 download`_
 
-.. _download: http://wiki.python.org/jython/DownloadingJython
+.. _download: http://wiki.python.org/jython/DownloadInstructions
 
-.. _2.2 download: ./archive/22/download.html
+.. _2.2 download: ../archive/22/download.html

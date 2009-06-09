@@ -35,6 +35,7 @@
         <copy todir="dist">
             <fileset dir=".">
                 <include name="*.txt"/>
+                <include name="favicon.ico"/>
             </fileset>
             <fileset dir=".">
                 <include name="left.nav"/>
@@ -70,6 +71,11 @@
             </fileset>
         </copy>
         <copy todir="dist/graphics">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/Project">
             <fileset dir=".">
                 <include name="left.nav"/>
             </fileset>

@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _installation: http://wiki.python.org/jython/InstallingJython
 
-.. _2.2 installation: ./archive/22/installation.html
+.. _2.2 installation: ../archive/22/installation.html

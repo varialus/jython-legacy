@@ -12,6 +12,6 @@ menupageitem     | Download           | http://wiki.python.org/jython/DownloadIn
 menupageitem     | User Guide         | http://wiki.python.org/jython/UserGuide
 menupageitem     | Books and Articles | http://wiki.python.org/jython/JythonBibliography
 #menupageitem     | CPython comparison | http://wiki.python.org/jython/FIXME
-#menupageitem     | Developer FAQ      | http://wiki.python.org/jython/JythonDeveloperGuide
+menupageitem     | Developer FAQ      | http://wiki.python.org/jython/DeveloperFAQ
 menupageitem     | Developer Guide    | http://wiki.python.org/jython/JythonDeveloperGuide
-#menupageitem     | Reporting Bugs     | http://wiki.python.org/jython/JythonDeveloperGuide
+menupageitem     | Reporting Bugs     | http://wiki.python.org/jython/ReportingBugs

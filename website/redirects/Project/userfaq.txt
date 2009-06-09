@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _userfaq: http://wiki.python.org/jython/UserFAQ
 
-.. _2.2 userfaq: ./archive/22/userfaq.html
+.. _2.2 userfaq: ../archive/22/userfaq.html

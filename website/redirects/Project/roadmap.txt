@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _roadmap: http://wiki.python.org/jython/Roadmap
 
-.. _2.2 roadmap: ./archive/22/roadmap.html
+.. _2.2 roadmap: ../archive/22/roadmap.html

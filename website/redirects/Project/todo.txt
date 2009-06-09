@@ -6,4 +6,4 @@ If you want the archived web page:
 
 .. _todo: http://wiki.python.org/jython/Todo
 
-.. _2.2 todo: ./archive/22/todo.html
+.. _2.2 todo: ../archive/22/todo.html
