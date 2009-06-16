@@ -6,7 +6,7 @@ menupageitem     | Old 2.2 Website    | /archive/22/index.html
 menupageitem     | Mailing Lists      | http://sourceforge.net/mail/?group_id=12867
 section  | Wiki links
 menupageitem     | Front page/News    | http://wiki.python.org/jython/
-menupageitem     | Installation       | http://wiki.python.org/jython/InsallationInstructions
+menupageitem     | Installation       | http://wiki.python.org/jython/InstallationInstructions
 menupageitem     | FAQ                | http://wiki.python.org/jython/JythonFaq
 menupageitem     | Download           | http://wiki.python.org/jython/DownloadInstructions
 menupageitem     | User Guide         | http://wiki.python.org/jython/UserGuide
