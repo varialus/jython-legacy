@@ -107,7 +107,7 @@ class HTMLTranslator(html4css1.HTMLTranslator):
             buffer.append('</div>')
             buffer.append('<div id="content">')
         else:
-            raise "%s does not exisi." % navleft
+            raise Exception("%s does not exisi." % navleft)
         return "\n".join(buffer)
 
     def get_body_suffix(self):
