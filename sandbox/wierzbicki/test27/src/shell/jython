@@ -16,7 +16,8 @@ cygwin=false
 
 # ----- Identify OS we are running under --------------------------------------
 case "`uname`" in
-  CYGWIN*) cygwin=true
+  CYGWIN*) cygwin=true;;
+  Darwin) darwin=true;;
 esac
 
 # ----- Verify and set required environment variables -------------------------
@@ -28,7 +29,11 @@ while [ -h "$PRG" ] ; do
   ls=`ls -ld "$PRG"`
   link=`expr "$ls" : '.*-> \(.*\)$'`
   if expr "$link" : '.*/.*' > /dev/null; then
-    PRG="$link"
+    if expr "$link" : '^/' > /dev/null; then
+      PRG="$link"
+    else
+      PRG="`dirname ${PRG}`/${link}"
+    fi
   else
     PRG="`dirname $PRG`/$link"
   fi
@@ -90,11 +95,17 @@ else
 fi
 
 if $cygwin; then
-  CP=`cygpath -wp "$CP"`
+  # switch delimiter only after building a Unix style $CP
+  CP_DELIMITER=";"
+  CP=`cygpath -p -w "$CP"`
   PRG=`cygpath -w "$PRG"`
 fi
 
 # ----- Execute the requested command -----------------------------------------
+
+if [ -z "$JAVA_MEM" ] ; then
+  JAVA_MEM=-Xmx512m
+fi
 
 if [ -z "$JAVA_STACK" ]; then
    # 32 bit Java 6 needs the stack increased to at least 512k for
@@ -103,6 +114,8 @@ if [ -z "$JAVA_STACK" ]; then
   JAVA_STACK=-Xss1024k
 fi
 
+JAVA_ENCODING=""
+
 # Split out any -J argument for passing to the JVM.
 # Scanning for args is aborted by '--'.
 while [ $# -gt 0 ] ; do
@@ -110,16 +123,33 @@ while [ $# -gt 0 ] ; do
     # Stuff after '-J' in this argument goes to JVM
     -J*)
       val=${1:2}
-      if [ "${val:0:4}" = "-Xss" ] ; then
+      if [ "${val:0:4}" = "-Xmx" ]; then
+        JAVA_MEM=$val
+      elif [ "${val:0:4}" = "-Xss" ]; then
         JAVA_STACK=$val
+      elif [ "${val}" = "" ]; then
+          $JAVA_CMD -help
+          echo "(Prepend -J in front of these options when using 'jython' command)" 
+          exit
+      elif [ "${val}" = "-X" ]; then
+          $JAVA_CMD -X
+          echo "(Prepend -J in front of these options when using 'jython' command)" 
+          exit
       else
-	java_args=("${java_args[@]}" "${1:2}")
+          if [ "${val:0:16}" = "-Dfile.encoding=" ]; then
+              JAVA_ENCODING=$val
+          fi
+	  java_args=("${java_args[@]}" "${1:2}")
       fi
       ;;
     # Match switches that take an argument
-    -c|-C|-jar|-Q|-W)
-      python_args=("${python_args[@]}" "$1" "$2")
-      shift
+    -c|-C|-m|-jar|-Q|-W)
+      if [ $# = 1 ]; then
+          python_args=("${python_args[@]}" "$1")
+      else
+          python_args=("${python_args[@]}" "$1" "$2")
+          shift
+      fi;
       ;;
     # Match -Dprop=val type args
     -D*)
@@ -142,9 +172,9 @@ while [ $# -gt 0 ] ; do
       java_args=("${java_args[@]}" -javaagent:"$agent_path"
 	-Dprofile.properties="$props_path")
       ;;
-    # Don't put Jython on the boot classpath (enables the verifier)
-    --verify)
-      verify_requested=true
+    # Put Jython on the boot classpath (disables the verifier)
+    --boot)
+      boot_requested=true
       ;;
     # Run under JDB
     --jdb)
@@ -177,13 +207,18 @@ while [ $# -gt 0 ] ; do
   shift
 done
 
+# Force file.encoding to UTF-8 when on Mac, since Apple JDK defaults to MacRoman (JRUBY-3576)
+if [[ $darwin && -z "$JAVA_ENCODING" ]]; then
+  java_args=("${java_args[@]}" "-Dfile.encoding=UTF-8")
+fi
+
 # Append the rest of the arguments
 python_args=("${python_args[@]}" "$@")
 
 # Put the python_args back into the position arguments $1, $2 etc
 set -- "${python_args[@]}"
 
-JAVA_OPTS="$JAVA_OPTS $JAVA_STACK"
+JAVA_OPTS="$JAVA_OPTS $JAVA_MEM $JAVA_STACK"
 
 if $cygwin; then
   JAVA_HOME=`cygpath --mixed "$JAVA_HOME"`
@@ -195,9 +230,15 @@ if $cygwin; then
     win_args=("$win_arg" "$@")
     set -- "${win_args[@]}"
   fi
+
+  # fix JLine to use UnixTerminal
+  stty -icanon min 1 -echo > /dev/null 2>&1
+  if [ $? = 0 ]; then
+    JAVA_OPTS="$JAVA_OPTS -Djline.terminal=jline.UnixTerminal"
+  fi
 fi
 
-if [ -n "$profile_requested" -o -n "$verify_requested" ] ; then
+if [ -n "$profile_requested" -o -z "$boot_requested" ] ; then
   [ -n "$profile_requested" ] && echo "Running with instrumented profiler"
   java_args=("${java_args[@]}" -classpath "$CP$CP_DELIMITER$CLASSPATH")
 else
@@ -214,6 +255,7 @@ fi
 
 "${JAVA_CMD[@]}" $JAVA_OPTS "${java_args[@]}" -Dpython.home="$JYTHON_HOME" \
   -Dpython.executable="$PRG" org.python.util.jython $JYTHON_OPTS "$@"
+JYTHON_STATUS=$?
 
 if [ -n "$profile_requested" ] ; then
   echo "Profiling results:"
@@ -224,10 +266,16 @@ elif [ -n "$help_requested" ] ; then
   echo "--jdb    : run under JDB" >&2
   echo "--print  : print the Java command instead of executing it" >&2
   echo "--profile: run with the Java Interactive Profiler (http://jiprof.sf.net)" >&2
-  echo "--verify : enable bytecode verifier for Jython classes (for development)" >&2
+  echo "--boot   : put jython on the boot classpath (disables the bytecode verifier)" >&2
   echo "--       : pass remaining arguments through to Jython" >&2
   echo "Jython launcher environment variables:" >&2
   echo "JAVA_HOME  : Java installation directory" >&2
   echo "JYTHON_HOME: Jython installation directory" >&2
   echo "JYTHON_OPTS: default command line arguments" >&2
 fi
+
+if $cygwin; then
+  stty icanon echo > /dev/null 2>&1
+fi
+
+exit $JYTHON_STATUS

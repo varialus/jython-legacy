@@ -46,7 +46,7 @@ public class PyInteger extends PyObject {
             try {
                 return Py.newInteger(((PyString)x).atoi(base));
             } catch (PyException pye) {
-                if (Py.matchException(pye, Py.OverflowError)) {
+                if (pye.match(Py.OverflowError)) {
                     return ((PyString)x).atol(base);
                 }
                 throw pye;
@@ -79,7 +79,7 @@ public class PyInteger extends PyObject {
 		try {
 			return x.__int__();
 		} catch (PyException pye) {
-			if (!Py.matchException(pye, Py.AttributeError))
+			if (!pye.match(Py.AttributeError))
 				throw pye;
 			throw Py.TypeError("int() argument must be a string or a number");
 		}
@@ -257,9 +257,6 @@ public class PyInteger extends PyObject {
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.int___mul___doc)
     final PyObject int___mul__(PyObject right) {
-        if (right instanceof PySequence)
-            return ((PySequence) right).repeat(getValue());
-
         if (!canCoerce(right))
             return null;
         int rightv = coerce(right);
@@ -722,7 +719,7 @@ public class PyInteger extends PyObject {
 
     @ExposedMethod(doc = BuiltinDocs.int___pos___doc)
     final PyObject int___pos__() {
-        return Py.newInteger(getValue());
+        return int___int__();
     }
 
     public PyObject __abs__() {
@@ -731,10 +728,10 @@ public class PyInteger extends PyObject {
     
     @ExposedMethod(doc = BuiltinDocs.int___abs___doc)
     final PyObject int___abs__() {
-        if (getValue() >= 0)
-            return Py.newInteger(getValue());
-        else
-            return __neg__();
+        if (getValue() < 0) {
+            return int___neg__();
+        }
+        return int___int__();
     }
 
     public PyObject __invert__() {
@@ -752,6 +749,9 @@ public class PyInteger extends PyObject {
 
     @ExposedMethod(doc = BuiltinDocs.int___int___doc)
     final PyInteger int___int__() {
+        if (getType() == TYPE) {
+            return this;
+        }
         return Py.newInteger(getValue());
     }
 

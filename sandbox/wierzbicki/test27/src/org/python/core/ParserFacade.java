@@ -21,17 +21,13 @@ import java.util.regex.Pattern;
 
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
-
 import org.python.antlr.BaseParser;
-import org.python.antlr.ExpressionParser;
-import org.python.antlr.InteractiveParser;
-import org.python.antlr.ParseException;
-import org.python.antlr.ModuleParser;
 import org.python.antlr.NoCloseReaderStream;
-import org.python.antlr.PythonTree;
+import org.python.antlr.ParseException;
 import org.python.antlr.PythonLexer;
 import org.python.antlr.PythonPartial;
 import org.python.antlr.PythonTokenSource;
+import org.python.antlr.PythonTree;
 import org.python.antlr.base.mod;
 import org.python.core.io.StreamIO;
 import org.python.core.io.TextIOInputStream;
@@ -47,7 +43,7 @@ public class ParserFacade {
 
     private ParserFacade() {}
 
-    private static String getLine(BufferedReader reader, int line) {
+    private static String getLine(ExpectedEncodingBufferedReader reader, int line) {
         if (reader == null) {
             return "";
         }
@@ -56,7 +52,14 @@ public class ParserFacade {
             for (int i = 0; i < line; i++) {
                 text = reader.readLine();
             }
-            return text == null ? text : text + "\n";
+            if (text == null) {
+                return text;
+            }
+            if (reader.encoding != null) {
+                // restore the original encoding
+                text = new PyUnicode(text).encode(reader.encoding);
+            }
+            return text + "\n";
         } catch (IOException ioe) {
         }
         return text;
@@ -83,7 +86,7 @@ public class ParserFacade {
                 line = node.getLine();
                 col = node.getCharPositionInLine();
             }
-            String text=getLine(reader, line);
+            String text= getLine(reader, line);
             String msg = e.getMessage();
             if (e.getType() == Py.IndentationError) {
                 return new PyIndentationError(msg, line, col, text, filename);
@@ -111,30 +114,23 @@ public class ParserFacade {
      * PyIndentationErrors.
      */
     private static mod parse(ExpectedEncodingBufferedReader reader,
-                                String kind,
+                                CompileMode kind,
                                 String filename,
                                 CompilerFlags cflags) throws Throwable {
         reader.mark(MARK_LIMIT); // We need the ability to move back on the
                                  // reader, for the benefit of fixParseError and
                                  // validPartialSentence
-        if (kind.equals("eval")) {
+        if (kind != null) {
             CharStream cs = new NoCloseReaderStream(reader);
-            ExpressionParser e = new ExpressionParser(cs, filename, cflags.encoding);
-            return e.parse();
-        } else if (kind.equals("single")) {
-            InteractiveParser i = new InteractiveParser(reader, filename, cflags.encoding);
-            return i.parse();
-        } else if (kind.equals("exec")) {
-            CharStream cs = new NoCloseReaderStream(reader);
-            ModuleParser g = new ModuleParser(cs, filename, cflags.encoding);
-            return g.file_input();
+            BaseParser parser = new BaseParser(cs, filename, cflags.encoding);
+            return kind.dispatch(parser);
         } else {
             throw Py.ValueError("parse kind must be eval, exec, or single");
         }
     }
 
     public static mod parse(InputStream stream,
-                                String kind,
+                                CompileMode kind,
                                 String filename,
                                 CompilerFlags cflags) {
         ExpectedEncodingBufferedReader bufReader = null;
@@ -151,7 +147,7 @@ public class ParserFacade {
     }
 
     public static mod parse(String string,
-                                String kind,
+                                CompileMode kind,
                                 String filename,
                                 CompilerFlags cflags) {
         ExpectedEncodingBufferedReader bufReader = null;
@@ -166,7 +162,7 @@ public class ParserFacade {
     }
 
     public static mod partialParse(String string,
-                                       String kind,
+                                       CompileMode kind,
                                        String filename,
                                        CompilerFlags cflags,
                                        boolean stdprompt) {
@@ -186,7 +182,7 @@ public class ParserFacade {
         }
     }
 
-    private static boolean validPartialSentence(BufferedReader bufreader, String kind, String filename) {
+    private static boolean validPartialSentence(BufferedReader bufreader, CompileMode kind, String filename) {
         PythonLexer lexer = null;
         try {
             bufreader.reset();
@@ -197,14 +193,16 @@ public class ParserFacade {
             PythonTokenSource indentedSource = new PythonTokenSource(tokens, filename);
             tokens = new CommonTokenStream(indentedSource);
             PythonPartial parser = new PythonPartial(tokens);
-            if (kind.equals("single")) {
+            switch (kind) {
+            case single:
                 parser.single_input();
-            } else if (kind.equals("eval")) {
+                break;
+            case eval:
                 parser.eval_input();
-            } else {
+                break;
+            default:
                 return false;
             }
-
         } catch (Exception e) {
             return lexer.eofWhileNested;
         }
@@ -228,6 +226,15 @@ public class ParserFacade {
                                                                 CompilerFlags cflags,
                                                                 String filename,
                                                                 boolean fromString)
+        throws IOException {
+        return prepBufReader(input, cflags, filename, fromString, true);
+    }
+
+    private static ExpectedEncodingBufferedReader prepBufReader(InputStream input,
+                                                                CompilerFlags cflags,
+                                                                String filename,
+                                                                boolean fromString,
+                                                                boolean universalNewlines)
             throws IOException {
         input = new BufferedInputStream(input);
         boolean bom = adjustForBOM(input);
@@ -248,12 +255,14 @@ public class ParserFacade {
         }
         cflags.encoding = encoding;
 
-        // Enable universal newlines mode on the input
-        StreamIO rawIO = new StreamIO(input, true);
-        org.python.core.io.BufferedReader bufferedIO =
-                new org.python.core.io.BufferedReader(rawIO, 0);
-        UniversalIOWrapper textIO = new UniversalIOWrapper(bufferedIO);
-        input = new TextIOInputStream(textIO);
+        if (universalNewlines) {
+            // Enable universal newlines mode on the input
+            StreamIO rawIO = new StreamIO(input, true);
+            org.python.core.io.BufferedReader bufferedIO =
+                    new org.python.core.io.BufferedReader(rawIO, 0);
+            UniversalIOWrapper textIO = new UniversalIOWrapper(bufferedIO);
+            input = new TextIOInputStream(textIO);
+        }
 
         Charset cs;
         try {
@@ -278,7 +287,8 @@ public class ParserFacade {
 
     private static ExpectedEncodingBufferedReader prepBufReader(String string,
                                                                 CompilerFlags cflags,
-                                                                String filename) throws IOException {
+                                                                String filename)
+        throws IOException {
         byte[] stringBytes;
         if (cflags.source_is_utf8) {
             // Passed unicode, re-encode the String to raw bytes
@@ -293,7 +303,7 @@ public class ParserFacade {
         } else {
             stringBytes = StringUtil.toBytes(string);
         }
-        return prepBufReader(new ByteArrayInputStream(stringBytes), cflags, filename, true);
+        return prepBufReader(new ByteArrayInputStream(stringBytes), cflags, filename, true, false);
     }
 
     /**

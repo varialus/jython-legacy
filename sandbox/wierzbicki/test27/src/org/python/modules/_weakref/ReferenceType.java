@@ -3,7 +3,6 @@ package org.python.modules._weakref;
 
 import org.python.core.ArgParser;
 import org.python.core.Py;
-import org.python.core.PyBuiltinCallable;
 import org.python.core.PyNewWrapper;
 import org.python.core.PyObject;
 import org.python.core.PyType;
@@ -36,7 +35,10 @@ public class ReferenceType extends AbstractReference {
 
         GlobalRef gref = GlobalRef.newInstance(ob);
         if (new_.for_type == subtype) {
-            // XXX: Reject types that aren't weak referenceable
+            // NOTE: CPython disallows weakrefs to many builtin types (e.g. dict, list)
+            // and would check weakrefability here. We aren't as strict since the JVM can
+            // weakref anything. Our types' needs_weakref flag only refers to whether it
+            // has a __weakref__ descriptor, not weakrefability
             if (callback == null) {
                 ReferenceType ret = (ReferenceType)gref.find(ReferenceType.class);
                 if (ret != null) {
@@ -54,7 +56,7 @@ public class ReferenceType extends AbstractReference {
     final void weakref___init__(PyObject[] args, String[] keywords) {
         // Just ensure at least one arg, leaving other args alone
         ArgParser ap = parseInitArgs("__init__", args, keywords);
-        PyObject ob = ap.getPyObject(0);
+        ap.getPyObject(0);
     }
 
     /**

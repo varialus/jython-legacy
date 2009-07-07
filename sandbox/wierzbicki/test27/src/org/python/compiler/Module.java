@@ -12,9 +12,14 @@ import java.util.Map;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
+import org.python.core.CodeBootstrap;
+import org.python.core.CodeFlag;
+import org.python.core.CodeLoader;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
 import org.python.core.PyException;
+import org.python.core.PyRunnableBootstrap;
+import org.objectweb.asm.Type;
 import org.python.antlr.ParseException;
 import org.python.antlr.PythonTree;
 import org.python.antlr.ast.Suite;
@@ -296,11 +301,17 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
     public boolean linenumbers;
     Future futures;
     Hashtable scopes;
+    long mtime;
 
     public Module(String name, String filename, boolean linenumbers) {
+        this(name, filename, linenumbers, org.python.core.imp.NO_MTIME);
+    }
+
+    public Module(String name, String filename, boolean linenumbers, long mtime) {
         this.linenumbers = linenumbers;
+        this.mtime = mtime;
         classfile = new ClassFile(name, "org/python/core/PyFunctionTable",
-                                  ACC_SYNCHRONIZED | ACC_PUBLIC);
+                                  ACC_SYNCHRONIZED | ACC_PUBLIC, mtime);
         constants = new Hashtable();
         sfilename = filename;
         if (filename != null)
@@ -313,7 +324,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
     }
 
     public Module(String name) {
-        this(name, name+".py", true);
+        this(name, name+".py", true, org.python.core.imp.NO_MTIME);
     }
 
     // This block of code handles the pool of Python Constants
@@ -421,31 +432,20 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
 
         Code c = classfile.addMethod(
             code.fname,
-            "(" + $pyFrame + ")" + $pyObj,
+            "(" + $pyFrame + $threadState + ")" + $pyObj,
             ACC_PUBLIC);
 
         CodeCompiler compiler = new CodeCompiler(this, printResults);
 
         if (classBody) {
-            Label label_got_name = new Label();
-            int module_tmp = c.getLocal("org/python/core/PyObject");
-
+            // Set the class's __module__ to __name__. fails when there's no __name__
             c.aload(1);
             c.ldc("__module__");
-            c.invokevirtual("org/python/core/PyFrame", "getname_or_null", "(" + $str + ")" + $pyObj);
-            c.dup();
-            c.ifnonnull(label_got_name);
 
-            c.pop();
             c.aload(1);
             c.ldc("__name__");
-            c.invokevirtual("org/python/core/PyFrame", "getname_or_null", "(" + $str + ")" + $pyObj);
+            c.invokevirtual("org/python/core/PyFrame", "getname", "(" + $str + ")" + $pyObj);
 
-            c.label(label_got_name);
-            c.astore(module_tmp);
-            c.aload(1);
-            c.ldc("__module__");
-            c.aload(module_tmp);
             c.invokevirtual("org/python/core/PyFrame", "setlocal", "(" + $str + $pyObj + ")V");
         }
 
@@ -500,17 +500,17 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
         code.jy_npurecell = scope.jy_npurecell;
 
         if (compiler.optimizeGlobals) {
-            code.moreflags |= org.python.core.PyTableCode.CO_OPTIMIZED;
+            code.moreflags |= org.python.core.CodeFlag.CO_OPTIMIZED.flag;
         }
         if (compiler.my_scope.generator) {
-            code.moreflags |= org.python.core.PyTableCode.CO_GENERATOR;
+            code.moreflags |= org.python.core.CodeFlag.CO_GENERATOR.flag;
         }
         if (cflags != null) {
-            if (cflags.generator_allowed) {
-                code.moreflags |= org.python.core.PyTableCode.CO_GENERATOR_ALLOWED;
+            if (cflags.isFlagSet(CodeFlag.CO_GENERATOR_ALLOWED)) {
+                code.moreflags |= org.python.core.CodeFlag.CO_GENERATOR_ALLOWED.flag;
             }
-            if (cflags.division) {
-                code.moreflags |= org.python.core.PyTableCode.CO_FUTUREDIVISION;
+            if (cflags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
+                code.moreflags |= org.python.core.CodeFlag.CO_FUTURE_DIVISION.flag;
             }
         }
 
@@ -540,9 +540,25 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
         c.dup();
         c.ldc(classfile.name);
         c.invokespecial(classfile.name, "<init>", "(" + $str + ")V");
+        c.invokevirtual(classfile.name, "getMain", "()" + $pyCode);
+        String bootstrap = Type.getDescriptor(CodeBootstrap.class);
+        c.invokestatic(Type.getInternalName(CodeLoader.class),
+                CodeLoader.SIMPLE_FACTORY_METHOD_NAME,
+                "(" + $pyCode +  ")" + bootstrap);
         c.aload(0);
-        c.invokestatic("org/python/core/Py", "runMain", "(" + $pyRunnable + $strArr + ")V");
+        c.invokestatic("org/python/core/Py", "runMain", "(" + bootstrap + $strArr + ")V");
         c.return_();
+    }
+    
+    public void addBootstrap() throws IOException {
+        Code c = classfile.addMethod(CodeLoader.GET_BOOTSTRAP_METHOD_NAME,
+                "()" + Type.getDescriptor(CodeBootstrap.class),
+                ACC_PUBLIC | ACC_STATIC);
+        c.ldc(Type.getType("L" + classfile.name + ";"));
+        c.invokestatic(Type.getInternalName(PyRunnableBootstrap.class),
+                PyRunnableBootstrap.REFLECTION_METHOD_NAME,
+                "(" + $clss + ")" + Type.getDescriptor(CodeBootstrap.class));
+        c.areturn();
     }
 
     public void addConstants(Code c) throws IOException {
@@ -568,11 +584,12 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
     public void addFunctions() throws IOException {
         Code code = classfile.addMethod(
             "call_function",
-            "(I" + $pyFrame + ")" + $pyObj,
+            "(I" + $pyFrame + $threadState + ")" + $pyObj,
             ACC_PUBLIC);
 
-        code.aload(0);
-        code.aload(2);
+        code.aload(0); // this
+        code.aload(2); // frame
+        code.aload(3); // thread state
         Label def = new Label();
         Label[] labels = new Label[codes.size()];
         int i;
@@ -584,7 +601,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
         code.tableswitch(0, labels.length - 1, def, labels);
         for(i=0; i<labels.length; i++) {
             code.label(labels[i]);
-            code.invokevirtual(classfile.name, ((PyCodeConstant)codes.get(i)).fname, "(" + $pyFrame + ")" + $pyObj);
+            code.invokevirtual(classfile.name, ((PyCodeConstant)codes.get(i)).fname, "(" + $pyFrame + $threadState + ")" + $pyObj);
             code.areturn();
         }
         code.label(def);
@@ -598,6 +615,7 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
         addInit();
         addRunnable();
         addMain();
+        addBootstrap();
 
         addFunctions();
 
@@ -627,20 +645,28 @@ public class Module implements Opcodes, ClassConstants, CompilationContext
                            node.getLine() ,null, Py.None);
                 return;
             } catch(PyException e) {
-                if (!Py.matchException(e, Py.SyntaxWarning))
+                if (!e.match(Py.SyntaxWarning))
                     throw e;
             }
         }
         throw new ParseException(msg,node);
     }
-
     public static void compile(mod node, OutputStream ostream,
                                String name, String filename,
                                boolean linenumbers, boolean printResults,
                                CompilerFlags cflags)
+        throws Exception 
+    {
+        compile(node, ostream, name, filename, linenumbers, printResults, cflags, org.python.core.imp.NO_MTIME);
+    }
+
+    public static void compile(mod node, OutputStream ostream,
+                               String name, String filename,
+                               boolean linenumbers, boolean printResults,
+                               CompilerFlags cflags, long mtime)
         throws Exception
     {
-        Module module = new Module(name, filename, linenumbers);
+        Module module = new Module(name, filename, linenumbers, mtime);
         if (cflags == null) {
             cflags = new CompilerFlags();
         }

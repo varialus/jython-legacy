@@ -1,6 +1,6 @@
 // Copyright (c) Corporation for National Research Initiatives
-
 package org.python.compiler;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,10 +15,13 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import org.python.core.imp;
+
 public class ClassFile
 {
     ClassWriter cw;
     int access;
+    long mtime;
     public String name;
     String superclass;
     String sfilename;
@@ -37,18 +40,23 @@ public class ClassFile
     }
 
     public ClassFile(String name) {
-        this(name, "java/lang/Object", Opcodes.ACC_SYNCHRONIZED | Opcodes.ACC_PUBLIC);
+        this(name, "java/lang/Object", Opcodes.ACC_SYNCHRONIZED | Opcodes.ACC_PUBLIC,
+                org.python.core.imp.NO_MTIME);
     }
 
     public ClassFile(String name, String superclass, int access) {
+        this(name, superclass, access, org.python.core.imp.NO_MTIME);
+    }
+    public ClassFile(String name, String superclass, int access, long mtime) {
         this.name = fixName(name);
         this.superclass = fixName(superclass);
         this.interfaces = new String[0];
         this.access = access;
+        this.mtime = mtime;
         
         cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        methodVisitors = Collections.synchronizedList(new ArrayList());
-        fieldVisitors = Collections.synchronizedList(new ArrayList());
+        methodVisitors = Collections.synchronizedList(new ArrayList<MethodVisitor>());
+        fieldVisitors = Collections.synchronizedList(new ArrayList<FieldVisitor>());
     }
 
     public void setSource(String name) {
@@ -90,7 +98,7 @@ public class ClassFile
         throws IOException
     {
         for (int i=0; i<methodVisitors.size(); i++) {
-            MethodVisitor mv = (MethodVisitor)methodVisitors.get(i);
+            MethodVisitor mv = methodVisitors.get(i);
             mv.visitMaxs(0,0);
             mv.visitEnd();
         }
@@ -99,8 +107,13 @@ public class ClassFile
     public void write(OutputStream stream) throws IOException {
         cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, this.name, null, this.superclass, interfaces);
         AnnotationVisitor av = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
-        //XXX: should imp.java really house this value or should imp.java point into org.python.compiler?
-        av.visit("value", new Integer(org.python.core.imp.APIVersion));
+        // XXX: should imp.java really house this value or should imp.java point into
+        // org.python.compiler?
+        av.visit("value", new Integer(imp.getAPIVersion()));
+        av.visitEnd();
+
+        av = cw.visitAnnotation("Lorg/python/compiler/MTime;", true);
+        av.visit("value", new Long(mtime));
         av.visitEnd();
 
         if (sfilename != null) {
@@ -116,12 +129,5 @@ public class ClassFile
         baos.writeTo(stream);
         //debug(baos);
         baos.close();
-    }
-    
-    //XXX: this should go away when things stabilize.
-    private void debug(ByteArrayOutputStream baos) throws IOException {
-        FileOutputStream fos = new FileOutputStream("DEBUG.class");
-        baos.writeTo(fos);
-        fos.close();
     }
 }

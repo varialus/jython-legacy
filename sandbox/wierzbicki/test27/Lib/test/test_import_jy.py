@@ -98,16 +98,18 @@ class MislabeledImportTestCase(unittest.TestCase):
 
 class OverrideBuiltinsImportTestCase(unittest.TestCase):
     def test_override(self):
+        modname = os.path.__name__
         tests = [
             ("import os.path"         , "('os.path', None, -1, 'os')"  ),
             ("import os.path as path2", "('os.path', None, -1, 'os')"  ),
-            ("from os.path import *"  , "('os.path', ('*',), -1, 'posixpath')"),
+            ("from os.path import *"  ,
+             "('os.path', ('*',), -1, '%s')" % modname),
             ("from os.path import join",
-                 "('os.path', ('join',), -1, 'posixpath')"),
+                 "('os.path', ('join',), -1, '%s')" % modname),
             ("from os.path import join as join2",
-                 "('os.path', ('join',), -1, 'posixpath')"),
+                 "('os.path', ('join',), -1, '%s')" % modname),
             ("from os.path import join as join2, split as split2",
-                 "('os.path', ('join', 'split'), -1, 'posixpath')"),
+                 "('os.path', ('join', 'split'), -1, '%s')" % modname),
         ]
 
         import sys
@@ -158,6 +160,9 @@ class ImpTestCase(unittest.TestCase):
         from org.python.tests.inbred import Zeus
         self.assertEquals(Metis, Zeus.Athena.__bases__[0])
         self.assertEquals(Zeus, Metis.__bases__[0])
+
+    def test_sys_modules_deletion(self):
+        self.assertRaises(ZeroDivisionError, __import__, 'test.module_deleter')
 
 def test_main():
     test_support.run_unittest(MislabeledImportTestCase,

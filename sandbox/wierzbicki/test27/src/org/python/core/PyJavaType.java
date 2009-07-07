@@ -229,10 +229,15 @@ public class PyJavaType extends PyType {
             // returns just the public methods
             methods = forClass.getMethods();
         } else {
-            methods = forClass.getDeclaredMethods();
-            for (Method method : methods) {
-                method.setAccessible(true);
+            // Grab all methods on this class and all of its superclasses and make them accessible
+            List<Method> allMethods = Generic.list();
+            for(Class<?> c = forClass; c != null; c = c.getSuperclass()) {
+                for (Method meth : c.getDeclaredMethods()) {
+                    allMethods.add(meth);
+                    meth.setAccessible(true);
+                }
             }
+            methods = allMethods.toArray(new Method[allMethods.size()]);
         }
 
         boolean isInAwt = name.startsWith("java.awt.") && name.indexOf('.', 9) == -1;
@@ -304,6 +309,17 @@ public class PyJavaType extends PyType {
                     prop.myType = meth.getReturnType();
                 } else {
                     prop.setMethod = meth;
+                    // Needed for readonly properties.  Getter will be used instead
+                    // if there is one.  Only works if setX method has exactly one
+                    // param, which is the only reasonable case.
+                    // XXX: should we issue a warning if setX and getX have different
+                    // types?
+                    if (prop.myType == null) {
+                        Class[] params = meth.getParameterTypes();
+                        if (params.length == 1) {
+                            prop.myType = params[0];
+                        }
+                    }
                 }
             }
         }
@@ -396,17 +412,19 @@ public class PyJavaType extends PyType {
 
             // If one of our superclasses  has something defined for this name, check if its a bean
             // property, and if so, try to fill in any gaps in our property from there
-            PyObject superForName = lookup(prop.__name__);
+            PyObject fromType[] = new PyObject[] { null };
+            PyObject superForName = lookup_where(prop.__name__, fromType);
             if (superForName instanceof PyBeanProperty) {
                 PyBeanProperty superProp = ((PyBeanProperty)superForName);
                 // If it has a set method and we don't, take it regardless.  If the types don't line
                 // up, it'll be rejected below
                 if (prop.setMethod == null) {
                     prop.setMethod = superProp.setMethod;
-                } else if (superProp.myType == prop.setMethod.getParameterTypes()[0]) {
-                    // Otherwise, we must not have a get method. Only take a get method if the type
-                    // on it agrees with the set method we already have. The bean on this type
-                    // overrides a conflicting one o the parent
+                } else if (prop.getMethod == null
+                           && superProp.myType == prop.setMethod.getParameterTypes()[0]) {
+                    // Only take a get method if the type on it agrees with the set method
+                    // we already have. The bean on this type overrides a conflicting one
+                    // of the parent
                     prop.getMethod = superProp.getMethod;
                     prop.myType = superProp.myType;
                 }
@@ -415,6 +433,12 @@ public class PyJavaType extends PyType {
                     // If the parent bean is hiding a static field, we need it as well.
                     prop.field = superProp.field;
                 }
+            } else if (superForName != null  &&  fromType[0] != this  &&  !(superForName instanceof PyBeanEvent)) {
+                // There is already an entry for this name
+                // It came from a type which is not @this; it came from a superclass
+                // It is not a bean event
+                // Do not override methods defined in superclass
+                continue;
             }
             // If the return types on the set and get methods for a property don't agree, the get
             // method takes precedence
@@ -487,16 +511,16 @@ public class PyJavaType extends PyType {
                 @Override
                 public PyObject __call__(PyObject o) {
                     Object proxy = self.getJavaProxy();
-                    Object oAsJava = o.__tojava__(proxy.getClass());
-                    return proxy.equals(oAsJava) ? Py.True : Py.False;
+                    Object oProxy = o.getJavaProxy();
+                    return proxy.equals(oProxy) ? Py.True : Py.False;
                 }
             });
             addMethod(new PyBuiltinMethodNarrow("__ne__", 1) {
                 @Override
                 public PyObject __call__(PyObject o) {
                     Object proxy = self.getJavaProxy();
-                    Object oAsJava = o.__tojava__(proxy.getClass());
-                    return !proxy.equals(oAsJava) ? Py.True : Py.False;
+                    Object oProxy = o.getJavaProxy();
+                    return !proxy.equals(oProxy) ? Py.True : Py.False;
                 }
             });
             addMethod(new PyBuiltinMethodNarrow("__hash__") {
@@ -867,9 +891,6 @@ public class PyJavaType extends PyType {
 
         @Override
         public void setSlice(int start, int stop, int step, PyObject value) {
-            if (stop < start) {
-                stop = start;
-            }
             if (step == 0) {
                 return;
             }

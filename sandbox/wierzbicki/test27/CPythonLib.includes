@@ -135,6 +135,7 @@ SimpleHTTPServer.py
 SimpleXMLRPCServer.py
 site.py
 site-packages/README
+smtpd.py
 smtplib.py
 sndhdr.py
 SocketServer.py
@@ -167,6 +168,7 @@ warnings.py
 weakref.py
 whichdb.py
 whrandom.py
+wsgiref.egg-info
 wsgiref/*.py
 xdrlib.py
 xmllib.py

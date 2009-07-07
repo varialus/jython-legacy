@@ -13,41 +13,17 @@ public abstract class PyBaseCode extends PyCode {
     public int jy_npurecell; // internal: jython specific
     public String co_freevars[];
     public String co_filename;
-    public int co_flags;
+    public CompilerFlags co_flags = new CompilerFlags();
     public int co_nlocals;
     public boolean varargs,  varkwargs;
-
-    final public static int CO_OPTIMIZED         = 0x0001;
-    final public static int CO_NEWLOCALS       = 0x0002;
-    final public static int CO_VARARGS           = 0x0004;
-    final public static int CO_VARKEYWORDS       = 0x0008;
-    final public static int CO_GENERATOR         = 0x0020;
-
-    // these are defined in __future__.py
-    final public static int CO_NESTED                 = 0x0010;
-    final public static int CO_GENERATOR_ALLOWED      = 0x0;
-    final public static int CO_FUTUREDIVISION         = 0x2000;
-    final public static int CO_FUTURE_ABSOLUTE_IMPORT = 0x4000;
-    final public static int CO_WITH_STATEMENT         = 0x8000;
-
-    //XXX: I'm not positive that this is the right place for these constants.
-    final public static int PyCF_SOURCE_IS_UTF8    = 0x0100;
-    final public static int PyCF_DONT_IMPLY_DEDENT = 0x0200;
-    final public static int PyCF_ONLY_AST          = 0x0400;
-
-    final public static int CO_ALL_FEATURES = PyCF_DONT_IMPLY_DEDENT|PyCF_ONLY_AST|
-                                              PyCF_SOURCE_IS_UTF8|CO_NESTED|
-                                              CO_GENERATOR_ALLOWED| CO_FUTUREDIVISION|
-                                              CO_FUTURE_ABSOLUTE_IMPORT|CO_WITH_STATEMENT;
 
 
     public boolean hasFreevars() {
         return co_freevars != null && co_freevars.length > 0;
     }
 
-    public PyObject call(PyFrame frame, PyObject closure) {
+    public PyObject call(ThreadState ts, PyFrame frame, PyObject closure) {
 //         System.err.println("tablecode call: "+co_name);
-        ThreadState ts = Py.getThreadState();
         if (ts.systemState == null) {
             ts.systemState = Py.defaultSystemState;
         }
@@ -128,76 +104,94 @@ public abstract class PyBaseCode extends PyCode {
         return ret;
     }
 
-    public PyObject call(PyObject globals, PyObject[] defaults,
+    public PyObject call(ThreadState state, PyObject globals, PyObject[] defaults,
                          PyObject closure)
     {
         if (co_argcount != 0 || varargs || varkwargs)
-            return call(Py.EmptyObjects, Py.NoKeywords, globals, defaults,
+            return call(state, Py.EmptyObjects, Py.NoKeywords, globals, defaults,
                         closure);
         PyFrame frame = new PyFrame(this, globals);
-        if ((co_flags & CO_GENERATOR) != 0) {
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(frame, closure);
+        return call(state, frame, closure);
     }
 
-    public PyObject call(PyObject arg1, PyObject globals, PyObject[] defaults,
+    public PyObject call(ThreadState state, PyObject arg1, PyObject globals, PyObject[] defaults,
                          PyObject closure)
     {
         if (co_argcount != 1 || varargs || varkwargs)
-            return call(new PyObject[] {arg1},
+            return call(state, new PyObject[] {arg1},
                         Py.NoKeywords, globals, defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
         frame.f_fastlocals[0] = arg1;
-        if ((co_flags & CO_GENERATOR) != 0) {
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(frame, closure);
+        return call(state, frame, closure);
     }
 
-    public PyObject call(PyObject arg1, PyObject arg2, PyObject globals,
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject globals,
                          PyObject[] defaults, PyObject closure)
     {
         if (co_argcount != 2 || varargs || varkwargs)
-            return call(new PyObject[] {arg1, arg2},
+            return call(state, new PyObject[] {arg1, arg2},
                         Py.NoKeywords, globals, defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
         frame.f_fastlocals[0] = arg1;
         frame.f_fastlocals[1] = arg2;
-        if ((co_flags & CO_GENERATOR) != 0) {
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(frame, closure);
+        return call(state, frame, closure);
     }
 
-    public PyObject call(PyObject arg1, PyObject arg2, PyObject arg3,
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject arg3,
                          PyObject globals, PyObject[] defaults,
                          PyObject closure)
     {
         if (co_argcount != 3 || varargs || varkwargs)
-            return call(new PyObject[] {arg1, arg2, arg3},
+            return call(state, new PyObject[] {arg1, arg2, arg3},
                         Py.NoKeywords, globals, defaults, closure);
         PyFrame frame = new PyFrame(this, globals);
         frame.f_fastlocals[0] = arg1;
         frame.f_fastlocals[1] = arg2;
         frame.f_fastlocals[2] = arg3;
-        if ((co_flags & CO_GENERATOR) != 0) {
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(frame, closure);
+        return call(state, frame, closure);
+    }
+    
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2,
+            PyObject arg3, PyObject arg4, PyObject globals,
+            PyObject[] defaults, PyObject closure) {
+        if (co_argcount != 4 || varargs || varkwargs)
+            return call(state, new PyObject[]{arg1, arg2, arg3, arg4},
+                        Py.NoKeywords, globals, defaults, closure);
+        PyFrame frame = new PyFrame(this, globals);
+        frame.f_fastlocals[0] = arg1;
+        frame.f_fastlocals[1] = arg2;
+        frame.f_fastlocals[2] = arg3;
+        frame.f_fastlocals[3] = arg4;
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
+            return new PyGenerator(frame, closure);
+        }
+        return call(state, frame, closure);
     }
 
-    public PyObject call(PyObject self, PyObject args[],
+    public PyObject call(ThreadState state, PyObject self, PyObject args[],
                          String keywords[], PyObject globals,
                          PyObject[] defaults, PyObject closure)
     {
         PyObject[] os = new PyObject[args.length+1];
         os[0] = self;
         System.arraycopy(args, 0, os, 1, args.length);
-        return call(os, keywords, globals, defaults, closure);
+        return call(state, os, keywords, globals, defaults, closure);
     }
 
-    public PyObject call(PyObject args[], String kws[], PyObject globals, PyObject[] defs,
+    public PyObject call(ThreadState state, PyObject args[], String kws[], PyObject globals, PyObject[] defs,
                           PyObject closure) {
         PyFrame frame = new PyFrame(this, globals);
         int argcount = args.length - kws.length;
@@ -297,10 +291,10 @@ public abstract class PyBaseCode extends PyCode {
                                              co_name, argcount));
         }
 
-        if ((co_flags & CO_GENERATOR) != 0) {
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR)) {
             return new PyGenerator(frame, closure);
         }
-        return call(frame, closure);
+        return call(state, frame, closure);
     }
 
     public String toString() {
@@ -312,5 +306,10 @@ public abstract class PyBaseCode extends PyCode {
 
     protected int getline(PyFrame f) {
          return f.f_lineno;
+    }
+
+    // returns the augmented version of CompilerFlags (instead of just as a bit vector int)
+    public CompilerFlags getCompilerFlags() {
+        return co_flags;
     }
 }

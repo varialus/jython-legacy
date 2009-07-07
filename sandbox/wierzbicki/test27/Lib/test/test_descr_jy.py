@@ -17,6 +17,7 @@ class New(object):
 old = Old()
 new = New()
 
+
 class TestDescrTestCase(unittest.TestCase):
 
     def test_class_dict_is_copy(self):
@@ -95,6 +96,7 @@ class TestDescrTestCase(unittest.TestCase):
             self.assert_(False) # Previous line should raise AttributteError
         except AttributeError, e:
             self.assertEquals("Custom message", str(e))
+
 
 class SubclassDescrTestCase(unittest.TestCase):
 
@@ -223,6 +225,23 @@ class SubclassDescrTestCase(unittest.TestCase):
             pass
         self.assertEquals(DoublerBase(2) * AnotherDoubler(3), 12)
 
+    def test_oldstyle_binop_notimplemented(self):
+        class Foo:
+            pass
+        class Bar(object):
+            def __radd__(self, other):
+		return 3
+        self.assertEqual(Foo() + Bar(), 3)
+
+    def test_int_mul(self):
+        # http://bugs.jython.org/issue1332
+        class Foo(tuple):
+            def __rmul__(self, other):
+                return 'foo'
+        foo = Foo()
+        self.assertEqual(3.0 * foo, 'foo')
+        self.assertEqual(4 * foo, 'foo')
+
 
 class InPlaceTestCase(unittest.TestCase):
 
@@ -331,6 +350,13 @@ class DescrExceptionsTestCase(unittest.TestCase):
         self.assertRaises(AttributeError, func, old)
         self.assertRaises(TypeError, func, new)
 
+    def test_eq(self):
+        class A(object):
+            def __eq__(self, other):
+                return self.value == other.value
+        self.assertRaises(AttributeError, lambda: A() == A())
+
+
 class GetAttrTestCase(unittest.TestCase):
     def test_raising_custom_attribute_error(self):
         # Very similar to
@@ -368,11 +394,11 @@ class GetAttrTestCase(unittest.TestCase):
         except AttributeError, e:
             self.assertEquals("Custom message", str(e))
 
-# try to test more exhaustively binop overriding combination cases
 
 class Base(object):
     def __init__(self, name):
         self.name = name
+
 
 def lookup_where(obj, name):
     mro = type(obj).__mro__
@@ -380,6 +406,7 @@ def lookup_where(obj, name):
         if name in t.__dict__:
             return t.__dict__[name], t
     return None, None
+
 
 def refop(x, y, opname, ropname):
     # this has been validated by running the tests on top of cpython
@@ -393,13 +420,13 @@ def refop(x, y, opname, ropname):
     if op is None and rop is not None:
         return rop(y, x)
     if rop and where1 is not where2:
-        if (issubclass(t2, t1) and not issubclass(where1, where2)
-            and not issubclass(t1, where2)
-            ):
+        if (issubclass(t2, t1) and not issubclass(where1, where2) and
+            not issubclass(t1, where2)):
             return rop(y, x)
     if op is None:
         return "TypeError"
     return op(x,y)
+
 
 def do_test(X, Y, name, impl):
     x = X('x')
@@ -427,7 +454,7 @@ def do_test(X, Y, name, impl):
             return
 
         f = lambda self, other: (n, self.name, other.name)
-        if n%2 == 0:
+        if n % 2 == 0:
             name = opname
         else:
             name = ropname
@@ -437,23 +464,27 @@ def do_test(X, Y, name, impl):
                 continue
             if C is not object:
                 setattr(C, name, f)
-            override_in_hier(n-1)
-            if C is not object:        
+            override_in_hier(n - 1)
+            if C is not object:
                 delattr(C, name)
 
     override_in_hier()
     #print count[0]
     return fail
 
+
 class BinopCombinationsTestCase(unittest.TestCase):
-    
+
+    """Try to test more exhaustively binop overriding combination
+    cases"""
+
     def test_binop_combinations_mul(self):
         class X(Base):
             pass
         class Y(X):
             pass
 
-        fail = do_test(X, Y, 'mul', lambda x,y: x*y)
+        fail = do_test(X, Y, 'mul', lambda x, y: x*y)
         #print len(fail)
         self.assert_(not fail)
 
@@ -463,9 +494,9 @@ class BinopCombinationsTestCase(unittest.TestCase):
         class Y(X):
             pass
 
-        fail = do_test(X, Y, 'sub', lambda x,y: x-y)
+        fail = do_test(X, Y, 'sub', lambda x, y: x-y)
         #print len(fail)
-        self.assert_(not fail)        
+        self.assert_(not fail)
 
     def test_binop_combinations_pow(self):
         class X(Base):
@@ -473,9 +504,9 @@ class BinopCombinationsTestCase(unittest.TestCase):
         class Y(X):
             pass
 
-        fail = do_test(X, Y, 'pow', lambda x,y: x**y)
+        fail = do_test(X, Y, 'pow', lambda x, y: x**y)
         #print len(fail)
-        self.assert_(not fail)        
+        self.assert_(not fail)
 
     def test_binop_combinations_more_exhaustive(self):
         class X(Base):
@@ -499,9 +530,10 @@ class BinopCombinationsTestCase(unittest.TestCase):
         class Y(C1, X1, C2):
             pass
 
-        fail = do_test(X, Y, 'sub', lambda x,y: x-y)
+        fail = do_test(X, Y, 'sub', lambda x, y: x - y)
         #print len(fail)
         self.assert_(not fail)
+
 
 def test_main():
     test_support.run_unittest(TestDescrTestCase,
@@ -510,6 +542,7 @@ def test_main():
                               DescrExceptionsTestCase,
                               GetAttrTestCase,
                               BinopCombinationsTestCase)
+
 
 if __name__ == '__main__':
     test_main()

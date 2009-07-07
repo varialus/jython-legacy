@@ -384,10 +384,7 @@ public class cPickle implements ClassDictInit {
     public static PyObject PicklingError;
     public static PyObject UnpickleableError;
     public static PyObject UnpicklingError;
-
-    public static final PyString BadPickleGet =
-                new PyString("cPickle.BadPickleGet");
-
+    public static PyObject BadPickleGet;
 
     final static char MARK            = '(';
     final static char STOP            = '.';
@@ -510,6 +507,7 @@ public class cPickle implements ClassDictInit {
         PicklingError = Py.makeClass("PicklingError", PickleError, exceptionNamespace());
         UnpickleableError = Py.makeClass("UnpickleableError", PicklingError, _UnpickleableError());
         UnpicklingError = Py.makeClass("UnpicklingError", PickleError, exceptionNamespace());
+        BadPickleGet = Py.makeClass("BadPickleGet", UnpicklingError, exceptionNamespace());
     }
 
     public static PyObject exceptionNamespace() {
@@ -772,14 +770,8 @@ public class cPickle implements ClassDictInit {
 
 
         private void save(PyObject object, boolean pers_save) {
-            if (!pers_save) {
-                if (persistent_id != null) {
-                    PyObject pid = persistent_id.__call__(object);
-                    if (pid != Py.None) {
-                        save_pers(pid);
-                        return;
-                    }
-                }
+            if (!pers_save && persistent_id != null && save_pers(object, persistent_id)) {
+                return;
             }
 
             int d = get_id(object);
@@ -803,12 +795,8 @@ public class cPickle implements ClassDictInit {
             if (save_type(object, t))
                 return;
 
-            if (inst_persistent_id != null) {
-                PyObject pid = inst_persistent_id.__call__(object);
-                if (pid != Py.None) {
-                    save_pers(pid);
-                    return;
-                }
+            if (!pers_save && inst_persistent_id != null && save_pers(object, inst_persistent_id)) {
+                return;
             }
 
             if (Py.isSubClass(t, PyType.TYPE)) {
@@ -861,13 +849,20 @@ public class cPickle implements ClassDictInit {
                             "Second element of tupe returned by " +
                             reduce.__repr__() + " must be a tuple");
             }
-            save_reduce(callable, arg_tup, state, listitems, dictitems, putMemo(d, object));
-
+            save_reduce(callable, arg_tup, state, listitems, dictitems, object);
         }
 
 
-        final private void save_pers(PyObject pid) {
+        final private boolean save_pers(PyObject object, PyObject pers_func) {
+            PyObject pid = pers_func.__call__(object);
+            if (pid == Py.None) {
+                return false;
+            }
+
             if (protocol == 0) {
+                if (!Py.isInstance(pid, PyString.TYPE)) {
+                    throw new PyException(PicklingError, "persistent id must be string");
+                }
                 file.write(PERSID);
                 file.write(pid.toString());
                 file.write("\n");
@@ -875,10 +870,12 @@ public class cPickle implements ClassDictInit {
                 save(pid, true);
                 file.write(BINPERSID);
             }
+            return true;
         }
 
         final private void save_reduce(PyObject callable, PyObject arg_tup,
-                                       PyObject state, PyObject listitems, PyObject dictitems, int memoId)
+                                       PyObject state, PyObject listitems, PyObject dictitems,
+                                       PyObject object)
         {
             PyObject callableName = callable.__findattr__("__name__");
             if(protocol >= 2 && callableName != null
@@ -896,7 +893,10 @@ public class cPickle implements ClassDictInit {
                 save(arg_tup);
                 file.write(REDUCE);
             }
-            put(memoId);
+
+            // Memoize
+            put(putMemo(get_id(object), object));
+
             if (listitems != Py.None) {
                 batch_appends(listitems);
             }
@@ -1067,21 +1067,15 @@ public class cPickle implements ClassDictInit {
 
 
         final private void save_string(PyObject object) {
-            boolean unicode = ((PyString) object).isunicode();
             String str = object.toString();
 
             if (protocol > 0) {
-                if (unicode)
-                    str = codecs.PyUnicode_EncodeUTF8(str, "struct");
                 int l = str.length();
-                if (l < 256 && !unicode) {
+                if (l < 256) {
                     file.write(SHORT_BINSTRING);
                     file.write((char)l);
                 } else {
-                    if (unicode)
-                        file.write(BINUNICODE);
-                    else
-                        file.write(BINSTRING);
+                    file.write(BINSTRING);
                     file.write((char)( l         & 0xFF));
                     file.write((char)((l >>> 8 ) & 0xFF));
                     file.write((char)((l >>> 16) & 0xFF));
@@ -1089,14 +1083,8 @@ public class cPickle implements ClassDictInit {
                 }
                 file.write(str);
             } else {
-                if (unicode) {
-                    file.write(UNICODE);
-                    file.write(codecs.PyUnicode_EncodeRawUnicodeEscape(str,
-                                                            "strict", true));
-                } else {
-                    file.write(STRING);
-                    file.write(object.__repr__().toString());
-                }
+                file.write(STRING);
+                file.write(object.__repr__().toString());
                 file.write("\n");
             }
             put(putMemo(get_id(object), object));
@@ -1426,7 +1414,7 @@ public class cPickle implements ClassDictInit {
     /*
      * A very specialized and simplified version of PyStringMap. It can
      * only use integers as keys and stores both an integer and an object
-     * as value. It is very private!
+     * as value. It is very private! And should only be used thread-confined.
      */
     static private class PickleMemo {
         //Table of primes to cycle through
@@ -1456,7 +1444,7 @@ public class cPickle implements ClassDictInit {
             this(4);
         }
 
-        public synchronized int size() {
+        public int size() {
             return size;
         }
 
@@ -1521,7 +1509,7 @@ public class cPickle implements ClassDictInit {
         }
 
 
-        private synchronized final void resize(int capacity) {
+        private final void resize(int capacity) {
             int p = prime;
             for(; p<primes.length; p++) {
                 if (primes[p] >= capacity) break;
@@ -1670,6 +1658,9 @@ public class cPickle implements ClassDictInit {
                 case LONG4:           load_bin_long(4); break;
                 case STOP:
                     return load_stop();
+                default:
+                    throw new PyException(UnpicklingError,
+                                          String.format("invalid load key, '%s'.", key));
                 }
             }
         }
@@ -1696,14 +1687,27 @@ public class cPickle implements ClassDictInit {
 
 
         final private void load_persid() {
-            String pid = file.readlineNoNl();
-            push(persistent_load.__call__(new PyString(pid)));
+            load_persid(new PyString(file.readlineNoNl()));
         }
 
 
         final private void load_binpersid() {
-            PyObject pid = pop();
-            push(persistent_load.__call__(pid));
+            load_persid(pop());
+        }
+
+        final private void load_persid(PyObject pid) {
+            if (persistent_load == null) {
+                throw new PyException(UnpicklingError,
+                                      "A load persistent id instruction was encountered,\n"
+                                      + "but no persistent_load function was specified.");
+            }
+
+            if (persistent_load instanceof PyList) {
+                ((PyList)persistent_load).append(pid);
+            } else {
+                pid = persistent_load.__call__(pid);
+            }
+            push(pid);
         }
 
 
@@ -2064,16 +2068,18 @@ public class cPickle implements ClassDictInit {
         final private void load_get() {
             String py_str = file.readlineNoNl();
             PyObject value = memo.get(py_str);
-            if (value == null)
+            if (value == null) {
                 throw new PyException(BadPickleGet, py_str);
+            }
             push(value);
         }
 
         final private void load_binget() {
             String py_key = String.valueOf((int)file.read(1).charAt(0));
             PyObject value = memo.get(py_key);
-            if (value == null)
+            if (value == null) {
                 throw new PyException(BadPickleGet, py_key);
+            }
             push(value);
         }
 
@@ -2081,8 +2087,9 @@ public class cPickle implements ClassDictInit {
             int i = read_binint();
             String py_key = String.valueOf(i);
             PyObject value = memo.get(py_key);
-            if (value == null)
+            if (value == null) {
                 throw new PyException(BadPickleGet, py_key);
+            }
             push(value);
         }
 
@@ -2150,40 +2157,43 @@ public class cPickle implements ClassDictInit {
         }
 
         private void load_build() {
-            PyObject value = pop();
+            PyObject state = pop();
             PyObject inst  = peek();
             PyObject setstate = inst.__findattr__("__setstate__");
-            if(setstate == null) {
-                PyObject slotstate = null;
-                // A default __setstate__.  First see whether state
-                // embeds a slot state dict too (a proto 2 addition).
-                if (value instanceof PyTuple && value.__len__() == 2) {
-                    PyObject temp = value;
-                    value = temp.__getitem__(0);
-                    slotstate = temp.__getitem__(1);
-                }
+            if (setstate != null) {
+                // The explicit __setstate__ is responsible for everything.
+                setstate.__call__(state);
+                return;
+            }
 
-                PyObject dict;
-                if(inst instanceof PyInstance) {
-                    dict = ((PyInstance)inst).__dict__;
-                } else {
-                    dict = inst.getDict();
-                }
-                dict.__findattr__("update").__call__(value);
+            // A default __setstate__.  First see whether state embeds a slot state dict
+            // too (a proto 2 addition).
+            PyObject slotstate = null;
+            if (state instanceof PyTuple && state.__len__() == 2) {
+                PyObject temp = state;
+                state = temp.__getitem__(0);
+                slotstate = temp.__getitem__(1);
+            }
 
-                // Also set instance attributes from the slotstate
-                // dict (if any).
-                if (slotstate != null) {
-                    if (!(slotstate instanceof PyDictionary)) {
-                        throw new PyException(UnpicklingError, "slot state is not a dictionary");
-                    }
-                    for (PyObject item : ((PyDictionary)slotstate).iteritems().asIterable()) {
-                        inst.__setattr__(PyObject.asName(item.__getitem__(0)),
-                                         item.__getitem__(1));
-                    }
+            if (state != Py.None) {
+                if (!(state instanceof PyDictionary)) {
+                    throw new PyException(UnpicklingError, "state is not a dictionary");
                 }
-            } else {
-                setstate.__call__(value);
+                PyObject dict = inst.__getattr__("__dict__");
+                for (PyObject item : ((PyDictionary)state).iteritems().asIterable()) {
+                    dict.__setitem__(item.__getitem__(0), item.__getitem__(1));
+                }
+            }
+
+            // Also set instance attributes from the slotstate dict (if any).
+            if (slotstate != null) {
+                if (!(slotstate instanceof PyDictionary)) {
+                    throw new PyException(UnpicklingError, "slot state is not a dictionary");
+                }
+                for (PyObject item : ((PyDictionary)slotstate).iteritems().asIterable()) {
+                    inst.__setattr__(PyObject.asName(item.__getitem__(0)),
+                                     item.__getitem__(1));
+                }
             }
         }
 

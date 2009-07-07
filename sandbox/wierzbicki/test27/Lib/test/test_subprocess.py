@@ -323,8 +323,10 @@ class ProcessTestCase(unittest.TestCase):
         # communicate() with writes larger than pipe_buf
         # This test will probably deadlock rather than fail, if
         # communicate() does not work properly.
-        if mswindows or jython:
+        if mswindows or (jython and os._name == 'nt'):
             pipe_buf = 512
+        elif jython:
+            pipe_buf = 16384
         else:
             x, y = os.pipe()
             pipe_buf = os.fpathconf(x, "PC_PIPE_BUF")
@@ -697,6 +699,10 @@ class ProcessTestCase(unittest.TestCase):
                               [sys.executable,
                                "-c", "import sys; sys.exit(47)"],
                               preexec_fn=lambda: 1)
+            # invalid command line args should raise TypeError
+            self.assertRaises(TypeError, subprocess.call,
+                              [sys.executable,
+                               "-c", 1])
 
 
 def test_main():

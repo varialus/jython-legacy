@@ -30,15 +30,13 @@ __all__.extend(['EX_OK', 'F_OK', 'O_APPEND', 'O_CREAT', 'O_EXCL', 'O_RDONLY',
                 'O_RDWR', 'O_SYNC', 'O_TRUNC', 'O_WRONLY', 'R_OK', 'SEEK_CUR',
                 'SEEK_END', 'SEEK_SET', 'W_OK', 'X_OK', '_exit', 'access',
                 'altsep', 'chdir', 'chmod', 'close', 'curdir', 'defpath',
-                'environ', 'error', 'fdopen', 'getcwd', 'getcwdu', 'getegid',
-                'getenv','geteuid', 'getgid', 'getlogin', 'getlogin', 'getpgrp',
-                'getpid', 'getppid', 'getuid', 'isatty', 'linesep', 'listdir',
-                'lseek', 'lstat', 'makedirs', 'mkdir', 'name', 'open', 'pardir',
-                'path', 'pathsep', 'popen', 'popen2', 'popen3', 'popen4',
-                'putenv', 'read', 'remove', 'removedirs', 'rename', 'renames',
-                'rmdir', 'sep', 'setpgrp', 'setsid', 'stat', 'stat_result',
-                'strerror', 'system', 'unlink', 'unsetenv', 'utime', 'walk',
-                'write'])
+                'environ', 'error', 'fdopen', 'fsync', 'getcwd', 'getcwdu',
+                'getenv', 'getpid', 'isatty', 'linesep', 'listdir', 'lseek',
+                'lstat', 'makedirs', 'mkdir', 'name', 'open', 'pardir', 'path',
+                'pathsep', 'popen', 'popen2', 'popen3', 'popen4', 'putenv',
+                'read', 'remove', 'removedirs', 'rename', 'renames', 'rmdir',
+                'sep', 'stat', 'stat_result', 'strerror', 'system', 'unlink',
+                'unsetenv', 'utime', 'walk', 'write'])
 
 import errno
 import jarray
@@ -57,17 +55,9 @@ except ImportError:
 
 # Mapping of: os._name: [name list, shell command list]
 _os_map = dict(nt=[
-        ['Windows 95', 'Windows 98', 'Windows ME', 'Windows NT',
-         'Windows NT 4.0', 'WindowsNT', 'Windows 2000', 'Windows 2003',
-         'Windows XP', 'Windows Vista'],
+        ['Windows'],
         [['cmd.exe', '/c'], ['command.com', '/c']]
         ],
-
-               ce=[
-        ['Windows CE'],
-        [['cmd.exe', '/c']]
-        ],
-
                posix=[
         [], # posix is a fallback, instead of matching names
         [['/bin/sh', '-c']]
@@ -133,7 +123,7 @@ class PythonPOSIXHandler(POSIXHandler):
 _posix = POSIXFactory.getPOSIX(PythonPOSIXHandler(), True)
 _native_posix = not isinstance(_posix, JavaPOSIX)
 
-if _name in ('nt', 'ce'):
+if _name == 'nt':
     import ntpath as path
 else:
     import posixpath as path
@@ -198,7 +188,7 @@ class stat_result:
 
   def __init__(self, results):
     if len(results) != 10:
-      raise TypeError("stat_result() takes an a  10-sequence")
+      raise TypeError("stat_result() takes an a 10-sequence")
     for (name, index) in stat_result._stat_members:
       self.__dict__[name] = results[index]
 
@@ -233,6 +223,10 @@ class stat_result:
     if not isinstance(other, stat_result):
       return 1
     return cmp(self.__dict__, other.__dict__)
+
+  def __repr__(self):
+      return repr(tuple(self.__dict__[member[0]] for member
+                        in stat_result._stat_members))
 
 error = OSError
 
@@ -723,27 +717,28 @@ def _handle_oserror(func, *args, **kwargs):
     except:
         raise OSError(errno.EBADF, strerror(errno.EBADF))
 
-# Provide lazy popen*, and system objects
-# Do these lazily, as most jython programs don't need them,
-# and they are very expensive to initialize
-
-def system( *args, **kwargs ):
+def system(command):
     """system(command) -> exit_status
 
     Execute the command (a string) in a subshell.
     """
-    # allow lazy import of popen2 and javashell
-    import popen2
-    return popen2.system( *args, **kwargs )
+    import subprocess
+    return subprocess.call(command, shell=True)
 
-def popen( *args, **kwargs ):
+def popen(command, mode='r', bufsize=-1):
     """popen(command [, mode='r' [, bufsize]]) -> pipe
 
     Open a pipe to/from a command returning a file object.
     """
-    # allow lazy import of popen2 and javashell
-    import popen2
-    return popen2.popen( *args, **kwargs )
+    import subprocess
+    if mode == 'r':
+        return subprocess.Popen(command, bufsize=bufsize, shell=True,
+                                stdout=subprocess.PIPE).stdout
+    elif mode == 'w':
+        return subprocess.Popen(command, bufsize=bufsize, shell=True,
+                                stdin=subprocess.PIPE).stdin
+    else:
+        raise OSError(errno.EINVAL, strerror(errno.EINVAL))
 
 # os module versions of the popen# methods have different return value
 # order than popen2 functions
@@ -909,9 +904,22 @@ if _name in ('os2', 'nt'):  # Where Env Var Names Must Be UPPERCASE
             return key.upper() in self.data
         def get(self, key, failobj=None):
             return self.data.get(key.upper(), failobj)
-        def update(self, dict):
-            for k, v in dict.items():
-                self[k] = v
+        def update(self, dict=None, **kwargs):
+            if dict:
+                try:
+                    keys = dict.keys()
+                except AttributeError:
+                    # List of (key, value)
+                    for k, v in dict:
+                        self[k] = v
+                else:
+                    # got keys
+                    # cannot use items(), since mappings
+                    # may not have them.
+                    for k in keys:
+                        self[k] = dict[k]
+            if kwargs:
+                self.update(kwargs)
         def copy(self):
             return dict(self)
 
@@ -1053,6 +1061,41 @@ if _name == 'posix':
             raise OSError(status[0], strerror(status[0]))
         return res_pid, status[0]
 
+    def fdatasync(fd):
+        """fdatasync(fildes)
+        
+        force write of file with filedescriptor to disk.
+        does not force update of metadata.
+        """
+        _fsync(fd, False)
+
+    __all__.extend(['link', 'symlink', 'readlink', 'getegid', 'geteuid',
+                    'getgid', 'getlogin', 'getpgrp', 'getppid', 'getuid',
+                    'setpgrp', 'setsid', 'kill', 'wait', 'waitpid',
+                    'fdatasync'])
+
+def fsync(fd):
+    """fsync(fildes)
+    
+    force write of file with filedescriptor to disk.
+    """
+    _fsync(fd, True)
+
+def _fsync(fd, metadata):
+    """Internal fsync impl"""
+    rawio = FileDescriptors.get(fd)
+    rawio.checkClosed()
+    
+    from java.nio.channels import FileChannel
+    channel = rawio.getChannel()
+    if not isinstance(channel, FileChannel):
+        raise OSError(errno.EINVAL, strerror(errno.EINVAL))
+
+    try:
+        channel.force(metadata)
+    except java.io.IOException, ioe:
+        raise OSError(ioe)
+
 def getpid():
     """getpid() -> pid
 
@@ -1083,7 +1126,6 @@ def isatty(fileno):
         return _posix.isatty(fileno)
 
     if not isinstance(fileno, IOBase):
-        print fileno
         raise TypeError('a file descriptor is required')
 
     return fileno.isatty()

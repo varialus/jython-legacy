@@ -19,21 +19,21 @@ class VisibilityTest(unittest.TestCase):
                 "Calling a Java class with package protected constructors should raise a TypeError")
 
     def test_protected_from_python_subclass(self):
-        class SubVisible(Visible):
+        class PySubVisible(Visible):
             def __init__(self, publicValue=None):
                 if publicValue is not None:
                     Visible.__init__(self, publicValue)
                 else:
                     Visible.__init__(self)
-        class SubSubVisible(SubVisible):
+        class SubPySubVisible(PySubVisible):
             pass
         # TODO - protectedStaticMethod, protectedStaticField, StaticInner, and protectedField should
         # be here
-        for cls in SubVisible, SubSubVisible:
+        for cls in PySubVisible, SubPySubVisible:
             s = cls()
             self.assertEquals(Results.PROTECTED_METHOD, s.protectedMethod(0))
             self.assertEquals(Results.OVERLOADED_PROTECTED_METHOD, s.protectedMethod('foo'))
-            self.assertEquals(Results.UNUSED, SubVisible(Results.UNUSED).visibleField)
+            self.assertEquals(Results.UNUSED, PySubVisible(Results.UNUSED).visibleField)
             self.assertRaises(TypeError, OnlySubclassable,
                     "Calling a Java class with protected constructors should raise a TypeError")
         class SubSubclassable(OnlySubclassable):
@@ -227,6 +227,9 @@ class RespectJavaAccessibilityTest(unittest.TestCase):
 
     def test_protected_class(self):
         self.run_accessibility_script("access_protected_class.py", TypeError)
+
+    def test_overriding(self):
+        self.run_accessibility_script("call_overridden_method.py")
 
 class ClassloaderTest(unittest.TestCase):
     def test_loading_classes_without_import(self):

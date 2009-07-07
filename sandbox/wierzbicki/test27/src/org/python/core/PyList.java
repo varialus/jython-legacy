@@ -1,38 +1,61 @@
 // Copyright (c) Corporation for National Research Initiatives
 package org.python.core;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
 import org.python.util.Generic;
 
-/**
- * A builtin python list.
- */
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
 @ExposedType(name = "list", base = PyObject.class)
-public class PyList extends PySequenceList {
+public class PyList extends PySequenceList implements List {
 
     public static final PyType TYPE = PyType.fromClass(PyList.class);
+    protected final List<PyObject> list;
+    public volatile int gListAllocatedStatus = -1;
 
     public PyList() {
-        this(TYPE, Py.EmptyObjects);
+        this(TYPE);
     }
 
     public PyList(PyType type) {
         super(type);
+        list = Generic.list();
+    }
+
+    private PyList(List list, boolean convert) {
+        super(TYPE);
+        if (!convert) {
+            this.list = list;
+        } else {
+            this.list = Generic.list();
+            for (Object o : list) {
+                add(o);
+            }
+        }
     }
 
     public PyList(PyType type, PyObject[] elements) {
-        super(type, elements);
+        super(type);
+        list = new ArrayList<PyObject>(Arrays.asList(elements));
     }
 
     public PyList(PyType type, Collection c) {
-        super(type, c);
+        super(type);
+        list = new ArrayList<PyObject>(c.size());
+        for (Object o : c) {
+            add(o);
+        }
     }
 
     public PyList(PyObject[] elements) {
@@ -40,23 +63,28 @@ public class PyList extends PySequenceList {
     }
 
     public PyList(Collection c) {
-        super(TYPE, c);
+        this(TYPE, c);
     }
 
     public PyList(PyObject o) {
         this(TYPE);
         for (PyObject item : o.asIterable()) {
-            append(item);
+            list.add(item);
         }
     }
 
-    private static List<PyObject> listify(Iterator<PyObject> iter) {
-         List<PyObject> list = Generic.list();
-         while (iter.hasNext()) {
-            list.add(iter.next());
-         }
-         return list;
+    public static PyList fromList(List<PyObject> list) {
+        return new PyList(list, false);
     }
+
+    private static List<PyObject> listify(Iterator<PyObject> iter) {
+        List<PyObject> list = Generic.list();
+        while (iter.hasNext()) {
+            list.add(iter.next());
+        }
+        return list;
+    }
+
     public PyList(Iterator<PyObject> iter) {
         this(TYPE, listify(iter));
     }
@@ -64,15 +92,16 @@ public class PyList extends PySequenceList {
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.list___init___doc)
     final void list___init__(PyObject[] args, String[] kwds) {
-        ArgParser ap = new ArgParser("list", args, kwds, new String[] {"sequence"}, 0);
+        ArgParser ap = new ArgParser("list", args, kwds, new String[]{"sequence"}, 0);
         PyObject seq = ap.getPyObject(0, null);
         clear();
-        if(seq == null) {
+        if (seq == null) {
             return;
         }
-        if(seq instanceof PySequenceList) {
-            PySequenceList p = (PySequenceList)seq.__getslice__(Py.None, Py.None, Py.One);
-            this.list = p.list;
+        if (seq instanceof PyList) {
+            list.addAll(((PyList) seq).list); // don't convert
+        } else if (seq instanceof PyTuple) {
+            list.addAll(((PyTuple) seq).getList());
         } else {
             for (PyObject item : seq.asIterable()) {
                 append(item);
@@ -80,115 +109,103 @@ public class PyList extends PySequenceList {
         }
     }
 
+    @Override
     public int __len__() {
         return list___len__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___len___doc)
-    final int list___len__() {
+    final synchronized int list___len__() {
         return size();
     }
 
-    protected PyObject getslice(int start, int stop, int step) {
-        if(step > 0 && stop < start) {
-            stop = start;
-        }
-        int n = sliceLength(start, stop, step);
-        PyObject[] newList = new PyObject[n];
-        PyObject[] array = getArray();
-        if(step == 1) {
-            System.arraycopy(array, start, newList, 0, stop - start);
-            return new PyList(newList);
-        }
-        int j = 0;
-        for(int i = start; j < n; i += step) {
-            newList[j] = array[i];
-            j++;
-        }
-        return new PyList(newList);
-    }
-
+    @Override
     protected void del(int i) {
         remove(i);
     }
 
+    @Override
     protected void delRange(int start, int stop) {
         remove(start, stop);
     }
 
+    @Override
     protected void setslice(int start, int stop, int step, PyObject value) {
-        if(stop < start) {
+        if (stop < start) {
             stop = start;
         }
-        if(value instanceof PySequence) {
-            PySequence sequence = (PySequence) value;
-            setslicePySequence(start, stop, step, sequence);
-        } else if(value instanceof List) {
-            List list = (List)value.__tojava__(List.class);
-            if(list != null && list != Py.NoConversion) {
-                setsliceList(start, stop, step, list);
+        if (value instanceof PyList) {
+            if (value == this) { // copy
+                value = new PyList((PySequence) value);
             }
+            setslicePyList(start, stop, step, (PyList) value);
+        } else if (value instanceof PySequence) {
+            setsliceIterator(start, stop, step, value.asIterable().iterator());
+        } else if (value != null && !(value instanceof List)) {
+            value = new PyList(value);
+            setsliceIterator(start, stop, step, value.asIterable().iterator());
         } else {
-            setsliceIterable(start, stop, step, value);
+            List valueList = (List) value.__tojava__(List.class);
+            if (valueList != null && valueList != Py.NoConversion) {
+                setsliceList(start, stop, step, valueList);
+            }
         }
     }
 
-    protected void setslicePySequence(int start, int stop, int step, PySequence value) {
-        if(step == 1) {
-            PyObject[] otherArray;
-            PyObject[] array = getArray();
+    final private void setsliceList(int start, int stop, int step, List value) {
+        int n = sliceLength(start, stop, step);
+        if (list instanceof ArrayList) {
+            ((ArrayList) list).ensureCapacity(start + n);
+        }
+        ListIterator src = value.listIterator();
+        for (int j = start; src.hasNext(); j += step) {
+            set(j, src.next());
+        }
+    }
 
-            int n = value.__len__();
-            if (value instanceof PySequenceList) {
-                otherArray = ((PySequenceList)value).getArray();
-            } else {
-                otherArray = Py.unpackSequence(value, value.__len__());
-            }
-            if (otherArray == array) {
-                otherArray = otherArray.clone();
-            }
-            list.replaceSubArray(start, stop, otherArray, 0, n);
-        } else if(step != 0) {
-            if(value == this) {
-                PyList newseq = new PyList();
-                PyObject iter = value.__iter__();
-                for(PyObject item = null; (item = iter.__iternext__()) != null;) {
-                    newseq.append(item);
+    final private void setsliceIterator(int start, int stop, int step, Iterator<PyObject> iter) {
+        if (step == 1) {
+            List<PyObject> insertion = new ArrayList<PyObject>();
+            if (iter != null) {
+                while (iter.hasNext()) {
+                    insertion.add(iter.next());
                 }
-                value = newseq;
             }
-            int n = value.__len__();
-            for (int i = 0, j = start; i < n; i++, j += step) {
-                list.pyset(j, value.pyget(i));
+            list.subList(start, stop).clear();
+            list.addAll(start, insertion);
+        } else {
+            int size = list.size();
+            for (int j = start; iter.hasNext(); j += step) {
+                PyObject item = iter.next();
+                if (j >= size) {
+                    list.add(item);
+                } else {
+                    list.set(j, item);
+                }
             }
         }
     }
 
-    protected void setsliceList(int start, int stop, int step, List value) {
-        if(step != 1) {
-            throw Py.TypeError("setslice with java.util.List and step != 1 not supported yet");
-        }
-        int n = value.size();
-        list.ensureCapacity(start + n);
-        for(int i = 0; i < n; i++) {
-            list.add(i + start, value.get(i));
-        }
-    }
-
-    protected void setsliceIterable(int start, int stop, int step, PyObject value) {
-        PyObject[] seq;
-        try {
-            seq = Py.make_array(value);
-        } catch (PyException pye) {
-            if (Py.matchException(pye, Py.TypeError)) {
-                throw Py.TypeError("can only assign an iterable");
+    final private void setslicePyList(int start, int stop, int step, PyList other) {
+        if (step == 1) {
+            list.subList(start, stop).clear();
+            list.addAll(start, other.list);
+        } else {
+            int size = list.size();
+            Iterator<PyObject> iter = other.list.listIterator();
+            for (int j = start; iter.hasNext(); j += step) {
+                PyObject item = iter.next();
+                if (j >= size) {
+                    list.add(item);
+                } else {
+                    list.set(j, item);
+                }
             }
-            throw pye;
         }
-        setslicePySequence(start, stop, step, new PyList(seq));
     }
 
-    protected PyObject repeat(int count) {
+    @Override
+    protected synchronized PyObject repeat(int count) {
         if (count < 0) {
             count = 0;
         }
@@ -198,50 +215,50 @@ public class PyList extends PySequenceList {
             throw Py.MemoryError("");
         }
 
-        PyObject[] array = getArray();
-        PyObject[] newArray = new PyObject[newSize];
-        for(int i = 0; i < count; i++) {
-            System.arraycopy(array, 0, newArray, i * size, size);
+        PyList newList = new PyList();
+        for (int i = 0; i < count; i++) {
+            newList.addAll(list);
         }
-        return new PyList(newArray);
+        return newList;
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___ne___doc)
-    final PyObject list___ne__(PyObject o) {
+    final synchronized PyObject list___ne__(PyObject o) {
         return seq___ne__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___eq___doc)
-    final PyObject list___eq__(PyObject o) {
+    final synchronized PyObject list___eq__(PyObject o) {
         return seq___eq__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___lt___doc)
-    final PyObject list___lt__(PyObject o) {
+    final synchronized PyObject list___lt__(PyObject o) {
         return seq___lt__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___le___doc)
-    final PyObject list___le__(PyObject o) {
+    final synchronized PyObject list___le__(PyObject o) {
         return seq___le__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___gt___doc)
-    final PyObject list___gt__(PyObject o) {
+    final synchronized PyObject list___gt__(PyObject o) {
         return seq___gt__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___ge___doc)
-    final PyObject list___ge__(PyObject o) {
+    final synchronized PyObject list___ge__(PyObject o) {
         return seq___ge__(o);
     }
 
+    @Override
     public PyObject __imul__(PyObject o) {
         return list___imul__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___imul___doc)
-    final PyObject list___imul__(PyObject o) {
+    final synchronized PyObject list___imul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -262,12 +279,14 @@ public class PyList extends PySequenceList {
         }
 
         int newSize = size * count;
-        list.setSize(newSize);
-        PyObject[] array = getArray();
-        for (int i = 1; i < count; i++) {
-            System.arraycopy(array, 0, array, i * size, size);
+        if (list instanceof ArrayList) {
+            ((ArrayList) list).ensureCapacity(newSize);
         }
-        gListAllocatedStatus = __len__();
+        List oldList = new ArrayList<PyObject>(list);
+        for (int i = 1; i < count; i++) {
+            list.addAll(oldList);
+        }
+        gListAllocatedStatus = __len__(); // now omit?
         return this;
     }
 
@@ -277,7 +296,7 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___mul___doc)
-    final PyObject list___mul__(PyObject o) {
+    final synchronized PyObject list___mul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
@@ -290,36 +309,37 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___rmul___doc)
-    final PyObject list___rmul__(PyObject o) {
+    final synchronized PyObject list___rmul__(PyObject o) {
         if (!o.isIndex()) {
             return null;
         }
         return repeat(o.asIndex(Py.OverflowError));
     }
 
+    @Override
     public PyObject __add__(PyObject o) {
         return list___add__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___add___doc)
-    final PyObject list___add__(PyObject o) {
+    final synchronized PyObject list___add__(PyObject o) {
         PyList sum = null;
-        if(o instanceof PyList) {
-            PyList other = (PyList)o;
-            int thisLen = size();
-            int otherLen = other.size();
-            PyObject[] newList = new PyObject[thisLen + otherLen];
-            System.arraycopy(getArray(), 0, newList, 0, thisLen);
-            System.arraycopy(other.getArray(), 0, newList, thisLen, otherLen);
-            sum = new PyList(newList);
-        } else if(!(o instanceof PySequenceList)) {
+        if (o instanceof PySequenceList && !(o instanceof PyTuple)) {
+            if (o instanceof PyList) {
+                List oList = ((PyList) o).list;
+                List newList = new ArrayList(list.size() + oList.size());
+                newList.addAll(list);
+                newList.addAll(oList);
+                sum = fromList(newList);
+            }
+        } else if (!(o instanceof PySequenceList)) {
             // also support adding java lists (but not PyTuple!)
             Object oList = o.__tojava__(List.class);
-            if(oList != Py.NoConversion && oList != null) {
+            if (oList != Py.NoConversion && oList != null) {
                 List otherList = (List) oList;
                 sum = new PyList();
                 sum.list_extend(this);
-                for(Iterator i = otherList.iterator(); i.hasNext();) {
+                for (Iterator i = otherList.iterator(); i.hasNext();) {
                     sum.add(i.next());
                 }
             }
@@ -327,17 +347,18 @@ public class PyList extends PySequenceList {
         return sum;
     }
 
+    @Override
     public PyObject __radd__(PyObject o) {
         return list___radd__(o);
     }
 
     //XXX: needs __doc__
     @ExposedMethod(type = MethodType.BINARY)
-    final PyObject list___radd__(PyObject o) {
+    final synchronized PyObject list___radd__(PyObject o) {
         // Support adding java.util.List, but prevent adding PyTuple.
-        // 'o' should never be a PyList since __add__ is defined.
+        // 'o' should never be a PyNewList since __add__ is defined.
         PyList sum = null;
-        if(o instanceof PySequence) {
+        if (o instanceof PySequence) {
             return null;
         }
         Object oList = o.__tojava__(List.class);
@@ -350,55 +371,57 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___contains___doc)
-    final boolean list___contains__(PyObject o) {
+    final synchronized boolean list___contains__(PyObject o) {
         return object___contains__(o);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___delitem___doc)
-    final void list___delitem__(PyObject index) {
+    final synchronized void list___delitem__(PyObject index) {
         seq___delitem__(index);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___setitem___doc)
-    final void list___setitem__(PyObject o, PyObject def) {
+    final synchronized void list___setitem__(PyObject o, PyObject def) {
         seq___setitem__(o, def);
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___getitem___doc)
-    final PyObject list___getitem__(PyObject o) {
+    final synchronized PyObject list___getitem__(PyObject o) {
         PyObject ret = seq___finditem__(o);
-        if(ret == null) {
+        if (ret == null) {
             throw Py.IndexError("index out of range: " + o);
         }
         return ret;
     }
 
+    @Override
     public PyObject __iter__() {
         return list___iter__();
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___iter___doc)
-    public PyObject list___iter__() {
+    public synchronized PyObject list___iter__() {
         return new PyFastSequenceIter(this);
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.list___getslice___doc)
-    final PyObject list___getslice__(PyObject start, PyObject stop, PyObject step) {
+    final synchronized PyObject list___getslice__(PyObject start, PyObject stop, PyObject step) {
         return seq___getslice__(start, stop, step);
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.list___setslice___doc)
-    final void list___setslice__(PyObject start, PyObject stop, PyObject step, PyObject value) {
+    final synchronized void list___setslice__(PyObject start, PyObject stop, PyObject step, PyObject value) {
         seq___setslice__(start, stop, step, value);
     }
 
     @ExposedMethod(defaults = "null", doc = BuiltinDocs.list___delslice___doc)
-    final void list___delslice__(PyObject start, PyObject stop, PyObject step) {
+    final synchronized void list___delslice__(PyObject start, PyObject stop, PyObject step) {
         seq___delslice__(start, stop, step);
     }
 
+    @Override
     protected String unsupportedopMessage(String op, PyObject o2) {
-        if(op.equals("+")) {
+        if (op.equals("+")) {
             return "can only concatenate list (not \"{2}\") to list";
         }
         return super.unsupportedopMessage(op, o2);
@@ -410,20 +433,20 @@ public class PyList extends PySequenceList {
 
     //XXX: needs __doc__
     @ExposedMethod(names = "__repr__")
-    final String list_toString() {
+    final synchronized String list_toString() {
         ThreadState ts = Py.getThreadState();
-        if(!ts.enterRepr(this)) {
+        if (!ts.enterRepr(this)) {
             return "[...]";
         }
         StringBuilder buf = new StringBuilder("[");
         int length = size();
-        PyObject[] array = getArray();
-        for(int i = 0; i < length - 1; i++) {
-            buf.append((array[i]).__repr__().toString());
-            buf.append(", ");
-        }
-        if(length > 0) {
-            buf.append((array[length - 1]).__repr__().toString());
+        int i = 0;
+        for (PyObject item : list) {
+            buf.append(item.__repr__().toString());
+            if (i < length - 1) {
+                buf.append(", ");
+            }
+            i++;
         }
         buf.append("]");
         ts.exitRepr(this);
@@ -441,7 +464,7 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_append_doc)
-    final void list_append(PyObject o) {
+    final synchronized void list_append(PyObject o) {
         pyadd(o);
         gListAllocatedStatus = __len__();
     }
@@ -457,11 +480,10 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_count_doc)
-    final int list_count(PyObject o) {
+    final synchronized int list_count(PyObject o) {
         int count = 0;
-        PyObject[] array = getArray();
-        for(int i = 0, n = size(); i < n; i++) {
-            if(array[i].equals(o)) {
+        for (PyObject item : list) {
+            if (item.equals(o)) {
                 count++;
             }
         }
@@ -487,21 +509,21 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(defaults = {"null", "null"}, doc = BuiltinDocs.list_index_doc)
-    final int list_index(PyObject o, PyObject start, PyObject stop) {
+    final synchronized int list_index(PyObject o, PyObject start, PyObject stop) {
         int startInt = start == null ? 0 : PySlice.calculateSliceIndex(start);
         int stopInt = stop == null ? size() : PySlice.calculateSliceIndex(stop);
         return list_index(o, startInt, stopInt);
     }
 
-    final int list_index(PyObject o, int start, int stop) {
+    final synchronized int list_index(PyObject o, int start, int stop) {
         return _index(o, "list.index(x): x not in list", start, stop);
     }
 
-    final int list_index(PyObject o, int start) {
+    final synchronized int list_index(PyObject o, int start) {
         return _index(o, "list.index(x): x not in list", start, size());
     }
 
-    final int list_index(PyObject o) {
+    final synchronized int list_index(PyObject o) {
         return _index(o, "list.index(x): x not in list", 0, size());
     }
 
@@ -509,10 +531,17 @@ public class PyList extends PySequenceList {
         // Follow Python 2.3+ behavior
         int validStop = boundToSequence(stop);
         int validStart = boundToSequence(start);
-        PyObject[] array = getArray();
-        for(int i = validStart; i < validStop && i < size(); i++) {
-            if(array[i].equals(o)) {
-                return i;
+        int i = validStart;
+        if (validStart <= validStop) {
+            try {
+                for (PyObject item : list.subList(validStart, validStop)) {
+                    if (item.equals(o)) {
+                        return i;
+                    }
+                    i++;
+                }
+            } catch (ConcurrentModificationException ex) {
+                throw Py.ValueError(message);
             }
         }
         throw Py.ValueError(message);
@@ -532,14 +561,14 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_insert_doc)
-    final void list_insert(int index, PyObject o) {
-        if(index < 0) {
+    final synchronized void list_insert(int index, PyObject o) {
+        if (index < 0) {
             index = Math.max(0, size() + index);
         }
-        if(index > size()) {
+        if (index > size()) {
             index = size();
         }
-        list.pyadd(index, o);
+        pyadd(index, o);
         gListAllocatedStatus = __len__();
     }
 
@@ -556,7 +585,7 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_remove_doc)
-    final void list_remove(PyObject o) {
+    final synchronized void list_remove(PyObject o) {
         del(_index(o, "list.remove(x): x not in list", 0, size()));
         gListAllocatedStatus = __len__();
     }
@@ -571,16 +600,8 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_reverse_doc)
-    final void list_reverse() {
-        PyObject tmp;
-        int n = size();
-        PyObject[] array = getArray();
-        int j = n - 1;
-        for(int i = 0; i < n / 2; i++, j--) {
-            tmp = array[i];
-            array[i] = array[j];
-            array[j] = tmp;
-        }
+    final synchronized void list_reverse() {
+        Collections.reverse(list);
         gListAllocatedStatus = __len__();
     }
 
@@ -602,19 +623,18 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(defaults = "-1", doc = BuiltinDocs.list_pop_doc)
-    final PyObject list_pop(int n) {
+    final synchronized PyObject list_pop(int n) {
         int length = size();
-        if(length == 0) {
+        if (length == 0) {
             throw Py.IndexError("pop from empty list");
         }
-        if(n < 0) {
+        if (n < 0) {
             n += length;
         }
-        if(n < 0 || n >= length) {
+        if (n < 0 || n >= length) {
             throw Py.IndexError("pop index out of range");
         }
-        PyObject v = pyget(n);
-        setslice(n, n + 1, 1, Py.EmptyTuple);
+        PyObject v = list.remove(n);
         return v;
     }
 
@@ -630,18 +650,24 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list_extend_doc)
-    final void list_extend(PyObject o) {
-        int length = size();
-        setslice(length, length, 1, o);
+    final synchronized void list_extend(PyObject o) {
+        if (o instanceof PyList) {
+            list.addAll(((PyList) o).list);
+        } else {
+            for (PyObject item : o.asIterable()) {
+                list.add(item);
+            }
+        }
         gListAllocatedStatus = __len__();
     }
 
+    @Override
     public PyObject __iadd__(PyObject o) {
         return list___iadd__(o);
     }
 
     @ExposedMethod(type = MethodType.BINARY, doc = BuiltinDocs.list___iadd___doc)
-    final PyObject list___iadd__(PyObject o) {
+    final synchronized PyObject list___iadd__(PyObject o) {
         PyType oType = o.getType();
         if (oType == TYPE || oType == PyTuple.TYPE || this == o) {
             extend(fastSequence(o, "argument must be iterable"));
@@ -652,7 +678,7 @@ public class PyList extends PySequenceList {
         try {
             it = o.__iter__();
         } catch (PyException pye) {
-            if (!Py.matchException(pye, Py.TypeError)) {
+            if (!pye.match(Py.TypeError)) {
                 throw pye;
             }
             return null;
@@ -672,15 +698,12 @@ public class PyList extends PySequenceList {
      * @param compare
      *            the comparison function.
      */
-
-        /**
+    /**
      * Sort the items of the list in place. Items is compared with the normal relative comparison
      * operators.
      */
-
-
     @ExposedMethod(doc = BuiltinDocs.list_sort_doc)
-    final void list_sort(PyObject[] args, String[] kwds) {
+    final synchronized void list_sort(PyObject[] args, String[] kwds) {
         ArgParser ap = new ArgParser("list", args, kwds, new String[]{"cmp", "key", "reverse"}, 0);
         PyObject cmp = ap.getPyObject(0, Py.None);
         PyObject key = ap.getPyObject(1, Py.None);
@@ -688,17 +711,181 @@ public class PyList extends PySequenceList {
         sort(cmp, key, reverse);
     }
 
-    public void sort(PyObject compare) {
-        sort(compare, Py.None, Py.False);
+    public void sort(PyObject cmp, PyObject key, PyObject reverse) {
+        boolean bReverse = reverse.__nonzero__();
+        if (key == Py.None || key == null) {
+            if (cmp == Py.None || cmp == null) {
+                sort(bReverse);
+            } else {
+                sort(cmp, bReverse);
+            }
+        } else {
+            sort(cmp, key, bReverse);
+        }
     }
+
+    // a bunch of optimized paths for sort to avoid unnecessary work, such as DSU or checking compare functions for null
 
     public void sort() {
-        sort(Py.None, Py.None, Py.False);
+        sort(false);
     }
 
-    public void sort(PyObject cmp, PyObject key, PyObject reverse) {
-        MergeState ms = new MergeState(this, cmp, key, reverse.__nonzero__());
-        ms.sort();
+    private synchronized void sort(boolean reverse) {
+        gListAllocatedStatus = -1;
+        if (reverse) {
+            Collections.reverse(list); // maintain stability of sort by reversing first
+        }
+        Collections.sort(list, new PyObjectDefaultComparator(this));
+        if (reverse) {
+            Collections.reverse(list); // maintain stability of sort by reversing first
+        }
+        gListAllocatedStatus = __len__();
+    }
+
+    private static class PyObjectDefaultComparator implements Comparator<PyObject> {
+
+        private final PyList list;
+
+        PyObjectDefaultComparator(PyList list) {
+            this.list = list;
+        }
+
+        public int compare(PyObject o1, PyObject o2) {
+            int result = o1._cmp(o2);
+            if (this.list.gListAllocatedStatus >= 0) {
+                throw Py.ValueError("list modified during sort");
+            }
+            return result;
+        }
+
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o instanceof PyObjectDefaultComparator) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public void sort(PyObject compare) {
+        sort(compare, false);
+    }
+
+    private synchronized void sort(PyObject compare, boolean reverse) {
+        gListAllocatedStatus = -1;
+        if (reverse) {
+            Collections.reverse(list); // maintain stability of sort by reversing first
+        }
+        PyObjectComparator c = new PyObjectComparator(this, compare);
+        Collections.sort(list, c);
+        if (reverse) {
+            Collections.reverse(list);
+        }
+        gListAllocatedStatus = __len__();
+    }
+
+    private static class PyObjectComparator implements Comparator<PyObject> {
+
+        private final PyList list;
+        private final PyObject cmp;
+
+        PyObjectComparator(PyList list, PyObject cmp) {
+            this.list = list;
+            this.cmp = cmp;
+        }
+
+        public int compare(PyObject o1, PyObject o2) {
+            int result = cmp.__call__(o1, o2).asInt();
+            if (this.list.gListAllocatedStatus >= 0) {
+                throw Py.ValueError("list modified during sort");
+            }
+            return result;
+        }
+
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+
+            if (o instanceof PyObjectComparator) {
+                return cmp.equals(((PyObjectComparator) o).cmp);
+            }
+            return false;
+        }
+    }
+
+    private static class KV {
+
+        private final PyObject key;
+        private final PyObject value;
+
+        KV(PyObject key, PyObject value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private static class KVComparator implements Comparator<KV> {
+
+        private final PyList list;
+        private final PyObject cmp;
+
+        KVComparator(PyList list, PyObject cmp) {
+            this.list = list;
+            this.cmp = cmp;
+        }
+
+        public int compare(KV o1, KV o2) {
+            int result;
+            if (cmp != null && cmp != Py.None) {
+                result = cmp.__call__(o1.key, o2.key).asInt();
+            } else {
+                result = o1.key._cmp(o2.key);
+            }
+            if (this.list.gListAllocatedStatus >= 0) {
+                throw Py.ValueError("list modified during sort");
+            }
+            return result;
+        }
+
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+
+            if (o instanceof KVComparator) {
+                return cmp.equals(((KVComparator) o).cmp);
+            }
+            return false;
+        }
+    }
+
+    private synchronized void sort(PyObject cmp, PyObject key, boolean reverse) {
+        gListAllocatedStatus = -1;
+
+        int size = list.size();
+        final ArrayList<KV> decorated = new ArrayList<KV>(size);
+        for (PyObject value : list) {
+            decorated.add(new KV(key.__call__(value), value));
+        }
+        list.clear();
+        KVComparator c = new KVComparator(this, cmp);
+        if (reverse) {
+            Collections.reverse(decorated); // maintain stability of sort by reversing first
+        }
+        Collections.sort(decorated, c);
+        if (reverse) {
+            Collections.reverse(decorated);
+        }
+        if (list instanceof ArrayList) {
+            ((ArrayList) list).ensureCapacity(size);
+        }
+        for (KV kv : decorated) {
+            list.add(kv.value);
+        }
+        gListAllocatedStatus = __len__();
     }
 
     public int hashCode() {
@@ -706,11 +893,274 @@ public class PyList extends PySequenceList {
     }
 
     @ExposedMethod(doc = BuiltinDocs.list___hash___doc)
-    final int list___hash__() {
+    final synchronized int list___hash__() {
         throw Py.TypeError(String.format("unhashable type: '%.200s'", getType().fastGetName()));
     }
 
+    @Override
     public PyTuple __getnewargs__() {
-        return new PyTuple(new PyTuple(list.getArray()));
+        return new PyTuple(new PyTuple(getArray()));
+    }
+
+    @Override
+    public void add(int index, Object element) {
+        pyadd(index, Py.java2py(element));
+    }
+
+    @Override
+    public boolean add(Object o) {
+        pyadd(Py.java2py(o));
+        return true;
+    }
+
+    @Override
+    public synchronized boolean addAll(int index, Collection c) {
+        PyList elements = new PyList(c);
+        return list.addAll(index, elements.list);
+    }
+
+    @Override
+    public boolean addAll(Collection c) {
+        return addAll(0, c);
+    }
+
+    @Override
+    public synchronized void clear() {
+        list.clear();
+    }
+
+    @Override
+    public synchronized boolean contains(Object o) {
+        return list.contains(Py.java2py(o));
+    }
+
+    @Override
+    public synchronized boolean containsAll(Collection c) {
+        if (c instanceof PyList) {
+            return list.containsAll(((PyList) c).list);
+        } else if (c instanceof PyTuple) {
+            return list.containsAll(((PyTuple) c).getList());
+        } else {
+            return list.containsAll(new PyList(c));
+        }
+    }
+
+    @Override
+    public synchronized boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof PyList) {
+            return _eq((PyList)other).__nonzero__();
+        } else if (other instanceof List && !(other instanceof PyTuple)) {
+            List otherList = (List)other;
+            return list.equals(otherList);
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized Object get(int index) {
+        return list.get(index).__tojava__(Object.class);
+    }
+
+    @Override
+    public synchronized PyObject[] getArray() {
+        PyObject a[] = null;
+        return list.toArray(a);
+    }
+
+    @Override
+    public synchronized int indexOf(Object o) {
+        return list.indexOf(o);
+    }
+
+    @Override
+    public synchronized boolean isEmpty() {
+        return list.isEmpty();
+    }
+
+    @Override
+    public Iterator iterator() {
+        return new Iterator() {
+
+            private final Iterator<PyObject> iter = list.iterator();
+
+            public boolean hasNext() {
+                return iter.hasNext();
+            }
+
+            public Object next() {
+                return iter.next().__tojava__(Object.class);
+            }
+
+            public void remove() {
+                iter.remove();
+            }
+        };
+
+    }
+
+    @Override
+    public synchronized int lastIndexOf(Object o) {
+        return list.lastIndexOf(Py.java2py(o));
+    }
+
+    @Override
+    public ListIterator listIterator() {
+        return listIterator(0);
+    }
+
+    @Override
+    public ListIterator listIterator(final int index) {
+        return new ListIterator() {
+
+            private final ListIterator<PyObject> iter = list.listIterator(index);
+
+            public boolean hasNext() {
+                return iter.hasNext();
+            }
+
+            public Object next() {
+                return iter.next().__tojava__(Object.class);
+            }
+
+            public boolean hasPrevious() {
+                return iter.hasPrevious();
+            }
+
+            public Object previous() {
+                return iter.previous().__tojava__(Object.class);
+            }
+
+            public int nextIndex() {
+                return iter.nextIndex();
+            }
+
+            public int previousIndex() {
+                return iter.previousIndex();
+            }
+
+            public void remove() {
+                iter.remove();
+            }
+
+            public void set(Object o) {
+                iter.set(Py.java2py(o));
+            }
+
+            public void add(Object o) {
+                iter.add(Py.java2py(o));
+            }
+        };
+    }
+
+    @Override
+    public synchronized void pyadd(int index, PyObject element) {
+        list.add(index, element);
+    }
+
+    @Override
+    public synchronized boolean pyadd(PyObject o) {
+        list.add(o);
+        return true;
+    }
+
+    @Override
+    public synchronized PyObject pyget(int index) {
+        return list.get(index);
+    }
+
+    public synchronized void pyset(int index, PyObject element) {
+        list.set(index, element);
+    }
+
+    @Override
+    public synchronized Object remove(int index) {
+        return list.remove(index);
+    }
+
+    @Override
+    public synchronized void remove(int start, int stop) {
+        list.subList(start, stop).clear();
+    }
+
+    @Override
+    public synchronized boolean removeAll(Collection c) {
+        if (c instanceof PySequenceList) {
+            return list.removeAll(c);
+        } else {
+            return list.removeAll(new PyList(c));
+        }
+    }
+
+    @Override
+    public synchronized boolean retainAll(Collection c) {
+        if (c instanceof PySequenceList) {
+            return list.retainAll(c);
+        } else {
+            return list.retainAll(new PyList(c));
+        }
+    }
+
+    @Override
+    public synchronized Object set(int index, Object element) {
+        return list.set(index, Py.java2py(element)).__tojava__(Object.class);
+    }
+
+    @Override
+    public synchronized int size() {
+        return list.size();
+    }
+
+    @Override
+    public synchronized List subList(int fromIndex, int toIndex) {
+        return fromList(list.subList(fromIndex, toIndex));
+    }
+
+    @Override
+    public synchronized Object[] toArray() {
+        Object copy[] = list.toArray();
+        for (int i = 0; i < copy.length; i++) {
+            copy[i] = ((PyObject) copy[i]).__tojava__(Object.class);
+        }
+        return copy;
+    }
+
+    @Override
+    public synchronized Object[] toArray(Object[] a) {
+        Object copy[] = list.toArray();
+        if (a.length < copy.length) {
+            a = copy;
+        }
+        for (int i = 0; i < copy.length; i++) {
+            a[i] = ((PyObject) copy[i]).__tojava__(Object.class);
+        }
+        if (a.length > copy.length) {
+            a[copy.length] = null;
+        }
+        return a;
+    }
+
+    protected PyObject getslice(int start, int stop, int step) {
+        if (step > 0 && stop < start) {
+            stop = start;
+        }
+        int n = sliceLength(start, stop, step);
+        List newList;
+        if (step == 1) {
+            newList = new ArrayList<PyObject>(list.subList(start, stop));
+        } else {
+            newList = new ArrayList<PyObject>(n);
+            for (int i = start, j = 0; j < n; i += step, j++) {
+                newList.add(list.get(i));
+            }
+        }
+        return fromList(newList);
+    }
+
+    @Override
+    public synchronized boolean remove(Object o) {
+        return list.remove(Py.java2py(o));
     }
 }

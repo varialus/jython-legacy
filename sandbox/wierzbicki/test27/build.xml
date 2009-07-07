@@ -117,9 +117,10 @@ svnant.jar.dir=${basedir}/../externals/svnant-jars
         <property name="build.compiler" value="modern" />
         <property name="jdk.target.version" value="1.5" />
         <property name="jdk.source.version" value="1.5" />
-        <property name="deprecation" value="off" />
+        <property name="deprecation" value="true" />
         <property name="debug" value="true" />
         <property name="nowarn" value="false" />
+        <property name="javac.Xlint" value="-Xlint -Xlint:-serial -Xlint:-unchecked -Xlint:-cast"/>
 
         <!-- properties work.dir and jython.base.dir are also defined in full-preinit -->
         <property name="work.dir" value="${basedir}" />
@@ -144,7 +145,7 @@ svnant.jar.dir=${basedir}/../externals/svnant-jars
         <!-- classpaths -->
         <path id="main.classpath">
             <pathelement path="${extlibs.dir}/libreadline-java-0.8.jar" />
-            <pathelement path="${extlibs.dir}/jline-0.9.94.jar" />
+            <pathelement path="${extlibs.dir}/jline-0.9.95-SNAPSHOT.jar" />
             <pathelement path="${extlibs.dir}/servlet-api-2.5.jar" />
             <pathelement path="${informix.jar}" />
             <pathelement path="${oracle.jar}" />
@@ -157,6 +158,7 @@ svnant.jar.dir=${basedir}/../externals/svnant-jars
             <pathelement path="${extlibs.dir}/asm-3.1.jar" />
             <pathelement path="${extlibs.dir}/asm-commons-3.1.jar" />
             <pathelement path="${extlibs.dir}/constantine-0.4.jar" />
+            <pathelement path="${extlibs.dir}/jna-posix.jar"/>
         </path>
 
         <available property="informix.present" classname="com.informix.jdbc.IfxDriver" classpath="${informix.jar}" />
@@ -170,9 +172,6 @@ svnant.jar.dir=${basedir}/../externals/svnant-jars
             <pathelement path="${compile.dir}" />
             <pathelement path="${cpptasks.jar.dir}" />
         </path>
-        <!-- 64 bit Java 6 needs roughly 96m for regrtest on most platforms, but Apple's needs
-         more -->
-        <property name="regrtest.Xmx" value="-Xmx160m" />
         <property name="jython.dev.jar" value="jython-dev.jar" />
         <property name="jython.deploy.jar" value="jython.jar" />
     </target>
@@ -188,12 +187,12 @@ svnant.jar.dir=${basedir}/../externals/svnant-jars
         <property name="PY_RELEASE_LEVEL_SNAPSHOT" value="170"/> <!-- 0xAA -->
 
         <!-- The current version info -->
-        <property name="jython.version" value="2.5b1+"/>
-        <property name="jython.version.noplus" value="2.5b1"/>
+        <property name="jython.version" value="2.5.0+"/>
+        <property name="jython.version.noplus" value="2.5.0"/>
         <property name="jython.major_version" value="2"/>
         <property name="jython.minor_version" value="5"/>
         <property name="jython.micro_version" value="0"/>
-        <property name="jython.release_level" value="${PY_RELEASE_LEVEL_BETA}"/>
+        <property name="jython.release_level" value="${PY_RELEASE_LEVEL_FINAL}"/>
         <property name="jython.release_serial" value="0"/>
 
         <condition property="do.snapshot.build">
@@ -416,6 +415,7 @@ The readme text for the next release will be like:
                 deprecation="${deprecation}"
                 nowarn="${nowarn}">
             <include name="org/python/util/TemplateAntTask.java" />
+            <compilerarg line="${javac.Xlint}"/>
         </javac>
     </target>
 
@@ -459,6 +459,7 @@ The readme text for the next release will be like:
                nowarn="${nowarn}"
                memoryMaximumSize="192m"
                fork="true">
+            <compilerarg line="${javac.Xlint}"/>
             <src path="${source.dir}"/>
             <src path="${gensrc.dir}"/>
 
@@ -474,7 +475,9 @@ The readme text for the next release will be like:
                source="${jdk.source.version}"
                debug="${debug}"
                deprecation="${deprecation}"
-               nowarn="${nowarn}"/>
+               nowarn="${nowarn}">
+            <compilerarg line="${javac.Xlint}"/>
+        </javac>
 
         <!-- java files used by tests -->
         <javac srcdir="${test.source.dir}"
@@ -483,7 +486,8 @@ The readme text for the next release will be like:
                source="${jdk.source.version}"
                debug="${debug}"
                deprecation="${deprecation}"
-               nowarn="${nowarn}"> 
+               nowarn="${nowarn}">
+            <compilerarg line="${javac.Xlint}"/>
             <classpath refid="test.classpath" />
         </javac>
         <javac srcdir="tests/data/initializer"
@@ -493,17 +497,20 @@ The readme text for the next release will be like:
             debug="${debug}"
             deprecation="${deprecation}"
             nowarn="${nowarn}"> 
+            <compilerarg line="${javac.Xlint}"/>
             <classpath refid="test.classpath" />
         </javac>
         <copy file="${source.dir}/org/python/modules/ucnhash.dat"
               todir="${compile.dir}/org/python/modules"
               preservelastmodified="true" />
 
-        <copy todir="${compile.dir}/com" preservelastmodified="true">
-            <fileset dir="${source.dir}/com">
+        <copy todir="${compile.dir}" preservelastmodified="true">
+            <fileset dir="${source.dir}">
                 <include name="**/*.properties" />
             </fileset>
         </copy>
+        <!-- grammar must now be up to date -->
+        <property name="antlr.notneeded" value="true" />
     </target>
 
     <!--
@@ -539,7 +546,7 @@ The readme text for the next release will be like:
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="extlibs/jarjar-0.7.jar"/>
         <jarjar destfile="${dist.dir}/${jython.deploy.jar}">
             <zipfileset src="${dist.dir}/${jython.dev.jar}"/>
-            <zipfileset src="extlibs/antlr-3.1.2-runtime.jar"/>
+            <zipfileset src="extlibs/antlr-runtime-3.1.2.jar"/>
             <rule pattern="org.antlr.runtime.**" result="org.python.antlr.runtime.@1"/>
             <zipfileset src="extlibs/asm-3.1.jar"/>
             <zipfileset src="extlibs/asm-commons-3.1.jar"/>
@@ -556,6 +563,10 @@ The readme text for the next release will be like:
             <rule pattern="org.apache.xerces.**" result="org.python.apache.xerces.@1"/>
             <rule pattern="org.apache.wml.**" result="org.python.apache.wml.@1"/>
             <rule pattern="org.apache.html.**" result="org.python.apache.html.@1"/>
+            <zipfileset src="extlibs/jline-0.9.95-SNAPSHOT.jar"/>
+            <!--
+            <rule pattern="jline.**" result="org.python.jline.@1"/>
+            -->
             <manifest>
                 <attribute name="Main-Class" value="org.python.util.jython" />
                 <attribute name="Built-By" value="${user.name}" />
@@ -630,7 +641,7 @@ The readme text for the next release will be like:
 
     <target name="copy-full" depends="copy-lib, copy-license" if="full-build">
         <echo>copy misc files from ${jython.base.dir}</echo>
-        <copy todir="${dist.dir}" preservelastmodified="true">
+        <copy todir="${dist.dir}" preservelastmodified="true" overwrite="true">
             <fileset dir="${jython.base.dir}"
                      includes="ACKNOWLEDGMENTS, build.xml, build.Lib.include.properties, NEWS, LICENSE.txt, README.txt, registry"
             />
@@ -647,10 +658,16 @@ The readme text for the next release will be like:
               <include name="Lib/jxxload_help/*.java" />
               <include name="src/org/**/ucnhash.dat" />
               <include name="grammar/*.g" />
-              <include name="extlibs/**/*.jar" />
-              <include name="extlibs/**/*.zip" />
               <include name="tests/java/**/*.java" />
               <include name="CoreExposed.includes" />
+              <include name="extlibs/**/*.jar" />
+
+              <!-- don't distribute jdbc jars -->
+              <exclude name="extlibs/mysql-connector-java-5.1.6.jar" />
+              <exclude name="extlibs/postgresql-8.3-603.jdbc4.jar" />
+              <exclude name="extlibs/ifxjdbc.jar" />
+              <exclude name="extlibs/ojdbc14.jar" />
+
             </fileset>
         </copy>
 
@@ -691,14 +708,16 @@ The readme text for the next release will be like:
             </fileset>
         </copy>
 
+        <!-- copy the shell scripts and make them executable -->
         <copy todir="${dist.dir}/bin">
             <fileset dir="${source.dir}/shell"/>
         </copy>
-
         <chmod perm="ugo+rx">
             <fileset dir="${dist.dir}/bin" />
         </chmod>
 
+        <!-- copy the registry -->
+        <copy todir="${dist.dir}" file="${jython.base.dir}/registry" preservelastmodified="true" overwrite="true" />
     </target>
 
     <target name="copy-cpythonlib">
@@ -809,7 +828,7 @@ The readme text for the next release will be like:
         <!-- Clean any old test output -->
         <delete dir="${junit.reports}"/>
     </target>
-    <target name="javatest" depends="compile,expose">
+    <target name="javatest" depends="developer-build">
         <mkdir dir="${junit.reports}"/>
         <junit fork="true" printsummary="true">
             <formatter type="xml"/>
@@ -831,8 +850,6 @@ The readme text for the next release will be like:
     <target name="regrtest" depends="developer-build,regrtest-unix,regrtest-windows"/>
     <target name="regrtest-unix" if="os.family.unix">
       <exec executable="${dist.dir}/bin/jython">
-        <arg value="--verify"/>
-        <arg value="-J${regrtest.Xmx}"/>
         <arg value="${dist.dir}/Lib/test/regrtest.py"/>
         <!-- Only run the tests that are expected to work on Jython -->
         <arg value="--expected"/>
@@ -842,7 +859,6 @@ The readme text for the next release will be like:
     </target>
     <target name="regrtest-windows" if="os.family.windows">
       <exec executable="${dist.dir}/bin/jython.bat">
-        <arg value="-J${regrtest.Xmx}"/>
         <arg value="${dist.dir}/Lib/test/regrtest.py"/>
         <!-- Only run the tests that are expected to work on Jython -->
         <arg value="--expected"/>

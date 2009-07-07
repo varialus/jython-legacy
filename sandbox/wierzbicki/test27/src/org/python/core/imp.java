@@ -20,7 +20,9 @@ public class imp {
 
     private static final String UNKNOWN_SOURCEFILE = "<unknown>";
 
-    public static final int APIVersion = 17;
+    private static final int APIVersion = 23;
+
+    public static final int NO_MTIME = -1;
 
     // This should change to 0 for Python 2.7 and 3.0 see PEP 328
     public static final int DEFAULT_LEVEL = -1;
@@ -64,6 +66,26 @@ public class imp {
         return module;
     }
 
+    /**
+     * Remove name form sys.modules if it's there.
+     *
+     * @param name the module name
+     */
+    private static void removeModule(String name) {
+        name = name.intern();
+        PyObject modules = Py.getSystemState().modules;
+        if (modules.__finditem__(name) != null) {
+            try {
+                modules.__delitem__(name);
+            } catch (PyException pye) {
+                // another thread may have deleted it
+                if (!pye.match(Py.KeyError)) {
+                    throw pye;
+                }
+            }
+        }
+    }
+
     private static byte[] readBytes(InputStream fp) {
         try {
             return FileUtil.readBytes(fp);
@@ -85,12 +107,17 @@ public class imp {
             throw Py.IOError(ioe);
         }
     }
-
     static PyObject createFromPyClass(String name, InputStream fp, boolean testing,
                                       String sourceName, String compiledName) {
+        return createFromPyClass(name, fp, testing, sourceName, compiledName, NO_MTIME);
+
+    }
+
+    static PyObject createFromPyClass(String name, InputStream fp, boolean testing,
+                                      String sourceName, String compiledName, long mtime) {
         byte[] data = null;
         try {
-            data = readCode(name, fp, testing);
+            data = readCode(name, fp, testing, mtime);
         } catch (IOException ioe) {
             if (!testing) {
                 throw Py.ImportError(ioe.getMessage() + "[name=" + name + ", source=" + sourceName
@@ -118,9 +145,13 @@ public class imp {
     }
 
     public static byte[] readCode(String name, InputStream fp, boolean testing) throws IOException {
+        return readCode(name, fp, testing, NO_MTIME);
+    }
+
+    public static byte[] readCode(String name, InputStream fp, boolean testing, long mtime) throws IOException {
         byte[] data = readBytes(fp);
         int api;
-        APIReader ar = new APIReader(data);
+        AnnotationReader ar = new AnnotationReader(data);
         api = ar.getVersion();
         if (api != APIVersion) {
             if (testing) {
@@ -128,6 +159,12 @@ public class imp {
             } else {
                 throw Py.ImportError("invalid api version(" + api + " != "
                         + APIVersion + ") in: " + name);
+            }
+        }
+        if (testing && mtime != NO_MTIME) {
+            long time = ar.getMTime();
+            if (mtime != time) {
+                return null;
             }
         }
         return data;
@@ -146,7 +183,8 @@ public class imp {
         if (sourceFilename == null) {
             sourceFilename = file.toString();
         }
-        return compileSource(name, makeStream(file), sourceFilename);
+        long mtime = file.lastModified();
+        return compileSource(name, makeStream(file), sourceFilename, mtime);
     }
 
     public static String makeCompiledFilename(String filename) {
@@ -176,11 +214,20 @@ public class imp {
         }
         FileOutputStream fop = null;
         try {
+            SecurityManager man = System.getSecurityManager();
+            if (man != null) {
+                man.checkWrite(compiledFilename);
+            }
             fop = new FileOutputStream(compiledFilename);
             fop.write(compiledSource);
             fop.close();
             return compiledFilename;
         } catch(IOException exc) {
+            // If we can't write the cache file, just log and continue
+            Py.writeDebug(IMPORT_LOG, "Unable to write to source cache file '"
+                    + compiledFilename + "' due to " + exc);
+            return null;
+        } catch(SecurityException exc) {
             // If we can't write the cache file, just log and continue
             Py.writeDebug(IMPORT_LOG, "Unable to write to source cache file '"
                     + compiledFilename + "' due to " + exc);
@@ -199,6 +246,10 @@ public class imp {
     }
 
     public static byte[] compileSource(String name, InputStream fp, String filename) {
+        return compileSource(name, fp, filename, NO_MTIME);
+    }
+
+    public static byte[] compileSource(String name, InputStream fp, String filename, long mtime) {
         ByteArrayOutputStream ofp = new ByteArrayOutputStream();
         try {
             if(filename == null) {
@@ -206,11 +257,11 @@ public class imp {
             }
             org.python.antlr.base.mod node;
             try {
-                node = ParserFacade.parse(fp, "exec", filename, new CompilerFlags());
+                node = ParserFacade.parse(fp, CompileMode.exec, filename, new CompilerFlags());
             } finally {
                 fp.close();
             }
-            Module.compile(node, ofp, name + "$py", filename, true, false, null);
+            Module.compile(node, ofp, name + "$py", filename, true, false, null, mtime);
             return ofp.toByteArray();
         } catch(Throwable t) {
             throw ParserFacade.fixParseError(null, t, filename);
@@ -218,12 +269,17 @@ public class imp {
     }
 
     public static PyObject createFromSource(String name, InputStream fp, String filename) {
-        return createFromSource(name, fp, filename, null);
+        return createFromSource(name, fp, filename, null, NO_MTIME);
     }
 
     public static PyObject createFromSource(String name, InputStream fp,
             String filename, String outFilename) {
-        byte[] bytes = compileSource(name, fp, filename);
+        return createFromSource(name, fp, filename, outFilename, NO_MTIME);
+    }
+
+    public static PyObject createFromSource(String name, InputStream fp,
+            String filename, String outFilename, long mtime) {
+        byte[] bytes = compileSource(name, fp, filename, mtime);
         outFilename = cacheCompiledSource(filename, outFilename, bytes);
 
         Py.writeComment(IMPORT_LOG, "'" + name + "' as " + filename);
@@ -266,9 +322,9 @@ public class imp {
 
         try {
             PyFrame f = new PyFrame(code, module.__dict__, module.__dict__, null);
-            code.call(f);
+            code.call(Py.getThreadState(), f);
         } catch (RuntimeException t) {
-            Py.getSystemState().modules.__delitem__(name.intern());
+            removeModule(name);
             throw t;
         }
         return module;
@@ -306,7 +362,7 @@ public class imp {
                 importer = hook.__call__(p);
                 break;
             } catch (PyException e) {
-                if (!Py.matchException(e, Py.ImportError)) {
+                if (!e.match(Py.ImportError)) {
                     throw e;
                 }
             }
@@ -416,8 +472,14 @@ public class imp {
         File sourceFile = new File(dir, sourceName);
         File compiledFile = new File(dir, compiledName);
 
-        boolean pkg = dir.isDirectory() && caseok(dir, name) && (sourceFile.isFile()
-                                                                 || compiledFile.isFile());
+        boolean pkg = false;
+        try {
+            pkg = dir.isDirectory() && caseok(dir, name)
+                    && (sourceFile.isFile() || compiledFile.isFile());
+        } catch (SecurityException e) {
+            // ok
+        }
+
         if (!pkg) {
             Py.writeDebug(IMPORT_LOG, "trying source " + dir.getPath());
             sourceName = name + ".py";
@@ -432,28 +494,34 @@ public class imp {
             m.__dict__.__setitem__("__path__", new PyList(new PyObject[] {filename}));
         }
 
-        if (sourceFile.isFile() && caseok(sourceFile, sourceName)) {
-            if (compiledFile.isFile() && caseok(compiledFile, compiledName)) {
-                Py.writeDebug(IMPORT_LOG, "trying precompiled " + compiledFile.getPath());
+        try {
+            if (sourceFile.isFile() && caseok(sourceFile, sourceName)) {
                 long pyTime = sourceFile.lastModified();
-                long classTime = compiledFile.lastModified();
-                if (classTime >= pyTime) {
-                    PyObject ret = createFromPyClass(modName, makeStream(compiledFile), true,
-                                                     displaySourceName, displayCompiledName);
-                    if (ret != null) {
-                        return ret;
+                if (compiledFile.isFile() && caseok(compiledFile, compiledName)) {
+                    Py.writeDebug(IMPORT_LOG, "trying precompiled " + compiledFile.getPath());
+                    long classTime = compiledFile.lastModified();
+                    if (classTime >= pyTime) {
+                        PyObject ret = createFromPyClass(modName, makeStream(compiledFile), true,
+                                                         displaySourceName, displayCompiledName, pyTime);
+                        if (ret != null) {
+                            return ret;
+                        }
                     }
+                    return createFromSource(modName, makeStream(sourceFile), displaySourceName,
+                                            compiledFile.getPath(), pyTime);
                 }
+                return createFromSource(modName, makeStream(sourceFile), displaySourceName,
+                                        compiledFile.getPath(), pyTime);
             }
-            return createFromSource(modName, makeStream(sourceFile), displaySourceName,
-                                    compiledFile.getPath());
-        }
 
-        // If no source, try loading precompiled
-        Py.writeDebug(IMPORT_LOG, "trying precompiled with no source " + compiledFile.getPath());
-        if (compiledFile.isFile() && caseok(compiledFile, compiledName)) {
-            return createFromPyClass(modName, makeStream(compiledFile), true, displaySourceName,
-                                     displayCompiledName);
+            // If no source, try loading precompiled
+            Py.writeDebug(IMPORT_LOG, "trying precompiled with no source " + compiledFile.getPath());
+            if (compiledFile.isFile() && caseok(compiledFile, compiledName)) {
+                return createFromPyClass(modName, makeStream(compiledFile), true, displaySourceName,
+                                         displayCompiledName);
+            }
+        } catch (SecurityException e) {
+            // ok
         }
         return null;
     }
@@ -608,9 +676,20 @@ public class imp {
             } else {
                 name = dottedName.substring(last_dot, dot);
             }
+            PyJavaPackage jpkg = null;
+            if (mod instanceof PyJavaPackage) {
+                jpkg = (PyJavaPackage)mod;
+            }
+
             mod = import_next(mod, parentNameBuffer, name, fullName, fromlist);
+            if (jpkg != null && (mod == null || mod == Py.None)) {
+                // try again -- under certain circumstances a PyJavaPackage may
+                // have been added as a side effect of the last import_next
+                // attempt.  see Lib/test_classpathimport.py#test_bug1126
+                mod = import_next(jpkg, parentNameBuffer, name, fullName, fromlist);
+            }
             if (mod == null || mod == Py.None) {
-            	throw Py.ImportError("No module named " + name);
+                throw Py.ImportError("No module named " + name);
             }
             last_dot = dot + 1;
         } while (dot != -1);
@@ -751,6 +830,7 @@ public class imp {
      * replaced by importFrom with level param.  Kept for backwards compatibility.
      * @deprecated use importFrom with level param.
      */
+    @Deprecated
     public static PyObject[] importFrom(String mod, String[] names,
             PyFrame frame) {
         return importFromAs(mod, names, null, frame, DEFAULT_LEVEL);
@@ -769,6 +849,7 @@ public class imp {
      * replaced by importFromAs with level param.  Kept for backwards compatibility.
      * @deprecated use importFromAs with level param.
      */
+    @Deprecated
     public static PyObject[] importFromAs(String mod, String[] names,
             PyFrame frame) {
         return importFromAs(mod, names, null, frame, DEFAULT_LEVEL);
@@ -908,5 +989,9 @@ public class imp {
         PyObject ret = find_module(name, modName, path);
         modules.__setitem__(modName, ret);
         return ret;
+    }
+
+    public static int getAPIVersion() {
+        return APIVersion;
     }
 }

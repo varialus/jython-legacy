@@ -211,7 +211,7 @@ public class AstList extends PySequence implements Cloneable, List {
         try {
             it = o.__iter__();
         } catch (PyException pye) {
-            if (!Py.matchException(pye, Py.TypeError)) {
+            if (!pye.match(Py.TypeError)) {
                 throw pye;
             }
             return null;
@@ -376,14 +376,14 @@ public class AstList extends PySequence implements Cloneable, List {
         List newList = data.subList(start, stop);
         if(step == 1) {
             newList = data.subList(start, stop);
-            return new AstList(newList);
+            return new AstList(newList, adapter);
         }
         int j = 0;
         for(int i = start; j < n; i += step) {
             newList.set(j, data.get(i));
             j++;
         }
-        return new AstList(newList);
+        return new AstList(newList, adapter);
     }
 
     public void insert(int index, PyObject o) {
@@ -503,7 +503,7 @@ public class AstList extends PySequence implements Cloneable, List {
         try {
             seq = Py.make_array(value);
         } catch (PyException pye) {
-            if (Py.matchException(pye, Py.TypeError)) {
+            if (pye.match(Py.TypeError)) {
                 throw Py.TypeError("can only assign an iterable");
             }
             throw pye;

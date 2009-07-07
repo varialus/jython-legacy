@@ -2,11 +2,12 @@ package org.python.util;
 
 import java.util.Properties;
 
+import org.python.core.CompileMode;
 import org.python.core.CompilerFlags;
 import org.python.core.Py;
-import org.python.core.PyCode;
 import org.python.core.PyException;
 import org.python.core.PyFile;
+import org.python.core.PyFileWriter;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyString;
@@ -34,6 +35,7 @@ public class PythonInterpreter {
      *
      * @param preProperties
      *            A set of properties. Typically System.getProperties() is used.
+     *            PreProperties override properties from the registry file.
      * @param postProperties
      *            An other set of properties. Values like python.home, python.path and all other
      *            values from the registry files can be added to this property set. PostProperties
@@ -90,6 +92,12 @@ public class PythonInterpreter {
         systemState.stdout = outStream;
     }
 
+    /** @deprecated */
+    @Deprecated
+    public void setOut(java.io.Writer outStream) {
+        setOut(new PyFileWriter(outStream));
+    }
+
     /**
      * Set a java.io.OutputStream to use for the standard output stream
      *
@@ -102,6 +110,12 @@ public class PythonInterpreter {
 
     public void setErr(PyObject outStream) {
         systemState.stderr = outStream;
+    }
+
+    /** @deprecated */
+    @Deprecated
+    public void setErr(java.io.Writer outStream) {
+        setErr(new PyFileWriter(outStream));
     }
 
     public void setErr(java.io.OutputStream outStream) {
@@ -121,7 +135,7 @@ public class PythonInterpreter {
      */
     public void exec(String s) {
         setState();
-        Py.exec(Py.compile_flags(s, "<string>", "exec", cflags), locals, locals);
+        Py.exec(Py.compile_flags(s, "<string>", CompileMode.exec, cflags), locals, locals);
         Py.flushLine();
     }
 
@@ -149,7 +163,7 @@ public class PythonInterpreter {
 
     public void execfile(java.io.InputStream s, String name) {
         setState();
-        Py.runCode((PyCode)Py.compile_flags(s, name, "exec", cflags), locals, locals);
+        Py.runCode(Py.compile_flags(s, name, CompileMode.exec, cflags), locals, locals);
         Py.flushLine();
     }
 

@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.python.util.Generic;
 
 /**
  * Special fast dict implementation for __dict__ instances. Allows interned String keys in addition
@@ -14,18 +17,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PyStringMap extends PyObject {
 
-    private final Map<Object, PyObject> table;
+    private final ConcurrentMap<Object, PyObject> table;
 
     public PyStringMap() {
         this(4);
     }
 
     public PyStringMap(int capacity) {
-        table = new ConcurrentHashMap<Object, PyObject>(capacity);
+        table = new ConcurrentHashMap<Object, PyObject>(capacity, Generic.CHM_LOAD_FACTOR,
+                                                        Generic.CHM_CONCURRENCY_LEVEL);
     }
 
     public PyStringMap(Map<Object, PyObject> map) {
-        table = new ConcurrentHashMap<Object, PyObject>(map);
+        table = Generic.concurrentMap();
+        table.putAll(map);
     }
 
     public PyStringMap(PyObject elements[]) {
@@ -299,7 +304,7 @@ public class PyStringMap extends PyObject {
             try {
                 pair = PySequence.fastSequence(pair, "");
             } catch(PyException pye) {
-                if (Py.matchException(pye, Py.TypeError)) {
+                if (pye.match(Py.TypeError)) {
                     throw Py.TypeError(String.format("cannot convert dictionary update sequence "
                                                      + "element #%d to a sequence", i));
                 }
@@ -334,11 +339,13 @@ public class PyStringMap extends PyObject {
      *            the default value to insert in the mapping if key does not already exist.
      */
     public PyObject setdefault(PyObject key, PyObject failobj) {
-        PyObject o = __finditem__(key);
-        if (o == null) {
-            __setitem__(key, o = failobj);
+        Object internedKey = (key instanceof PyString) ? ((PyString)key).internedString() : key;
+        PyObject oldValue = table.putIfAbsent(internedKey, failobj);
+        if (oldValue == null) {
+            return failobj;
+        } else {
+            return oldValue;
         }
-        return o;
     }
 
     /**

@@ -105,8 +105,44 @@ public class StdoutWrapper extends OutputStream {
                 file.write(" ");
                 file.softspace = false;
             }
-            PyString string = o.__str__();
-            String s = string.toString();
+
+            String s;
+            if (o instanceof PyUnicode && file.encoding != null) {
+                s = ((PyUnicode)o).encode(file.encoding, "strict");
+            } else {
+                s = o.__str__().toString();
+            }
+
+            int len = s.length();
+            file.write(s);
+            if (o instanceof PyString) {
+                if (len == 0 || !Character.isWhitespace(s.charAt(len - 1))
+                    || s.charAt(len - 1) == ' ') {
+                    file.softspace = space;
+                }
+            } else {
+                file.softspace = space;
+            }
+            if (newline) {
+                file.write("\n");
+                file.softspace = false;
+            }
+            file.flush();
+        } else if (obj instanceof PyFileWriter) {
+            PyFileWriter file = (PyFileWriter)obj;
+            if (file.softspace) {
+                file.write(" ");
+                file.softspace = false;
+            }
+
+            // since we are outputting directly to a character stream,
+            // avoid doing an encoding
+            String s;
+            if (o instanceof PyString) {
+                s = ((PyString)o).string;
+            } else {
+                s = o.toString();
+            }
             int len = s.length();
             file.write(s);
             if (o instanceof PyString) {

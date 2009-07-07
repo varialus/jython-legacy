@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -21,7 +22,8 @@ import java.util.Set;
 
 import org.python.antlr.base.mod;
 import com.kenai.constantine.platform.Errno;
-import org.python.compiler.Module;
+import java.util.ArrayList;
+import java.util.List;
 import org.python.core.adapter.ClassicPyObjectAdapter;
 import org.python.core.adapter.ExtensiblePyObjectAdapter;
 import org.python.util.Generic;
@@ -225,7 +227,7 @@ public final class Py {
     public static PyObject SystemExit;
 
     static void maybeSystemExit(PyException exc) {
-        if (Py.matchException(exc, Py.SystemExit)) {
+        if (exc.match(Py.SystemExit)) {
             PyObject value = exc.value;
             if (PyException.isExceptionInstance(exc.value)) {
                 value = value.__findattr__("code");
@@ -391,7 +393,7 @@ public final class Py {
         try {
             mod = __builtin__.__import__("warnings");
         } catch (PyException e) {
-            if (matchException(e, ImportError)) {
+            if (e.match(ImportError)) {
                 return null;
             }
             throw e;
@@ -485,7 +487,7 @@ public final class Py {
     // ??pending: was @deprecated but is actually used by proxie code.
     // Can get rid of it?
     public static Object tojava(PyObject o, String s) {
-        Class c = findClass(s);
+        Class<?> c = findClass(s);
         if (c == null) {
             throw Py.TypeError("can't convert to: " + s);
         }
@@ -494,15 +496,15 @@ public final class Py {
     /* Helper functions for PyProxy's */
 
     /* Convenience methods to create new constants without using "new" */
-    private static PyInteger[] integerCache = null;
+    private final static PyInteger[] integerCache = new PyInteger[1000];
+
+    static {
+        for (int j = -100; j < 900; j++) {
+            integerCache[j + 100] = new PyInteger(j);
+        }
+    }
 
     public static final PyInteger newInteger(int i) {
-        if (integerCache == null) {
-            integerCache = new PyInteger[1000];
-            for (int j = -100; j < 900; j++) {
-                integerCache[j + 100] = new PyInteger(j);
-            }
-        }
         if (i >= -100 && i < 900) {
             return integerCache[i + 100];
         } else {
@@ -667,15 +669,13 @@ public final class Py {
                 funcs, func_id);
     }
 
-    public static PyCode newJavaCode(Class cls, String name) {
+    public static PyCode newJavaCode(Class<?> cls, String name) {
         return new JavaCode(newJavaFunc(cls, name));
     }
 
-    public static PyObject newJavaFunc(Class cls, String name) {
+    public static PyObject newJavaFunc(Class<?> cls, String name) {
         try {
-            java.lang.reflect.Method m = cls.getMethod(name, new Class[]{
-                PyObject[].class, String[].class
-            });
+            Method m = cls.getMethod(name, new Class<?>[]{PyObject[].class, String[].class});
             return new JavaFunc(m);
         } catch (NoSuchMethodException e) {
             throw Py.JavaError(e);
@@ -754,7 +754,7 @@ public final class Py {
 
     private static boolean secEnv = false;
 
-    public static Class findClass(String name) {
+    public static Class<?> findClass(String name) {
         try {
             ClassLoader classLoader = Py.getSystemState().getClassLoader();
             if (classLoader != null) {
@@ -776,8 +776,11 @@ public final class Py {
                 }
             }
 
-            return Thread.currentThread().getContextClassLoader().loadClass(name);
-
+            classLoader = Thread.currentThread().getContextClassLoader();
+            if (classLoader != null) {
+                return classLoader.loadClass(name);
+            }
+            return null;
         } catch (ClassNotFoundException e) {
             //             e.printStackTrace();
             return null;
@@ -790,7 +793,7 @@ public final class Py {
         }
     }
 
-    public static Class findClassEx(String name, String reason) {
+    public static Class<?> findClassEx(String name, String reason) {
         try {
             ClassLoader classLoader = Py.getSystemState().getClassLoader();
             if (classLoader != null) {
@@ -818,7 +821,11 @@ public final class Py {
 
             writeDebug("import", "trying " + name + " as " + reason +
                     " in Class.forName");
-            return Thread.currentThread().getContextClassLoader().loadClass(name);
+            classLoader = Thread.currentThread().getContextClassLoader();
+            if (classLoader != null) {
+                return classLoader.loadClass(name);
+            }
+            return null;
         } catch (ClassNotFoundException e) {
             return null;
         } catch (IllegalArgumentException e) {
@@ -866,15 +873,25 @@ public final class Py {
      * Initializes a default PythonInterpreter and runs the code from
      * {@link PyRunnable#getMain} as __main__
      *
-     * Called by the code generated in {@link Module#addMain()}
+     * Called by the code generated in {@link org.python.compiler.Module#addMain()}
      */
     public static void runMain(PyRunnable main, String[] args) throws Exception {
+        runMain(new PyRunnableBootstrap(main), args);
+    }
+
+    /**
+     * Initializes a default PythonInterpreter and runs the code loaded from the
+     * {@link CodeBootstrap} as __main__ Called by the code generated in
+     * {@link org.python.compiler.Module#addMain()}
+     */
+    public static void runMain(CodeBootstrap main, String[] args)
+            throws Exception {
         PySystemState.initialize(null, null, args, main.getClass().getClassLoader());
         try {
-            imp.createFromCode("__main__", main.getMain());
+            imp.createFromCode("__main__", CodeLoader.loadCode(main));
         } catch (PyException e) {
             Py.getSystemState().callExitFunc();
-            if (Py.matchException(e, Py.SystemExit)) {
+            if (e.match(Py.SystemExit)) {
                 return;
             }
             throw e;
@@ -1132,40 +1149,13 @@ public final class Py {
         return pye;
     }
 
+    
+    /**
+     * @deprecated As of Jython 2.5, use {@link PyException#match} instead.
+     */
+    @Deprecated
     public static boolean matchException(PyException pye, PyObject exc) {
-        if (exc instanceof PyTuple) {
-            for (PyObject item : ((PyTuple)exc).getArray()) {
-                if (matchException(pye, item)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        pye.normalize();
-        // FIXME, see bug 737978
-        //
-        // A special case for IOError's to allow them to also match
-        // java.io.IOExceptions.  This is a hack for 1.0.x until I can do
-        // it right in 1.1
-        if (exc == Py.IOError) {
-            if (__builtin__.isinstance(pye.value, PyType.fromClass(IOException.class))) {
-                return true;
-            }
-        }
-        // FIXME too, same approach for OutOfMemoryError
-        if (exc == Py.MemoryError) {
-            if (__builtin__.isinstance(pye.value,
-                                       PyType.fromClass(OutOfMemoryError.class))) {
-                return true;
-            }
-        }
-
-        if (PyException.isExceptionClass(pye.type) && PyException.isExceptionClass(exc)) {
-            return isSubClass(pye.type, exc);
-        }
-
-        return pye.type == exc;
+        return pye.match(exc);
     }
 
 
@@ -1191,16 +1181,17 @@ public final class Py {
     public static PyObject runCode(PyCode code, PyObject locals,
             PyObject globals) {
         PyFrame f;
+        ThreadState ts = getThreadState();
         if (locals == null || locals == Py.None) {
             if (globals != null && globals != Py.None) {
                 locals = globals;
             } else {
-                locals = Py.getFrame().getLocals();
+                locals = ts.frame.getLocals();
             }
         }
 
         if (globals == null || globals == Py.None) {
-            globals = Py.getFrame().f_globals;
+            globals = ts.frame.f_globals;
         }
 
         PyTableCode tc = null;
@@ -1210,12 +1201,25 @@ public final class Py {
 
         f = new PyFrame(tc, locals, globals,
                 Py.getSystemState().getBuiltins());
-        return code.call(f);
+        return code.call(ts, f);
     }
 
     public static void exec(PyObject o, PyObject globals, PyObject locals) {
         PyCode code;
         int flags = 0;
+        if (o instanceof PyTuple) {
+            PyTuple tuple = (PyTuple) o;
+            int len = tuple.__len__();
+            if ((globals == null || globals.equals(None))
+                    && (locals == null || locals.equals(None))
+                    && (len >= 2 && len <= 3)) {
+                o = tuple.__getitem__(0);
+                globals = tuple.__getitem__(1);
+                if (len == 3) {
+                    locals = tuple.__getitem__(2);
+                }
+            }
+        }
         if (o instanceof PyCode) {
             code = (PyCode) o;
             if (locals == null && o instanceof PyBaseCode && ((PyBaseCode) o).hasFreevars()) {
@@ -1225,7 +1229,7 @@ public final class Py {
             String contents = null;
             if (o instanceof PyString) {
                 if (o instanceof PyUnicode) {
-                    flags |= PyBaseCode.PyCF_SOURCE_IS_UTF8;
+                    flags |= CompilerFlags.PyCF_SOURCE_IS_UTF8;
                 }
                 contents = o.toString();
             } else if (o instanceof PyFile) {
@@ -1238,8 +1242,8 @@ public final class Py {
                 throw Py.TypeError(
                         "exec: argument 1 must be string, code or file object");
             }
-            code = (PyCode)Py.compile_flags(contents, "<string>", "exec",
-                                            getCompilerFlags(flags, false));
+            code = Py.compile_flags(contents, "<string>", CompileMode.exec,
+                                    getCompilerFlags(flags, false));
         }
         Py.runCode(code, locals, globals);
     }
@@ -1450,7 +1454,14 @@ public final class Py {
             throw Py.TypeError("None required for void return");
         }
     }
-    private static PyString[] letters = null;
+    
+    private final static PyString[] letters = new PyString[256];
+
+    static {
+        for (char j = 0; j < 256; j++) {
+            letters[j] = new PyString(new Character(j).toString());
+        }
+    }
 
     public static final PyString makeCharacter(Character o) {
         return makeCharacter(o.charValue());
@@ -1468,13 +1479,6 @@ public final class Py {
                                                              + "toUnicode argument", codepoint));
         } else if (codepoint > 256) {
             return new PyString((char)codepoint);
-        }
-
-        if (letters == null) {
-            letters = new PyString[256];
-            for (char j = 0; j < 256; j++) {
-                letters[j] = new PyString(new Character(j).toString());
-            }
         }
         return letters[codepoint];
     }
@@ -1511,12 +1515,6 @@ public final class Py {
      */
     private static ExtensiblePyObjectAdapter adapter;
 
-    private static Class[] pyClassCtrSignature = {
-        String.class, PyTuple.class, PyObject.class, Class.class
-    };
-
-    static private final PyType CLASS_TYPE = PyType.fromClass(PyClass.class);
-
     // XXX: The following two makeClass overrides are *only* for the
     // old compiler, they should be removed when the newcompiler hits
     public static PyObject makeClass(String name, PyObject[] bases,
@@ -1527,9 +1525,9 @@ public final class Py {
     public static PyObject makeClass(String name, PyObject[] bases,
                                      PyCode code, PyObject doc,
                                      PyObject[] closure_cells) {
-        PyObject globals = getFrame().f_globals;
-        PyObject dict = code.call(Py.EmptyObjects, Py.NoKeywords, globals, Py.EmptyObjects,
-                                  new PyTuple(closure_cells));
+        ThreadState state = getThreadState();
+        PyObject dict = code.call(state, Py.EmptyObjects, Py.NoKeywords,
+                state.frame.f_globals, Py.EmptyObjects, new PyTuple(closure_cells));
         if (doc != null && dict.__finditem__("__doc__") == null) {
             dict.__setitem__("__doc__", doc);
         }
@@ -1551,14 +1549,6 @@ public final class Py {
      * @return a new Python Class PyObject
      */
     public static PyObject makeClass(String name, PyObject[] bases, PyObject dict) {
-        PyFrame frame = getFrame();
-        if (dict.__finditem__("__module__") == null) {
-            PyObject module = frame.getglobal("__name__");
-            if (module != null) {
-                dict.__setitem__("__module__", module);
-            }
-        }
-
         PyObject metaclass = dict.__finditem__("__metaclass__");
 
         if (metaclass == null) {
@@ -1569,31 +1559,20 @@ public final class Py {
                     metaclass = base.getType();
                 }
             } else {
-                PyObject globals = frame.f_globals;
+                PyObject globals = getFrame().f_globals;
                 if (globals != null) {
                     metaclass = globals.__finditem__("__metaclass__");
                 }
-            }
-        }
-
-        if (metaclass == null || metaclass == CLASS_TYPE) {
-            boolean moreGeneral = false;
-            for (PyObject base : bases) {
-                if (!(base instanceof PyClass)) {
-                    metaclass = base.getType();
-                    moreGeneral = true;
-                    break;
+                if (metaclass == null) {
+                    metaclass = PyClass.TYPE;
                 }
-            }
-            if (!moreGeneral) {
-                return new PyClass(name, new PyTuple(bases), dict);
             }
         }
 
         try {
             return metaclass.__call__(new PyString(name), new PyTuple(bases), dict);
         } catch (PyException pye) {
-            if (!matchException(pye, TypeError)) {
+            if (!pye.match(TypeError)) {
                 throw pye;
             }
             pye.value = Py.newString(String.format("Error when calling the metaclass bases\n    "
@@ -1610,26 +1589,31 @@ public final class Py {
     }
 
     public static CompilerFlags getCompilerFlags() {
-        return getCompilerFlags(0, false);
+        return CompilerFlags.getCompilerFlags();
     }
 
     public static CompilerFlags getCompilerFlags(int flags, boolean dont_inherit) {
-        CompilerFlags cflags = null;
+        final PyFrame frame;
         if (dont_inherit) {
-            cflags = new CompilerFlags(flags);
+            frame = null;
         } else {
-            PyFrame frame = Py.getFrame();
-            if (frame != null && frame.f_code != null) {
-                cflags = new CompilerFlags(frame.f_code.co_flags | flags);
-            } else {
-                cflags = new CompilerFlags(flags);
-            }
+            frame = Py.getFrame();
         }
-        return cflags;
+        return CompilerFlags.getCompilerFlags(flags, frame);
+    }
+
+    public static CompilerFlags getCompilerFlags(CompilerFlags flags, boolean dont_inherit) {
+        final PyFrame frame;
+        if (dont_inherit) {
+            frame = null;
+        } else {
+            frame = Py.getFrame();
+        }
+        return CompilerFlags.getCompilerFlags(flags, frame);
     }
 
     // w/o compiler-flags
-    public static PyObject compile(InputStream istream, String filename, String kind) {
+    public static PyCode compile(InputStream istream, String filename, CompileMode kind) {
         return compile_flags(istream, filename, kind, new CompilerFlags());
     }
 
@@ -1647,47 +1631,35 @@ public final class Py {
      * @param cflags Compiler flags
      * @return Code object for the compiled module
      */
-    public static PyObject compile_flags(mod node, String name, String filename,
+    public static PyCode compile_flags(mod node, String name, String filename,
                                          boolean linenumbers, boolean printResults,
                                          CompilerFlags cflags) {
-        try {
-            if (cflags != null && cflags.only_ast) {
-                return Py.java2py(node);
-            }
-            ByteArrayOutputStream ostream = new ByteArrayOutputStream();
-            Module.compile(node, ostream, name, filename, linenumbers, printResults, cflags);
-
-            saveClassFile(name, ostream);
-
-            return BytecodeLoader.makeCode(name, ostream.toByteArray(), filename);
-        } catch (Throwable t) {
-            throw ParserFacade.fixParseError(null, t, filename);
-        }
+        return CompilerFacade.compile(node, name, filename, linenumbers, printResults, cflags);
     }
 
-    public static PyObject compile_flags(mod node, String filename,
-                                         String kind, CompilerFlags cflags) {
+    public static PyCode compile_flags(mod node, String filename,
+                                         CompileMode kind, CompilerFlags cflags) {
         return Py.compile_flags(node, getName(), filename, true,
-                                kind.equals("single"), cflags);
+                                kind == CompileMode.single, cflags);
     }
 
     /**
      * Compiles python source code coming from a file or another external stream
      */
-    public static PyObject compile_flags(InputStream istream, String filename,
-                                         String kind, CompilerFlags cflags) {
+    public static PyCode compile_flags(InputStream istream, String filename,
+                                         CompileMode kind, CompilerFlags cflags) {
         mod node = ParserFacade.parse(istream, kind, filename, cflags);
         return Py.compile_flags(node, filename, kind, cflags);
     }
 
     /**
-     * Compiles python source code coming from decoded Strings.
+     * Compiles python source code coming from String (raw bytes) data.
      *
-     * DO NOT use this for PyString input. Use
-     * {@link #compile_flags(byte[], String, String, CompilerFlags)} instead.
+     * If the String is properly decoded (from PyUnicode) the PyCF_SOURCE_IS_UTF8 flag
+     * should be specified.
      */
-    public static PyObject compile_flags(String data, String filename,
-                                         String kind, CompilerFlags cflags) {
+    public static PyCode compile_flags(String data, String filename,
+                                         CompileMode kind, CompilerFlags cflags) {
         if (data.contains("\0")) {
             throw Py.TypeError("compile() expected string without null bytes");
         }
@@ -1701,7 +1673,7 @@ public final class Py {
     }
 
     public static PyObject compile_command_flags(String string, String filename,
-            String kind, CompilerFlags cflags, boolean stdprompt) {
+            CompileMode kind, CompilerFlags cflags, boolean stdprompt) {
         mod node = ParserFacade.partialParse(string + "\n", kind, filename,
                                                  cflags, stdprompt);
         if (node == null) {
@@ -1738,7 +1710,7 @@ public final class Py {
         try {
             return seq.__iter__();
         } catch (PyException exc) {
-            if (Py.matchException(exc, Py.TypeError)) {
+            if (exc.match(Py.TypeError)) {
                 throw Py.TypeError(message);
             }
             throw exc;
@@ -1931,16 +1903,15 @@ public final class Py {
         } catch (PyException exc) {
         }
 
-        PyObjectArray objs = new PyObjectArray(n);
+        List<PyObject> objs = new ArrayList<PyObject>(n);
         for (PyObject item : o.asIterable()) {
             objs.add(item);
         }
-        // Cut back if guess was too large.
-        objs.trimToSize();
-        return (PyObject[]) objs.getArray();
+        PyObject dest[] = new PyObject[0];
+        return (objs.toArray(dest));
     }
 }
-/** @deprecated */
+
  class FixedFileWrapper extends StdoutWrapper {
 
     private PyObject file;
@@ -1957,6 +1928,7 @@ public final class Py {
         }
     }
 
+    @Override
     protected PyObject myFile() {
         return file;
     }
@@ -1976,44 +1948,58 @@ class JavaCode extends PyCode {
         }
     }
 
-    public PyObject call(PyFrame frame, PyObject closure) {
+    @Override
+    public PyObject call(ThreadState state, PyFrame frame, PyObject closure) {
         //XXX: what the heck is this?  Looks like debug code, but it's
         //     been here a long time...
         System.out.println("call #1");
         return Py.None;
     }
 
-    public PyObject call(PyObject args[], String keywords[],
+    @Override
+    public PyObject call(ThreadState state, PyObject args[], String keywords[],
             PyObject globals, PyObject[] defaults,
             PyObject closure) {
         return func.__call__(args, keywords);
     }
 
-    public PyObject call(PyObject self, PyObject args[], String keywords[],
+    @Override
+    public PyObject call(ThreadState state, PyObject self, PyObject args[], String keywords[],
             PyObject globals, PyObject[] defaults,
             PyObject closure) {
         return func.__call__(self, args, keywords);
     }
 
-    public PyObject call(PyObject globals, PyObject[] defaults,
+    @Override
+    public PyObject call(ThreadState state, PyObject globals, PyObject[] defaults,
             PyObject closure) {
         return func.__call__();
     }
 
-    public PyObject call(PyObject arg1, PyObject globals,
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject globals,
             PyObject[] defaults, PyObject closure) {
         return func.__call__(arg1);
     }
 
-    public PyObject call(PyObject arg1, PyObject arg2, PyObject globals,
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject globals,
             PyObject[] defaults, PyObject closure) {
         return func.__call__(arg1, arg2);
     }
 
-    public PyObject call(PyObject arg1, PyObject arg2, PyObject arg3,
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2, PyObject arg3,
             PyObject globals, PyObject[] defaults,
             PyObject closure) {
         return func.__call__(arg1, arg2, arg3);
+    }
+    
+    @Override
+    public PyObject call(ThreadState state, PyObject arg1, PyObject arg2,
+            PyObject arg3, PyObject arg4, PyObject globals,
+            PyObject[] defaults, PyObject closure) {
+        return func.__call__(arg1, arg2, arg3, arg4);
     }
 }
 
@@ -2023,12 +2009,13 @@ class JavaCode extends PyCode {
  */
 class JavaFunc extends PyObject {
 
-    java.lang.reflect.Method method;
+    Method method;
 
-    public JavaFunc(java.lang.reflect.Method method) {
+    public JavaFunc(Method method) {
         this.method = method;
     }
 
+    @Override
     public PyObject __call__(PyObject[] args, String[] kws) {
         Object[] margs = new Object[]{args, kws};
         try {
@@ -2038,10 +2025,12 @@ class JavaFunc extends PyObject {
         }
     }
 
+    @Override
     public PyObject _doget(PyObject container) {
         return _doget(container, null);
     }
 
+    @Override
     public PyObject _doget(PyObject container, PyObject wherefound) {
         if (container == null) {
             return this;

@@ -51,6 +51,29 @@ class UnicodeTestCase(unittest.TestCase):
         self.assertEqual(ord(bar[2]), 92)
         self.assertEqual(ord(bar[3]), 110)
 
+        for baz in ur'Hello\u0020World !', ur'Hello\U00000020World !':
+            self.assertEqual(len(baz), 13, repr(baz))
+            self.assertEqual(repr(baz), "u'Hello World !'")
+            self.assertEqual(ord(baz[5]), 32)
+
+        quux = ur'\U00100000'
+        self.assertEqual(repr(quux), "u'\\U00100000'")
+        if sys.maxunicode == 0xffff:
+            self.assertEqual(len(quux), 2)
+            self.assertEqual(ord(quux[0]), 56256)
+            self.assertEqual(ord(quux[1]), 56320)
+        else:
+            self.assertEqual(len(quux), 1)
+            self.assertEqual(ord(quux), 1048576)
+
+    def test_raw_unicode_escape(self):
+        foo = u'\U00100000'
+        self.assertEqual(foo.encode('raw_unicode_escape'), '\\U00100000')
+        self.assertEqual(foo.encode('raw_unicode_escape').decode('raw_unicode_escape'),
+                         foo)
+        for bar in '\\u', '\\u000', '\\U00000':
+            self.assertRaises(UnicodeDecodeError, bar.decode, 'raw_unicode_escape')
+
     def test_encode_decimal(self):
         self.assertEqual(int(u'\u0039\u0032'), 92)
         self.assertEqual(int(u'\u0660'), 0)
@@ -58,6 +81,11 @@ class UnicodeTestCase(unittest.TestCase):
         self.assertEqual(long(u'\u0663'), 3)
         self.assertEqual(float(u'\u0663.\u0661'), 3.1)
         self.assertEqual(complex(u'\u0663.\u0661'), 3.1+0j)
+
+    def test_unstateful_end_of_data(self):
+        # http://bugs.jython.org/issue1368
+        for encoding in 'utf-8', 'utf-16', 'utf-16-be', 'utf-16-le':
+            self.assertRaises(UnicodeDecodeError, '\xe4'.decode, encoding)
 
     def test_formatchar(self):
         self.assertEqual('%c' % 255, '\xff')
@@ -109,8 +137,28 @@ class UnicodeTestCase(unittest.TestCase):
         self.assertEquals('\xe2\x82\xac', encoded_euro)
         self.assertEquals(EURO_SIGN, encoded_euro.decode('utf-8'))
 
+
+class UnicodeFormatTestCase(unittest.TestCase):
+    
+    def test_unicode_mapping(self):
+        assertTrue = self.assertTrue
+        class EnsureUnicode(dict):
+            def __missing__(self, key):
+                assertTrue(isinstance(key, unicode))
+                return key
+        u'%(foo)s' % EnsureUnicode()
+
+    def test_non_ascii_unicode_mod_str(self):
+        # Regression test for a problem on the formatting logic: when no unicode
+        # args were found, Jython stored the resulting buffer on a PyString,
+        # decoding it later to make a PyUnicode. That crashed when the left side
+        # of % was a unicode containing non-ascii chars
+        self.assertEquals(u"\u00e7%s" % "foo", u"\u00e7foo")
+
+
 def test_main():
-    test_support.run_unittest(UnicodeTestCase)
+    test_support.run_unittest(UnicodeTestCase,
+                              UnicodeFormatTestCase)
 
 
 if __name__ == "__main__":

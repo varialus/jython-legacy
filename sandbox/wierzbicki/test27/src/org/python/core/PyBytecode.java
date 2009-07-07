@@ -74,9 +74,9 @@ public class PyBytecode extends PyBaseCode {
         co_cellvars = cellvars;
         co_freevars = freevars;
         co_name = name;
-        varargs = (flags & CO_VARARGS) != 0;
-        varkwargs = (flags & CO_VARKEYWORDS) != 0;
-        co_flags |= flags;
+        co_flags = new CompilerFlags(flags);
+        varargs = co_flags.isFlagSet(CodeFlag.CO_VARARGS);
+        varkwargs = co_flags.isFlagSet(CodeFlag.CO_VARKEYWORDS);
 
         co_stacksize = stacksize;
         co_consts = constants;
@@ -156,6 +156,9 @@ public class PyBytecode extends PyBaseCode {
         if (name == "co_consts") {
             return new PyTuple(co_consts);
         }
+        if (name == "co_flags") {
+            return Py.newInteger(co_flags.toBits());
+        }
         return super.__findattr_ex__(name);
     }
 
@@ -172,7 +175,7 @@ public class PyBytecode extends PyBaseCode {
     };
 
     // to enable why's to be stored on a PyStack
-    private class PyStackWhy extends PyObject {
+    private static class PyStackWhy extends PyObject {
 
         Why why;
 
@@ -186,7 +189,7 @@ public class PyBytecode extends PyBaseCode {
         }
     }
 
-    private class PyStackException extends PyObject {
+    private static class PyStackException extends PyObject {
 
         PyException exception;
 
@@ -201,11 +204,11 @@ public class PyBytecode extends PyBaseCode {
     }
 
     private static String stringify_blocks(PyFrame f) {
-        if (f.f_exits == null || f.f_blockstate[0] == 0) {
+        if (f.f_exits == null || f.f_lineno == 0) {
             return "[]";
         }
         StringBuilder buf = new StringBuilder("[");
-        int len = f.f_blockstate[0];
+        int len = f.f_lineno;
         for (int i = 0; i < len; i++) {
             buf.append(f.f_exits[i].toString());
             if (i < len - 1) {
@@ -227,21 +230,24 @@ public class PyBytecode extends PyBaseCode {
         }
     }
 
+    // the following code exploits the fact that f_exits is only used by code compiled to Java bytecode;
+    // in their place we implement the block stack for PBC-VM, as mapped below in the comments of pushBlock
+
     private static PyTryBlock popBlock(PyFrame f) {
-        return (PyTryBlock) (f.f_exits[--f.f_blockstate[0]]);
+        return (PyTryBlock)(((PyList)f.f_exits[0]).pop());
     }
 
     private static void pushBlock(PyFrame f, PyTryBlock block) {
-        if (f.f_exits == null) { // allocate in the frame where they can fit! consider supporting directly in the frame
-            f.f_exits = new PyObject[CO_MAXBLOCKS]; // f_blockstack in CPython - a simple ArrayList might be best
-            f.f_blockstate = new int[]{0};        // f_iblock in CPython - f_blockstate is likely go away soon
+        if (f.f_exits == null) { // allocate in the frame where they can fit! TODO consider supporting directly in the frame
+            f.f_exits = new PyObject[1]; // f_blockstack in CPython - a simple ArrayList might be best
+            f.f_exits[0] = new PyList();
         }
-        f.f_exits[f.f_blockstate[0]++] = block;
+        ((PyList)f.f_exits[0]).append(block);
     }
 
     private boolean blocksLeft(PyFrame f) {
         if (f.f_exits != null) {
-            return f.f_blockstate[0] > 0;
+            return ((PyList)f.f_exits[0]).__nonzero__();
         } else {
             return false;
         }
@@ -414,7 +420,7 @@ public class PyBytecode extends PyBaseCode {
                         PyObject b = stack.pop();
                         PyObject a = stack.pop();
 
-                        if ((co_flags & CO_FUTUREDIVISION) == 0) {
+                        if (!co_flags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
                             stack.push(a._div(b));
                         } else {
                             stack.push(a._truediv(b));
@@ -524,7 +530,7 @@ public class PyBytecode extends PyBaseCode {
                     case Opcode.INPLACE_DIVIDE: {
                         PyObject b = stack.pop();
                         PyObject a = stack.pop();
-                        if ((co_flags & CO_FUTUREDIVISION) == 0) {
+                        if (!co_flags.isFlagSet(CodeFlag.CO_FUTURE_DIVISION)) {
                             stack.push(a._idiv(b));
                         } else {
                             stack.push(a._itruediv(b));
@@ -924,9 +930,9 @@ public class PyBytecode extends PyBaseCode {
                             case Opcode.PyCmp_EXC_MATCH:
                                 if (a instanceof PyStackException) {
                                     PyException pye = ((PyStackException) a).exception;
-                                    stack.push(Py.newBoolean(Py.matchException(pye, b)));
+                                    stack.push(Py.newBoolean(pye.match(b)));
                                 } else {
-                                    stack.push(Py.newBoolean(Py.matchException(new PyException(a), b)));
+                                    stack.push(Py.newBoolean(new PyException(a).match(b)));
                                 }
                                 break;
 
@@ -963,7 +969,7 @@ public class PyBytecode extends PyBaseCode {
                             stack.push(stack.top().__getattr__(name));
 
                         } catch (PyException pye) {
-                            if (Py.matchException(pye, Py.AttributeError)) {
+                            if (pye.match(Py.AttributeError)) {
                                 throw Py.ImportError(String.format("cannot import name %.230s", name));
                             } else {
                                 throw pye;
@@ -1009,7 +1015,7 @@ public class PyBytecode extends PyBaseCode {
                                 break;
                             }
                         } catch (PyException pye) {
-                            if (!Py.matchException(pye, Py.StopIteration)) {
+                            if (!pye.match(Py.StopIteration)) {
                                 throw pye;
                             }
                         }
@@ -1242,7 +1248,7 @@ public class PyBytecode extends PyBaseCode {
             throw ts.exception;
         }
 
-        if ((co_flags & CO_GENERATOR) != 0 && why == Why.RETURN && retval == Py.None) {
+        if (co_flags.isFlagSet(CodeFlag.CO_GENERATOR) && why == Why.RETURN && retval == Py.None) {
             f.f_lasti = -1;
         }
 
@@ -1355,7 +1361,7 @@ public class PyBytecode extends PyBaseCode {
 
     // XXX - perhaps add support for max stack size (presumably from co_stacksize)
     // and capacity hints
-    private class PyStack {
+    private static class PyStack {
 
         final List<PyObject> stack;
 
@@ -1473,7 +1479,7 @@ public class PyBytecode extends PyBaseCode {
         }
     }
 
-    private class PyTryBlock extends PyObject { // purely to sit on top of the existing PyFrame in f_exits!!!
+    private static class PyTryBlock extends PyObject { // purely to sit on top of the existing PyFrame in f_exits!!!
 
         int b_type;			/* what kind of block this is */
 
@@ -1571,6 +1577,7 @@ public class PyBytecode extends PyBaseCode {
             return lines.get(lo);
         }
 
+        @Override
         public String toString() {
             return addr_breakpoints.toString() + ";" + lines.toString();
         }

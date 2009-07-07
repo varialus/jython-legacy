@@ -76,7 +76,10 @@ goto cleanup
 rem ----- Execute the requested command ----------------------------------------
 
 :run
-set _JAVA_STACK=-Xss512k
+set _JAVA_MEM=-Xmx512m
+rem 1152k is the minimum for test_marshal to pass. Windows' default is
+rem apparently 1M, anyway
+set _JAVA_STACK=-Xss1152k
 
 rem Escape any quotes. Use _S for ', _D for ", and _U to escape _ itself.
 rem We have to escape _ itself, otherwise file names with _S and _D
@@ -121,9 +124,13 @@ if ["%_CMP%"] == ["--jdb"] (
    goto :nextArg
 )
 
-if ["%_CMP%"] == ["--verify"] (
-   set CLASSPATH=%_CP:"=%;%CLASSPATH:"=%
-   set _CP=
+if ["%_CMP%"] == ["--boot"] (
+   set _BOOT_CP=-Xbootclasspath/a:%_CP%
+   goto :nextArg
+)
+
+if ["%_CMP%"] == ["--print"] (
+   set _PRINT=print
    goto :nextArg
 )
 
@@ -148,20 +155,32 @@ goto nextArg
 :jvmArg
 set _VAL=%_CMP:~2%
 
-if "%_VAL:~0,4%" == "-Xss" (
+if "%_VAL:~0,4%" == "-Xmx" (
+   set _JAVA_MEM=%_VAL%
+) else if "%_VAL:~0,4%" == "-Xss" (
    set _JAVA_STACK=%_VAL%
-   echo %_VAL%
-   goto nextArg
+) else (
+   set _JAVA_OPTS=%_JAVA_OPTS% %_VAL%
 )
-
-set _JAVA_OPTS=%_JAVA_OPTS% %_VAL%
 
 :nextArg
 set _CMP=
 goto scanArgs
 
 :argsDone
-%_JAVA_CMD% %_JAVA_OPTS% %_JAVA_STACK% -Xbootclasspath/a:%_CP% -Dpython.home=%_JYTHON_HOME% -Dpython.executable="%~f0" -classpath "%CLASSPATH%" org.python.util.jython %_JYTHON_OPTS% %_JYTHON_ARGS% %_ARGS%
+if not defined _BOOT_CP (
+  if defined CLASSPATH (
+    set CLASSPATH=%_CP:"=%;%CLASSPATH:"=%
+  ) else (
+    set CLASSPATH=%_CP:"=%
+  )
+)
+set _FULL_CMD=%_JAVA_CMD% %_JAVA_OPTS% %_JAVA_MEM% %_JAVA_STACK% %_BOOT_CP% -Dpython.home=%_JYTHON_HOME% -Dpython.executable="%~f0" -classpath "%CLASSPATH%" org.python.util.jython %_JYTHON_OPTS% %_JYTHON_ARGS% %_ARGS%
+if defined _PRINT (
+  echo %_FULL_CMD%
+) else (
+  %_FULL_CMD%
+)
 set E=%ERRORLEVEL%
 
 :cleanup
@@ -170,15 +189,19 @@ set _CMP=
 set _CMP1=
 set _CMP2=
 set _CP=
+set _BOOT_CP=
+set _FULL_CMD=
 set _JAVA_CMD=
 set _JAVA_OPTS=
+set _JAVA_MEM=
 set _JAVA_STACK=
 set _JYTHON_HOME=
 set _JYTHON_OPTS=
 set _JYTHON_ARGS=
+set _PRINT=
 set _TRIMMED_JAVA_HOME=
 set _TRIMMED_JYTHON_HOME=
 set _TRIMMED_JYTHON_OPTS=
 
 :finish
-exit /b %E%
+%COMSPEC% /c exit /b %E%

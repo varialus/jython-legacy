@@ -12,7 +12,7 @@ from java.util import Date, Hashtable, Vector
 from java.awt import Color, Component, Dimension, Rectangle
 from javax.swing.table import AbstractTableModel
 
-from org.python.tests import BeanInterface, Callbacker, Coercions
+from org.python.tests import BeanInterface, Callbacker, Coercions, OwnMethodCaller
 
 class InterfaceTest(unittest.TestCase):
     def test_java_calling_python_interface_implementation(self):
@@ -211,6 +211,29 @@ class PythonSubclassesTest(unittest.TestCase):
             aa.name
             self.assertEquals("getName", output.pop())
 
+    def test_python_subclass_of_python_subclass_of_java_class_overriding(self):
+        '''Test for http://bugs.jython.org/issue1297.
+
+        Checks that getValue on SecondSubclass is overriden correctly when called from Java.'''
+        class FirstSubclass(OwnMethodCaller):
+            pass
+
+        class SecondSubclass(FirstSubclass):
+            def getValue(self):
+                return 10
+
+        self.assertEquals(10, SecondSubclass().callGetValue())
+
+
+    def test_deep_subclasses(self):
+        '''Checks for http://bugs.jython.org/issue1363.
+
+        Inheriting several classes deep from a Java class caused inconsistent MROs.'''
+        class A(Object): pass
+        class B(A): pass
+        class C(B): pass
+        class D(C): pass
+        d = D()
 
 """
 public abstract class Abstract {
@@ -235,7 +258,7 @@ class AbstractOnSyspathTest(unittest.TestCase):
     Checks for http://jython.org/bugs/1861985
     '''
     def setUp(self):
-        out = open('Abstract.class', 'w')
+        out = open('Abstract.class', 'wb')
         out.write(ABSTRACT_CLASS)
         out.close()
         self.orig_syspath = sys.path[:]
@@ -264,13 +287,12 @@ public abstract class ContextAbstract {
 """
 # The following is the correspoding bytecode for ContextAbstract compiled with javac 1.5
 # Needs to be named differently than Abstract above so the class loader won't just use it
-CONTEXT_ABSTRACT = '''\
-eJxdjr1uwjAUhc8lbgIh/AVegA0YQJ1BlRBSp6gdWrE7wQKjEEvBVH0tFip14AF4KMQ17YSHc3yu
-vuPry/X3DOAZ3RACrRAe2gE6AWKCP9OFti8EbzBcEsTCrBShlehCvR12qSo/ZZrzJE5MJvOlLLXL
-/0NhN3pP6CQLU1j1befp3pYys1N+d6fsxqwI4Yc5lJl61a7QewDHW/klIzzBjxDB58UPAKHtkEku
-i/XkPd2qzIo+/1/AnQrIdVkDTlN2Yq+NfkCjEyrHO1JlbXLF3QV7lbXGKfqDEaIOCHL7ORMad7J5
-A7yvPDQ=
-'''.decode('base64').decode('zlib')
+CONTEXT_ABSTRACT = """\
+eJxdTsEOwVAQnK2n1aq2Bz/ghgNxF4lInIQDcX9tX6jQJvWI33IhcfABPkrs69EedjKzM7v7+b7e
+AEaIPAj4HmpoOQgchAR7nOWZnhBq3d6WIGZFqgjhIsvV8nKKVbmR8ZEV+6T0vkgJ3rq4lImaZ0Zt
+z4pcq5uexmddykQPDvIqfdRh+3Bh86I/AyEyluFR5rvhKj6oRIsO/yNgygKZLHeHWY+RGN3+E9R/
+wLozITS4BxwxdsHYgBBkrlVTr9KbP6qaLFc=
+""".decode('base64').decode('zlib')
 class ContextClassloaderTest(unittest.TestCase):
     '''Classes on the context classloader should be importable and subclassable.
     

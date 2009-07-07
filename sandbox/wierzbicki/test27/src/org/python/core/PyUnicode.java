@@ -78,11 +78,11 @@ public class PyUnicode extends PyString implements Iterable {
         return buffer;
     }
 
-    PyUnicode(Iterator<Integer> iter) {
+    public PyUnicode(Iterator<Integer> iter) {
         this(fromCodePoints(iter));
     }
 
-    PyUnicode(Collection<Integer> ucs4) {
+    public PyUnicode(Collection<Integer> ucs4) {
         this(ucs4.iterator());
     }
 
@@ -213,10 +213,9 @@ public class PyUnicode extends PyString implements Iterable {
         return fmt.format(other);
     }
 
-    //XXX: needs doc
-    @ExposedMethod/*(doc = BuiltinDocs.unicode___unicode___doc)*/
-    final PyUnicode unicode___unicode__() {
-        return str___unicode__();
+    @Override
+    public PyUnicode __unicode__() {
+        return this;
     }
 
     @Override
@@ -367,7 +366,7 @@ public class PyUnicode extends PyString implements Iterable {
         }
     }
 
-    private class SteppedIterator<T> implements Iterator {
+    private static class SteppedIterator<T> implements Iterator {
 
         private final Iterator<T> iter;
         private final int step;
@@ -413,13 +412,17 @@ public class PyUnicode extends PyString implements Iterable {
         }
     }
 
-    public Iterator newSubsequenceIterator() {
+    // XXX: Parameterize SubsequenceIteratorImpl and friends (and make them Iterable)
+    public Iterator<Integer> newSubsequenceIterator() {
         return new SubsequenceIteratorImpl();
     }
 
-    public Iterator newSubsequenceIterator(int start, int stop, int step) {
+    public Iterator<Integer> newSubsequenceIterator(int start, int stop, int step) {
         if (step < 0) {
-            return new SteppedIterator(step * -1, new ReversedIterator(new SubsequenceIteratorImpl(stop + 1, start + 1, 1)));
+            return new SteppedIterator(step * -1,
+                                       new ReversedIterator(new SubsequenceIteratorImpl(stop + 1,
+                                                                                        start + 1,
+                                                                                        1)));
         } else {
             return new SubsequenceIteratorImpl(start, stop, step);
         }
@@ -456,6 +459,7 @@ public class PyUnicode extends PyString implements Iterable {
         return str___rmul__(o);
     }
 
+    @Override
     public PyObject __add__(PyObject other) {
         return unicode___add__(other);
     }
@@ -528,7 +532,7 @@ public class PyUnicode extends PyString implements Iterable {
         return new PyUnicode(buffer);
     }
 
-    private class StripIterator implements Iterator {
+    private static class StripIterator implements Iterator {
 
         private final Iterator<Integer> iter;
         private int lookahead = -1;
@@ -634,6 +638,7 @@ public class PyUnicode extends PyString implements Iterable {
                 new ReversedIterator(newSubsequenceIterator()))));
     }
 
+    @Override
     public PyTuple partition(PyObject sep) {
         return unicode_partition(sep);
     }
@@ -717,7 +722,7 @@ public class PyUnicode extends PyString implements Iterable {
         }
     }
 
-    private class PeekIterator<T> implements Iterator {
+    private static class PeekIterator<T> implements Iterator {
 
         private T lookahead = null;
         private final Iterator<T> iter;
@@ -746,7 +751,7 @@ public class PyUnicode extends PyString implements Iterable {
         }
     }
 
-    private class ReversedIterator<T> implements Iterator {
+    private static class ReversedIterator<T> implements Iterator {
 
         private final List<T> reversed = Generic.list();
         private final Iterator<T> iter;
@@ -874,6 +879,7 @@ public class PyUnicode extends PyString implements Iterable {
         }
     }
 
+    @Override
     public PyTuple rpartition(PyObject sep) {
         return unicode_rpartition(sep);
     }
@@ -1119,6 +1125,7 @@ public class PyUnicode extends PyString implements Iterable {
     }
 
     // end utf-16 aware
+    @Override
     public PyString join(PyObject seq) {
         return unicode_join(seq);
     }
@@ -1311,10 +1318,11 @@ public class PyUnicode extends PyString implements Iterable {
         }
         return true;
     }
-    // XXX: needs doc
+
     // end utf-16 aware
-    @ExposedMethod
+    @ExposedMethod(doc = "isunicode is deprecated.")
     final boolean unicode_isunicode() {
+        Py.warning(Py.DeprecationWarning, "isunicode is deprecated.");
         return true;
     }
 
@@ -1422,11 +1430,5 @@ public class PyUnicode extends PyString implements Iterable {
                                   "invalid decimal Unicode string");
         }
         return sb.toString();
-    }
-
-    //needs doc
-    @ExposedMethod/*(doc = BuiltinDocs.unicode_toString_doc)*/
-    final String unicode_toString() {
-        return toString();
     }
 }

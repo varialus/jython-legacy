@@ -44,7 +44,7 @@ public class PyComplex extends PyObject {
         try {
             real = real.__complex__();
         } catch (PyException pye) {
-            if (!Py.matchException(pye, Py.AttributeError)) {
+            if (!pye.match(Py.AttributeError)) {
                 // __complex__ not supported
                 throw pye;
             }
@@ -60,7 +60,7 @@ public class PyComplex extends PyObject {
             try {
                 toFloat = real.__float__();
             } catch (PyException pye) {
-                if (Py.matchException(pye, Py.AttributeError)) {
+                if (pye.match(Py.AttributeError)) {
                     // __float__ not supported
                     throw Py.TypeError("complex() argument must be a string or a number");
                 }
@@ -78,7 +78,7 @@ public class PyComplex extends PyObject {
             try {
                 toFloat = imag.__float__();
             } catch (PyException pye) {
-                if (Py.matchException(pye, Py.AttributeError)) {
+                if (pye.match(Py.AttributeError)) {
                     // __float__ not supported
                     throw Py.TypeError("complex() argument must be a string or a number");
                 }
@@ -164,7 +164,7 @@ public class PyComplex extends PyObject {
 
     @ExposedMethod(doc = BuiltinDocs.complex___nonzero___doc)
     final boolean complex___nonzero__() {
-        return real != 0 && imag != 0;
+        return real != 0 || imag != 0;
     }
 
     /*public Object __tojava__(Class c) {
@@ -639,6 +639,9 @@ public class PyComplex extends PyObject {
 
     @ExposedMethod(doc = BuiltinDocs.complex___pos___doc)
     final PyObject complex___pos__() {
+        if (getType() == TYPE) {
+            return this;
+        }
         return new PyComplex(real, imag);
     }
 

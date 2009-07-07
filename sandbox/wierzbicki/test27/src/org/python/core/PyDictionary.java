@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import java.util.concurrent.ConcurrentMap;
+
 import org.python.expose.ExposedClassMethod;
 import org.python.expose.ExposedMethod;
 import org.python.expose.ExposedNew;
 import org.python.expose.ExposedType;
 import org.python.expose.MethodType;
+import org.python.util.Generic;
 
 
 /**
@@ -33,7 +33,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap {
      * Create an empty dictionary.
      */
     public PyDictionary() {
-        table = new ConcurrentHashMap<PyObject, PyObject>();
+        table = Generic.concurrentMap();
     }
 
     /**
@@ -41,14 +41,15 @@ public class PyDictionary extends PyObject implements ConcurrentMap {
      */
     public PyDictionary(PyType subtype) {
         super(subtype);
-        table = new ConcurrentHashMap<PyObject, PyObject>();
+        table = Generic.concurrentMap();
     }
 
     /**
      * Create a new dictionary which is based on given map.
      */
     public PyDictionary(Map<PyObject, PyObject> t) {
-        table = new ConcurrentHashMap<PyObject, PyObject>(t);
+        table = Generic.concurrentMap();
+        table.putAll(t);
     }
 
     /**
@@ -56,7 +57,8 @@ public class PyDictionary extends PyObject implements ConcurrentMap {
      */
     public PyDictionary(PyType subtype, Map<PyObject, PyObject> t) {
         super(subtype);
-        table = new ConcurrentHashMap<PyObject, PyObject>(t);
+        table = Generic.concurrentMap();
+        table.putAll(t);
     }
 
 
@@ -421,7 +423,12 @@ public class PyDictionary extends PyObject implements ConcurrentMap {
         }
         if (nargs == 1) {
             PyObject arg = args[0];
-            if (arg.__findattr__("keys") != null) {
+
+            Object proxy = arg.getJavaProxy();
+            if (proxy instanceof Map) {
+                merge((Map)proxy);
+            }
+            else if (arg.__findattr__("keys") != null) {
                 merge(arg);
             } else {
                 mergeFromSeq(arg);
@@ -431,6 +438,13 @@ public class PyDictionary extends PyObject implements ConcurrentMap {
             dict___setitem__(Py.newString(keywords[i]), args[nargs + i]);
         }
     }
+
+    private void merge(Map<Object,Object> other) {
+        for (Entry<Object,Object> entry : other.entrySet()) {
+            dict___setitem__(Py.java2py(entry.getKey()), Py.java2py(entry.getValue()));
+        }
+    }
+
 
     /**
      * Merge another PyObject that supports keys() with this
@@ -474,7 +488,7 @@ public class PyDictionary extends PyObject implements ConcurrentMap {
             try {
                 pair = PySequence.fastSequence(pair, "");
             } catch(PyException pye) {
-                if (Py.matchException(pye, Py.TypeError)) {
+                if (pye.match(Py.TypeError)) {
                     throw Py.TypeError(String.format("cannot convert dictionary update sequence "
                                                      + "element #%d to a sequence", i));
                 }

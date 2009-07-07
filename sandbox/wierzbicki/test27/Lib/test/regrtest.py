@@ -1403,8 +1403,6 @@ _expectations = {
         test_curses
         test_dbm
         test_dl
-        test_dummy_thread
-        test_dummy_threading
         test_email_codecs
         test_fcntl
         test_fork1
@@ -1414,7 +1412,6 @@ _expectations = {
         test_hotshot
         test_imageop
         test_imgfile
-        test_import
         test_ioctl
         test_largefile
         test_linuxaudiodev
@@ -1431,7 +1428,6 @@ _expectations = {
         test_plistlib
         test_poll
         test_pty
-        test_pyexpat
         test_resource
         test_rgbimg
         test_scriptpackages
@@ -1445,7 +1441,6 @@ _expectations = {
         test_sundry
         test_symtable
         test_tcl
-        test_threadsignals
         test_timeout
         test_unicode_file
         test_wait3
@@ -1475,20 +1470,21 @@ _failures = {
         test_codecmaps_tw
         test_compiler
         test_dis
+        test_dummy_threading
         test_eof
         test_frozen
         test_gc
+        test_import
         test_iterlen
-        test_marshal
         test_multibytecodec
         test_multibytecodec_support
         test_peepholer
-        test_profile
         test_pyclbr
+        test_pyexpat
         test_stringprep
+        test_threadsignals
         test_transformer
         test_ucn
-        test_unicode
         test_unicodedata
         test_zipimport
         """,
@@ -1497,6 +1493,13 @@ _failures = {
 _platform = sys.platform
 if _platform[:4] == 'java':
     _platform = 'java'
+    if os._name == 'nt':
+        # XXX: Omitted for now because it fails so miserably and ruins
+        # other tests
+        _failures['java'] += '\ntest_mailbox'
+        if ' ' in sys.executable:
+            # http://bugs.python.org/issue1559298
+            _failures['java'] += '\ntest_popen'
 
 class _ExpectedSkips:
     def __init__(self):
@@ -1536,11 +1539,11 @@ class _ExpectedSkips:
 
             if test_support.is_jython:
                 if os._name != 'posix':
-                    self.expected.add('test_mhlib')
-                import platform
-                os_name = platform.java_ver()[3][0]
-                if os_name == 'Mac OS X' or 'BSD' in os_name:
-                    self.expected.add('test_asynchat')
+                    self.expected.update([
+                            'test_grp', 'test_mhlib', 'test_posix', 'test_pwd',
+                            'test_signal'])
+                if os._name != 'nt':
+                    self.expected.add('test_nt_paths_jy')
 
             self.valid = True
 

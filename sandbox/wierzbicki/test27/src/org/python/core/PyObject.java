@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.python.expose.ExposedDelete;
 import org.python.expose.ExposedGet;
 import org.python.expose.ExposedMethod;
@@ -24,26 +25,68 @@ public class PyObject implements Serializable {
 
     public static final PyType TYPE = PyType.fromClass(PyObject.class);
 
+    /** The type of this object. */
+    PyType objtype;
+
+    /**
+     * An underlying Java instance that this object is wrapping or is a subclass
+     * of. Anything attempting to use the proxy should go through {@link #getJavaProxy()}
+     * which ensures that it's initialized.
+     */
+    protected Object javaProxy;
+
+    /** Primitives classes their wrapper classes. */
+    private static final Map<Class<?>, Class<?>> primitiveMap = Generic.map();
+
+    static {
+        primitiveMap.put(Character.TYPE, Character.class);
+        primitiveMap.put(Boolean.TYPE, Boolean.class);
+        primitiveMap.put(Byte.TYPE, Byte.class);
+        primitiveMap.put(Short.TYPE, Short.class);
+        primitiveMap.put(Integer.TYPE, Integer.class);
+        primitiveMap.put(Long.TYPE, Long.class);
+        primitiveMap.put(Float.TYPE, Float.class);
+        primitiveMap.put(Double.TYPE, Double.class);
+
+        if (Py.BOOTSTRAP_TYPES.size() > 0) {
+            Py.writeWarning("init", "Bootstrap types weren't encountered in bootstrapping: "
+                            + Py.BOOTSTRAP_TYPES);
+            
+        }
+    }
+
+    public PyObject(PyType objtype) {
+        this.objtype = objtype;
+    }
+
+    /**
+     * The standard constructor for a <code>PyObject</code>. It will set the <code>objtype</code>
+     * field to correspond to the specific subclass of <code>PyObject</code> being instantiated.
+     **/
+    public PyObject() {
+        objtype = PyType.fromClass(getClass());
+    }
+
+    /**
+     * Creates the PyObject for the base type. The argument only exists to make the constructor
+     * distinct.
+     */
+    PyObject(boolean ignored) {
+        objtype = (PyType)this;
+    }
+
     //XXX: in CPython object.__new__ has a doc string...
     @ExposedNew
     @ExposedMethod(doc = BuiltinDocs.object___init___doc)
     final void object___init__(PyObject[] args, String[] keywords) {
-// XXX: attempted fix for object(foo=1), etc
-// XXX: this doesn't work for metaclasses, for some reason
-//        if (args.length > 0) {
-//            throw Py.TypeError("default __new__ takes no parameters");
-//        }
-
+        // XXX: attempted fix for object(foo=1), etc
+        // XXX: this doesn't work for metaclasses, for some reason
+        /*
+        if (args.length > 0) {
+            throw Py.TypeError("default __new__ takes no parameters");
+        }
+        */
     }
-
-    /**
-     * An underlying Java instance that this object is wrapping or is a subclass of. Anything
-     * attempting to use the proxy should go through {@link #getJavaProxy()} which ensures that it's
-     * initialized.
-     */
-    protected Object javaProxy;
-
-    PyType objtype;
 
     @ExposedGet(name = "__class__")
     public PyType getType() {
@@ -80,26 +123,6 @@ public class PyObject implements Serializable {
             }
         }
         return Py.None;
-    }
-
-    public PyObject(PyType objtype) {
-        this.objtype = objtype;
-    }
-
-    /**
-     * Creates the PyObject for the base type. The argument only exists to make the constructor
-     * distinct.
-     */
-    PyObject(boolean ignored) {
-        objtype = (PyType)this;
-    }
-
-    /**
-     * The standard constructor for a <code>PyObject</code>. It will set the <code>objtype</code>
-     * field to correspond to the specific subclass of <code>PyObject</code> being instantiated.
-     **/
-    public PyObject() {
-        objtype = PyType.fromClass(getClass());
     }
 
     /**
@@ -264,6 +287,20 @@ public class PyObject implements Serializable {
         if (c.isInstance(getJavaProxy())) {
             return javaProxy;
         }
+
+        // convert faux floats
+        // XXX: should also convert faux ints, but that breaks test_java_visibility
+        // (ReflectedArgs resolution)
+        if (c == Double.TYPE || c == Double.class || c == Float.TYPE || c == Float.class) {
+            try {
+                return __float__().getValue();
+            } catch (PyException pye) {
+                if (!pye.match(Py.AttributeError)) {
+                    throw pye;
+                }
+            }
+        }
+
         return Py.NoConversion;
     }
 
@@ -272,18 +309,6 @@ public class PyObject implements Serializable {
             proxyInit();
         }
         return javaProxy;
-    }
-
-    private static final Map<Class<?>, Class<?>> primitiveMap = Generic.map();
-    static {
-        primitiveMap.put(Character.TYPE, Character.class);
-        primitiveMap.put(Boolean.TYPE, Boolean.class);
-        primitiveMap.put(Byte.TYPE, Byte.class);
-        primitiveMap.put(Short.TYPE, Short.class);
-        primitiveMap.put(Integer.TYPE, Integer.class);
-        primitiveMap.put(Long.TYPE, Long.class);
-        primitiveMap.put(Float.TYPE, Float.class);
-        primitiveMap.put(Double.TYPE, Double.class);
     }
 
     /**
@@ -300,6 +325,10 @@ public class PyObject implements Serializable {
     public PyObject __call__(PyObject args[], String keywords[]) {
         throw Py.TypeError(String.format("'%s' object is not callable", getType().fastGetName()));
     }
+    
+    public PyObject __call__(ThreadState state, PyObject args[], String keywords[]) {
+        return __call__(args, keywords);
+    }
 
     /**
      * A variant of the __call__ method with one extra initial argument.
@@ -315,14 +344,15 @@ public class PyObject implements Serializable {
      *                 keyword arguments).
      * @param keywords the keywords used for all keyword arguments.
      **/
-    public PyObject __call__(
-        PyObject arg1,
-        PyObject args[],
-        String keywords[]) {
+    public PyObject __call__(PyObject arg1, PyObject args[], String keywords[]) {
         PyObject[] newArgs = new PyObject[args.length + 1];
         System.arraycopy(args, 0, newArgs, 1, args.length);
         newArgs[0] = arg1;
         return __call__(newArgs, keywords);
+    }
+    
+    public PyObject __call__(ThreadState state, PyObject arg1, PyObject args[], String keywords[]) {
+        return __call__(arg1, args, keywords);
     }
 
     /**
@@ -336,6 +366,10 @@ public class PyObject implements Serializable {
     public PyObject __call__(PyObject args[]) {
         return __call__(args, Py.NoKeywords);
     }
+    
+    public PyObject __call__(ThreadState state, PyObject args[]) {
+        return __call__(args);
+    }
 
     /**
      * A variant of the __call__ method with no arguments.  The default
@@ -345,6 +379,10 @@ public class PyObject implements Serializable {
      **/
     public PyObject __call__() {
         return __call__(Py.EmptyObjects, Py.NoKeywords);
+    }
+    
+    public PyObject __call__(ThreadState state) {
+        return __call__();
     }
 
     /**
@@ -357,6 +395,10 @@ public class PyObject implements Serializable {
      **/
     public PyObject __call__(PyObject arg0) {
         return __call__(new PyObject[] { arg0 }, Py.NoKeywords);
+    }
+    
+    public PyObject __call__(ThreadState state, PyObject arg0) {
+        return __call__(arg0);
     }
 
     /**
@@ -372,6 +414,10 @@ public class PyObject implements Serializable {
         return __call__(new PyObject[] { arg0, arg1 }, Py.NoKeywords);
     }
 
+    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1) {
+        return __call__(arg0, arg1);
+    }
+
     /**
      * A variant of the __call__ method with three arguments.  The default
      * behavior is to invoke <code>__call__(args, keywords)</code> with the
@@ -385,6 +431,10 @@ public class PyObject implements Serializable {
     public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2) {
         return __call__(new PyObject[] { arg0, arg1, arg2 }, Py.NoKeywords);
     }
+    
+    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1, PyObject arg2) {
+        return __call__(arg0, arg1, arg2);
+    }
 
     /**
      * A variant of the __call__ method with four arguments.  The default
@@ -397,17 +447,16 @@ public class PyObject implements Serializable {
      * @param arg2     the third argument to the function.
      * @param arg3     the fourth argument to the function.
      **/
-    public PyObject __call__(
-        PyObject arg0,
-        PyObject arg1,
-        PyObject arg2,
-        PyObject arg3) {
+    public PyObject __call__(PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
         return __call__(
             new PyObject[] { arg0, arg1, arg2, arg3 },
             Py.NoKeywords);
     }
+    
+    public PyObject __call__(ThreadState state, PyObject arg0, PyObject arg1, PyObject arg2, PyObject arg3) {
+        return __call__(arg0, arg1, arg2, arg3);
+    }
 
-    /** @deprecated **/
     public PyObject _callextra(PyObject[] args,
                                String[] keywords,
                                PyObject starargs,
@@ -819,7 +868,7 @@ public class PyObject implements Serializable {
         try {
             return  __findattr_ex__(name);
         } catch (PyException exc) {
-            if (Py.matchException(exc, Py.AttributeError)) {
+            if (exc.match(Py.AttributeError)) {
                 return null;
             }
             throw exc;
@@ -855,7 +904,7 @@ public class PyObject implements Serializable {
      * @return the value corresponding to name
      * @exception Py.AttributeError if the name is not found.
      *
-     * @see #__findattr_ex__(PyString)
+     * @see #__findattr_ex__(String)
      **/
     public final PyObject __getattr__(PyString name) {
         return __getattr__(name.internedString());
@@ -1208,6 +1257,10 @@ public class PyObject implements Serializable {
      * @return -1 if this < 0; 0 if this == o; +1 if this > o
      **/
     public final int _cmp(PyObject o) {
+        if (this == o) {
+            return 0;
+        }
+
         PyObject token = null;
         ThreadState ts = Py.getThreadState();
         try {
@@ -1216,27 +1269,30 @@ public class PyObject implements Serializable {
                     return 0;
             }
 
-            PyObject r;
-            r = __eq__(o);
-            if (r != null && r.__nonzero__())
+            PyObject result;
+            result = __eq__(o);
+            if (result == null) {
+                result = o.__eq__(this);
+            }
+            if (result != null && result.__nonzero__()) {
                 return 0;
-            r = o.__eq__(this);
-            if (r != null && r.__nonzero__())
-                return 0;
+            }
 
-            r = __lt__(o);
-            if (r != null && r.__nonzero__())
+            result = __lt__(o);
+            if (result == null) {
+                result = o.__gt__(this);
+            }
+            if (result != null && result.__nonzero__()) {
                 return -1;
-            r = o.__gt__(this);
-            if (r != null && r.__nonzero__())
-                return -1;
+            }
 
-            r = __gt__(o);
-            if (r != null && r.__nonzero__())
+            result = __gt__(o);
+            if (result == null) {
+                result = o.__lt__(this);
+            }
+            if (result != null && result.__nonzero__()) {
                 return 1;
-            r = o.__lt__(this);
-            if (r != null && r.__nonzero__())
-                return 1;
+            }
 
             return _cmp_unsafe(o);
         } finally {
@@ -1396,11 +1452,6 @@ public class PyObject implements Serializable {
             if (res != null)
                 return res;
             return _cmpeq_unsafe(o) == 0 ? Py.True : Py.False;
-        } catch (PyException e) {
-            if (Py.matchException(e, Py.AttributeError)) {
-                return Py.False;
-            }
-            throw e;
         } finally {
             delete_token(ts, token);
             ts.compareStateNesting--;
@@ -1599,7 +1650,7 @@ public class PyObject implements Serializable {
     public PyObject _isnot(PyObject o) {
         // Access javaProxy directly here as is is for object identity, and at best getJavaProxy
         // will initialize a new object with a different identity
-        return this != o || javaProxy != o.javaProxy ? Py.True : Py.False;
+        return this != o && (javaProxy == null || javaProxy != o.javaProxy) ? Py.True : Py.False;
     }
 
     /**
@@ -1634,7 +1685,7 @@ public class PyObject implements Serializable {
 
     final boolean object___contains__(PyObject o) {
         for (PyObject item : asIterable()) {
-            if (o._eq(item).__nonzero__()) {
+            if (o.equals(item)) {
                 return true;
             }
         }
@@ -3740,7 +3791,7 @@ public class PyObject implements Serializable {
             try {
                 obj_dict.__delitem__(name);
             } catch (PyException exc) {
-                if (Py.matchException(exc, Py.KeyError))
+                if (exc.match(Py.KeyError))
                     noAttributeError(name);
                 else
                     throw exc;
@@ -3968,7 +4019,7 @@ public class PyObject implements Serializable {
         try {
             intObj = __int__();
         } catch (PyException pye) {
-            if (Py.matchException(pye, Py.AttributeError)) {
+            if (pye.match(Py.AttributeError)) {
                 throw Py.TypeError("an integer is required");
             }
             throw pye;
@@ -3994,7 +4045,7 @@ public class PyObject implements Serializable {
         try {
             floatObj = __float__();
         } catch (PyException pye) {
-            if (Py.matchException(pye, Py.AttributeError)) {
+            if (pye.match(Py.AttributeError)) {
                 throw Py.TypeError("a float is required");
             }
             throw pye;
@@ -4022,13 +4073,6 @@ public class PyObject implements Serializable {
     public int asIndex(PyObject err) {
         // OverflowErrors are handled in PyLong.asIndex
         return __index__().asInt();
-    }
-
-    static {
-        for (Class<?> unbootstrapped : Py.BOOTSTRAP_TYPES) {
-            Py.writeWarning("init", "Bootstrap type wasn't encountered in bootstrapping[class="
-                    + unbootstrapped + "]");
-        }
     }
 }
 

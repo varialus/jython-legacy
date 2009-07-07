@@ -45,14 +45,14 @@ public class PyTableCode extends PyBaseCode
         co_name = name;
         if (varargs) {
             co_argcount -= 1;
-            co_flags |= CO_VARARGS;
+            co_flags.setFlag(CodeFlag.CO_VARARGS);
         }
         this.varkwargs = varkwargs;
         if (varkwargs) {
             co_argcount -= 1;
-            co_flags |= CO_VARKEYWORDS;
+            co_flags.setFlag(CodeFlag.CO_VARKEYWORDS);
         }
-        co_flags |= moreflags;
+        co_flags = new CompilerFlags(co_flags.toBits() | moreflags);
         this.funcs = funcs;
         this.func_id = func_id;
     }
@@ -115,13 +115,15 @@ public class PyTableCode extends PyBaseCode
         if (name == "co_name") {
             return new PyString(co_name);
         }
+        if (name == "co_flags") {
+            return Py.newInteger(co_flags.toBits());
+        }
         return super.__findattr_ex__(name);
     }
 
     @Override
-    public PyObject call(PyFrame frame, PyObject closure) {
+    public PyObject call(ThreadState ts, PyFrame frame, PyObject closure) {
 //         System.err.println("tablecode call: "+co_name);
-        ThreadState ts = Py.getThreadState();
         if (ts.systemState == null) {
             ts.systemState = Py.defaultSystemState;
         }
@@ -160,7 +162,7 @@ public class PyTableCode extends PyBaseCode
 
         PyObject ret;
         try {
-            ret = funcs.call_function(func_id, frame);
+            ret = funcs.call_function(func_id, frame, ts);
         } catch (Throwable t) {
             // Convert exceptions that occured in Java code to PyExceptions
             PyException pye = Py.JavaError(t);

@@ -1,9 +1,15 @@
 /* Copyright (c) Jython Developers */
 package org.python;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Properties;
+import java.util.Set;
+
+import org.python.core.CodeFlag;
 
 /**
  * Jython version information.
@@ -35,6 +41,10 @@ public class Version {
 
     /** Short version of branch, e.g. asm. */
     public static String SHORT_BRANCH;
+
+    /** The flags that are set by default in a code object. */
+    private static final Collection<CodeFlag> defaultCodeFlags = Arrays.asList(
+            CodeFlag.CO_NESTED, CodeFlag.CO_GENERATOR_ALLOWED);
 
     private static final String headURL =
             "$HeadURL$";
@@ -76,31 +86,39 @@ public class Version {
      * Load the version information from the properties file.
      */
     private static void loadProperties() {
-        InputStream in = Version.class.getResourceAsStream("/org/python/version.properties");
-        Properties properties = new Properties();
-        try {
-            properties.load(in);
-        } catch (IOException ioe) {
-            System.err.println("There was a problem loading version.properties:");
-            ioe.printStackTrace();
-        } finally {
+        boolean loaded = false;
+        final String versionProperties = "/org/python/version.properties";
+        InputStream in = Version.class.getResourceAsStream(versionProperties);
+        if (in != null) {
             try {
-                in.close();
+                Properties properties = new Properties();
+                properties.load(in);
+                loaded = true;
+                PY_VERSION = properties.getProperty("jython.version");
+                PY_MAJOR_VERSION = Integer.valueOf(properties.getProperty("jython.major_version"));
+                PY_MINOR_VERSION = Integer.valueOf(properties.getProperty("jython.minor_version"));
+                PY_MICRO_VERSION = Integer.valueOf(properties.getProperty("jython.micro_version"));
+                PY_RELEASE_LEVEL = Integer.valueOf(properties.getProperty("jython.release_level"));
+                PY_RELEASE_SERIAL = Integer.valueOf(properties.getProperty("jython.release_serial"));
+                DATE = properties.getProperty("jython.build.date");
+                TIME = properties.getProperty("jython.build.time");
+                SVN_REVISION = properties.getProperty("jython.build.svn_revision");
             } catch (IOException ioe) {
-                // ok
+                System.err.println("There was a problem loading ".concat(versionProperties)
+                        .concat(":"));
+                ioe.printStackTrace();
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException ioe) {
+                    // ok
+                }
             }
         }
-
-        PY_VERSION = properties.getProperty("jython.version");
-        PY_MAJOR_VERSION = Integer.valueOf(properties.getProperty("jython.major_version"));
-        PY_MINOR_VERSION = Integer.valueOf(properties.getProperty("jython.minor_version"));
-        PY_MICRO_VERSION = Integer.valueOf(properties.getProperty("jython.micro_version"));
-        PY_RELEASE_LEVEL = Integer.valueOf(properties.getProperty("jython.release_level"));
-        PY_RELEASE_SERIAL = Integer.valueOf(properties.getProperty("jython.release_serial"));
-
-        DATE = properties.getProperty("jython.build.date");
-        TIME = properties.getProperty("jython.build.time");
-        SVN_REVISION = properties.getProperty("jython.build.svn_revision");
+        if (!loaded) {
+            // fail with a meaningful exception (cannot use Py exceptions here)
+            throw new RuntimeException("unable to load ".concat(versionProperties));
+        }
     }
 
     /**
@@ -143,5 +161,9 @@ public class Version {
      */
     public static String getVersion() {
         return String.format("%.80s (%.80s) %.80s", PY_VERSION, getBuildInfo(), getVM());
+    }
+
+    public static Set<CodeFlag> getDefaultCodeFlags() {
+        return EnumSet.copyOf(defaultCodeFlags);
     }
 }
