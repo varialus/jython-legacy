@@ -30,6 +30,11 @@
             <fileset dir=".">
                 <include name="index.html"/>
                 <include name="left.nav"/>
+                <include name="twitterBullet.gif"/>
+                <include name="twitterUpdates.htm"/>
+                <include name="faq.htm"/>
+                <include name="developer.htm"/>
+                <include name="latest_release_bg.jpg"/>
             </fileset>
         </copy>
         <copy todir="dist">
@@ -78,11 +83,12 @@
         <copy todir="dist/Project">
             <fileset dir=".">
                 <include name="left.nav"/>
+
             </fileset>
         </copy>
         <apply verbose="true" executable="${rst2jysite.command}" dest="dist">
             <arg line="--link-stylesheet" />
-            <arg line="--stylesheet=../css/html4css1.css" />
+            <arg line="--stylesheet=../cssold/html4css1.css" />
             <srcfile />
             <targetfile />
             <fileset dir="dist">
