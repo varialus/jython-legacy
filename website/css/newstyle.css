@@ -59,7 +59,7 @@ text-decoration:none;
 
 
 
-/* VERTICAL NAVIGATION */
+/* VERTICAL NAVIGATION - Left Side*/
 div#navigation{float:left; position: relative; left: 10px; margin-top: 10px;margin-left:-100%; color:#fff; background-image:url(nav_bg2.png); height: 100%; background-repeat: no-repeat;}
 .navcontainer { width: 198px; padding:0; margin-bottom: 1em; 
 background-color: transparent;}
@@ -133,6 +133,7 @@ div#content a:visited {color: #452; text-decoration:none; border-bottom: 1px sol
 /* EXTRA SECTION */
 div#extra {float:left;width:198px;margin-left:-200px; background-color: #FFF;}
 /*div#extra {float:left;width:198px;margin-left:-200px; background-color: #F5F5DC; border-left: 2px solid #000;}*/
+/* Right-Side collapse menu */
 .applemenu{
 position: relative;
 margin: 0px 0;
