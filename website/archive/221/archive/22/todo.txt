@@ -1,0 +1,7 @@
+==========
+To Do List
+==========
+
+* Re-work css.  The current css files where taken almont unchanged from the Lenya project at Apache and from the docutils project.  There are 5 files: print.css, basic.css, FIXME: finish.
+
+* slots

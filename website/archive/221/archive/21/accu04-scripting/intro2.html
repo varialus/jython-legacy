@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scripting Java with Jython</title>
+<LINK href="talk.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<div id="header">
+Introduction (2)
+</div>
+<div id="leftbar">
+<!-- LEFTBAR -->
+<ol>
+<li><a href='index.html' >*</a></li>
+<li><a href='intro0.html' >Introduction</a></li>
+<li><a href='intro1.html' >Introduction (1)</a></li>
+<li><a href='intro2.html' >Introduction (2)</a></li>
+<li><a href='search_snpt.html' >Search Snippet</a></li>
+<li><a href='tasks_snpt.html' >Tasks Snippet</a></li>
+<li><a href='pinterp1.html' >Intepreter</a></li>
+<li><a href='ijyside.html' >IJythonSide</a></li>
+<li><a href='glue.html' >Jython Side</a></li>
+<li><a href='import.html' >Importing</a></li>
+<li><a href='doctest.html' >Doctest</a></li>
+<li><a href='doctest_out.html' >Doctest run</a></li>
+</ol>
+<!-- /LEFTBAR -->
+</div>
+<div id="main">
+<ul>
+<li> Python:
+ <ul>
+     <li>Powerful simple reflection:
+     <pre>
+>>> class A:
+...   def __getitem__(self,index): return "a"
+...
+>>> a=A()
+>>> a.newattr=1
+>>> A.__dict__
+{'__getitem__': &lt;function __getitem__ at 23747531&gt;, '__doc__': None,
+ '__module__': '__main__'}
+>>> a.__dict__
+{'newattr': 1}
+>>> getattr(a,'newattr')
+1
+>>> # setattr(obj,name,val)
+     </pre>
+     </li>
+ </ul>
+</li>
+<li> Jython allows smooth integration: Java classes and objects
+ are integrated in Python object model </li>
+</ul>
+</div>
+
+</body>
+</html>

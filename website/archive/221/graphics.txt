@@ -1,0 +1,8 @@
+This page has been retired.
+
+If you want the archived web page:
+
+`2.1 graphics`_
+
+.. _2.1 graphics: ./archive/21/graphics.html
+

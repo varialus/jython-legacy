@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scripting Java with Jython</title>
+<LINK href="talk.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<div id="header">
+Search snippet
+</div>
+<div id="leftbar">
+<!-- LEFTBAR -->
+<ol>
+<li><a href='index.html' >*</a></li>
+<li><a href='intro0.html' >Introduction</a></li>
+<li><a href='intro1.html' >Introduction (1)</a></li>
+<li><a href='intro2.html' >Introduction (2)</a></li>
+<li><a href='search_snpt.html' >Search Snippet</a></li>
+<li><a href='tasks_snpt.html' >Tasks Snippet</a></li>
+<li><a href='pinterp1.html' >Intepreter</a></li>
+<li><a href='ijyside.html' >IJythonSide</a></li>
+<li><a href='glue.html' >Jython Side</a></li>
+<li><a href='import.html' >Importing</a></li>
+<li><a href='doctest.html' >Doctest</a></li>
+<li><a href='doctest_out.html' >Doctest run</a></li>
+</ol>
+<!-- /LEFTBAR -->
+</div>
+<div id="main">
+<pre>
+# search snippet
+from org.eclipse.jdt.core import Flags,JavaCore
+from org.eclipse.jdt.core.search import SearchEngine as SE
+from org.eclipse.jdt.core.search import IJavaSearchResultCollector as IColl
+from org.eclipse.jdt.core.search import IJavaSearchConstants as CONSTS
+
+out(env.got)
+PYO=env.got # PyObject
+
+def public_non_static_bean(memb):
+   fl,name = memb.flags, memb.elementName
+   if not (Flags.isPublic(fl) and not Flags.isStatic(fl)): return 0
+   if name.startswith('is'): return memb.elementName[2].isupper()
+   return name[3].isupper()
+
+def meth(spec):
+   return SE.createSearchPattern(spec,CONSTS.METHOD,CONSTS.DECLARATIONS,1)
+OR = SE.createOrSearchPattern
+
+pyo_hier = PYO.newTypeHierarchy(None)
+pyo_subtypes = pyo_hier.getAllSubtypes(PYO)
+out("PyObject subtypes #: %d" % len(pyo_subtypes))
+
+class Coll(IColl):
+  def aboutToStart(self): out('start')
+  def done(self): out('done')
+  def getProgressMonitor(self): return monitor
+  def accept(self,res,st,end,encl,accur):
+     if public_non_static_bean(encl):
+       out(encl)
+
+scope = SE.createJavaSearchScope([PYO]+list(pyo_subtypes))
+patt = OR(meth("set*(*)"),OR(meth("get*()"),meth("is*()")))
+out(patt)
+
+SE().search(ws,patt,scope,Coll())
+
+</pre>
+</div>
+
+</body>
+</html>

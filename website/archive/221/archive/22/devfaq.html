@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Developer's FAQ</title>
+<link rel="stylesheet" href="../css/html4css1.css" type="text/css" />
+<link type="text/css" href="../css/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../css/screen.css" rel="stylesheet"> 
+<link media="print" type="text/css" href="../css/print.css" rel="stylesheet"> 
+<link type="text/css" href="../css/profile.css" rel="stylesheet"> 
+<!--[if lt IE 7]>
+<script defer type="text/javascript" src="../css/pngfix.js"></script>
+<![endif]-->
+</head>
+<body>
+<div id="top">
+<div class="header">
+<div class="grouplogo">
+<a href="./" ><img class="logoImage" alt="Jython" src="../css/jython.png" title="Jython"></a>
+</div>
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="www.jython.org" name="sitesearch" type="hidden"><input size="25" name="q" id="query" type="text">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+</div>
+</div>
+<div id="main"><div id="menu"><div class="menupage">
+<div class="menupagetitle">About</div>
+<div class="menupageitem"><a href="./index.html">Welcome</a></div> 
+<div class="menupageitem"><a href="./license.html">License</a></div> 
+<div class="menupageitem"><a href="./installation.html">Installation</a></div> 
+<div class="menupageitem"><a href="./userfaq.html">FAQ</a></div> 
+<div class="menupageitem"><a href="./news.html">News</a></div> 
+<div class="menupageitem"><a href="./history.html">History</a></div> 
+<div class="menupageitem"><a href="./download.html">Download</a></div> 
+<div class="menupageitem"><a href="./userguide.html">User Guide</a></div> 
+<div class="menupageitem"><a href="../21/index.html">Old Website</a></div> 
+<div class="menupagetitle">Community</div>
+<div class="menupageitem"><a href="http://wiki.python.org/jython/">Wiki</a></div> 
+<div class="menupageitem"><a href="./bugs.html">Reporting Bugs</a></div> 
+<div class="menupageitem"><a href="http://sourceforge.net/mail/?group_id=12867">Mailing Lists</a></div> 
+<div class="menupageitem"><a href="./devfaq.html">Developer FAQ</a></div> 
+<div class="menupageitem"><a href="http://wiki.python.org/jython/JythonDeveloperGuide">Developer Guide</a></div> 
+<div class="menupageitem"><a href="./roadmap.html">Jython Roadmap</a></div> 
+<div class="menupageitem"><a href="./contributors.html">Contributors</a></div> 
+<div class="menupagetitle"></div>
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://www.python.org"><img src="../css/PythonPoweredSmall.gif" /></a></div> 
+<div style="height:1em"></div>
+<div class="menupageitem"><a target="_blank" href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=12867" /></a></div> 
+</div>
+</div>
+</div>
+<div id="content"><div class="document" id="developer-s-faq">
+<h1 class="title">Developer's FAQ</h1>
+<div class="contents topic">
+<p class="topic-title first"><a id="table-of-contents" name="table-of-contents">Table of Contents</a></p>
+<ul class="auto-toc simple">
+<li><a class="reference" href="#general-information" id="id1" name="id1">1&nbsp;&nbsp;&nbsp;General Information</a><ul class="auto-toc">
+<li><a class="reference" href="#what-is-sourceforge" id="id2" name="id2">1.1&nbsp;&nbsp;&nbsp;What is SourceForge?</a></li>
+<li><a class="reference" href="#where-can-i-find-jython-on-sourceforge" id="id3" name="id3">1.2&nbsp;&nbsp;&nbsp;Where can I find Jython on SourceForge?</a></li>
+<li><a class="reference" href="#who-is-who" id="id4" name="id4">1.3&nbsp;&nbsp;&nbsp;Who is who?</a></li>
+<li><a class="reference" href="#how-can-i-become-a-developer" id="id5" name="id5">1.4&nbsp;&nbsp;&nbsp;How can I become a developer?</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#subversion-svn" id="id6" name="id6">2&nbsp;&nbsp;&nbsp;Subversion (svn)</a><ul class="auto-toc">
+<li><a class="reference" href="#where-can-i-learn-about-subversion-svn" id="id7" name="id7">2.1&nbsp;&nbsp;&nbsp;Where can I learn about Subversion (svn)?</a></li>
+<li><a class="reference" href="#what-do-i-need-to-use-subversion" id="id8" name="id8">2.2&nbsp;&nbsp;&nbsp;What do I need to use Subversion?</a><ul class="auto-toc">
+<li><a class="reference" href="#unix-command-line" id="id9" name="id9">2.2.1&nbsp;&nbsp;&nbsp;UNIX Command line</a></li>
+<li><a class="reference" href="#windows" id="id10" name="id10">2.2.2&nbsp;&nbsp;&nbsp;Windows</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#how-do-i-get-a-checkout-of-the-repository" id="id11" name="id11">2.3&nbsp;&nbsp;&nbsp;How do I get a checkout of the repository?</a></li>
+<li><a class="reference" href="#how-do-i-update-my-working-copy-to-be-in-sync-with-the-repository" id="id12" name="id12">2.4&nbsp;&nbsp;&nbsp;How do I update my working copy to be in sync with the repository?</a></li>
+<li><a class="reference" href="#how-do-i-browse-the-source-code-through-a-web-browser" id="id13" name="id13">2.5&nbsp;&nbsp;&nbsp;How do I browse the source code through a web browser?</a></li>
+<li><a class="reference" href="#how-do-i-add-a-file-or-directory-to-the-repository" id="id14" name="id14">2.6&nbsp;&nbsp;&nbsp;How do I add a file or directory to the repository?</a></li>
+<li><a class="reference" href="#how-do-i-commit-a-change-to-a-file" id="id15" name="id15">2.7&nbsp;&nbsp;&nbsp;How do I commit a change to a file?</a></li>
+<li><a class="reference" href="#how-do-i-delete-a-file-or-directory-in-the-repository" id="id16" name="id16">2.8&nbsp;&nbsp;&nbsp;How do I delete a file or directory in the repository?</a></li>
+<li><a class="reference" href="#what-files-are-modified-locally-in-my-working-copy" id="id17" name="id17">2.9&nbsp;&nbsp;&nbsp;What files are modified locally in my working copy?</a></li>
+<li><a class="reference" href="#how-do-i-find-out-what-subversions-properties-are-set-for-a-file-or-directory" id="id18" name="id18">2.10&nbsp;&nbsp;&nbsp;How do I find out what Subversions properties are set for a file or directory?</a></li>
+<li><a class="reference" href="#how-do-i-revert-a-file-i-have-modified-back-to-the-version-in-the-respository" id="id19" name="id19">2.11&nbsp;&nbsp;&nbsp;How do I revert a file I have modified back to the version in the respository?</a></li>
+<li><a class="reference" href="#how-do-i-find-out-who-edited-or-what-revision-changed-a-line-last" id="id20" name="id20">2.12&nbsp;&nbsp;&nbsp;How do I find out who edited or what revision changed a line last?</a></li>
+<li><a class="reference" href="#how-can-i-see-a-list-of-log-messages-for-a-file-or-specific-revision" id="id21" name="id21">2.13&nbsp;&nbsp;&nbsp;How can I see a list of log messages for a file or specific revision?</a></li>
+<li><a class="reference" href="#how-do-i-get-a-diff-between-the-repository-and-my-working-copy-for-a-file" id="id22" name="id22">2.14&nbsp;&nbsp;&nbsp;How do I get a diff between the repository and my working copy for a file?</a></li>
+<li><a class="reference" href="#how-do-i-undo-the-changes-made-in-a-recent-committal" id="id23" name="id23">2.15&nbsp;&nbsp;&nbsp;How do I undo the changes made in a recent committal?</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#patches" id="id24" name="id24">3&nbsp;&nbsp;&nbsp;Patches</a><ul class="auto-toc">
+<li><a class="reference" href="#how-to-make-a-patch" id="id25" name="id25">3.1&nbsp;&nbsp;&nbsp;How to make a patch?</a></li>
+<li><a class="reference" href="#how-do-i-apply-a-patch" id="id26" name="id26">3.2&nbsp;&nbsp;&nbsp;How do I apply a patch?</a></li>
+<li><a class="reference" href="#how-do-i-undo-an-applied-patch" id="id27" name="id27">3.3&nbsp;&nbsp;&nbsp;How do I undo an applied patch?</a></li>
+<li><a class="reference" href="#how-to-submit-a-patch" id="id28" name="id28">3.4&nbsp;&nbsp;&nbsp;How to submit a patch?</a></li>
+<li><a class="reference" href="#how-to-test-a-patch" id="id29" name="id29">3.5&nbsp;&nbsp;&nbsp;How to test a patch?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id1" id="general-information" name="general-information">1&nbsp;&nbsp;&nbsp;General Information</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id2" id="what-is-sourceforge" name="what-is-sourceforge">1.1&nbsp;&nbsp;&nbsp;What is SourceForge?</a></h2>
+<p>SourceForge is a free hosting service for open source projects. The main website is found at <a class="reference" href="http://sourceforge.net">http://sourceforge.net</a>.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id3" id="where-can-i-find-jython-on-sourceforge" name="where-can-i-find-jython-on-sourceforge">1.2&nbsp;&nbsp;&nbsp;Where can I find Jython on SourceForge?</a></h2>
+<p>The Jython project page can be found at <a class="reference" href="http://sourceforge.net/projects/jython">http://sourceforge.net/projects/jython</a>.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id4" id="who-is-who" name="who-is-who">1.3&nbsp;&nbsp;&nbsp;Who is who?</a></h2>
+<p>The list of developers with commit access is here: <a class="reference" href="http://sourceforge.net/project/memberlist.php?group_id=12867">http://sourceforge.net/project/memberlist.php?group_id=12867</a></p>
+<p>This presents a list of developers, giving their names and SourceForge IDs.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id5" id="how-can-i-become-a-developer" name="how-can-i-become-a-developer">1.4&nbsp;&nbsp;&nbsp;How can I become a developer?</a></h2>
+<p>Submit patches that fix bugs or implement features, especially features that exist in CPython but are not yet implemented in Jython.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id6" id="subversion-svn" name="subversion-svn">2&nbsp;&nbsp;&nbsp;Subversion (svn)</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id7" id="where-can-i-learn-about-subversion-svn" name="where-can-i-learn-about-subversion-svn">2.1&nbsp;&nbsp;&nbsp;Where can I learn about Subversion (svn)?</a></h2>
+<p>Subversion has its official web site at <a class="reference" href="http://subversion.tigris.org/">http://subversion.tigris.org/</a> (it is also known as svn thanks to that being the name of the executable of Subversion itself). A book on Subversion published by O'Reilly Media, Version Control with Subversion, is available for free online.</p>
+<p>With Subversion installed, you can run the help tool that comes with Subversion to get help:</p>
+<p>svn help</p>
+<p>This will give you the needed information to use the tool. The man page for svn is rather scant and thus not worth reading.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id8" id="what-do-i-need-to-use-subversion" name="what-do-i-need-to-use-subversion">2.2&nbsp;&nbsp;&nbsp;What do I need to use Subversion?</a></h2>
+<div class="section">
+<h3><a class="toc-backref" href="#id9" id="unix-command-line" name="unix-command-line">2.2.1&nbsp;&nbsp;&nbsp;UNIX Command line</a></h3>
+<p>First, you need to download Subversion. Most UNIX-based operating systems have binary packages available for Subversion. Also, most package systems also have Subversion available.</p>
+</div>
+<div class="section">
+<h3><a class="toc-backref" href="#id10" id="windows" name="windows">2.2.2&nbsp;&nbsp;&nbsp;Windows</a></h3>
+<p>You have several options on Windows. One is to download Subversion itself which will give you a command-line version. Another option is to download TortoiseSVN which integrates with Windows Explorer.</p>
+</div>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id11" id="how-do-i-get-a-checkout-of-the-repository" name="how-do-i-get-a-checkout-of-the-repository">2.3&nbsp;&nbsp;&nbsp;How do I get a checkout of the repository?</a></h2>
+<p>The basic command is:</p>
+<p>svn checkout &lt;URL&gt; [PATH]</p>
+<p>&lt;URL&gt; is the specified location of the project within the repository that you would like to check out (those paths are discussed later). The optional [PATH] argument specifies the local directory to put the checkout into. If left out then the tail part of &lt;URL&gt; is used for the directory name.</p>
+<p>The format of &lt;URL&gt; is:</p>
+<p><a class="reference" href="https://jython.svn.sourceforge.net/svnroot/jython">https://jython.svn.sourceforge.net/svnroot/jython</a>/&lt;path&gt;</p>
+<p>with &lt;path&gt; representing the path to the project.</p>
+<p>The Subversion repository has many projects under it. Most people are probably interested in one of these four projects:</p>
+<blockquote>
+<ul class="simple">
+<li>the trunk or HEAD (the current version under development)</li>
+<li>the experimental Jython 2.5 (ASM) branch</li>
+<li>the latest release (plus bug fixes) of Jython</li>
+<li>the website source</li>
+</ul>
+</blockquote>
+<p>The projects above can be checked out using the following &lt;URL&gt; paths,
+respectively:</p>
+<blockquote>
+<ul class="simple">
+<li><a class="reference" href="https://jython.svn.sourceforge.net/svnroot/jython/trunk/">https://jython.svn.sourceforge.net/svnroot/jython/trunk/</a></li>
+<li><a class="reference" href="https://jython.svn.sourceforge.net/svnroot/jython/branches/asm/">https://jython.svn.sourceforge.net/svnroot/jython/branches/asm/</a></li>
+<li><a class="reference" href="https://jython.svn.sourceforge.net/svnroot/jython/branches/Release_2_2maint/">https://jython.svn.sourceforge.net/svnroot/jython/branches/Release_2_2maint/</a></li>
+<li><a class="reference" href="https://jython.svn.sourceforge.net/svnroot/jython/trunk/website/">https://jython.svn.sourceforge.net/svnroot/jython/trunk/website/</a></li>
+</ul>
+</blockquote>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id12" id="how-do-i-update-my-working-copy-to-be-in-sync-with-the-repository" name="how-do-i-update-my-working-copy-to-be-in-sync-with-the-repository">2.4&nbsp;&nbsp;&nbsp;How do I update my working copy to be in sync with the repository?</a></h2>
+<p>Run:</p>
+<p>svn update</p>
+<p>from the directory you wish to update (and all subdirectories).</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id13" id="how-do-i-browse-the-source-code-through-a-web-browser" name="how-do-i-browse-the-source-code-through-a-web-browser">2.5&nbsp;&nbsp;&nbsp;How do I browse the source code through a web browser?</a></h2>
+<p>Visit <a class="reference" href="http://fisheye3.cenqua.com/browse/jython">http://fisheye3.cenqua.com/browse/jython</a> to browse the Subversion repository.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id14" id="how-do-i-add-a-file-or-directory-to-the-repository" name="how-do-i-add-a-file-or-directory-to-the-repository">2.6&nbsp;&nbsp;&nbsp;How do I add a file or directory to the repository?</a></h2>
+<p>Simply specify the path to the file or directory to add and run:</p>
+<p>svn add PATH</p>
+<p>Subversion will skip any directories it already knows about. But if you want new files that exist in any directories specified in PATH, specify --force and Subversion will check all directories for new files.</p>
+<p>You will then need to run svn commit.  See the next section.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id15" id="how-do-i-commit-a-change-to-a-file" name="how-do-i-commit-a-change-to-a-file">2.7&nbsp;&nbsp;&nbsp;How do I commit a change to a file?</a></h2>
+<p>To have any changes to a file (which include adding a new file or deleting an existing one), you use the command:</p>
+<p>svn commit [PATH]</p>
+<p>Although [PATH] is optional, if PATH is omitted all changes in your local copy will be committed to the repository. DO NOT USE THIS!!! You should specify the specific files to be committed unless you are absolutely positive that all outstanding modifications are meant to go in this commit.</p>
+<p>To abort a commit that you are in the middle of, perform a commit with no message (i.e., close the text editor without adding any text for the message). Subversion will ask if you want to abort the commit or not at that point.</p>
+<p>If you do not like the default text editor Subversion uses for entering commmit messages, you may specify a different editor in your Subversion config file with the editor-cmd option in the [helpers] section.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id16" id="how-do-i-delete-a-file-or-directory-in-the-repository" name="how-do-i-delete-a-file-or-directory-in-the-repository">2.8&nbsp;&nbsp;&nbsp;How do I delete a file or directory in the repository?</a></h2>
+<p>Specify the path to be removed with:</p>
+<p>svn delete PATH</p>
+<p>Any modified files or files that are not checked in will not be deleted in the working copy on your machine.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id17" id="what-files-are-modified-locally-in-my-working-copy" name="what-files-are-modified-locally-in-my-working-copy">2.9&nbsp;&nbsp;&nbsp;What files are modified locally in my working copy?</a></h2>
+<p>Running:</p>
+<p>svn status [PATH]</p>
+<p>will list any differences between your working copy and the repository. Some key indicators that can appear in the first column of output are:</p>
+<blockquote>
+<ul class="simple">
+<li>A Scheduled to be added</li>
+<li>D Scheduled to be deleted</li>
+<li>M Modified locally</li>
+<li>?  Not under version control</li>
+</ul>
+</blockquote>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id18" id="how-do-i-find-out-what-subversions-properties-are-set-for-a-file-or-directory" name="how-do-i-find-out-what-subversions-properties-are-set-for-a-file-or-directory">2.10&nbsp;&nbsp;&nbsp;How do I find out what Subversions properties are set for a file or directory?</a></h2>
+<p>svn proplist PATH</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id19" id="how-do-i-revert-a-file-i-have-modified-back-to-the-version-in-the-respository" name="how-do-i-revert-a-file-i-have-modified-back-to-the-version-in-the-respository">2.11&nbsp;&nbsp;&nbsp;How do I revert a file I have modified back to the version in the respository?</a></h2>
+<p>Running:</p>
+<p>svn revert PATH</p>
+<p>will change PATH to match the version in the repository, throwing away any changes you made locally. If you run:</p>
+<p>svn revert -R</p>
+<p>from the root of your local repository it will recursively restore everything to match up with the main server.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id20" id="how-do-i-find-out-who-edited-or-what-revision-changed-a-line-last" name="how-do-i-find-out-who-edited-or-what-revision-changed-a-line-last">2.12&nbsp;&nbsp;&nbsp;How do I find out who edited or what revision changed a line last?</a></h2>
+<p>You want:</p>
+<p>svn blame PATH</p>
+<p>This will output to stdout every line of the file along with what revision number last touched that line and who committed that revision. Since it is printed to stdout, you probably want to pipe the output to a pager:</p>
+<p>svn blame PATH | less</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id21" id="how-can-i-see-a-list-of-log-messages-for-a-file-or-specific-revision" name="how-can-i-see-a-list-of-log-messages-for-a-file-or-specific-revision">2.13&nbsp;&nbsp;&nbsp;How can I see a list of log messages for a file or specific revision?</a></h2>
+<p>To see the log messages for a specific file, run:</p>
+<p>svn log PATH</p>
+<p>That will list all messages that pertain to the file specified in PATH.</p>
+<p>If you want to view the log message for a specific revision, run:</p>
+<p>svn log --verbose -r REV</p>
+<p>With REV substituted with the revision number. The --verbose flag should be used to get a listing of all files modified in that revision.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id22" id="how-do-i-get-a-diff-between-the-repository-and-my-working-copy-for-a-file" name="how-do-i-get-a-diff-between-the-repository-and-my-working-copy-for-a-file">2.14&nbsp;&nbsp;&nbsp;How do I get a diff between the repository and my working copy for a file?</a></h2>
+<p>The diff between your working copy and what is in the repository can be had with:</p>
+<p>svn diff PATH</p>
+<p>This will work off the current revision in the repository. To diff your working copy with a specific revision, do:</p>
+<p>svn diff -r REV PATH</p>
+<p>Finally, to generate a diff between two specific revisions, use:</p>
+<p>svn diff -r REV1:REV2 PATH</p>
+<p>Notice the : between REV1 and REV2.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id23" id="how-do-i-undo-the-changes-made-in-a-recent-committal" name="how-do-i-undo-the-changes-made-in-a-recent-committal">2.15&nbsp;&nbsp;&nbsp;How do I undo the changes made in a recent committal?</a></h2>
+<p>Assuming your bad revision is NEW and OLD is the equivalent of NEW - 1, then run:</p>
+<p>svn merge -r NEW:OLD PATH</p>
+<p>This will revert all files back to their state in revision OLD. The reason that OLD is just NEW - 1 is you do not want files to be accidentally reverted to a state older than your changes, just to the point prior.</p>
+<p>Note: PATH here refers to the top of the checked out repository, not the full pathname to a file. PATH can refer to a different branch when merging from the head, but it must still be the top and not an individual file or subdirectory.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id24" id="patches" name="patches">3&nbsp;&nbsp;&nbsp;Patches</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id25" id="how-to-make-a-patch" name="how-to-make-a-patch">3.1&nbsp;&nbsp;&nbsp;How to make a patch?</a></h2>
+<p>If you are using subversion (anonymous or developer) you can use subversion to make the patches for you. Just edit your local copy and enter the following command:</p>
+<p>svn diff | tee ~/name_of_the_patch.diff</p>
+<p>Else you can use the diff util which comes with most operating systems (a Windows version is available as part of the cygwin tools).</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id26" id="how-do-i-apply-a-patch" name="how-do-i-apply-a-patch">3.2&nbsp;&nbsp;&nbsp;How do I apply a patch?</a></h2>
+<p>For the general case, to apply a patch go to the directory that the patch was created from (usually /dist/src/) and run:</p>
+<p>patch -p0 &lt; name_of_the_patch.diff</p>
+<p>The -p option specifies the number of directory separators (&quot;/&quot; in the case of UNIX) to remove from the paths of the files in the patch. -p0 leaves the paths alone.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id27" id="how-do-i-undo-an-applied-patch" name="how-do-i-undo-an-applied-patch">3.3&nbsp;&nbsp;&nbsp;How do I undo an applied patch?</a></h2>
+<p>Undoing a patch differs from applying one by only a command-line option:</p>
+<p>patch -R -p0 &lt; name_of_the_patch.diff</p>
+<p>Another option is to have 'patch' create backups of all files by using the -b command-line option. See the man page for 'patch' on the details of use.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id28" id="how-to-submit-a-patch" name="how-to-submit-a-patch">3.4&nbsp;&nbsp;&nbsp;How to submit a patch?</a></h2>
+<p>Please consult the patch submission guidelines at <a class="reference" href="http://www.python.org/patches/">http://www.python.org/patches/</a>.</p>
+<p>Submit the patch to the Jython bug tracker at <a class="reference" href="http://bugs.jython.org/">http://bugs.jython.org/</a>.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id29" id="how-to-test-a-patch" name="how-to-test-a-patch">3.5&nbsp;&nbsp;&nbsp;How to test a patch?</a></h2>
+<p>Start by testing on your own system. Jython comes with an extensive regression test suite by running the Lib/test/regrtest.py script.</p>
+<p>Also run the tests in trunk/bugtests/ directions are in a README file there.</p>
+<!-- TODO: For more thorough documentation, read the documentation for the test package at http://www.python.org/doc/lib/module-test.html. -->
+<!-- TODO: For more information about the use of the "Status:" and "Assigned To:" fields consult the Patch Manager Guidelines. -->
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This FAQ was adapted from the Python developers FAQ at <a class="reference" href="http://www.python.org/dev/faq/">http://www.python.org/dev/faq/</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="devfaq.txt">View document source</a>.
+
+</div>
+
+</div></div></body>

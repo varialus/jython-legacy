@@ -1,0 +1,201 @@
+=================
+jythonc Guide
+=================
+
+.. contents:: Table of Contents
+
+----------------
+What is jythonc
+----------------
+
+jythonc transforms Python source code into Java source code then invokes a Java
+compiler to turn it into .class files.  This allows Python to be integrated
+into Java in several places that regular Jython currently doesn't support.  It
+also processes special annotations in docstrings on methods in Python code to
+determine the static type information to expose when turning a dynmically typed
+Python method into a statically typed Java method.  
+
+**jythonc is unmaintained and will not be present in its current form
+in Jython 2.5**.  While jythonc handles all the language features of
+Python 2.2, it doesn't support Python 2.3 and later features such as
+generators.  As such, we cannot maintain the current jythonc going
+forward; however, Jython 2.5 will include a replacement (likely also
+called jythonc) which produces class files directly instead of
+generating Java source files.  The current jythonc is included in
+Jython 2.2.x to support existing users and for these features:
+
+1. Running in a JVM with a classloader that will not load dynamically created classes
+2. Declaring Java method signatures in Python code
+3. Loading Python classes dynamically from Java with Class.forName
+
+Most uses of the second feature, adding method declarations to
+docstrings, can be handled by declaring a Java interface to implement
+with a Python class.  Each implementing Python method inherits its
+type signature from the corresponding method in the Java interface.
+Exposing the Python class as an instance of that type to Java code is
+explained in `Accessing Jython from Java Without Using jythonc`_ and
+its followup, `Simple and Efficient Jython Object Factories`_.
+
+--------------------------------------------
+Using jythonc
+--------------------------------------------
+
+A script called ``jythonc`` should have been installed in the Jython
+installation directory when you installed the package. If it was not,
+it can be invoked as follows: ``jython Tools\jythonc\jythonc.py``.
+
+The jythonc tool generates actual Java source code, and then invokes a
+Java compiler over this source code to create the .class files. Thus,
+you will need access to a Java compiler in order to use jythonc. It
+is recommended that you use Sun's standard javac compiler, or IBM's
+excellent jikes compiler. Specifically, the Microsoft SDK jvc compiler
+is not recommended.
+
+Invoke jythonc like this: ::
+
+    jythonc [options] [module]*
+
+Options are given in the table below. Note that jythonc now uses the
+standard Python getopt module, meaning that both long and short forms
+of the options are available. The old option names still work, and are
+described below, but noted as deprecated and will be removed in a future
+version. ::
+
+  --package package
+  -p package
+  -package package	Put all compiled code into the named Java package.
+  --jar jarfile
+  -j jarfile
+  -jar jarfile	Specifies a .jar file to create and put the results of
+  the freeze into. Implies the --deep option.
+  --deep
+  -d
+  -deep		Compile all Python dependencies of the module. This is
+  used for creating applets.
+  --core
+  -c
+  -core		Include the core Jython libraries (about 130K). Needed for
+  applets since Netscape doesn't yet support multiple archives. Implies
+  the --deep option.
+  --all
+  -a
+  -all	Include all of the Jython libraries (everything in core +
+  compiler and parser). Implies the --deep option.
+  --bean jarfile
+  -b jarfile
+  -bean jarfile		Compile into jarfile, including the correct
+  manifest for the bean.
+  --addpackages pkgs
+  -A pkgs
+  -addpackages pkgs	Include Java dependencies from this list of
+  packages. Default is org.python.modules and org.apache.oro.text.regex.
+  --workdir directory
+  -w directory
+  -workdir directory	Specify the working directory where the generated
+  Java source code is placed. Default is "./jpywork"
+  --skip modules
+  -s modules
+  -skip modules		Don't include any of these modules in
+  compilation. This is a comma-separated list of modules.
+  --compiler path
+  -C path
+  -compiler path	Use a different compiler than `standard'
+  javac. If this is set to "NONE" then compile ends with the generation
+  of the Java source file. Alternatively, you can set the property
+  python.jythonc.compiler in the registry.
+  --compileropts options
+  -J options	Options passed directly to the Java
+  compiler. Alternatively, you can set the property
+  python.jythonc.compileropts in the registry.
+  --falsenames names
+  -f names
+  -falsenames names	A comma-separated list of names that are always
+  false. Can be used to short-circuit if clauses.
+  --help
+  -h	Print a usage message and exit.
+  [module]*	A list of Python modules to freeze. Can be either modules
+  names that are on the python.path or .py files
+
+In order to create real java class, the Python module must contain a
+Python class with the same name as the module, and that Python class
+must subclass exactly one Java class or interface. The real Java class
+created will be a subclass of whatever Java class is subclassed.
+
+Compiling python methods to java methods
+========================================
+
+Normally, compiled python methods are not directly callable from
+java. There is simple not sufficient information in a python method
+definition to create a useable java method. There are however two ways a
+python method be made into real java method. Both ways require that the
+python class have a java class or a java interface as its base classes.
+
+* Overriding / Implementing a java method.
+
+      By overriding a java method, the overridden method's signature is
+      used for the real java class. That includes return type, privacy
+      modifier, arguments, argument types and throws clauses.
+
+* Adding java method signature to python methods docstrings.
+
+      Using a special convention in the method docstring allow for
+      the creation of a corresponding java method. The signature must
+      be written on one line and must start with the text "@sig". All
+      class names (except those ion java.lang) must be specified as
+      fully qualified class names. Example: ::
+
+		  def setExpression(self, e):
+		      "@sig public void setExpression(java.lang.String e)"
+
+
+Examples
+========
+
+On my Windows NT machine, I used the following command to create the
+file appletdemo.jar (containing all of the applet demos on the web site,
+as well as the core Jython libraries): ::
+
+    c:\jython\Demo\applet> jythonc --core --deep --jar appletdemo.jar *.py
+
+Note: One special thing to consider when building applets is the java VM
+version used when compiling the sources must usually be the same as the
+VM version used by the browser. If a newer JVM is used when compiling
+the applets, the compiled code may have references to classes that does
+not exists in older JVM's.
+
+To generate a skeleton class to allow a Python class to be used as
+java.awt.Component in a Java gui program, I used the following command: ::
+
+    c:\jython\Demo\javaclasses> jythonc Graph.py
+
+To generate a Jython-based bean I do the following: ::
+
+    c:\jython\Demo\bean> jythonc --deep --bean f2c.jar
+    conversion.FahrenheitToCelsius
+
+To use this with SUN's BDK, I do the following (the important steps are
+to make the bean and the Jython libraries known to the tool).
+
+1. modify BDK\beanbox\run.bat (or run.sh) to include the jython\JavaCode
+   in the CLASSPATH
+2. copy f2c.jar to BDK\jars
+
+You should now be able to access the FahrenheitToCelsius bean from SUN's
+BeanBox (or other Bean-aware tool).
+
+Freezing modules
+================
+
+jythonc can also be used to freeze a python application. The frozen
+application can then be distributed and deployed as any other java
+application.
+
+Some diffrences between an interpreted application and a frozen
+application exists:
+
+* Properties are diffrent
+* sys.argv[0]
+* loading of python classes
+
+.. _Accessing Jython from Java Without Using jythonc: http://wiki.python.org/jython/JythonMonthly/Articles/September2006/1
+.. _Simple and Efficient Jython Object Factories: http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3

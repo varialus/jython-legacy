@@ -1,0 +1,9 @@
+This page has been retired for versions of Jython older than 2.2. Please see the bugs_ wiki page for the current 2.5 version.
+
+If you want the archived web page:
+
+`2.2 bugs`_
+
+.. _bugs: http://wiki.python.org/jython/ReportingBugs
+
+.. _2.2 bugs: ../archive/22/bugs.html

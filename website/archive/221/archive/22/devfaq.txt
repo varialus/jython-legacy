@@ -1,0 +1,274 @@
+===============
+Developer's FAQ
+===============
+
+.. contents:: Table of Contents
+.. sectnum::
+
+-------------------
+General Information
+-------------------
+
+What is SourceForge?
+====================
+
+SourceForge is a free hosting service for open source projects. The main website is found at http://sourceforge.net.
+
+Where can I find Jython on SourceForge?
+=======================================
+
+The Jython project page can be found at http://sourceforge.net/projects/jython.
+
+Who is who?
+===========
+
+The list of developers with commit access is here: http://sourceforge.net/project/memberlist.php?group_id=12867
+
+This presents a list of developers, giving their names and SourceForge IDs.
+
+How can I become a developer?
+=============================
+Submit patches that fix bugs or implement features, especially features that exist in CPython but are not yet implemented in Jython.
+
+----------------
+Subversion (svn)
+----------------
+
+Where can I learn about Subversion (svn)?
+=========================================
+
+Subversion has its official web site at http://subversion.tigris.org/ (it is also known as svn thanks to that being the name of the executable of Subversion itself). A book on Subversion published by O'Reilly Media, Version Control with Subversion, is available for free online.
+
+With Subversion installed, you can run the help tool that comes with Subversion to get help:
+
+svn help
+
+This will give you the needed information to use the tool. The man page for svn is rather scant and thus not worth reading.
+
+What do I need to use Subversion?
+=================================
+
+UNIX Command line
+-----------------
+
+First, you need to download Subversion. Most UNIX-based operating systems have binary packages available for Subversion. Also, most package systems also have Subversion available.
+
+Windows
+-------
+
+You have several options on Windows. One is to download Subversion itself which will give you a command-line version. Another option is to download TortoiseSVN which integrates with Windows Explorer.
+
+How do I get a checkout of the repository?
+==========================================
+
+The basic command is:
+
+svn checkout <URL> [PATH]
+
+<URL> is the specified location of the project within the repository that you would like to check out (those paths are discussed later). The optional [PATH] argument specifies the local directory to put the checkout into. If left out then the tail part of <URL> is used for the directory name.
+
+The format of <URL> is:
+
+https://jython.svn.sourceforge.net/svnroot/jython/<path>
+
+with <path> representing the path to the project.
+
+The Subversion repository has many projects under it. Most people are probably interested in one of these four projects:
+
+    * the trunk or HEAD (the current version under development)
+    * the experimental Jython 2.5 (ASM) branch
+    * the latest release (plus bug fixes) of Jython
+    * the website source
+
+The projects above can be checked out using the following <URL> paths,
+respectively:
+
+    * https://jython.svn.sourceforge.net/svnroot/jython/trunk/
+    * https://jython.svn.sourceforge.net/svnroot/jython/branches/asm/
+    * https://jython.svn.sourceforge.net/svnroot/jython/branches/Release_2_2maint/
+    * https://jython.svn.sourceforge.net/svnroot/jython/trunk/website/
+
+How do I update my working copy to be in sync with the repository?
+==================================================================
+
+Run:
+
+svn update
+
+from the directory you wish to update (and all subdirectories).
+
+How do I browse the source code through a web browser?
+======================================================
+
+Visit http://fisheye3.cenqua.com/browse/jython to browse the Subversion repository.
+
+How do I add a file or directory to the repository?
+===================================================
+
+Simply specify the path to the file or directory to add and run:
+
+svn add PATH
+
+Subversion will skip any directories it already knows about. But if you want new files that exist in any directories specified in PATH, specify --force and Subversion will check all directories for new files.
+
+You will then need to run svn commit.  See the next section.
+
+How do I commit a change to a file?
+===================================
+
+To have any changes to a file (which include adding a new file or deleting an existing one), you use the command:
+
+svn commit [PATH]
+
+Although [PATH] is optional, if PATH is omitted all changes in your local copy will be committed to the repository. DO NOT USE THIS!!! You should specify the specific files to be committed unless you are absolutely positive that all outstanding modifications are meant to go in this commit.
+
+To abort a commit that you are in the middle of, perform a commit with no message (i.e., close the text editor without adding any text for the message). Subversion will ask if you want to abort the commit or not at that point.
+
+If you do not like the default text editor Subversion uses for entering commmit messages, you may specify a different editor in your Subversion config file with the editor-cmd option in the [helpers] section.
+
+How do I delete a file or directory in the repository?
+======================================================
+
+Specify the path to be removed with:
+
+svn delete PATH
+
+Any modified files or files that are not checked in will not be deleted in the working copy on your machine.
+
+What files are modified locally in my working copy?
+===================================================
+
+Running:
+
+svn status [PATH]
+
+will list any differences between your working copy and the repository. Some key indicators that can appear in the first column of output are:
+
+        * A Scheduled to be added
+        * D Scheduled to be deleted
+        * M Modified locally
+        * ?  Not under version control
+
+How do I find out what Subversions properties are set for a file or directory?
+==============================================================================
+
+svn proplist PATH
+
+How do I revert a file I have modified back to the version in the respository?
+==============================================================================
+
+Running:
+
+svn revert PATH
+
+will change PATH to match the version in the repository, throwing away any changes you made locally. If you run:
+
+svn revert -R
+
+from the root of your local repository it will recursively restore everything to match up with the main server.
+
+How do I find out who edited or what revision changed a line last?
+==================================================================
+
+You want:
+
+svn blame PATH
+
+This will output to stdout every line of the file along with what revision number last touched that line and who committed that revision. Since it is printed to stdout, you probably want to pipe the output to a pager:
+
+svn blame PATH | less
+
+How can I see a list of log messages for a file or specific revision?
+=====================================================================
+
+To see the log messages for a specific file, run:
+
+svn log PATH
+
+That will list all messages that pertain to the file specified in PATH.
+
+If you want to view the log message for a specific revision, run:
+
+svn log --verbose -r REV
+
+With REV substituted with the revision number. The --verbose flag should be used to get a listing of all files modified in that revision.
+
+How do I get a diff between the repository and my working copy for a file?
+==========================================================================
+
+The diff between your working copy and what is in the repository can be had with:
+
+svn diff PATH
+
+This will work off the current revision in the repository. To diff your working copy with a specific revision, do:
+
+svn diff -r REV PATH
+
+Finally, to generate a diff between two specific revisions, use:
+
+svn diff -r REV1:REV2 PATH
+
+Notice the : between REV1 and REV2.
+
+How do I undo the changes made in a recent committal?
+=====================================================
+
+Assuming your bad revision is NEW and OLD is the equivalent of NEW - 1, then run:
+
+svn merge -r NEW:OLD PATH
+
+This will revert all files back to their state in revision OLD. The reason that OLD is just NEW - 1 is you do not want files to be accidentally reverted to a state older than your changes, just to the point prior.
+
+Note: PATH here refers to the top of the checked out repository, not the full pathname to a file. PATH can refer to a different branch when merging from the head, but it must still be the top and not an individual file or subdirectory.
+
+-------
+Patches
+-------
+
+How to make a patch?
+====================
+
+If you are using subversion (anonymous or developer) you can use subversion to make the patches for you. Just edit your local copy and enter the following command:
+
+svn diff | tee ~/name_of_the_patch.diff
+
+Else you can use the diff util which comes with most operating systems (a Windows version is available as part of the cygwin tools).
+
+How do I apply a patch?
+=======================
+
+For the general case, to apply a patch go to the directory that the patch was created from (usually /dist/src/) and run:
+
+patch -p0 < name_of_the_patch.diff
+
+The -p option specifies the number of directory separators ("/" in the case of UNIX) to remove from the paths of the files in the patch. -p0 leaves the paths alone.
+
+How do I undo an applied patch?
+===============================
+
+Undoing a patch differs from applying one by only a command-line option:
+
+patch -R -p0 < name_of_the_patch.diff
+
+Another option is to have 'patch' create backups of all files by using the -b command-line option. See the man page for 'patch' on the details of use.
+
+How to submit a patch?
+======================
+
+Please consult the patch submission guidelines at http://www.python.org/patches/.
+
+Submit the patch to the Jython bug tracker at http://bugs.jython.org/.
+
+How to test a patch?
+====================
+
+Start by testing on your own system. Jython comes with an extensive regression test suite by running the Lib/test/regrtest.py script.
+
+Also run the tests in trunk/bugtests/ directions are in a README file there.
+
+.. TODO: For more thorough documentation, read the documentation for the test package at http://www.python.org/doc/lib/module-test.html.
+
+.. TODO: For more information about the use of the "Status:" and "Assigned To:" fields consult the Patch Manager Guidelines.
+
+.. Note:: This FAQ was adapted from the Python developers FAQ at http://www.python.org/dev/faq/
+

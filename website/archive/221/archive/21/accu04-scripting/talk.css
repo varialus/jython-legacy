@@ -1,0 +1,65 @@
+body {
+margin: 0px;
+
+background-color: #ffffff;
+}
+
+#header {
+position: absolute;
+top: 0px;
+left: 0px;
+width: 100%;
+height: 60px;
+
+text-align: center;
+font-size: xx-large;
+font-weight: bold;
+
+background-image: url(jython-new-small.gif);
+background-repeat: no-repeat;
+backround-position: left center;
+background-color: #cccccc;
+}
+
+#leftbar {
+position: absolute;
+top: 300px;
+left: 0px;
+
+width: 100px;
+
+color: #cccccc;
+
+font-size: small;
+
+
+padding-left: 5px;
+}
+
+#leftbar a {
+color: #cccccc;
+}
+
+#leftbar a:link {
+text-decoration: none;
+}
+
+#leftbar a:visited {
+text-decoration: underline;
+}
+
+#main {
+position: absolute;
+top: 80px;
+left: 125px;
+
+width: 85%;
+height: 100%;
+
+font-size: x-large;
+
+}
+
+#main pre {
+font-size: x-large;
+}

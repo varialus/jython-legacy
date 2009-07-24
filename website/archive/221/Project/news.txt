@@ -1,0 +1,9 @@
+This page has been retired for versions of Jython older than 2.2. Please see the main_ wiki page for the current 2.5 version.
+
+If you want the archived web page:
+
+`2.2 news`_
+
+.. _main: http://wiki.python.org/jython/
+
+.. _2.2 news: ../archive/22/news.html

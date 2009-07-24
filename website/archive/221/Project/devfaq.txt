@@ -1,0 +1,9 @@
+This page has been retired for versions of Jython older than 2.2. Please see the devfaq_ wiki page for the current 2.5 version.
+
+If you want the archived web page:
+
+`2.2 devfaq`_
+
+.. _devfaq: http://wiki.python.org/jython/DeveloperFAQ
+
+.. _2.2 devfaq: ../archive/22/devfaq.html

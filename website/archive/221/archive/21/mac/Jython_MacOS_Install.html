@@ -1,0 +1,61 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>Jython_MacOS_Install</title>
+</head>
+<body>
+<h1>How to install Jython on Macintosh</h1>
+<p>Prerequists:
+<br>You need
+<br><a href="ftp://ftp.apple.com/developer/Development_Kits/MRJ_SDK_2.2_Install.sit.bin">ftp://ftp.apple.com/developer/Development_Kits/MRJ_SDK_2.2_Install.sit.bin</a>
+<br>I got it via - don't choose&nbsp; MRJ 2.2.3 (because it has _no batteries
+includes_)
+<br><a href="http://developer.apple.com/java/download.html">http://developer.apple.com/java/download.html</a>
+<p>Install it.
+<br>The JBindery is the most useful application for installing Jython.
+<p>Get the Jython.class from
+<br><a href="http://jython.sourceforge.net/">http://jython.sourceforge.net/</a>
+<p>
+<img SRC="Jython_get.gif" height=598 width=731>
+</p>
+<p><img SRC="Jython_get_2.gif" height=649 width=732>
+</p>
+Install
+<p><img SRC="mrj_SDK_2_2.gif" height=509 width=816>
+</p>
+<p><img SRC="mrj_JBindery.gif" BORDER=0 height=477 width=831>
+</p>
+<p>Drag and drop jython-20a3.class on the JBindery Icon:
+<p><img SRC="JBindery_1.gif" BORDER=0 height=506 width=912>
+<p>Choose Run
+<p>Now the install process should start:
+</p>
+<p><img SRC="Jython_Install_1.gif" height=737 width=936>
+<p>At the first step you have to choose, which pakets will be installed
+<p><img SRC="Jython_Install_2.gif" height=465 width=750>
+<p>The System is going to be inspected
+<p><img SRC="Jython_Install_3.gif" height=463 width=747>
+<p>The install process is running
+<p>After installing, you'll find some new created folders
+<p><img SRC="Jython_dest.gif" height=388 width=639>
+<p>Next, the jython.jar - file has to be used to be started.
+<p>Here you have to put some data into JBindery:
+<br>at first the class name has to be choosen:
+<br><strong>org.python.util.jython</strong>
+<p>
+<p><img SRC="Jython_Klick1.gif" height=382 width=625>
+<p>Then the classpath has to be adjusted, so it includes the jython.jar
+(I added the Lib-Folder to), you may put any elements you need on this
+List.
+<p><img SRC="Jython_klick_2.gif" height=360 width=497>
+<p>Properties have to be set: this is the location, where your Jython-Home
+is located.
+<p><img SRC="Jython_Klick_3.gif" height=357 width=499>
+<p>After all this little steps, <strong>Save Settings</strong> and then <strong>Run</strong>
+<br>
+<p><img SRC="Jython_RUN_1.gif" height=254 width=928>
+<p>The jar-Files are (the first time you start it up) processed, and the Jython-Interpreter is started:
+<p><img SRC="Jython_Console.gif" height=169 width=793>
+</body>
+</html>

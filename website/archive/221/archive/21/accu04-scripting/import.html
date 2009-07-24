@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scripting Java with Jython</title>
+<LINK href="talk.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<div id="header">
+Importing
+</div>
+<div id="leftbar">
+<!-- LEFTBAR -->
+<ol>
+<li><a href='index.html' >*</a></li>
+<li><a href='intro0.html' >Introduction</a></li>
+<li><a href='intro1.html' >Introduction (1)</a></li>
+<li><a href='intro2.html' >Introduction (2)</a></li>
+<li><a href='search_snpt.html' >Search Snippet</a></li>
+<li><a href='tasks_snpt.html' >Tasks Snippet</a></li>
+<li><a href='pinterp1.html' >Intepreter</a></li>
+<li><a href='ijyside.html' >IJythonSide</a></li>
+<li><a href='glue.html' >Jython Side</a></li>
+<li><a href='import.html' >Importing</a></li>
+<li><a href='doctest.html' >Doctest</a></li>
+<li><a href='doctest_out.html' >Doctest run</a></li>
+</ol>
+<!-- /LEFTBAR -->
+</div>
+<div id="main">
+<code>
+import foo <br /> 
+import foo.bar
+</code>
+<ul>
+<li> Tries Python modules (source in .py files). Searches along sys.path dir list.
+Python packages are subdirectories of sys.path dirs with a __init__.py file
+whose execution on package import populates the corresponding first-class module.
+<pre>
+>>> import xml
+>>> xml
+&lt;module xml at 22396194&gt;
+>>> xml.__file__
+'/home/pedronis/jython-2.1/Lib/xml/__init__.py'
+>>> import xml.sax
+</pre>
+ ( .py files are implicitly and automatically compiled to java bytecode and cached as $py.class
+files)
+</li>
+<li> Tries Java importing. Search along classpath + sys.path with Java rules.
+Jar files are scanned, as necessary,  on startup to cache information about contained java packages (and classes). Beyond that one can explicitly register packages:
+<pre>
+>>> import sys ; sys.add_package("foo")
+&lt;java package foo at 11829808&gt;
+>>> import foo
+</pre>
+
+Classloading happens normally from jython code classloader and possibly a secondary classloader (sys.classLoader).</li>
+<li> Hooks: __builtin__.__import__  , in the future PEP 302 <br />
+<code>import __builtin__; __builtin__.__import__ = ...</code>
+
+</li>
+</ul>
+</div>
+
+</body>
+</html>

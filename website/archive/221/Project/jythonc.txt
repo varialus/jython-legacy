@@ -1,0 +1,9 @@
+This page has been retired for versions of Jython older than 2.2. Please see the ReplaceJythonc_ wiki page for the current 2.5 version.
+
+If you want the archived web page:
+
+`2.2 jythonc`_
+
+.. _ReplaceJythonc: http://wiki.python.org/jython/ReplaceJythonc
+
+.. _2.2 jythonc: ../archive/22/jythonc.html

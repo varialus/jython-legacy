@@ -1,0 +1,102 @@
+============
+Contributors
+============
+
+----------------
+Active Commiters
+----------------
+
+* James Baker
+* Charlie Groves
+* Otmar Humbel
+* Tobias Ivarsson
+* Philip Jenvey
+* Alan Kennedy
+* Samuele Pedroni
+* Nicholas Riley
+* Frank Wierzbicki
+* Khalid Zuberi
+
+-------------------
+Emeritus Committers
+-------------------
+
+* Finn Bock
+* Kevin J. Butler
+* Jim Hugunin
+* Sean McGrath
+* Clark Updike
+* Barry A. Warsaw
+* Brian Zimmer
+
+------------------
+Contributors
+------------------
+
+* Jim Althoff
+* Jens Abraham
+* Bernhard Bablok
+* Rajesh Battala
+* Michael Becke
+* Robert W. Bill
+* Randolph Brown
+* Ben Burton
+* Ian Castleden
+* Steve Cohen
+* Matt Conway
+* Charles Duffy
+* dsyer
+* Jonathan Feinberg
+* Byron Foster
+* Nathan Franzen
+* Tim Hochberg
+* Kent Johnson
+* Bryn Keller
+* Ype Kingma
+* Ivan Kougaenko
+* Pekka Laukkanen
+* leouser
+* Noel (Nick) Lockwood
+* Harry Mantakos
+* Mehendran T
+* Drew Morrissey
+* Cyrille Morvan
+* John Mudd
+* Rodrigo B. de Oliveira
+* Benjamin Peterson
+* Tony Plate
+* Josselin PUJO
+* Steffen Ries
+* Durant Schoon
+* Aleks Totic
+* Alexey N. Solofnenko
+* Phil Surette
+* Keshav Upadhyaya
+* Dj Walker-Morgan
+* Greg Ward
+* Randy Jay Yarger
+
+----------------------
+Corporate Contributors
+----------------------
+
+* Corporation for National Research Initiatives
+* cryptix
+* Sun Microsystems
+
+.. This YourKit message being posted on our Web site is a requirement
+   of our (free) open-source license.
+
+YourKit is kindly supporting open source projects with its
+full-featured Java Profiler.  YourKit, LLC is creator of innovative
+and intelligent tools for profiling Java and .NET applications. Take a
+look at YourKit's leading software products: `YourKit Java Profiler`_
+and `YourKit .NET Profiler`_.
+
+.. _YourKit Java Profiler: http://www.yourkit.com/java/profiler/index.jsp
+.. _YourKit .NET Profiler: http://www.yourkit.com/.net/profiler/index.jsp
+
+----
+Logo
+----
+Logo Design by Jesse Ross http://www.jesseross.com/ 

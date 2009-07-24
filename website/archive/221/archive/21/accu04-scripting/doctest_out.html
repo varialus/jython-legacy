@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scripting Java with Jython</title>
+<LINK href="talk.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<div id="header">
+Doctest run
+</div>
+<div id="leftbar">
+<!-- LEFTBAR -->
+<ol>
+<li><a href='index.html' >*</a></li>
+<li><a href='intro0.html' >Introduction</a></li>
+<li><a href='intro1.html' >Introduction (1)</a></li>
+<li><a href='intro2.html' >Introduction (2)</a></li>
+<li><a href='search_snpt.html' >Search Snippet</a></li>
+<li><a href='tasks_snpt.html' >Tasks Snippet</a></li>
+<li><a href='pinterp1.html' >Intepreter</a></li>
+<li><a href='ijyside.html' >IJythonSide</a></li>
+<li><a href='glue.html' >Jython Side</a></li>
+<li><a href='import.html' >Importing</a></li>
+<li><a href='doctest.html' >Doctest</a></li>
+<li><a href='doctest_out.html' >Doctest run</a></li>
+</ol>
+<!-- /LEFTBAR -->
+</div>
+<div id="main">
+<pre>
+$ ~/jython-2.1/jython doctestrect.py -v
+Running doctestrect.__doc__
+Trying: from java.awt import Rectangle
+Expecting: nothing
+ok
+Trying: r=Rectangle(10,20)
+Expecting: nothing
+ok
+Trying: r.x,r.y
+Expecting: (0, 0)
+ok
+Trying: r.width,r.height
+Expecting: (10, 20)
+ok
+Trying: r.grow(5,3)
+Expecting: nothing
+ok
+Trying: r.x,r.y,r.width,r.height
+Expecting: (-5, -3, 20, 26)
+ok
+0 of 6 examples failed in doctestrect.__doc__
+1 items passed all tests:
+   6 tests in doctestrect
+6 tests in 1 items.
+6 passed and 0 failed.
+Test passed.
+</pre>
+</div>
+
+</body>
+</html>

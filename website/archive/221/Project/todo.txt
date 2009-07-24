@@ -1,0 +1,9 @@
+This page has been retired for versions of Jython older than 2.2. Please see the todo_ wiki page for the current 2.5 version.
+
+If you want the archived web page:
+
+`2.2 todo`_
+
+.. _todo: http://wiki.python.org/jython/Todo
+
+.. _2.2 todo: ../archive/22/todo.html

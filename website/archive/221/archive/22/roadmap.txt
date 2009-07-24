@@ -1,0 +1,63 @@
+==============
+Jython Roadmap
+==============
+last modified: October 4, 2007
+
+.. contents:: Table of Contents
+.. sectnum::
+
+-------------------
+Summary
+-------------------
+
+Note that Jython's version numbers represent the version of CPython from which
+Jython pull most of its libraries that are written in pure Python (as opposed
+to the parts that are written in Java).
+
+Jython 2.2.1
+============
+
+Jython 2.2.1 has been released.  We will produce additional point releases
+for bug fixing as necessary.
+
+Jython 2.5
+==========================
+
+Jython's current fragility means that the next release will primarily
+be a cleanup release.  The current plan is to target Python 2.5.
+
+We have noticed that the current codebase is
+extremely brittle and uses way to many different styles to do many of
+the same things.  All of this inconsistency makes bugfixing a
+nightmare, and makes learning the codebase from scratch
+extraordinarily difficult.
+
+This means that, at least for the core developers, we will be
+concentrating on making a clean 2.5, while improving the java
+integration.  An earlier version of this doc suggested that
+we would not be considering moving to ASM or Antlr -- but a very
+successful Google Summer of Code project and much committer interest
+has made it quite likely that we will do just that (move to ASM
+and Antlr).
+
+A side goal of Jython 2.5 is to try to get some CPython frameworks working,
+especially the web frameworks, for example:
+
+* Django
+* Pylons
+* TurboGears
+* Twisted
+
+Jython 3.0
+==========
+
+Jython 3.0 (or Jython 3000 to denote the likely year of appearance) 
+will, like CPython 3.0, be a backwards incompatible version that can
+include radical departures from Jython 2.x.  The departures will at
+least include the departures that CPython 3.0 has made (for example,
+old-style classes go away, ints and longs are completely unified,
+etc.)
+
+Serious discussions about Jython 3.0 can perhaps begin once CPython 3.0
+goes to a GA release.
+

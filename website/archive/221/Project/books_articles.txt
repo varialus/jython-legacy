@@ -1,0 +1,9 @@
+This page has been retired for versions of Jython older than 2.2. Please see the JythonBibliography_ wiki page for the current 2.5 version.
+
+If you want the archived web page:
+
+`2.2 books_articles`_
+
+.. _JythonBibliography: http://wiki.python.org/jython/JythonBibliography
+
+.. _2.2 books_articles: ../archive/22/books_articles.html

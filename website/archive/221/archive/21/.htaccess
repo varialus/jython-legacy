@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^bugs/?$ http://bugs.jython.org/
+    RewriteRule ^bugs/(.+)$ http://bugs.jython.org/issue$1
+    RewriteRule ^patches/?$ http://bugs.jython.org/
+    RewriteRule ^patches/(.+)$ http://bugs.jython.org/issue$1
+    RewriteRule ^buildbot$ http://jython.achievewith.us/buildbot/
+    RewriteRule ^buildbot(.*)$ http://jython.achievewith.us/buildbot$1
+</IfModule>

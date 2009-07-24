@@ -1,0 +1,29 @@
+==================
+The Jython Project
+==================
+.. admonition:: Latest News
+
+  The Jython development team is proud to announce the release of `Jython 2.5.0 final <http://downloads.sourceforge.net/jython/jython_installer-2.5.0.jar>`__!
+
+  Jython 2.2.1 is also available if needed:
+
+  * `Download location`_
+  * `Installation instructions`_
+
+
+Jython 2.5 Documentation
+========================
+
+The documentation for Jython 2.5 is being developed on our wiki_.  Please help
+Jython by adding content and updating our wiki. As the content matures for 2.5
+it will be pulled back into this website. Archived versions of the old webpages
+are available below:
+
+* Old website for `Jython 2.2`_
+* Old website for `Jython 2.1`_.
+
+.. _wiki: http://wiki.python.org/jython
+.. _Jython 2.1: ./archive/21/index.html
+.. _Jython 2.2: ./archive/22/index.html
+.. _Installation instructions: http://wiki.python.org/jython/InstallationInstructions
+.. _Download location: http://downloads.sourceforge.net/jython/jython_installer-2.2.1.jar
