@@ -1,0 +1,111 @@
+<!-- Copyright 2001 Finn Bock -->
+<!-- Copyright 2003 Samuele Pedroni -->
+<!-- Copyright 2006 Frank Wierzbicki -->
+<!--
+ The "update" target requires that an bsf.jar file is available
+ in the ant/lib directory.
+-->
+
+<!-- ant file to build the jython website -->
+<project name="website" default="generate" basedir=".">
+    <target name="init">
+        <property file="ant.properties" />
+        
+        <property name="scp.destination"
+                  value="shell.sourceforge.net:/home/groups/j/jy/jython"/>
+        <property name="news.file" value="../jython/NEWS"/>
+
+        <property name="rst2jysite.command" value="rst2jysite.py"/>
+        <property name="scp.command" value="scp"/>
+        <property name="scp.user" value="fwierzbicki"/>
+
+        <property file="../ant.properties" />
+    </target>
+
+    <target name="generate" depends="init">
+    <!-- Create .html files in website -->
+        <mkdir dir="dist" />
+        <copy file="${news.file}" todir="dist"/>
+        <copy todir="dist">
+            <fileset dir=".">
+                <include name="index.html"/>
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist">
+            <fileset dir=".">
+                <include name="*.txt"/>
+                <include name="favicon.ico"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/css">
+            <fileset dir="css"/>
+        </copy>
+        <copy todir="dist/checksums">
+            <fileset dir="checksums"/>
+        </copy>
+        <copy todir="dist/archive">
+            <fileset dir="archive">
+            </fileset>
+        </copy>
+        <copy todir="dist">
+            <fileset dir="redirects">
+            </fileset>
+        </copy>
+        <copy todir="dist/archive/22">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/applets">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/accu04-scripting">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/graphics">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/Project">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <apply verbose="true" executable="${rst2jysite.command}" dest="dist">
+            <arg line="--link-stylesheet" />
+            <arg line="--stylesheet=../css/html4css1.css" />
+            <srcfile />
+            <targetfile />
+            <fileset dir="dist">
+                <include name="**/*.txt" />
+            </fileset>
+            <mapper type="glob" from="*.txt" to="*.html"/>
+        </apply>
+    </target>
+
+    <target name="collect" depends="generate">
+        <tar tarfile="website.tar.bz2" basedir="dist"
+             includes="**" compression="bzip2"/>
+    </target>
+
+    <target name="copy2sf" depends="collect">
+        <exec executable="${scp.command}">
+            <arg line="website.tar.bz2"/>
+            <arg line="${scp.user}@${scp.destination}"/>
+        </exec>
+    </target>
+
+    <target name="clean" depends="init">
+        <delete dir="dist" />
+        <delete file="website.tar.bz2" />
+    </target>
+</project>

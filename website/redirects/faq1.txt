@@ -1,0 +1,8 @@
+How to use Java from Jython?
+============================
+
+Using Java from Jython is as simple as importing the Java package that you'd like to use.
+
+Tips for Scripting Java with Jython | http://www.onjava.com/pub/a/onjava/2002/03/27/jython.html
+
+

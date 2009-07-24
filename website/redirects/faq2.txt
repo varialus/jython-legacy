@@ -1,0 +1,22 @@
+How to use Jython from Java
+===========================
+
+There are a variety of ways to use Jython from within Java.  Perhaps the most widely used solution is to create an object factory in Java that coerces the Jython object into Java code.  There are a multitude of ways create such a factory.  Object factories can be created one-to-one with Jython classes, or they can be more loosely-coupled such that one factory implementation would work for any Jython object.   
+
+If you are interested in making use of Jython Object Factories and you would like to see some example code, please take a look at the `plyjy`_ project as it contains working implementations that can be used out of the box. 
+
+Please see the articles below for more details on implementing object factories. 
+
+Valuable Articles
+-----------------
+
+Simple and Efficient Jython Object Factories | http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3
+
+.. _plyjy: http://kenai.com/projects/plyjy
+
+
+
+
+
+
+

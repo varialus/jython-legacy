@@ -1,0 +1,24 @@
+What Modules are Supported
+==========================
+
+We support most modules, certainly pure Python modules (w/o some dependency on something unsupported) and core modules. Of the builtin types, the only one we do not support is buffer. Having said that, here's the lengthier exposition:
+
+Currently we rely on the standard CPython (soon to be core Python) test suite, as patched for a number of minor problems (reliance on garbage collection/ref counting semantics, specific orderings due to hash codes, execution orderings in tracing, etc.). For your question, the problem with this test suite is that it doesn't necessarily directly map to a given module; still there might be something automated we could do.
+
+We have some modules where this is partial support; this is seen in the os and signals module for example, and their functionality may not be available under a given security context and would be OS platform dependent. We do plan to add more as we have time, such as perhaps os.fork. expat is another such module, it's complete enough that elementtree passes its unit tests.
+
+We do plan to support bz2, ctypes, sqlite3, flesh out unicodedata, and support cjk codecs in 2.5.1.
+
+Modules that we don't support, and perhaps won't, include bsddb3, curses, dbm, gdbm, ioctl, mmap, pty, Tkinter, and win32reg. Some of these might be readily doable, like mapping the curses module against CHARVA, but given limited resources, are not likely to be worked on. (Contributions welcome!)
+
+We will not support modules related to the obsolete syntax tree for CPython (parser), the related pure-Python compiler (compiler). I'm not certain about the feasibility of symtable, but incidentally we do support 2.6's ast.
+
+Finally, there are modules that are very much platform specific, likely not too interesting, generally obsolete, and I'm sure will never be supported in Jython, such as macostools, MacOS, sunaudiodev, winsound, etc. In this list, all but winsound were removed in Python 3.0.
+
+If someone wanted to write a missing module, I'd take a look at our implementations of modules like threading and expat (not complete). Both demonstrate that it's feasible to write modules that would have to be written at least in part in C in CPython, but can be completely written in "pure Jython" (that is code that imports in Java libraries).
+
+
+
+
+
+

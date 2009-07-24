@@ -1,0 +1,97 @@
+<html>
+	<head>
+		<title>
+			Jython Twitter Updates
+		</title>
+		<script src="importxml.js" type="text/javascript"></script>
+		<script type="text/javascript">
+
+
+		</script>
+		<style type="text/css">
+dd,dt,dl {padding: 0; margin: 0;
+font-family: "Lucida Sans", "Trebuchet MS", sans-serif;
+font-size: 13px;
+}
+h2{
+	font-family: "Lucida Sans", "Trebuchet MS", sans-serif;
+	color: #15708e;
+	text-transform: uppercase;
+	font-size: 12px;
+}
+
+h2 a, h2 a:link, h2 a:visited, h2 a:hover {
+	color: #15708e;
+	text-decoration: none;
+}
+h2 a:hover {
+	text-decoration: underline;
+}
+
+dl {
+width: 250px;
+}
+a:link{
+	text-decoration: none;
+	color: #333333;
+}
+
+a:visited{
+	text-decoration: none;
+	color: #333333;
+}
+
+a:hover{
+	color: #0b6fae;
+	text-decoration: underline;
+}
+a.author:link{
+	text-decoration: none;
+	color: #0B6FAE;
+}
+
+a.author:visited{
+	text-decoration: none;
+	color: #585858;
+}
+
+a.author:hover{
+	color: #0b6fae;
+	text-decoration: underline;
+}
+
+
+dd {
+	color: #888888;
+	font-size: 11px;
+	clear: left;
+}
+dt {margin-top: 6px;clear:both;}
+img {
+	float: left;
+	margin: 4px 4px 0 0 ;
+}
+
+		</style>
+		<base target="_top">
+	</head>
+	<body>
+		<div id="feedcontainer"></div>
+
+<script type="text/javascript">
+
+if( document.getElementById ) { window.defVal=document.getElementById('feedcontainer').innerHTML; }
+
+var refreshMinutes = 5.0;
+
+window.clearInterval(refreshMinutes);
+
+if(importXML('feed://search.twitter.com/search.atom?q=%23jython','parseRSS',false,2000)){
+		window.myInterval=window.setInterval('importXML(\'feed://search.twitter.com/search.atom?q=%23jython\',\'parseRSS\',false,2000);',refreshMinutes*60000);
+	}
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+/* **** NOTES **** */
+/* I have tried to comment this style sheet as much as possible to show you where things take place. 
+There is a large utilization of descendant selectors, so if you are not familiar with those, hopefully the 
+comments will help. 
+*/
+
+/* Global Styles */
+html,body{margin:0;padding:0}
+body{font-family:  "Lucida Grande", tahoma, arial;
+     font-size: 13px;}
+     
+
+
+
+/* TEXT STYLES */
+p{padding:0 5px 0px; font-size: 1em; line-height: 1.3em;}
+h1 { font-size: 2em; margin-top: 0;}
+h2 { font-size: 1.75em; color: #79B30B; line-height: 1.3em;}
+h3 { font-size: 1.5em; color: #b71;}
+h4 { font-size: 1.25em; color: #452;}
+h5 {font-size: 1em; font-weight:bold;}
+h1,h2,h3,h4,h5 {padding:0 5px 0px;}
+#navigation p, #extra p {color:#fff;}
+a:link { color: #452; text-decoration:none; border-bottom: 1px solid #b71; padding:1px;}
+a:visited {color: #452; text-decoration:none; border-bottom: 1px solid #b71; }
+a:hover {background-color: #79B30B; color:#fff; }
+acronym {border-bottom: 1px dotted #b71; cursor:help; } 
+label.header {font-size:larger; color: #b71; font-weight:bold; text-transform:uppercase; margin-bottom: 0; padding-bottom:0; } 
+   /* label.header is the label for the search box but can be used for other forms by using class="header" in a label */
+form,submit { padding:0; margin:0; } /* removes extraneous padding around the form */
+code { border: 1px dotted #b71; border-left: 3px solid #b71; background-color: #dda; padding: 1em; margin-left: 3ex; color:#742;}
+blockquote { border: 1px solid #b71; background-color: #dda;  margin: 3ex; font-style:italic;}
+
+/* HEADER SECTION */
+div#header {margin:0; padding:0; color: #FFF; height:9em;background-image: url(jython_org_bg.png); background-repeat: repeat-x; }
+div#header h1 a { height: 3em; min-height:8em; line-height:80px;margin:0; color: #fff; border-bottom: none; padding:0;}
+div#header h1 a:hover {background-color: transparent; border-bottom: none; color: #79B30B}
+div#header p#skip{position: absolute; top: 3px; right: 3px; margin:0; padding: 0;}
+#skip a,#skip a:visited {color:#fff; border-bottom: 1px solid #b71;}
+
+
+/*-----Latest Release------*/
+
+div#latest_release {
+right: 10px;
+top: 28px;
+width:180px;
+height:42px;
+padding:10px 10px 10px 30px;
+position:absolute;
+font-size:11px;
+background:url('/latest_release_bg.png') no-repeat;
+}
+
+div#latest_release .a {
+color:#007BFF;
+text-decoration:none;
+}
+
+
+
+/* VERTICAL NAVIGATION */
+div#navigation{float:left; position: relative; left: 10px; margin-top: 10px;margin-left:-100%; color:#fff; background-image:url(nav_bg2.png); height: 100%; background-repeat: no-repeat;}
+.navcontainer { width: 198px; padding:0; margin-bottom: 1em; 
+background-color: transparent;}
+.navcontainer ul { list-style: none; margin: 0; padding: 0; border: none; width: 198px; min-width:198px; }
+.navcontainer li { margin: 0; }
+html>body .navcontainer li a { width: auto;}
+.navcontainer li a,.navcontainer li a:visited { 
+          display: block; padding: 5px 5px 5px 0.5em; border-left: 10px solid transparent;
+          border-right: 10px solid transparent; background-color: transparent; 
+          text-decoration: none; font-weight:bold; width: 167px; min-width:165px; 
+          color: #fff; border-bottom: 1px solid transparent; 
+}
+.navcontainer li a:hover,.navcontainer li#active a { 
+          
+          background-color: transparent; color: #99cc33; font-weight:bold;
+}
+.navcontainer li.menutitle {border-left: 10px solid transparent ; border-top: 10px; border-right:10px solid transparent;  font-size:larger;
+text-align:left; color: #333; margin-top: 2px; font-weight:bold; padding-top:1px; border-bottom:none; text-transform:uppercase;}
+.navcontainer li#last a { border-bottom:none;}  /* the last one in the list should get the id of 'last' in the list to remove the bottom border */
+
+/* --- These are the subnavigation for sublinks. --- */
+.navcontainer li ul li { display:none;} /* this hides all sublinks if it is not the currently active link */
+.navcontainer li#active ul li { display: block;} /* this expands all sublinks if it is the currently active link */
+.navcontainer li#active ul li a:link, .navcontainer li#active ul li a:visited { border-left-color:transparent; border-right-color: transparent; }
+.navcontainer li#active ul li a:hover { background-color:#fff; color:#b71;}
+
+div#top {color:#000}
+
+html>body #top .searchbox {
+    bottom: 0px;
+}
+#top .searchbox {
+    position: relative;
+    right: 30px;
+    height: 42px;
+    font-size: 70%;
+    white-space: nowrap;
+    text-align: right;
+    color: white;
+    background-color: transparent;
+    z-index:0;
+    background-repeat: no-repeat;
+    background-position: top left;
+    top: 75px; /* compensate for IE rendering issue */
+}
+
+#top .searchbox form {
+    padding: 5px 10px;
+    margin: 0;
+}
+#top .searchbox p {
+    padding: 0 0 2px 0;
+    margin: 0;
+}
+#top .searchbox input {
+    font-size: 100%;
+}
+
+
+
+
+/* CONTENT SECTION */
+h2#topper {background-image:url(jython_label.png); background-repeat: repeat-x; height: 35px; color:#FFF; text-align: center; margin-top:0; padding-top:0; padding-bottom:0; margin-bottom:0px;} 
+div#wrapper{float:left;width:100%; top: 0px; background-image:url(css/jython_body_bg.png); background-repeat: repeat-y;}
+div#content{margin: 0 200px; padding-top: 10px; padding-left: 8px; padding-right: 20px; padding-bottom: 2em; background-color: #FFF; color: #000;}
+div#content p{line-height:1.4;}
+/* div#content h2#topper {background:#dda; color:#742; margin-top:0; padding-top:0;} */
+div#content a:visited {color: #452; text-decoration:none; border-bottom: 1px solid #b71; }
+
+
+/* EXTRA SECTION */
+div#extra {float:left;width:198px;margin-left:-200px; background-color: #FFF;}
+/*div#extra {float:left;width:198px;margin-left:-200px; background-color: #F5F5DC; border-left: 2px solid #000;}*/
+.applemenu{
+position: relative;
+margin: 0px 0;
+padding: 0;
+right: 10px;
+width: 195px; /*width of menu*/
+border: 2px solid #472;
+top: 10px;
+}
+
+.applemenu div.silverheader a{
+background: black url(jython_label.png) repeat-x center left;
+font: normal 12px Tahoma, "Lucida Grande", "Trebuchet MS", Helvetica, sans-serif;
+color: white;
+display: block;
+position: relative; /*To help in the anchoring of the ".statusicon" icon image*/
+width: auto;
+padding: 5px 0;
+padding-left: 8px;
+text-decoration: none;
+}
+
+
+.applemenu div.silverheader a:visited, .applemenu div.silverheader a:active{
+color: white;
+}
+
+.applemenu div.selected a, .applemenu div.silverheader a:hover{
+background: black url(jython_label_over.png) repeat-x;
+color: white;
+}
+
+.applemenu div.submenu{ /*DIV that contains each sub menu*/
+background: white;
+padding: 5px;
+height: 400px; /*Height that applies to all sub menu DIVs. A good idea when headers are toggled via "mouseover" instead of "click"*/
+}
+
+.applemenu div#tweet{
+height: 350px;
+overflow: auto;
+}
+
+/* RIGHT AFFILIATE LINKS BOX */
+ul#affiliate { border:1px solid #79B30B; margin:0; padding:0; margin-right: 20px; margin-left: 5px; padding: 3px 4px 4px 6px; background-color:#452; list-style-type:none; }
+ul#affiliate li { padding: 3px;}
+ul#affiliate li a:link, a:visited { color:#fff;}
+
+/* FOOTER SECTION */
+div#footer{clear:left;width:100%; background-image: url(jython_label.png); background-repeat: repeat-x;color: #FFF;}
+div#footer a:link, div#footer a:visited { color:#fff; }
+div#footer ul {list-style-type:none; margin:0; padding:.8em 0; text-align:center;}
+div#footer ul li {display:inline; padding: 0 4px;}
+
+/* General Image Stuff */
+img.sm { width: 160px; }
+
+/* TABLES */ 
+table {border: 2px solid #452; border-collapse:collapse; width:90%; margin-left: 3ex; }
+td {background-color: #fff; padding:3px; border: 1px solid #fff}
+th {text-align:left;border: 1px solid #fff}
+thead th {color:#fff; font-size:1.5em; background-color: #472 ; padding: 10px 6px}
+tbody th {color:#fff; font-size:1.15em; background-color: #79B30B ; padding: 6px}
+tbody th.sub {font-size: .90em; color:#000; background-color: #dda; padding: 6px}
