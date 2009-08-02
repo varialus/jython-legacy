@@ -49,6 +49,9 @@
         <copy todir="dist/css">
             <fileset dir="css"/>
         </copy>
+        <copy todir="dist/images">
+            <fileset dir="images"/>
+        </copy>
         <copy todir="dist/checksums">
             <fileset dir="checksums"/>
         </copy>
@@ -71,6 +74,11 @@
             </fileset>
         </copy>
         <copy todir="dist/accu04-scripting">
+            <fileset dir=".">
+                <include name="left.nav"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/docs">
             <fileset dir=".">
                 <include name="left.nav"/>
             </fileset>
