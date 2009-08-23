@@ -1,0 +1,267 @@
+#!/bin/sh
+
+# <configuration>
+#  <command names>
+CMD_JYTHON=jython
+CMD_INSTALL=easy_jython_install
+CMD_VIRTUAL=virtualjython
+CMD_BENCH=benchmark_jython
+#  </command names>
+#  <config files>
+CLASSPATH_FILE=~/.jython.classpath
+JYTHONPATH_FILE=~/.jython.path
+JYTHONOPTIONS_FILE=~/.jython.options
+JAVAHOME_FILE=~/.jython.java_home
+#  </config files>
+DEFAULT_INSTALL_PATH=~/bin
+BIN_OFFSET=target/dist/bin
+EZ_SETUP=http://peak.telecommunity.com/dist/ez_setup.py
+BUILD_TARGET=
+TEMP_DIR=/tmp
+# </configuration>
+
+install()
+{
+    if [ -n "$1" ]; then
+	INSTALL_PATH=$1
+    else
+	echo -n "Enter installation path [$DEFAULT_INSTALL_PATH]: "
+	read INSTALL_PATH
+	if [ -z "$INSTALL_PATH" ]; then
+	    INSTALL_PATH=$DEFAULT_INSTALL_PATH
+	fi
+    fi
+    if [ "`dirname ${INSTALL_PATH}x`" != "`dirname $INSTALL_PATH`" ]; then
+	INSTALL_PATH=`dirname ${INSTALL_PATH}x`
+    fi
+    if [ ! -e "$BASE/lib/benchmark.sh" ]; then
+	CMD_BENCH=
+    fi
+    TARGET=$BASE/`basename $EXE`
+    for SCRIPT in {$CMD_JYTHON,$CMD_INSTALL,$CMD_VIRTUAL,$CMD_BENCH}; do
+	if ln -is $TARGET $INSTALL_PATH/$SCRIPT; then
+	    echo installed $INSTALL_PATH/$SCRIPT
+	fi
+    done
+}
+
+build()
+{
+    CUR_DIR=`pwd`
+    cd $BASE
+    if [ -z "`which ant`" ]; then
+	echo ERROR: cannot build Jython, could not find ant
+	exit 1
+    fi
+    echo Rebuilding Jython
+    ant clean
+    if [ -n "`which svn`" ]; then
+	echo Updating working copy
+	svn up
+    fi
+    echo Building Jython
+    ant $BUILD_TARGET
+    cd $CUR_DIR
+}
+
+jython()
+{
+    JYTHON_COMMAND=$BIN_DIR/jython
+    if [ ! -e "$JYTHON_COMMAND" ]; then
+	build
+    elif [ 0 -eq 0 ]; then
+	# disable the next branch - it is too slow...
+	echo -n
+    elif [ -n "`which svn`" ]; then
+	# TODO: speed up this comparison - then it can be enabled...
+	BASE_REVISION=`svn info | grep ^Revision`
+	if [ $? -ne 0 ]; then
+	    echo ERROR: broken working copy
+	    exit 1
+	fi
+	HEAD_REVISION=`svn info -r HEAD | grep ^Revision`
+	if [ $? -eq 0 ]; then
+	    if [ "$BASE_REVISION" != "$HEAD_REVISION" ]; then
+		build
+	    fi
+	fi
+    fi
+    if [ -e "$JYTHONOPTIONS_FILE" ]; then
+	JYTHON_OPTIONS=`lam -s -J $JYTHONOPTIONS_FILE | paste -s -d \  -`
+    fi
+    while [ "${1:0:2}" == '-J' ]; do
+	case "${1:2}" in
+	    # Classpath parameters have arguments
+	    -cp)
+		JYTHON_OPTIONS="$JYTHON_OPTIONS $1 $2"
+		shift
+		;;
+	    -classpath)
+		JYTHON_OPTIONS="$JYTHON_OPTIONS $1 $2"
+		shift
+		;;
+	    *)
+		JYTHON_OPTIONS="$JYTHON_OPTIONS $1"
+		;;
+	esac
+	shift
+    done
+    if [ "$1" == "-m" -a "$2" == "benchmark" ]; then
+	# benchmarking special case add timing to jython
+	if [ -e "$BASE/lib/benchmark.sh" ]; then
+	    source $BASE/lib/benchmark.sh
+	fi
+    fi
+    $JYTHON_COMMAND $JYTHON_OPTIONS "$@"
+    if [ "$1" == "--help" ]; then
+	echo Bootstrap launcher configuration files:
+	echo $CLASSPATH_FILE - Configure CLASSPATH, one path per line
+	echo $JYTHONPATH_FILE - Configure JYTHONPATH, one path per line
+	echo $JYTHONOPTIONS_FILE - Options passed to the JVM, one per line
+    fi
+}
+
+benchmark_jython()
+{
+    for VM in {client,server}; do
+	echo "=== Benchmarking Jython ($VM VM) ==="
+	if [ -n "$JAVA_HOME" ]; then
+	    echo " *  JAVA_HOME = $JAVA_HOME"
+	fi
+	jython -J-$VM -m benchmark "$@"
+    done
+}
+
+benchmark()
+{
+    while [ $# -gt 0 ] ; do
+	case "$1" in
+	    --help)
+		echo "Run benchmarking of a Python module in CPython and Jython"
+		echo
+		echo "Usage:"
+		echo "    $0 <options> <script>.py"
+		echo "Where <options> can be one or several of the following:"
+		echo "    --jython    Run the benchmark in Jython only"
+		echo "    --help      Print this message and exit"
+		exit 0
+		;;
+	    --jython)
+		JYTHON_ONLY="true"
+		;;
+	    *)
+		break
+		;;
+	esac
+	shift
+    done
+    if [ -z "$1" ]; then
+	echo "ERROR: No script supplied"
+	echo "See '$0 --help' for options"
+	exit 1
+    fi
+    if [ -z "$JYTHON_ONLY" ]; then
+	echo "=== Benchmarking CPython ==="
+	time python $BASE/lib/benchmark.py --scripted "$@"
+    fi
+    if [ -e "$JAVAHOME_FILE" ]; then
+	for JAVA_HOME in `cat $JAVAHOME_FILE`; do
+	    export JAVA_HOME
+	    benchmark_jython --scripted "$@"
+	done
+    else
+	benchmark_jython --scripted "$@"
+    fi
+}
+
+easy_install()
+{
+    if [ ! -e "$BIN_DIR/easy_install" ]; then
+	if [ -n "`which wget`" ]; then
+	    wget --output-document=$TEMP_DIR/ez_setup.py $EZ_SETUP
+	elif [ -n "`which curl`" ]; then
+	    curl -o $TEMP_DIR/ez_setup.py $EZ_SETUP
+	else
+	    echo ERROR: could not install setuptools
+	    exit 1
+	fi
+	jython $TEMP_DIR/ez_setup.py
+	rm $TEMP_DIR/ez_setup.py
+    fi
+    $BIN_DIR/easy_install "$@"
+}
+
+virtualenv()
+{
+    if [ ! -e "$BIN_DIR/virtualenv" ]; then
+	easy_install virtualenv
+    fi
+    $BIN_DIR/virtualenv "$@"
+}
+
+NAME=`basename $0`
+EXE=$0
+while [ -L "$EXE" ]; do
+      EXE=`readlink $EXE`
+done
+BASE=`dirname $EXE`
+BASE=`cd $BASE; pwd`
+BIN_DIR=$BASE/$BIN_OFFSET
+
+if [ "$EXE" == "$0" ]; then
+    install "$@"
+else
+    # Setup CLASSPATH
+    if [ -e "$CLASSPATH_FILE" ]; then
+	LOCAL_CLASSPATH=`paste -s -d : $CLASSPATH_FILE`
+    fi
+    if [ -n "$CLASSPATH" ]; then
+	if [ -n "$LOCAL_CLASSPATH" ]; then
+	    export CLASSPATH=$LOCAL_CLASSPATH:$CLASSPATH
+	fi
+    else
+	export CLASSPATH=$LOCAL_CLASSPATH
+    fi
+    # Setup JYTHONPATH
+    if [ -e "$JYTHONPATH_FILE" ]; then
+	LOCAL_JYTHONPATH=`paste -s -d : $JYTHONPATH_FILE`
+    fi
+    if [ -n $"JYTHONPATH" ]; then
+	if [ -n "$LOCAL_JYTHONPATH" ]; then
+	    export JYTHONPATH=$LOCAL_JYTHONPATH:$BASE/lib:$JYTHONPATH
+	else
+	    export JYTHONPATH=$BASE/lib:$JYTHONPATH
+	fi
+    else
+	if [ -n "$LOCAL_JYTHONPATH" ]; then
+	    export JYTHONPATH=$LOCAL_JYTHONPATH:$BASE/lib
+	else
+	    export JYTHONPATH=$BASE/lib
+	fi
+    fi
+    # Setup JAVA_HOME
+    if [ -z "$JAVA_HOME" ]; then
+	if [ -e "$JAVAHOME_FILE" ]; then
+	    export JAVA_HOME=`head -n 1 $JAVAHOME_FILE`
+	fi
+    fi
+    # Dispatch command
+    case "$NAME" in
+	$CMD_JYTHON)
+	    jython "$@"
+	    ;;
+	$CMD_INSTALL)
+	    easy_install "$@"
+	    ;;
+	$CMD_VIRTUAL)
+	    virtualenv "$@"
+	    ;;
+	$CMD_BENCH)
+	    benchmark "$@"
+	    ;;
+	*)
+	    echo ERROR: unknown command \"$NAME\"
+	    exit 1
+	    ;;
+    esac
+fi

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><launchConfiguration type="org.eclipse.ant.AntBuilderLaunchConfigurationType">
+<?xml version="1.0" encoding="UTF-8"?>
+<launchConfiguration type="org.eclipse.ant.AntBuilderLaunchConfigurationType">
 <stringAttribute key="org.eclipse.ant.ui.ATTR_ANT_AFTER_CLEAN_TARGETS" value="brand-version,antlr_gen,"/>
 <stringAttribute key="org.eclipse.ant.ui.ATTR_ANT_MANUAL_TARGETS" value="brand-version,antlr_gen,"/>
 <booleanAttribute key="org.eclipse.ant.ui.ATTR_TARGETS_UPDATED" value="true"/>
@@ -18,7 +19,7 @@
 <mapEntry key="eclipse.running" value="true"/>
 <mapEntry key="eclipse.pdebuild.home" value="/Library/eclipse/plugins/org.eclipse.pde.build_3.4.1.R34x_v20080805/./"/>
 <mapEntry key="eclipse.home" value="/Library/eclipse"/>
-<mapEntry key="compile.dir" value="${project_loc}/target/build"/>
+<mapEntry key="compile.dir" value="${project_loc:/target/build}"/>
 <mapEntry key="eclipse.pdebuild.templates" value="/Library/eclipse/plugins/org.eclipse.pde.build_3.4.1.R34x_v20080805/templates/"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:/advanced-compiler/jython/build.xml}"/>

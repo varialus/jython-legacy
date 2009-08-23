@@ -53,6 +53,9 @@
     </exec>
   </target>
 
+  <target name="source dist">
+  </target>
+
   <target name="setup target">
     <mkdir dir="${target.dir}"/>
   </target>

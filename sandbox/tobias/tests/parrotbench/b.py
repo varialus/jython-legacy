@@ -9,7 +9,8 @@ import b6
 import sys
 from time import time
 
-WARMUP = 0
+WARMUP = 250
+#WARMUP = 0
 TIMES = 3
 NUMBER = 1
 ITERATIONS = 1
@@ -38,7 +39,7 @@ def main():
         print >>sys.stderr, "--> iteration", i
         for module in (b0, b2, b3, b4, b5, b6): # b1 ommitted
             mt = min(run(module, i))
-            print >>sys.stderr, "best of 3:", mt
+            print >>sys.stderr, "best of %s:" % TIMES, mt
     t = time() - t
     print >>sys.stderr, "--> All done.", t
 
