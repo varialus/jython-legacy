@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. anydbm — Generic access to DBM-style databases &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="The Python Standard Library and What Comes with Jython" href="indexprogress.html" />
+    <link rel="next" title="4. Data Compression and Archiving" href="archiving.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="archiving.html" title="4. Data Compression and Archiving"
+             accesskey="N">next</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" accesskey="U">The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="archiving.html"
+                                  title="next chapter">4. Data Compression and Archiving</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/anydbm.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="anydbm-generic-access-to-dbm-style-databases">
+<h1>3. <tt class="docutils literal"><span class="pre">anydbm</span></tt> &#8212; Generic access to DBM-style databases<a class="headerlink" href="#anydbm-generic-access-to-dbm-style-databases" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt>Note: The <tt class="docutils literal"><span class="pre">anydbm</span></tt> module has been renamed to <tt class="docutils literal"><span class="pre">dbm</span></tt> in Python 3.0.</dt>
+<dd>The <em>2to3</em> tool will automatically adapt imports when converting
+your sources to 3.0.</dd>
+</dl>
+<p><tt class="docutils literal"><span class="pre">anydbm</span></tt> is a generic interface to variants of the DBM database &#8212; Slow-but-simple implementation in
+module <tt class="docutils literal"><span class="pre">dumbdbm</span></tt> will be used.</p>
+<p>anydbm.open(filename[, flag[, mode]])</p>
+<blockquote>
+<p>Open the database file <em>filename</em> and return a corresponding
+object.</p>
+<p>If the database file already exists, the <tt class="docutils literal"><span class="pre">whichdb</span></tt> module is used
+to determine its type and the appropriate module is used; if it
+does not exist, the first module listed above that can be imported
+is used.</p>
+<p>The optional <em>flag</em> argument must be one of these values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Value</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">'r'</span></tt></td>
+<td>Open existing database for reading only
+(default)</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'w'</span></tt></td>
+<td>Open existing database for reading and
+writing</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'c'</span></tt></td>
+<td>Open database for reading and writing,
+creating it if it doesn&#8217;t exist</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'n'</span></tt></td>
+<td>Always create a new, empty database, open
+for reading and writing</td>
+</tr>
+</tbody>
+</table>
+<p>If not specified, the default value is <tt class="docutils literal"><span class="pre">'r'</span></tt>.</p>
+<p>The optional <em>mode</em> argument is the Unix mode of the file, used
+only when the database has to be created.  It defaults to octal
+<tt class="docutils literal"><span class="pre">0666</span></tt> (and will be modified by the prevailing umask).</p>
+</blockquote>
+<p>exception exception anydbm.error</p>
+<blockquote>
+A tuple containing the exceptions that can be raised by each of the
+supported modules, with a unique exception also named
+<tt class="docutils literal"><span class="pre">anydbm.error</span></tt> as the first item &#8212; the latter is used when
+<tt class="docutils literal"><span class="pre">anydbm.error</span></tt> is raised.</blockquote>
+<p>The object returned by <tt class="docutils literal"><span class="pre">open()</span></tt> supports most of the same
+functionality as dictionaries; keys and their corresponding values can
+be stored, retrieved, and deleted, and the <tt class="docutils literal"><span class="pre">has_key()</span></tt> and
+<tt class="docutils literal"><span class="pre">keys()</span></tt> methods are available.  Keys and values must always be
+strings.</p>
+<p>The following example records some hostnames and a corresponding
+title,  and then prints out the contents of the database:</p>
+<blockquote>
+<p>import anydbm</p>
+<p># Open database, creating it if necessary.
+db = anydbm.open(&#8216;cache&#8217;, &#8216;c&#8217;)</p>
+<p># Record some values
+db[&#8216;www.jython.org&#8217;] = &#8220;Jython Website&#8221;
+db[&#8216;www.python.org&#8217;] = &#8216;Python Website&#8217;</p>
+<p># Loop through contents.  Other dictionary methods
+# such as .keys(), .values() also work.
+for k, v in db.iteritems():</p>
+<blockquote>
+print k, &#8216;t&#8217;, v</blockquote>
+<p># Storing a non-string key or value will raise an exception (most
+# likely a TypeError).
+db[&#8216;wiki.python.org/jython&#8217;] = 4</p>
+<p># Close when done.
+db.close()</p>
+</blockquote>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Module <tt class="docutils literal"><span class="pre">dbhash</span></tt></dt>
+<dd>BSD <tt class="docutils literal"><span class="pre">db</span></tt> database interface.</dd>
+<dt>Module <tt class="docutils literal"><span class="pre">dbm</span></tt></dt>
+<dd>Standard Unix database interface.</dd>
+<dt>Module <tt class="docutils literal"><span class="pre">dumbdbm</span></tt></dt>
+<dd>Portable implementation of the <tt class="docutils literal"><span class="pre">dbm</span></tt> interface.</dd>
+<dt>Module <tt class="docutils literal"><span class="pre">gdbm</span></tt></dt>
+<dd>GNU database interface, based on the <tt class="docutils literal"><span class="pre">dbm</span></tt> interface.</dd>
+<dt>Module <tt class="docutils literal"><span class="pre">shelve</span></tt></dt>
+<dd>General object persistence built on top of  the Python <tt class="docutils literal"><span class="pre">dbm</span></tt>
+interface.</dd>
+<dt>Module <tt class="docutils literal"><span class="pre">whichdb</span></tt></dt>
+<dd>Utility module used to determine the type of an existing
+database.</dd>
+</dl>
+</blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="archiving.html" title="4. Data Compression and Archiving"
+             >next</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" >The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

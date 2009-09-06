@@ -1,0 +1,67 @@
+
+What's New in Jython 2.5
+************************
+
+Author:
+
+   Josh Juneau
+
+Date:  08/20/2009
+
+There are many new features in Jython 2.5, the intention of this article is to cover the new additions available with the 2.5 release.  The previous release of Jython was 2.2.1, and this release takes a significant step forward adding language constructs and features bringing Jython in-line with more current versions of the CPython implementation.
+
+Below is a quick reference for those new features that have been added to Jython with the 2.5 release.  In the coming weeks, new content will be added to this article that explains each of the new features in greater detail.
+
+New Features - Quick Look
+=========================
+
+* yield is always a keyword
+* int() will now return a long instead of raising OverflowError if a number is too large
+* list.insert() changed to be consistent with negative slice indexing
+* list.index() takes optional start, stop arguments.
+* Dictionaries gained a pop() method and .fromkeys() class method.
+* dict() constructor takes keyword arguments.
+* Many type objects are now callable.
+* PEP 279: enumerate() built-in added.
+* PEP 218: A Standard Set Datatype
+* PEP 273: Importing Modules from Zip Archives
+* PEP 278: Universal Newline Support
+* PEP 282: logging package
+* PEP 285: A Boolean Type
+* PEP 293: Codec Error Handling Callbacks
+* PEP 302: New Import Hooks
+* PEP 307: Pickle Enhancements
+* PEP 324: subprocess module
+* optparse module
+* ExposeAnnotations
+* Move antlr parser in /trunk/sandbox/ast to trunk
+* Hookup asm compiler to antlr, solidify and add 2.5 features
+* PEP 289: Generator expressions
+* PEP 263: Defining Python Source Code Encodings
+* PEP 318: Function/method decorators
+* PEP 308: Conditional expressions
+* PEP 343: 'with' statement
+* PEP 342: Coroutines via generators
+* PEP 341: Unified try/except/finally
+* PEP 352: Exceptions as new-style classes
+* UpgradeTo25CPythonLib
+* PEP 292: Simpler String Substitutions
+* PEP 327: decimal type
+* Ongoing parser fixes (universal newlines, line numbering, newline handling, interactive interpreter bugs)
+* PEP 237: Unifying int/long
+* PEP 357: Allowing Any Object to be Used for Slicing
+* PEP 309: Partial Function Application
+* PEP 305: csv module
+* PEP 338: Executing modules as scripts
+* unicodedata module
+* PEP 328: Multi-line and absolute/relative imports
+* elementtree module -> jython-elementtree
+* New Java integration (based on new style classes)
+* cjkcodecs
+* bz2 module
+* ReplaceJythonc (Not yet complete)
+
+Acknowledgements
+================
+
+

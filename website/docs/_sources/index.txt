@@ -1,0 +1,60 @@
+.. Jython 2.5.0 documentation master file, created by
+   sphinx-quickstart in August 2009.
+
+Jython 2.5.0 Documentation
+==========================
+
+Welcome! This is the documentation for Jython 2.5.0, last updated Aug 06, 2009.
+
+:Documentation Preparation: 
+    Josh Juneau
+
+:Version: 0.5 of 09/04/2009
+
+Parts of the Documentation
+==========================
+
+.. toctree::
+    :maxdepth: 1
+   
+    What's New in Jython 2.5 <whatsnew/index.txt>
+    
+    Tutorial <tutorial/indexprogress.txt>
+    *start here*
+
+    Using Jython <using/index.txt>
+    *how to use Python on different platforms*
+
+    Library Reference *In Progress*<library/indexprogress.txt>
+    *keep this under your pillow*
+
+    Language Reference *In Progress*<reference/indexprogress.txt>
+    *describes Python syntax and language elements*
+
+    Jython HOWTOs *In Progress*<howto/indexprogress.txt>
+    *specific in-depth topics*
+
+    Extending and Embedding *In Progress*<extending/indexprogress.txt>
+    *tutorial for Java programmers*
+
+    Documenting Jython <documenting/index.txt>
+    *guide for documentation authors*
+    
+   
+Indices and Tables
+==================
+
+.. toctree::
+
+   Global Module Index <modules/indexprogress.txt>
+   Glossary <glossaryprogress.txt>
+   Complete Table of Contents <contentsprogress.txt>
+
+
+
+Meta Information
+================
+
+.. toctree::
+
+   bugs.txt   

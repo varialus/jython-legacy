@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Examples &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Examples</a><ul>
+<li><a class="reference external" href="#pure-python-distribution-by-module">Pure Python distribution (by module)</a></li>
+<li><a class="reference external" href="#pure-python-distribution-by-package">Pure Python distribution (by package)</a></li>
+<li><a class="reference external" href="#single-extension-module">Single extension module</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/distutils/examples.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>This chapter provides a number of basic examples to help get started
+with distutils.  Additional information about using distutils can be
+found in the Distutils Cookbook.</p>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Distutils Cookbook</dt>
+<dd>Collection of recipes showing how to achieve more control over
+distutils.</dd>
+</dl>
+</blockquote>
+<div class="section" id="pure-python-distribution-by-module">
+<h2>Pure Python distribution (by module)<a class="headerlink" href="#pure-python-distribution-by-module" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re just distributing a couple of modules, especially if they
+don&#8217;t live in a particular package, you can specify them individually
+using the <em>py_modules</em> option in the setup script.</p>
+<p>In the simplest case, you&#8217;ll have two files to worry about: a setup
+script and the single module you&#8217;re distributing, <tt class="docutils literal"><span class="pre">foo.py</span></tt> in this
+example:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd>setup.py
+foo.py</dd>
+</dl>
+</blockquote>
+<p>(In all diagrams in this section, <em>&lt;root&gt;</em> will refer to the
+distribution root directory.)  A minimal setup script to describe this
+situation would be:</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foo&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+py_modules=[&#8216;foo&#8217;],
+)</blockquote>
+</blockquote>
+<p>Note that the name of the distribution is specified independently with
+the <em>name</em> option, and there&#8217;s no rule that says it has to be the same
+as the name of the sole module in the distribution (although that&#8217;s
+probably a good convention to follow).  However, the distribution name
+is used to generate filenames, so you should stick to letters, digits,
+underscores, and hyphens.</p>
+<p>Since <em>py_modules</em> is a list, you can of course specify multiple
+modules, eg. if you&#8217;re distributing modules <tt class="docutils literal"><span class="pre">foo</span></tt> and <tt class="docutils literal"><span class="pre">bar</span></tt>, your
+setup might look like this:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd>setup.py
+foo.py
+bar.py</dd>
+</dl>
+</blockquote>
+<p>and the setup script might be</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+py_modules=[&#8216;foo&#8217;, &#8216;bar&#8217;],
+)</blockquote>
+</blockquote>
+<p>You can put module source files into another directory, but if you
+have enough modules to do that, it&#8217;s probably easier to specify
+modules by package rather than listing them individually.</p>
+</div>
+<div class="section" id="pure-python-distribution-by-package">
+<h2>Pure Python distribution (by package)<a class="headerlink" href="#pure-python-distribution-by-package" title="Permalink to this headline">¶</a></h2>
+<p>If you have more than a couple of modules to distribute, especially if
+they are in multiple packages, it&#8217;s probably easier to specify whole
+packages rather than individual modules.  This works even if your
+modules are not in a package; you can just tell the Distutils to
+process modules from the root package, and that works the same as any
+other package (except that you don&#8217;t have to have an <tt class="docutils literal"><span class="pre">__init__.py</span></tt>
+file).</p>
+<p>The setup script from the last example could also be written as</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+packages=[&#8216;&#8217;],
+)</blockquote>
+</blockquote>
+<p>(The empty string stands for the root package.)</p>
+<p>If those two files are moved into a subdirectory, but remain in the
+root package, e.g.:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd><p class="first">setup.py
+src/      foo.py</p>
+<blockquote class="last">
+bar.py</blockquote>
+</dd>
+</dl>
+</blockquote>
+<p>then you would still specify the root package, but you have to tell
+the Distutils where source files in the root package live:</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+package_dir={&#8216;&#8217;: &#8216;src&#8217;},
+packages=[&#8216;&#8217;],
+)</blockquote>
+</blockquote>
+<p>More typically, though, you will want to distribute multiple modules
+in the same package (or in sub-packages).  For example, if the <tt class="docutils literal"><span class="pre">foo</span></tt>
+and <tt class="docutils literal"><span class="pre">bar</span></tt> modules belong in package <tt class="docutils literal"><span class="pre">foobar</span></tt>, one way to layout
+your source tree is</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd><p class="first">setup.py
+foobar/</p>
+<blockquote class="last">
+__init__.py
+foo.py
+bar.py</blockquote>
+</dd>
+</dl>
+</blockquote>
+<p>This is in fact the default layout expected by the Distutils, and the
+one that requires the least work to describe in your setup script:</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+packages=[&#8216;foobar&#8217;],
+)</blockquote>
+</blockquote>
+<p>If you want to put modules in directories not named for their package,
+then you need to use the <em>package_dir</em> option again.  For example, if
+the <tt class="docutils literal"><span class="pre">src</span></tt> directory holds modules in the <tt class="docutils literal"><span class="pre">foobar</span></tt> package:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd><p class="first">setup.py
+src/</p>
+<blockquote class="last">
+__init__.py
+foo.py
+bar.py</blockquote>
+</dd>
+</dl>
+</blockquote>
+<p>an appropriate setup script would be</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+package_dir={&#8216;foobar&#8217;: &#8216;src&#8217;},
+packages=[&#8216;foobar&#8217;],
+)</blockquote>
+</blockquote>
+<p>Or, you might put modules from your main package right in the
+distribution root:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd>setup.py
+__init__.py
+foo.py
+bar.py</dd>
+</dl>
+</blockquote>
+<p>in which case your setup script would be</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+package_dir={&#8216;foobar&#8217;: &#8216;&#8217;},
+packages=[&#8216;foobar&#8217;],
+)</blockquote>
+</blockquote>
+<p>(The empty string also stands for the current directory.)</p>
+<p>If you have sub-packages, they must be explicitly listed in
+<em>packages</em>, but any entries in <em>package_dir</em> automatically extend to
+sub-packages. (In other words, the Distutils does <em>not</em> scan your
+source tree, trying to figure out which directories correspond to
+Python packages by looking for <tt class="docutils literal"><span class="pre">__init__.py</span></tt> files.)  Thus, if the
+default layout grows a sub-package:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd><p class="first">setup.py
+foobar/</p>
+<blockquote class="last">
+<p>__init__.py
+foo.py
+bar.py
+subfoo/</p>
+<blockquote>
+__init__.py
+blah.py</blockquote>
+</blockquote>
+</dd>
+</dl>
+</blockquote>
+<p>then the corresponding setup script would be</p>
+<blockquote>
+<p>from distutils.core import setup
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+packages=[&#8216;foobar&#8217;, &#8216;foobar.subfoo&#8217;],
+)</blockquote>
+</blockquote>
+<p>(Again, the empty string in <em>package_dir</em> stands for the current
+directory.)</p>
+</div>
+<div class="section" id="single-extension-module">
+<h2>Single extension module<a class="headerlink" href="#single-extension-module" title="Permalink to this headline">¶</a></h2>
+<p>Extension modules are specified using the <em>ext_modules</em> option.
+<em>package_dir</em> has no effect on where extension source files are found;
+it only affects the source for pure Python modules.  The simplest
+case, a single extension module in a single C source file, is:</p>
+<blockquote>
+<dl class="docutils">
+<dt>&lt;root&gt;/</dt>
+<dd>setup.py
+foo.c</dd>
+</dl>
+</blockquote>
+<p>If the <tt class="docutils literal"><span class="pre">foo</span></tt> extension belongs in the root package, the setup script
+for this could be</p>
+<blockquote>
+<p>from distutils.core import setup
+from distutils.extension import Extension
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+ext_modules=[Extension(&#8216;foo&#8217;, [&#8216;foo.c&#8217;])],
+)</blockquote>
+</blockquote>
+<p>If the extension actually belongs in a package, say <tt class="docutils literal"><span class="pre">foopkg</span></tt>, then</p>
+<p>With exactly the same source tree layout, this extension can be put in
+the <tt class="docutils literal"><span class="pre">foopkg</span></tt> package simply by changing the name of the extension:</p>
+<blockquote>
+<p>from distutils.core import setup
+from distutils.extension import Extension
+setup(name=&#8217;foobar&#8217;,</p>
+<blockquote>
+version=&#8216;1.0&#8217;,
+ext_modules=[Extension(&#8216;foopkg.foo&#8217;, [&#8216;foo.c&#8217;])],
+)</blockquote>
+</blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

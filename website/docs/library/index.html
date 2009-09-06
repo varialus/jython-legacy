@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Python Standard Library and What Comes with Jython &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Jython Documentation contents" href="../contents.html" />
+    <link rel="next" title="1. Introduction" href="intro.html" />
+    <link rel="prev" title="9. Full Grammar specification" href="../reference/grammar.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="1. Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../reference/grammar.html" title="9. Full Grammar specification"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="../contents.html" accesskey="U">Jython Documentation contents</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="../reference/grammar.html"
+                                  title="previous chapter">9. Full Grammar specification</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="intro.html"
+                                  title="next chapter">1. Introduction</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-python-standard-library-and-what-comes-with-jython">
+<span id="library-index"></span><h1>The Python Standard Library and What Comes with Jython<a class="headerlink" href="#the-python-standard-library-and-what-comes-with-jython" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Release:</th><td class="field-body">2.5</td>
+</tr>
+<tr class="field"><th class="field-name">Date:</th><td class="field-body">August 27, 2009</td>
+</tr>
+</tbody>
+</table>
+<p>While <a class="reference external" href="../reference/index.html#reference-index"><em>The Python Language Reference</em></a> describes the exact syntax and
+semantics of the Python language, this library reference manual
+describes the standard library that is distributed with Jython. It also
+describes some of the optional components that are commonly included
+in Python distributions.</p>
+<p>Python&#8217;s standard library is very extensive, offering a wide range of
+facilities. The
+library contains built-in modules (written in C) that provide access to
+system functionality such as file I/O that would otherwise be
+inaccessible to Python programmers, as well as modules written in Python
+that provide standardized solutions for many problems that occur in
+everyday programming. Some of these modules are explicitly designed to
+encourage and enhance the portability of Python programs by abstracting
+away platform-specifics into platform-neutral APIs.</p>
+<p>Unlike the CPython distribution, Jython does not include built-in
+libraries written in C as they will not work on the Java platform.  Instead,
+there are certain libraries that have been re-written in the Java languages
+to be included with Jython.  Likewise, <em>most</em> of the modules written
+in Python are included with the Jython distribution as any Python that
+does not use C extensions <em>should</em> work on Jython.</p>
+<p>In addition to the standard library, there is a growing collection of
+several thousand components (from individual programs and modules to
+packages and entire application development frameworks), available from
+the <a class="reference external" href="http://pypi.python.org/pypi">Python Package Index</a>.  Many of these can
+be used with Jython as well.</p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="intro.html">1. Introduction</a></li>
+<li class="toctree-l1"><a class="reference external" href="functions.html">2. Built-in Functions</a></li>
+<li class="toctree-l1"><a class="reference external" href="functions.html#non-essential-built-in-functions">3. Non-essential Built-in Functions</a></li>
+<li class="toctree-l1"><a class="reference external" href="objects.html">4. Built-in Objects</a></li>
+<li class="toctree-l1"><a class="reference external" href="stdtypes.html">5. Built-in Types</a><ul>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#truth-value-testing">5.1. Truth Value Testing</a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#boolean-operations-and-or-not">5.2. Boolean Operations &#8212; <tt class="docutils literal"><span class="pre">and</span></tt>, <tt class="docutils literal"><span class="pre">or</span></tt>, <tt class="docutils literal"><span class="pre">not</span></tt></a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#comparisons">5.3. Comparisons</a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#numeric-types-int-float-long-complex">5.4. Numeric Types &#8212; <tt class="docutils literal"><span class="pre">int</span></tt>, <tt class="docutils literal"><span class="pre">float</span></tt>, <tt class="docutils literal"><span class="pre">long</span></tt>, <tt class="docutils literal"><span class="pre">complex</span></tt></a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#iterator-types">5.5. Iterator Types</a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#sequence-types-str-unicode-list-tuple-buffer-xrange">5.6. Sequence Types &#8212; <tt class="docutils literal"><span class="pre">str</span></tt>, <tt class="docutils literal"><span class="pre">unicode</span></tt>, <tt class="docutils literal"><span class="pre">list</span></tt>, <tt class="docutils literal"><span class="pre">tuple</span></tt>, <tt class="docutils literal"><span class="pre">buffer</span></tt>, <tt class="docutils literal"><span class="pre">xrange</span></tt></a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#set-types-set-frozenset">5.7. Set Types &#8212; <tt class="docutils literal"><span class="pre">set</span></tt>, <tt class="docutils literal"><span class="pre">frozenset</span></tt></a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#mapping-types-dict">5.8. Mapping Types &#8212; <tt class="docutils literal"><span class="pre">dict</span></tt></a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#file-objects">5.9. File Objects</a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#context-manager-types">5.10. Context Manager Types</a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#other-built-in-types">5.11. Other Built-in Types</a></li>
+<li class="toctree-l2"><a class="reference external" href="stdtypes.html#special-attributes">5.12. Special Attributes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="exceptions.html">6. Built-in Exceptions</a><ul>
+<li class="toctree-l2"><a class="reference external" href="exceptions.html#exception-hierarchy">6.1. Exception hierarchy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="strings.html">7. String Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="datatypes.html">8. Data Types</a><ul>
+<li class="toctree-l2"><a class="reference external" href="datetime.html">8.1. <tt class="docutils literal"><span class="pre">datetime</span></tt> &#8212; Basic date and time types</a></li>
+<li class="toctree-l2"><a class="reference external" href="calendar.html">8.2. <tt class="docutils literal"><span class="pre">calendar</span></tt> &#8212; General calendar-related functions</a></li>
+<li class="toctree-l2"><a class="reference external" href="collections.html">8.3. <tt class="docutils literal"><span class="pre">collections</span></tt> &#8212; High-performance container datatypes</a></li>
+<li class="toctree-l2"><a class="reference external" href="heapq.html">8.4. <tt class="docutils literal"><span class="pre">heapq</span></tt> &#8212; Heap queue algorithm</a></li>
+<li class="toctree-l2"><a class="reference external" href="bisect.html">8.5. <tt class="docutils literal"><span class="pre">bisect</span></tt> &#8212; Array bisection algorithm</a></li>
+<li class="toctree-l2"><a class="reference external" href="array.html">8.6. <tt class="docutils literal"><span class="pre">array</span></tt> &#8212; Efficient arrays of numeric values</a></li>
+<li class="toctree-l2"><a class="reference external" href="sets.html">8.7. <tt class="docutils literal"><span class="pre">sets</span></tt> &#8212; Unordered collections of unique elements</a></li>
+<li class="toctree-l2"><a class="reference external" href="sched.html">8.8. <tt class="docutils literal"><span class="pre">sched</span></tt> &#8212; Event scheduler</a></li>
+<li class="toctree-l2"><a class="reference external" href="mutex.html">8.9. <tt class="docutils literal"><span class="pre">mutex</span></tt> &#8212; Mutual exclusion support</a></li>
+<li class="toctree-l2"><a class="reference external" href="queue.html">8.10. <tt class="docutils literal"><span class="pre">queue</span></tt> &#8212; A synchronized queue class</a></li>
+<li class="toctree-l2"><a class="reference external" href="weakref.html">8.11. <tt class="docutils literal"><span class="pre">weakref</span></tt> &#8212; Weak references</a></li>
+<li class="toctree-l2"><a class="reference external" href="userdict.html">8.12. <tt class="docutils literal"><span class="pre">UserDict</span></tt> &#8212; Class wrapper for dictionary objects</a></li>
+<li class="toctree-l2"><a class="reference external" href="userdict.html#userlist-class-wrapper-for-list-objects">8.13. <tt class="docutils literal"><span class="pre">UserList</span></tt> &#8212; Class wrapper for list objects</a></li>
+<li class="toctree-l2"><a class="reference external" href="userdict.html#userstring-class-wrapper-for-string-objects">8.14. <tt class="docutils literal"><span class="pre">UserString</span></tt> &#8212; Class wrapper for string objects</a></li>
+<li class="toctree-l2"><a class="reference external" href="types.html">8.15. <tt class="docutils literal"><span class="pre">types</span></tt> &#8212; Names for built-in types</a></li>
+<li class="toctree-l2"><a class="reference external" href="new.html">8.16. <tt class="docutils literal"><span class="pre">new</span></tt> &#8212; Creation of runtime internal objects</a></li>
+<li class="toctree-l2"><a class="reference external" href="copy.html">8.17. <tt class="docutils literal"><span class="pre">copy</span></tt> &#8212; Shallow and deep copy operations</a></li>
+<li class="toctree-l2"><a class="reference external" href="pprint.html">8.18. <tt class="docutils literal"><span class="pre">pprint</span></tt> &#8212; Data pretty printer</a></li>
+<li class="toctree-l2"><a class="reference external" href="repr.html">8.19. <tt class="docutils literal"><span class="pre">repr</span></tt> &#8212; Alternate <tt class="docutils literal"><span class="pre">repr()</span></tt> implementation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="numeric.html">9. Numeric and Mathematical Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="filesys.html">10. File and Directory Access</a></li>
+<li class="toctree-l1"><a class="reference external" href="persistence.html">11. Data Persistence</a></li>
+<li class="toctree-l1"><a class="reference external" href="archiving.html">12. Data Compression and Archiving</a><ul>
+<li class="toctree-l2"><a class="reference external" href="zlib.html">12.1. <tt class="docutils literal"><span class="pre">zlib</span></tt> &#8212; Compression compatible with <strong>gzip</strong></a></li>
+<li class="toctree-l2"><a class="reference external" href="gzip.html">12.2. <tt class="docutils literal"><span class="pre">gzip</span></tt> &#8212; Support for <strong>gzip</strong> files</a></li>
+<li class="toctree-l2"><a class="reference external" href="zipfile.html">12.3. <tt class="docutils literal"><span class="pre">zipfile</span></tt> &#8212; Work with ZIP archives</a></li>
+<li class="toctree-l2"><a class="reference external" href="tarfile.html">12.4. <tt class="docutils literal"><span class="pre">tarfile</span></tt> &#8212; Read and write tar archive files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="fileformats.html">13. File Formats</a></li>
+<li class="toctree-l1"><a class="reference external" href="allos.html">14. Generic Operating System Services</a><ul>
+<li class="toctree-l2"><a class="reference external" href="os.html">14.1. <tt class="docutils literal"><span class="pre">os</span></tt> &#8212; Miscellaneous operating system interfaces</a></li>
+<li class="toctree-l2"><a class="reference external" href="time.html">14.2. <tt class="docutils literal"><span class="pre">time</span></tt> &#8212; Time access and conversions</a></li>
+<li class="toctree-l2"><a class="reference external" href="optparse.html">14.3. <tt class="docutils literal"><span class="pre">optparse</span></tt> &#8212; More powerful command line option parser</a></li>
+<li class="toctree-l2"><a class="reference external" href="getopt.html">14.4. <tt class="docutils literal"><span class="pre">getopt</span></tt> &#8212; Parser for command line options</a></li>
+<li class="toctree-l2"><a class="reference external" href="logging.html">14.5. <tt class="docutils literal"><span class="pre">logging</span></tt> &#8212; Logging facility for Python</a></li>
+<li class="toctree-l2"><a class="reference external" href="getpass.html">14.6. <tt class="docutils literal"><span class="pre">getpass</span></tt> &#8212; Portable password input</a></li>
+<li class="toctree-l2"><a class="reference external" href="platform.html">14.7. <tt class="docutils literal"><span class="pre">platform</span></tt> &#8212;  Access to underlying platform&#8217;s identifying data.</a></li>
+<li class="toctree-l2"><a class="reference external" href="errno.html">14.8. <tt class="docutils literal"><span class="pre">errno</span></tt> &#8212; Standard errno system symbols</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="someos.html">15. Optional Operating System Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="ipc.html">16. Interprocess Communication and Networking</a></li>
+<li class="toctree-l1"><a class="reference external" href="netdata.html">17. Internet Data Handling</a></li>
+<li class="toctree-l1"><a class="reference external" href="markup.html">18. Structured Markup Processing Tools</a></li>
+<li class="toctree-l1"><a class="reference external" href="internet.html">19. Internet Protocols and Support</a></li>
+<li class="toctree-l1"><a class="reference external" href="mm.html">20. Multimedia Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="i18n.html">21. Internationalization</a></li>
+<li class="toctree-l1"><a class="reference external" href="frameworks.html">22. Program Frameworks</a></li>
+<li class="toctree-l1"><a class="reference external" href="tk.html">23. Graphical User Interfaces with Tk</a></li>
+<li class="toctree-l1"><a class="reference external" href="development.html">24. Development Tools</a><ul>
+<li class="toctree-l2"><a class="reference external" href="pydoc.html">24.1. <tt class="docutils literal"><span class="pre">pydoc</span></tt> &#8212; Documentation generator and online help system</a></li>
+<li class="toctree-l2"><a class="reference external" href="doctest.html">24.2. <tt class="docutils literal"><span class="pre">doctest</span></tt> &#8212; Test interactive Python examples</a></li>
+<li class="toctree-l2"><a class="reference external" href="test.html">24.3. <tt class="docutils literal"><span class="pre">test</span></tt> &#8212; Regression tests package for Python</a></li>
+<li class="toctree-l2"><a class="reference external" href="test.html#test-test-support-utility-functions-for-tests">24.4. <tt class="docutils literal"><span class="pre">test.test_support</span></tt> &#8212; Utility functions for tests</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="debug.html">25. Debugging and Profiling</a><ul>
+<li class="toctree-l2"><a class="reference external" href="bdb.html">25.1. <tt class="docutils literal"><span class="pre">bdb</span></tt> &#8212; Debugger framework</a></li>
+<li class="toctree-l2"><a class="reference external" href="pdb.html">25.2. <tt class="docutils literal"><span class="pre">pdb</span></tt> &#8212; The Python Debugger</a></li>
+<li class="toctree-l2"><a class="reference external" href="pdb.html#debugger-commands">25.3. Debugger Commands</a></li>
+<li class="toctree-l2"><a class="reference external" href="profile.html">25.4. The Python Profilers</a></li>
+<li class="toctree-l2"><a class="reference external" href="hotshot.html">25.5. <tt class="docutils literal"><span class="pre">hotshot</span></tt> &#8212; High performance logging profiler</a></li>
+<li class="toctree-l2"><a class="reference external" href="timeit.html">25.6. <tt class="docutils literal"><span class="pre">timeit</span></tt> &#8212; Measure execution time of small code snippets</a></li>
+<li class="toctree-l2"><a class="reference external" href="trace.html">25.7. <tt class="docutils literal"><span class="pre">trace</span></tt> &#8212; Trace or track Python statement execution</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="python.html">26. Python Runtime Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="restricted.html">27. Restricted Execution</a></li>
+<li class="toctree-l1"><a class="reference external" href="modules.html">28. Importing Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="language.html">29. Python Language Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="compiler.html">30. Python compiler package</a><ul>
+<li class="toctree-l2"><a class="reference external" href="compiler.html#the-basic-interface">30.1. The basic interface</a></li>
+<li class="toctree-l2"><a class="reference external" href="compiler.html#limitations">30.2. Limitations</a></li>
+<li class="toctree-l2"><a class="reference external" href="compiler.html#python-abstract-syntax">30.3. Python Abstract Syntax</a></li>
+<li class="toctree-l2"><a class="reference external" href="compiler.html#using-visitors-to-walk-asts">30.4. Using Visitors to Walk ASTs</a></li>
+<li class="toctree-l2"><a class="reference external" href="compiler.html#bytecode-generation">30.5. Bytecode Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="misc.html">31. Miscellaneous Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="windows.html">32. MS Windows Specific Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="unix.html">33. Unix Specific Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="mac.html">34. Mac OS X specific services</a></li>
+<li class="toctree-l1"><a class="reference external" href="macosa.html">35. MacPython OSA Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="sgi.html">36. SGI IRIX Specific Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="sun.html">37. SunOS Specific Services</a></li>
+<li class="toctree-l1"><a class="reference external" href="undoc.html">38. Undocumented Modules</a><ul>
+<li class="toctree-l2"><a class="reference external" href="undoc.html#miscellaneous-useful-utilities">38.1. Miscellaneous useful utilities</a></li>
+<li class="toctree-l2"><a class="reference external" href="undoc.html#platform-specific-modules">38.2. Platform specific modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="undoc.html#multimedia">38.3. Multimedia</a></li>
+<li class="toctree-l2"><a class="reference external" href="undoc.html#undocumented-mac-os-modules">38.4. Undocumented Mac OS modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="undoc.html#obsolete">38.5. Obsolete</a></li>
+<li class="toctree-l2"><a class="reference external" href="undoc.html#sgi-specific-extension-modules">38.6. SGI-specific Extension modules</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="1. Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../reference/grammar.html" title="9. Full Grammar specification"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="../contents.html" >Jython Documentation contents</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

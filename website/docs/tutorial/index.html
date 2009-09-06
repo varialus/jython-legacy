@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Jython Tutorial &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/tutorial/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-jython-tutorial">
+<span id="tutorial-index"></span><h1>The Jython Tutorial<a class="headerlink" href="#the-jython-tutorial" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Release:</th><td class="field-body">2.5</td>
+</tr>
+<tr class="field"><th class="field-name">Date:</th><td class="field-body">August 25, 2009</td>
+</tr>
+</tbody>
+</table>
+<p>Python is an easy to learn, powerful programming language. It has efficient
+high-level data structures and a simple but effective approach to
+object-oriented programming. Python&#8217;s elegant syntax and dynamic typing,
+together with its interpreted nature, make it an ideal language for scripting
+and rapid application development in many areas on most platforms.</p>
+<p>The Python interpreter and the extensive standard library are freely available
+in source or binary form for all major platforms from the Python Web site,
+<a class="reference external" href="http://www.python.org/">http://www.python.org/</a>, and may be freely distributed. The same site also
+contains distributions of and pointers to many free third party Python modules,
+programs and tools, and additional documentation.</p>
+<p>The Python interpreter is easily extended with new functions and data types
+implemented in C or C++ (or other languages callable from C). Python is also
+suitable as an extension language for customizable applications.</p>
+<p>Jython is an implementation of Python for the JVM.  Jython takes the Python programming language syntax and enables it to run on the Java platform.  This allows seamless integration with the use of Java libraries and other Java-based applications.  The Jython project strives to make all Python modules run on the JVM, but there are a few differences between the implementations.  Perhaps the major difference between the two implementations is that Jython does not work with C extensions.  Therefore, most of the Python modules will run without changes under Jython, but if they use C extensions then they will probably not work.  Likewise, Jython code works with Java but CPython does not.  Jython code should run seamlessly under CPython unless it contains Java integration.</p>
+<p>This tutorial references the <a class="reference external" href="http://wiki.python.org/jython/DocumentationAndEducation">Jython wiki</a> at this time.  The most up-to-date references and examples reside on the <a class="reference external" href="http://wiki.python.org/jython/DocumentationAndEducation">wiki</a> at this time.  Over time, the <a class="reference external" href="http://docs.python.org/tutorial/">Python tutorial</a> will be reconstructed to show Jython examples.  However, at this time the <a class="reference external" href="http://wiki.python.org/jython/DocumentationAndEducation">wiki</a> and the open source <a class="reference external" href="http://jythonpodcast.hostjava.net/jythonbook/index.html">Jython book</a> are the most current references for 2.5 and previous releases.</p>
+<p>The <em class="xref">glossary</em> is also worth going through.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

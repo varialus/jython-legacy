@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>What’s New in Jython &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="next" title="What’s New in Jython 2.5" href="2.5.html" />
+    <link rel="prev" title="Jython 2.5.0 Documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="2.5.html" title="What’s New in Jython 2.5"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Jython 2.5.0 Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="../index.html"
+                                  title="previous chapter">Jython 2.5.0 Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="2.5.html"
+                                  title="next chapter">What&#8217;s New in Jython 2.5</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/whatsnew/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="what-s-new-in-jython">
+<span id="whatsnew-index"></span><h1>What&#8217;s New in Jython<a class="headerlink" href="#what-s-new-in-jython" title="Permalink to this headline">¶</a></h1>
+<p>The &#8220;What&#8217;s New in Python&#8221; series of essays takes tours through the most
+important changes between major Jython versions.  They are a &#8220;must read&#8221; for
+anyone wishing to stay up-to-date after a new release.</p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="2.5.html">What&#8217;s New in Jython 2.5</a><ul>
+<li class="toctree-l2"><a class="reference external" href="2.5.html#new-features-quick-look">New Features - Quick Look</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.5.html#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="2.2.html">Reference Material for Python 2.2</a><ul>
+<li class="toctree-l2"><a class="reference external" href="2.2.html#what-s-new-in-python-2-2">What&#8217;s New in Python 2.2</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="2.1.html">Reference Material for Python 2.1</a></li>
+<li class="toctree-l1"><a class="reference external" href="2.1.html#what-s-new-in-python-2-1">What&#8217;s New in Python 2.1</a><ul>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-227-nested-scopes">PEP 227: Nested Scopes</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-236-future-directives">PEP 236: __future__ Directives</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-207-rich-comparisons">PEP 207: Rich Comparisons</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-230-warning-framework">PEP 230: Warning Framework</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-229-new-build-system">PEP 229: New Build System</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-205-weak-references">PEP 205: Weak References</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-232-function-attributes">PEP 232: Function Attributes</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-235-importing-modules-on-case-insensitive-platforms">PEP 235: Importing Modules on Case-Insensitive Platforms</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-217-interactive-display-hook">PEP 217: Interactive Display Hook</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-208-new-coercion-model">PEP 208: New Coercion Model</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#pep-241-metadata-in-python-packages">PEP 241: Metadata in Python Packages</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#new-and-improved-modules">New and Improved Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#other-changes-and-fixes">Other Changes and Fixes</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.1.html#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="2.0.html">Reference Material for Python 2.0</a></li>
+<li class="toctree-l1"><a class="reference external" href="2.0.html#what-s-new-in-python-2-0">What&#8217;s New in Python 2.0</a><ul>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#what-about-python-1-6">What About Python 1.6?</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#new-development-process">New Development Process</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#unicode">Unicode</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#list-comprehensions">List Comprehensions</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#augmented-assignment">Augmented Assignment</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#string-methods">String Methods</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#garbage-collection-of-cycles">Garbage Collection of Cycles</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#other-core-changes">Other Core Changes</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#porting-to-2-0">Porting to 2.0</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#extending-embedding-changes">Extending/Embedding Changes</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#distutils-making-modules-easy-to-install">Distutils: Making Modules Easy to Install</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#xml-modules">XML Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#module-changes">Module changes</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#new-modules">New modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#idle-improvements">IDLE Improvements</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#deleted-and-deprecated-modules">Deleted and Deprecated Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="2.0.html#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="2.5.html" title="What’s New in Jython 2.5"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Jython 2.5.0 Documentation"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

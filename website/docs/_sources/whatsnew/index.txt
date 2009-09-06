@@ -1,0 +1,17 @@
+.. _whatsnew-index:
+
+######################
+ What's New in Jython
+######################
+
+The "What's New in Python" series of essays takes tours through the most
+important changes between major Jython versions.  They are a "must read" for
+anyone wishing to stay up-to-date after a new release.
+
+.. toctree::
+   :maxdepth: 2
+
+   2.5.txt
+   2.2.txt
+   2.1.txt
+   2.0.txt

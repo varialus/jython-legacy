@@ -1,4 +1,8 @@
 Current
 -------
 
-In Progress...stay tuned
+The Jython 2.5.0 documentation set is currently in progress.  Check back often for updates.
+
+`Jython 2.5.0 Documentation`_
+
+.. _Jython 2.5.0 Documentation: ./docs/index.html

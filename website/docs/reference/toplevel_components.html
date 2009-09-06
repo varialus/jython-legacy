@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8. Top-level components &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">8. Top-level components</a><ul>
+<li><a class="reference external" href="#complete-python-programs">8.1. Complete Python programs</a></li>
+<li><a class="reference external" href="#file-input">8.2. File input</a></li>
+<li><a class="reference external" href="#interactive-input">8.3. Interactive input</a></li>
+<li><a class="reference external" href="#expression-input">8.4. Expression input</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/toplevel_components.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="top-level-components">
+<h1>8. Top-level components<a class="headerlink" href="#top-level-components" title="Permalink to this headline">¶</a></h1>
+<p>The Python interpreter can get its input from a number of sources:
+from a script passed to it as standard input or as program argument,
+typed in interactively, from a module source file, etc.  This chapter
+gives the syntax used in these cases.</p>
+<div class="section" id="complete-python-programs">
+<h2>8.1. Complete Python programs<a class="headerlink" href="#complete-python-programs" title="Permalink to this headline">¶</a></h2>
+<p>While a language specification need not prescribe how the language
+interpreter is invoked, it is useful to have a notion of a complete
+Python program.  A complete Python program is executed in a minimally
+initialized environment: all built-in and standard modules are
+available, but none have been initialized, except for <tt class="docutils literal"><span class="pre">sys</span></tt> (various
+system services), <tt class="docutils literal"><span class="pre">__builtin__</span></tt> (built-in functions, exceptions and
+<tt class="xref docutils literal"><span class="pre">None</span></tt>) and <tt class="docutils literal"><span class="pre">__main__</span></tt>.  The latter is used to provide the local
+and global namespace for execution of the complete program.</p>
+<p>The syntax for a complete Python program is that for file input,
+described in the next section.</p>
+<p>The interpreter may also be invoked in interactive mode; in this case,
+it does not read and execute a complete program but reads and executes
+one statement (possibly compound) at a time.  The initial environment
+is identical to that of a complete program; each statement is executed
+in the namespace of <tt class="docutils literal"><span class="pre">__main__</span></tt>.</p>
+<p>Under Unix, a complete program can be passed to the interpreter in
+three forms: with the <em>-c</em> <em>string</em> command line option, as a file
+passed as the first command line argument, or as standard input. If
+the file or standard input is a tty device, the interpreter enters
+interactive mode; otherwise, it executes the file as a complete
+program.</p>
+</div>
+<div class="section" id="file-input">
+<h2>8.2. File input<a class="headerlink" href="#file-input" title="Permalink to this headline">¶</a></h2>
+<p>All input read from non-interactive files has the same form:</p>
+<blockquote>
+file_input ::= (NEWLINE | statement)*</blockquote>
+<p>This syntax is used in the following situations:</p>
+<ul class="simple">
+<li>when parsing a complete Python program (from a file or from a
+string);</li>
+<li>when parsing a module;</li>
+<li>when parsing a string passed to the <tt class="docutils literal"><span class="pre">exec</span></tt> statement;</li>
+</ul>
+</div>
+<div class="section" id="interactive-input">
+<h2>8.3. Interactive input<a class="headerlink" href="#interactive-input" title="Permalink to this headline">¶</a></h2>
+<p>Input in interactive mode is parsed using the following grammar:</p>
+<blockquote>
+interactive_input ::= [stmt_list] NEWLINE | compound_stmt NEWLINE</blockquote>
+<p>Note that a (top-level) compound statement must be followed by a blank
+line in interactive mode; this is needed to help the parser detect the
+end of the input.</p>
+</div>
+<div class="section" id="expression-input">
+<h2>8.4. Expression input<a class="headerlink" href="#expression-input" title="Permalink to this headline">¶</a></h2>
+<p>There are two forms of expression input.  Both ignore leading
+whitespace. The string argument to <tt class="docutils literal"><span class="pre">eval()</span></tt> must have the following
+form:</p>
+<blockquote>
+eval_input ::= expression_list NEWLINE*</blockquote>
+<p>The input line read by <tt class="docutils literal"><span class="pre">input()</span></tt> must have the following form:</p>
+<blockquote>
+input_input ::= expression_list NEWLINE</blockquote>
+<p>Note: to read &#8216;raw&#8217; input line without interpretation, you can use the
+built-in function <tt class="docutils literal"><span class="pre">raw_input()</span></tt> or the <tt class="docutils literal"><span class="pre">readline()</span></tt> method of file
+objects.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

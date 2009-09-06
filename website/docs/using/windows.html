@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. Using Python on Windows &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Using Jython" href="index.html" />
+    <link rel="next" title="4. Using Python on a Macintosh" href="mac.html" />
+    <link rel="prev" title="2. Using Python on Unix platforms" href="unix.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="mac.html" title="4. Using Python on a Macintosh"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="unix.html" title="2. Using Python on Unix platforms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="../contents.html" >Jython Documentation contents</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Using Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">3. Using Python on Windows</a><ul>
+<li><a class="reference external" href="#installing-python">3.1. Installing Python</a></li>
+<li><a class="reference external" href="#alternative-bundles">3.2. Alternative bundles</a></li>
+<li><a class="reference external" href="#configuring-python">3.3. Configuring Python</a><ul>
+<li><a class="reference external" href="#excursus-setting-environment-variables">3.3.1. Excursus: Setting environment variables</a></li>
+<li><a class="reference external" href="#finding-the-python-executable">3.3.2. Finding the Python executable</a></li>
+<li><a class="reference external" href="#finding-modules">3.3.3. Finding modules</a></li>
+<li><a class="reference external" href="#executing-scripts">3.3.4. Executing scripts</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#additional-modules">3.4. Additional modules</a><ul>
+<li><a class="reference external" href="#pywin32">3.4.1. PyWin32</a></li>
+<li><a class="reference external" href="#py2exe">3.4.2. Py2exe</a></li>
+<li><a class="reference external" href="#wconio">3.4.3. WConio</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#compiling-python-on-windows">3.5. Compiling Python on Windows</a></li>
+<li><a class="reference external" href="#other-resources">3.6. Other resources</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="unix.html"
+                                  title="previous chapter">2. Using Python on Unix platforms</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="mac.html"
+                                  title="next chapter">4. Using Python on a Macintosh</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/using/windows.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-python-on-windows">
+<h1>3. Using Python on Windows<a class="headerlink" href="#using-python-on-windows" title="Permalink to this headline">¶</a></h1>
+<p>This document aims to give an overview of Windows-specific behaviour
+you should know about when using Python on Microsoft Windows.</p>
+<div class="section" id="installing-python">
+<h2>3.1. Installing Python<a class="headerlink" href="#installing-python" title="Permalink to this headline">¶</a></h2>
+<p>Unlike most Unix systems and services, Windows does not require Python
+natively and thus does not pre-install a version of Python.  However,
+the CPython team has compiled Windows installers (MSI packages) with
+every release for many years.</p>
+<p>With ongoing development of Python, some platforms that used to be
+supported earlier are no longer supported (due to the lack of users or
+developers). Check <strong>PEP 11</strong> for details on all unsupported
+platforms.</p>
+<ul class="simple">
+<li>DOS and Windows 3.x are deprecated since Python 2.0 and code
+specific to these systems was removed in Python 2.1.</li>
+<li>Up to 2.5, Python was still compatible with Windows 95, 98 and ME
+(but already raised a deprecation warning on installation).  For
+Python 2.6 (and all following releases), this support was dropped
+and new releases are just expected to work on the Windows NT family.</li>
+<li>Windows CE is still supported.</li>
+<li>The Cygwin installer offers to install the Python interpreter as
+well; it is located under &#8220;Interpreters.&#8221; (cf. Cygwin package
+source, Maintainer releases)</li>
+</ul>
+<p>See Python for Windows (and DOS) for detailed information about
+platforms with precompiled installers.</p>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Python on XP</dt>
+<dd>&#8220;7 Minutes to &#8220;Hello World!&#8221;&#8221; by Richard Dooling, 2006</dd>
+<dt>Installing on Windows</dt>
+<dd>in &#8220;Dive into Python: Python from novice to pro&#8221; by Mark
+Pilgrim, 2004, ISBN 1-59059-356-1</dd>
+<dt>For Windows users</dt>
+<dd>in &#8220;Installing Python&#8221; in &#8220;A Byte of Python&#8221; by Swaroop C H,
+2003</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="alternative-bundles">
+<h2>3.2. Alternative bundles<a class="headerlink" href="#alternative-bundles" title="Permalink to this headline">¶</a></h2>
+<p>Besides the standard CPython distribution, there are modified packages
+including additional functionality.  The following is a list of
+popular versions and their key features:</p>
+<dl class="docutils">
+<dt>ActivePython</dt>
+<dd>Installer with multi-platform compatibility, documentation, PyWin32</dd>
+<dt>Python Enthought Edition</dt>
+<dd>Popular modules (such as PyWin32) with their respective
+documentation, tool suite for building extensible python
+applications</dd>
+</dl>
+<p>Notice that these packages are likely to install <em>older</em> versions of
+Python.</p>
+</div>
+<div class="section" id="configuring-python">
+<h2>3.3. Configuring Python<a class="headerlink" href="#configuring-python" title="Permalink to this headline">¶</a></h2>
+<p>In order to run Python flawlessly, you might have to change certain
+environment settings in Windows.</p>
+<div class="section" id="excursus-setting-environment-variables">
+<h3>3.3.1. Excursus: Setting environment variables<a class="headerlink" href="#excursus-setting-environment-variables" title="Permalink to this headline">¶</a></h3>
+<p>Windows has a built-in dialog for changing environment variables
+(following guide applies to XP classical view): Right-click the icon
+for your machine (usually located on your Desktop and called &#8220;My
+Computer&#8221;) and choose <em>Properties</em> there.  Then, open the <strong>Advanced</strong>
+tab and click the <strong>Environment Variables</strong> button.</p>
+<p>In short, your path is:</p>
+<blockquote>
+<em>My Computer ‣ Properties ‣ Advanced ‣ Environment Variables</em></blockquote>
+<p>In this dialog, you can add or modify User and System variables. To
+change System variables, you need non-restricted access to your
+machine (i.e. Administrator rights).</p>
+<p>Another way of adding variables to your environment is using the
+<strong>set</strong> command:</p>
+<blockquote>
+set PYTHONPATH=%PYTHONPATH%;C:My_python_lib</blockquote>
+<p>To make this setting permanent, you could add the corresponding
+command line to your <tt class="docutils literal"><span class="pre">autoexec.bat</span></tt>. <strong>msconfig</strong> is a graphical
+interface to this file.</p>
+<p>Viewing environment variables can also be done more straight-forward:
+The command prompt will expand strings wrapped into percent signs
+automatically:</p>
+<blockquote>
+echo %PATH%</blockquote>
+<p>Consult <strong>set /?</strong> for details on this behaviour.</p>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt><a class="reference external" href="http://support.microsoft.com/kb/100843">http://support.microsoft.com/kb/100843</a></dt>
+<dd>Environment variables in Windows NT</dd>
+<dt><a class="reference external" href="http://support.microsoft.com/kb/310519">http://support.microsoft.com/kb/310519</a></dt>
+<dd>How To Manage Environment Variables in Windows XP</dd>
+<dt><a class="reference external" href="http://www.chem.gla.ac.uk/~louis/software/faq/q1.html">http://www.chem.gla.ac.uk/~louis/software/faq/q1.html</a></dt>
+<dd>Setting Environment variables, Louis J. Farrugia</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="finding-the-python-executable">
+<h3>3.3.2. Finding the Python executable<a class="headerlink" href="#finding-the-python-executable" title="Permalink to this headline">¶</a></h3>
+<p>Besides using the automatically created start menu entry for the
+Python interpreter, you might want to start Python in the DOS prompt.
+To make this work, you need to set your <strong>%PATH%</strong> environment
+variable to include the directory of your Python distribution,
+delimited by a semicolon from other entries.  An example variable
+could look like this (assuming the first two entries are Windows&#8217;
+default):</p>
+<blockquote>
+C:WINDOWSsystem32;C:WINDOWS;C:Python25</blockquote>
+<p>Typing <strong>python</strong> on your command prompt will now fire up the Python
+interpreter.  Thus, you can also execute your scripts with command
+line options, see <em>Command line</em> documentation.</p>
+</div>
+<div class="section" id="finding-modules">
+<h3>3.3.3. Finding modules<a class="headerlink" href="#finding-modules" title="Permalink to this headline">¶</a></h3>
+<p>Python usually stores its library (and thereby your site-packages
+folder) in the installation directory.  So, if you had installed
+Python to <tt class="docutils literal"><span class="pre">C:\Python\</span></tt>, the default library would reside in
+<tt class="docutils literal"><span class="pre">C:\Python\Lib\</span></tt> and third-party modules should be stored in
+<tt class="docutils literal"><span class="pre">C:\Python\Lib\site-packages\</span></tt>.</p>
+<p>You can add folders to your search path to make Python&#8217;s import
+mechanism search in these directories as well.  Use <strong>PYTHONPATH</strong>, as
+described in <em>Environment variables</em>, to modify <tt class="docutils literal"><span class="pre">sys.path</span></tt>.  On
+Windows, paths are separated by semicolons, though, to distinguish
+them from drive identifiers (<tt class="docutils literal"><span class="pre">C:\</span></tt> etc.).</p>
+<p>Modifying the module search path can also be done through the Windows
+registry: Edit <tt class="docutils literal"><span class="pre">HKEY_LOCAL_MACHINE\SOFTWARE\Python\PythonCore\*versio</span>
+<span class="pre">n*\PythonPath\</span></tt>, as described above for the environment variable
+<strong>%PYTHONPATH%</strong>.  A convenient registry editor is <strong>regedit</strong> (start
+it by typing &#8220;regedit&#8221; into <em>Start ‣ Run</em>).</p>
+</div>
+<div class="section" id="executing-scripts">
+<h3>3.3.4. Executing scripts<a class="headerlink" href="#executing-scripts" title="Permalink to this headline">¶</a></h3>
+<p>Python scripts (files with the extension <tt class="docutils literal"><span class="pre">.py</span></tt>) will be executed by
+<strong>python.exe</strong> by default.  This executable opens a terminal, which
+stays open even if the program uses a GUI.  If you do not want this to
+happen, use the extension <tt class="docutils literal"><span class="pre">.pyw</span></tt> which will cause the script to be
+executed by <strong>pythonw.exe</strong> by default (both executables are located
+in the top-level of your Python installation directory).  This
+suppresses the terminal window on startup.</p>
+<p>You can also make all <tt class="docutils literal"><span class="pre">.py</span></tt> scripts execute with <strong>pythonw.exe</strong>,
+setting this through the usual facilities, for example (might require
+administrative rights):</p>
+<ol class="arabic">
+<li><p class="first">Launch a command prompt.</p>
+</li>
+<li><p class="first">Associate the correct file group with <tt class="docutils literal"><span class="pre">.py</span></tt> scripts:</p>
+<blockquote>
+<p>assoc .py=Python.File</p>
+</blockquote>
+</li>
+<li><p class="first">Redirect all Python files to the new executable:</p>
+<blockquote>
+<p>ftype Python.File=C:Pathtopythonw.exe &#8220;%1&#8221; %*</p>
+</blockquote>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="additional-modules">
+<h2>3.4. Additional modules<a class="headerlink" href="#additional-modules" title="Permalink to this headline">¶</a></h2>
+<p>Even though Python aims to be portable among all platforms, there are
+features that are unique to Windows.  A couple of modules, both in the
+standard library and external, and snippets exist to use these
+features.</p>
+<p>The Windows-specific standard modules are documented in <em>MS Windows
+Specific Services</em>.</p>
+<div class="section" id="pywin32">
+<h3>3.4.1. PyWin32<a class="headerlink" href="#pywin32" title="Permalink to this headline">¶</a></h3>
+<p>The PyWin32 module by Mark Hammond is a collection of modules for
+advanced Windows-specific support.  This includes utilities for:</p>
+<ul class="simple">
+<li>Component Object Model (COM)</li>
+<li>Win32 API calls</li>
+<li>Registry</li>
+<li>Event log</li>
+<li>Microsoft Foundation Classes (MFC) user interfaces</li>
+</ul>
+<p>PythonWin is a sample MFC application shipped with PyWin32.  It is an
+embeddable IDE with a built-in debugger.</p>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Win32 How Do I...?</dt>
+<dd>by Tim Golden</dd>
+<dt>Python and COM</dt>
+<dd>by David and Paul Boddie</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="py2exe">
+<h3>3.4.2. Py2exe<a class="headerlink" href="#py2exe" title="Permalink to this headline">¶</a></h3>
+<p>Py2exe is a <tt class="docutils literal"><span class="pre">distutils</span></tt> extension (see <em>Extending Distutils</em>) which
+wraps Python scripts into executable Windows programs (<tt class="docutils literal"><span class="pre">***.exe</span></tt>
+files).  When you have done this, you can distribute your application
+without requiring your users to install Python.</p>
+</div>
+<div class="section" id="wconio">
+<h3>3.4.3. WConio<a class="headerlink" href="#wconio" title="Permalink to this headline">¶</a></h3>
+<p>Since Python&#8217;s advanced terminal handling layer, <tt class="docutils literal"><span class="pre">curses</span></tt>, is
+restricted to Unix-like systems, there is a library exclusive to
+Windows as well: Windows Console I/O for Python.</p>
+<p>WConio is a wrapper for Turbo-C&#8217;s <tt class="docutils literal"><span class="pre">CONIO.H</span></tt>, used to create text
+user interfaces.</p>
+</div>
+</div>
+<div class="section" id="compiling-python-on-windows">
+<h2>3.5. Compiling Python on Windows<a class="headerlink" href="#compiling-python-on-windows" title="Permalink to this headline">¶</a></h2>
+<p>If you want to compile CPython yourself, first thing you should do is
+get the source. You can download either the latest release&#8217;s source or
+just grab a fresh checkout.</p>
+<p>For Microsoft Visual C++, which is the compiler with which official
+Python releases are built, the source tree contains solutions/project
+files.  View the <tt class="docutils literal"><span class="pre">readme.txt</span></tt> in their respective directories:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="25%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Directory</th>
+<th class="head">MSVC version</th>
+<th class="head">Visual Studio version</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">PC/VC6/</span></tt></td>
+<td>6.0</td>
+<td>97</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">PC/VS7.1/</span></tt></td>
+<td>7.1</td>
+<td>2003</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">PC/VS8.0/</span></tt></td>
+<td>8.0</td>
+<td>2005</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">PCbuild/</span></tt></td>
+<td>9.0</td>
+<td>2008</td>
+</tr>
+</tbody>
+</table>
+<p>Note that not all of these build directories are fully supported.
+Read the release notes to see which compiler version the official
+releases for your version are built with.</p>
+<p>Check <tt class="docutils literal"><span class="pre">PC/readme.txt</span></tt> for general information on the build process.</p>
+<p>For extension modules, consult <em>Building C and C++ Extensions on
+Windows</em>.</p>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Python + Windows + distutils + SWIG + gcc MinGW</dt>
+<dd>or &#8220;Creating Python extensions in C/C++ with SWIG and compiling
+them with MinGW gcc under Windows&#8221; or &#8220;Installing Python
+extension with distutils and without Microsoft Visual C++&#8221; by
+Sébastien Sauvage, 2003</dd>
+<dt>MingW &#8211; Python extensions</dt>
+<dd>by Trent Apted et al, 2007</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="other-resources">
+<h2>3.6. Other resources<a class="headerlink" href="#other-resources" title="Permalink to this headline">¶</a></h2>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Python Programming On Win32</dt>
+<dd>&#8220;Help for Windows Programmers&#8221; by Mark Hammond and Andy
+Robinson, O&#8217;Reilly Media, 2000, ISBN 1-56592-621-8</dd>
+<dt>A Python for Windows Tutorial</dt>
+<dd>by Amanda Birmingham, 2004</dd>
+</dl>
+</blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="mac.html" title="4. Using Python on a Macintosh"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="unix.html" title="2. Using Python on Unix platforms"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="../contents.html" >Jython Documentation contents</a> &raquo;</li>
+          <li><a href="index.html" >Using Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Command line and environment &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="Using Jython" href="index.html" />
+    <link rel="next" title="The Python Standard Library and What Comes with Jython" href="../library/indexprogress.html" />
+    <link rel="prev" title="Using Jython" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="../library/indexprogress.html" title="The Python Standard Library and What Comes with Jython"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Using Jython"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Using Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">1. Command line and environment</a><ul>
+<li><a class="reference external" href="#command-line">1.1. Command line</a><ul>
+<li><a class="reference external" href="#interface-options">1.1.1. Interface options</a></li>
+<li><a class="reference external" href="#generic-options">1.1.2. Generic options</a></li>
+<li><a class="reference external" href="#miscellaneous-options">1.1.3. Miscellaneous options</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#environment-variables">1.2. Environment variables</a></li>
+<li><a class="reference external" href="#jython-launcher-options">1.3. Jython Launcher Options</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Using Jython</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="../library/indexprogress.html"
+                                  title="next chapter">The Python Standard Library and What Comes with Jython</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/using/cmdline.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="command-line-and-environment">
+<h1>1. Command line and environment<a class="headerlink" href="#command-line-and-environment" title="Permalink to this headline">¶</a></h1>
+<p>The Jython interpreter scans the command line and the environment for
+various settings.</p>
+<dl class="docutils">
+<dt>Note: Other implementations&#8217; command line schemes may differ.  See</dt>
+<dd><em>Alternate Implementations</em> for further resources.</dd>
+</dl>
+<div class="section" id="command-line">
+<h2>1.1. Command line<a class="headerlink" href="#command-line" title="Permalink to this headline">¶</a></h2>
+<p>When invoking Jython, you may specify any of these options:</p>
+<blockquote>
+jython [-c command | -m module-name | script | - ] [args]</blockquote>
+<p>The most common use case is, of course, a simple invocation of a
+script:</p>
+<blockquote>
+jython myscript.py</blockquote>
+<div class="section" id="interface-options">
+<h3>1.1.1. Interface options<a class="headerlink" href="#interface-options" title="Permalink to this headline">¶</a></h3>
+<p>The interpreter interface resembles that of the UNIX shell, but
+provides some additional methods of invocation:</p>
+<ul class="simple">
+<li>When called with standard input connected to a tty device, it
+prompts for commands and executes them until an EOF (an end-of-file
+character, you can produce that with <em>Ctrl-D</em> on UNIX or <em>Ctrl-Z,
+Enter</em> on Windows) is read.</li>
+<li>When called with a file name argument or with a file as standard
+input, it reads and executes a script from that file.</li>
+<li>When called with a directory name argument, it reads and executes an
+appropriately named script from that directory.</li>
+<li>When called with <tt class="docutils literal"><span class="pre">-c</span> <span class="pre">command</span></tt>, it executes the Python statement(s)
+given as <em>command</em>.  Here <em>command</em> may contain multiple statements
+separated by newlines. Leading whitespace is significant in Python
+statements!</li>
+<li>When called with <tt class="docutils literal"><span class="pre">-m</span> <span class="pre">module-name</span></tt>, the given module is located on
+the Jython module path and executed as a script.</li>
+</ul>
+<p>In non-interactive mode, the entire input is parsed before it is
+executed.</p>
+<p>An interface option terminates the list of options consumed by the
+interpreter, all consecutive arguments will end up in <tt class="docutils literal"><span class="pre">sys.argv</span></tt> &#8211;
+note that the first element, subscript zero (<tt class="docutils literal"><span class="pre">sys.argv[0]</span></tt>), is a
+string reflecting the program&#8217;s source.</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-c <var>&lt;command&gt;</var></span></kbd></td>
+<td><p class="first">Execute the Jython code in <em>command</em>.  <em>command</em> can be one ore
+more statements separated by newlines, with significant leading
+whitespace as in normal module code.</p>
+<p class="last">If this option is given, the first element of <tt class="docutils literal"><span class="pre">sys.argv</span></tt> will be
+<tt class="docutils literal"><span class="pre">&quot;-c&quot;</span></tt> and the current directory will be added to the start of
+<tt class="docutils literal"><span class="pre">sys.path</span></tt> (allowing modules in that directory to be imported as
+top level modules).</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m <var>&lt;module-name&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td><p class="first">Search <tt class="docutils literal"><span class="pre">sys.path</span></tt> for the named module and execute its contents
+as the <tt class="docutils literal"><span class="pre">__main__</span></tt> module.</p>
+<p>Since the argument is a <em>module</em> name, you must not give a file
+extension (<tt class="docutils literal"><span class="pre">.py</span></tt>).  The <tt class="docutils literal"><span class="pre">module-name</span></tt> should be a valid Jython or Python
+module name, but the implementation may not always enforce this
+(e.g. it may allow you to use a name that includes a hyphen).</p>
+<p>If this option is given, the first element of <tt class="docutils literal"><span class="pre">sys.argv</span></tt> will be
+the full path to the module file. As with the <em>-c</em> option, the
+current directory will be added to the start of <tt class="docutils literal"><span class="pre">sys.path</span></tt>.</p>
+<p>Many standard library modules contain code that is invoked on their
+execution as a script.  An example is the <tt class="docutils literal"><span class="pre">timeit</span></tt> module:</p>
+<blockquote>
+jython -mtimeit -s &#8216;setup here&#8217; &#8216;benchmarked code here&#8217;
+jython -mtimeit -h # for details</blockquote>
+<p>See also:</p>
+<blockquote class="last">
+<p><tt class="docutils literal"><span class="pre">runpy.run_module()</span></tt>    The actual implementation of this
+feature.</p>
+<p><strong>PEP 338</strong> &#8211; Executing modules as scripts</p>
+</blockquote>
+</td></tr>
+</tbody>
+</table>
+<p>&lt;script&gt;</p>
+<blockquote>
+<p>Execute the Python code contained in <em>script</em>, which must be a
+filesystem path (absolute or relative) referring to either a Python
+file, a directory containing a <tt class="docutils literal"><span class="pre">__main__.py</span></tt> file, or a zipfile
+containing a <tt class="docutils literal"><span class="pre">__main__.py</span></tt> file.</p>
+<p>If this option is given, the first element of <tt class="docutils literal"><span class="pre">sys.argv</span></tt> will be
+the script name as given on the command line.</p>
+<p>If the script name refers directly to a Python file, the directory
+containing that file is added to the start of <tt class="docutils literal"><span class="pre">sys.path</span></tt>, and the
+file is executed as the <tt class="docutils literal"><span class="pre">__main__</span></tt> module.</p>
+<p>If the script name refers to a directory or zipfile, the script
+name is added to the start of <tt class="docutils literal"><span class="pre">sys.path</span></tt> and the <tt class="docutils literal"><span class="pre">__main__.py</span></tt>
+file in that location is executed as the <tt class="docutils literal"><span class="pre">__main__</span></tt> module.</p>
+<p>Changed in version 2.5: Directories and zipfiles containing a
+<tt class="docutils literal"><span class="pre">__main__.py</span></tt> file at the top level are now considered valid
+Python scripts.</p>
+</blockquote>
+<p>If no interface option is given, <em>-i</em> is implied, <tt class="docutils literal"><span class="pre">sys.argv[0]</span></tt> is
+an empty string (<tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>) and the current directory will be added to
+the start of <tt class="docutils literal"><span class="pre">sys.path</span></tt>.</p>
+<p>See also:</p>
+<blockquote>
+<em>Invoking the Interpreter</em></blockquote>
+</div>
+<div class="section" id="generic-options">
+<h3>1.1.2. Generic options<a class="headerlink" href="#generic-options" title="Permalink to this headline">¶</a></h3>
+<p>-?
+-h
+&#8211;help</p>
+<blockquote>
+<p>Print a short description of all command line options.</p>
+<p>Changed in version 2.5: The <tt class="docutils literal"><span class="pre">--help</span></tt> variant.</p>
+</blockquote>
+<p>-V
+&#8211;version</p>
+<blockquote>
+<p>Print the Jython version number and exit.  Example output could be:</p>
+<blockquote>
+Jython 2.5.0</blockquote>
+<p>Changed in version 2.5: The <tt class="docutils literal"><span class="pre">--version</span></tt> variant.</p>
+</blockquote>
+</div>
+<div class="section" id="miscellaneous-options">
+<h3>1.1.3. Miscellaneous options<a class="headerlink" href="#miscellaneous-options" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-i</span></kbd></td>
+<td><p class="first">When a script is passed as first argument or the <em>-c</em> option is
+used, enter interactive mode after executing the script or the
+command, even when <tt class="docutils literal"><span class="pre">sys.stdin</span></tt> does not appear to be a terminal.
+The <strong>PYTHONSTARTUP</strong> file is not read.</p>
+<p class="last">This can be useful to inspect global variables or a stack trace
+when a script raises an exception.  See also <strong>PYTHONINSPECT</strong>.</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-Q <var>&lt;arg&gt;</var></span></kbd></td>
+<td><p class="first">Division control. The argument must be one of the following:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">old</span></tt></dt>
+<dd>division of int/int and long/long return an int or long
+(<em>default</em>)</dd>
+<dt><tt class="docutils literal"><span class="pre">new</span></tt></dt>
+<dd>new division semantics, i.e. division of int/int and long/long
+returns a float</dd>
+<dt><tt class="docutils literal"><span class="pre">warn</span></tt></dt>
+<dd>old division semantics with a warning for int/int and long/long</dd>
+<dt><tt class="docutils literal"><span class="pre">warnall</span></tt></dt>
+<dd>old division semantics with a warning for all uses of the
+division operator</dd>
+</dl>
+<p>See also:</p>
+<blockquote class="last">
+<p><tt class="docutils literal"><span class="pre">Tools/scripts/fixdiv.py</span></tt>    for a use of <tt class="docutils literal"><span class="pre">warnall</span></tt></p>
+<p><strong>PEP 238</strong> &#8211; Changing the division operator</p>
+</blockquote>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span></kbd></td>
+<td>Disable the import of the module <tt class="docutils literal"><span class="pre">site</span></tt> and the site-dependent
+manipulations of <tt class="docutils literal"><span class="pre">sys.path</span></tt> that it entails.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-u</span></kbd></td>
+<td><p class="first">Force stdin, stdout and stderr to be totally unbuffered.  On
+systems where it matters, also put stdin, stdout and stderr in
+binary mode.</p>
+<p>Note that there is internal buffering in <tt class="docutils literal"><span class="pre">file.readlines()</span></tt> and
+<em>File Objects</em> (<tt class="docutils literal"><span class="pre">for</span> <span class="pre">line</span> <span class="pre">in</span> <span class="pre">sys.stdin</span></tt>) which is not influenced
+by this option.  To work around this, you will want to use
+<tt class="docutils literal"><span class="pre">file.readline()</span></tt> inside a <tt class="docutils literal"><span class="pre">while</span> <span class="pre">1:</span></tt> loop.</p>
+<p class="last">See also <strong>PYTHONUNBUFFERED</strong>.</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v</span></kbd></td>
+<td>Print a message each time a module is initialized, showing the
+place (filename or built-in module) from which it is loaded.  When
+given twice (<em>-vv</em>), print a message for each file that is checked
+for when searching for a module.  Also provides information on
+module cleanup at exit. See also <strong>PYTHONVERBOSE</strong>.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-W <var>arg</var></span></kbd></td>
+<td><p class="first">Warning control.  Jython&#8217;s warning machinery by default prints
+warning messages to <tt class="docutils literal"><span class="pre">sys.stderr</span></tt>.  A typical warning message has
+the following form:</p>
+<blockquote>
+<a class="reference external" href="file:line">file:line</a>: category: message</blockquote>
+<p>By default, each warning is printed once for each source line where
+it occurs.  This option controls how often warnings are printed.</p>
+<p>Multiple <em>-W</em> options may be given; when a warning matches more
+than one option, the action for the last matching option is
+performed.  Invalid <em>-W</em> options are ignored (though, a warning
+message is printed about invalid options when the first warning is
+issued).</p>
+<p>Warnings can also be controlled from within a Jython program using
+the <tt class="docutils literal"><span class="pre">warnings</span></tt> module.</p>
+<p>The simplest form of argument is one of the following action
+strings (or a unique abbreviation):</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">ignore</span></tt></dt>
+<dd>Ignore all warnings.</dd>
+<dt><tt class="docutils literal"><span class="pre">default</span></tt></dt>
+<dd>Explicitly request the default behavior (printing each warning
+once per source line).</dd>
+<dt><tt class="docutils literal"><span class="pre">all</span></tt></dt>
+<dd>Print a warning each time it occurs (this may generate many
+messages if a warning is triggered repeatedly for the same
+source line, such as inside a loop).</dd>
+<dt><tt class="docutils literal"><span class="pre">module</span></tt></dt>
+<dd>Print each warning only only the first time it occurs in each
+module.</dd>
+<dt><tt class="docutils literal"><span class="pre">once</span></tt></dt>
+<dd>Print each warning only the first time it occurs in the program.</dd>
+<dt><tt class="docutils literal"><span class="pre">error</span></tt></dt>
+<dd>Raise an exception instead of printing a warning message.</dd>
+</dl>
+<p>The full form of argument is:</p>
+<blockquote>
+action:message:category:module:line</blockquote>
+<p>Here, <em>action</em> is as explained above but only applies to messages
+that match the remaining fields.  Empty fields match all values;
+trailing empty fields may be omitted.  The <em>message</em> field matches
+the start of the warning message printed; this match is case-
+insensitive.  The <em>category</em> field matches the warning category.
+This must be a class name; the match test whether the actual
+warning category of the message is a subclass of the specified
+warning category.  The full class name must be given.  The <em>module</em>
+field matches the (fully-qualified) module name; this match is
+case-sensitive.  The <em>line</em> field matches the line number, where
+zero matches all line numbers and is thus equivalent to an omitted
+line number.</p>
+<p>See also:</p>
+<blockquote class="last">
+<p><tt class="docutils literal"><span class="pre">warnings</span></tt> &#8211; the warnings module</p>
+<p><strong>PEP 230</strong> &#8211; Warning framework</p>
+</blockquote>
+</td></tr>
+</tbody>
+</table>
+<p>-jar jar</p>
+<blockquote>
+Program read from __run__.py in jar file</blockquote>
+</div>
+</div>
+<div class="section" id="environment-variables">
+<h2>1.2. Environment variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>These environment variables influence Python&#8217;s behavior.</p>
+<p>JYTHON_HOME</p>
+<blockquote>
+Jython installation directory</blockquote>
+<p>JAVA_HOME</p>
+<blockquote>
+Java installation directory</blockquote>
+<p>JYTHONPATH</p>
+<blockquote>
+Augment the default search path for module files.  The format is
+the same as the shell&#8217;s <strong>PATH</strong>: one or more directory pathnames
+separated by <tt class="docutils literal"><span class="pre">os.pathsep</span></tt> (e.g. colons on Unix or semicolons on
+Windows). Non-existent directories are silently ignored.</blockquote>
+<p>JYTHON_OPTS</p>
+<blockquote>
+Default command line arguments</blockquote>
+</div>
+<div class="section" id="jython-launcher-options">
+<h2>1.3. Jython Launcher Options<a class="headerlink" href="#jython-launcher-options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-J<var>arg</var></span></kbd></td>
+<td>Pass argument through to Java VM (e.g. -J-Xmx512m)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--jdb</span></kbd></td>
+<td>Run under JDB</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--print</span></kbd></td>
+<td>Print the Java command instead of executing it</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--profile</span></kbd></td>
+<td>Run with the Java interactive Profiler (<a class="reference external" href="http://jiprof.sf.net">http://jiprof.sf.net</a>)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--boot</span></kbd></td>
+<td>Put Jython on the boot classpath (disables bytecode verifier)</td></tr>
+</tbody>
+</table>
+<p>&#8211;</p>
+<blockquote>
+Pass remaining variables through to Jython</blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../library/indexprogress.html" title="The Python Standard Library and What Comes with Jython"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Using Jython"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Using Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

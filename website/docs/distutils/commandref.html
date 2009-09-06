@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Command Reference &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Command Reference</a><ul>
+<li><a class="reference external" href="#installing-modules-the-install-command-family">Installing modules: the <strong>install</strong> command family</a><ul>
+<li><a class="reference external" href="#install-data"><strong>install_data</strong></a></li>
+<li><a class="reference external" href="#install-scripts"><strong>install_scripts</strong></a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#creating-a-source-distribution-the-sdist-command">Creating a source distribution: the <strong>sdist</strong> command</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/distutils/commandref.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="command-reference">
+<h1>Command Reference<a class="headerlink" href="#command-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-modules-the-install-command-family">
+<h2>Installing modules: the <strong>install</strong> command family<a class="headerlink" href="#installing-modules-the-install-command-family" title="Permalink to this headline">¶</a></h2>
+<p>The install command ensures that the build commands have been run and
+then runs the subcommands <strong>install_lib</strong>, <strong>install_data</strong> and
+<strong>install_scripts</strong>.</p>
+<div class="section" id="install-data">
+<h3><strong>install_data</strong><a class="headerlink" href="#install-data" title="Permalink to this headline">¶</a></h3>
+<p>This command installs all data files provided with the distribution.</p>
+</div>
+<div class="section" id="install-scripts">
+<h3><strong>install_scripts</strong><a class="headerlink" href="#install-scripts" title="Permalink to this headline">¶</a></h3>
+<p>This command installs all (Python) scripts in the distribution.</p>
+</div>
+</div>
+<div class="section" id="creating-a-source-distribution-the-sdist-command">
+<h2>Creating a source distribution: the <strong>sdist</strong> command<a class="headerlink" href="#creating-a-source-distribution-the-sdist-command" title="Permalink to this headline">¶</a></h2>
+<p><strong>**</strong> fragment moved down from above: needs context! <strong>**</strong></p>
+<p>The manifest template commands are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Command</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><strong>include pat1 pat2 ...</strong></td>
+<td>include all files matching any of the listed
+patterns</td>
+</tr>
+<tr><td><strong>exclude pat1 pat2 ...</strong></td>
+<td>exclude all files matching any of the listed
+patterns</td>
+</tr>
+<tr><td><strong>recursive-include dir pat1 pat2 ...</strong></td>
+<td>include all files under <em>dir</em> matching any of
+the listed patterns</td>
+</tr>
+<tr><td><strong>recursive-exclude dir pat1 pat2 ...</strong></td>
+<td>exclude all files under <em>dir</em> matching any of
+the listed patterns</td>
+</tr>
+<tr><td><strong>global-include pat1 pat2 ...</strong></td>
+<td>include all files anywhere in the source tree
+matching &#8212; &amp; any of the listed patterns</td>
+</tr>
+<tr><td><strong>global-exclude pat1 pat2 ...</strong></td>
+<td>exclude all files anywhere in the source tree
+matching &#8212; &amp; any of the listed patterns</td>
+</tr>
+<tr><td><strong>prune dir</strong></td>
+<td>exclude all files under <em>dir</em></td>
+</tr>
+<tr><td><strong>graft dir</strong></td>
+<td>include all files under <em>dir</em></td>
+</tr>
+</tbody>
+</table>
+<p>The patterns here are Unix-style &#8220;glob&#8221; patterns: <tt class="docutils literal"><span class="pre">*</span></tt> matches any
+sequence of regular filename characters, <tt class="docutils literal"><span class="pre">?</span></tt> matches any single
+regular filename character, and <tt class="docutils literal"><span class="pre">[range]</span></tt> matches any of the
+characters in <em>range</em> (e.g., <tt class="docutils literal"><span class="pre">a-z</span></tt>, <tt class="docutils literal"><span class="pre">a-zA-Z</span></tt>, <tt class="docutils literal"><span class="pre">a-f0-9_.</span></tt>).  The
+definition of &#8220;regular filename character&#8221; is platform-specific: on
+Unix it is anything except slash; on Windows anything except backslash
+or colon.</p>
+<p><strong>**</strong> Windows support not there yet <strong>**</strong></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

@@ -77,7 +77,7 @@ class HTMLTranslator(html4css1.HTMLTranslator):
         buffer.append('<div id="top">')
         buffer.append('<div id="header">')
         buffer.append('<div id="grouplogo">')
-        buffer.append('<a href="./" ><img class="logoImage" alt="Jython" style="border: 0px; position:absolute; left: 30px" src="css/jython.png" title="Jython"></a>')
+        buffer.append('<a href="./" ><img class="logoImage" alt="Jython" style="border: 0px; padding-top: 20px; position:absolute; left: 35px" src="css/jython.png" title="Jython"></a>')
         buffer.append('</div>')
         buffer.append('<div class="latest_release" style="position:absolute; color:#000; width:180px; top: 15px; right: 30px; padding:0px 10px 10px 30px; font-size:11px; background:url(\'css/latest_release_bg.png\') no-repeat">')
         buffer.append('<p style="top: 25px; color:#000">Latest release - 2.5.0<br/>')
@@ -171,6 +171,7 @@ class HTMLTranslator(html4css1.HTMLTranslator):
             buffer.append('</div>')
             
             buffer.append('<div id="extra">')
+	    buffer.append('<div id="pycon" class="pycon"><a href="http://us.pycon.org/"><img height="50" width="175" src="http://python.org/images/pycon-2010-banner.png" alt="PyCon 2010: Atlanta"></a></div>')
             buffer.append('<div class="applemenu">')
             buffer.append('<div class="silverheader"><a>Twitter Updates</a></div>')
             buffer.append('<div class="submenu"  style="height: 375px;">')

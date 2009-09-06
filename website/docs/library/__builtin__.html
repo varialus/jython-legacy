@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. __builtin__ — Built-in objects &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="The Python Standard Library and What Comes with Jython" href="indexprogress.html" />
+    <link rel="next" title="8. __future__ — Future statement definitions" href="__future__.html" />
+    <link rel="prev" title="6. Abstract Syntax Trees" href="ast.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="__future__.html" title="8. __future__ — Future statement definitions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ast.html" title="6. Abstract Syntax Trees"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" accesskey="U">The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="ast.html"
+                                  title="previous chapter">6. Abstract Syntax Trees</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="__future__.html"
+                                  title="next chapter">8. <tt class="docutils literal"><span class="pre">__future__</span></tt> &#8212; Future statement definitions</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/__builtin__.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="builtin-built-in-objects">
+<h1>7. <tt class="docutils literal"><span class="pre">__builtin__</span></tt> &#8212; Built-in objects<a class="headerlink" href="#builtin-built-in-objects" title="Permalink to this headline">¶</a></h1>
+<p>This module provides direct access to all &#8216;built-in&#8217; identifiers of
+Python; for example, <tt class="docutils literal"><span class="pre">__builtin__.open</span></tt> is the full name for the
+built-in function <tt class="docutils literal"><span class="pre">open()</span></tt>.  See chapter <em>Built-in Objects</em>.</p>
+<p>This module is not normally accessed explicitly by most applications,
+but can be useful in modules that provide objects with the same name
+as a built-in value, but in which the built-in of that name is also
+needed.  For example, in a module that wants to implement an
+<tt class="docutils literal"><span class="pre">open()</span></tt> function that wraps the built-in <tt class="docutils literal"><span class="pre">open()</span></tt>, this module
+can be used directly:</p>
+<blockquote>
+<p>import __builtin__</p>
+<dl class="docutils">
+<dt>def open(path):</dt>
+<dd>f = __builtin__.open(path, &#8216;r&#8217;)
+return UpperCaser(f)</dd>
+<dt>class UpperCaser:</dt>
+<dd><p class="first">&#8216;&#8217;&#8216;Wrapper around a file that converts output to upper-case.&#8217;&#8216;&#8217;</p>
+<dl class="docutils">
+<dt>def __init__(self, f):</dt>
+<dd>self._f = f</dd>
+<dt>def read(self, count=-1):</dt>
+<dd>return self._f.read(count).upper()</dd>
+</dl>
+<p class="last"># ...</p>
+</dd>
+</dl>
+</blockquote>
+<p>As an implementation detail, most modules have the name
+<tt class="docutils literal"><span class="pre">__builtins__</span></tt> (note the <tt class="docutils literal"><span class="pre">'s'</span></tt>) made available as part of their
+globals.  The value of <tt class="docutils literal"><span class="pre">__builtins__</span></tt> is normally either this module
+or the value of this modules&#8217;s <tt class="docutils literal"><span class="pre">__dict__</span></tt> attribute.  Since this is
+an implementation detail, it may not be used by alternate
+implementations of Python.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="__future__.html" title="8. __future__ — Future statement definitions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ast.html" title="6. Abstract Syntax Trees"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" >The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+***************
+ Jython HOWTOs
+***************
+
+**Currently in progress.  For information on Python HOWTOs, please visit `the Python documentation`_.
+
+.. _the Python documentation: http://docs.python.org/howto/index.html

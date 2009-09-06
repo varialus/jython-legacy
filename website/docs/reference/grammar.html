@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>9. Full Grammar specification &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/grammar.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="full-grammar-specification">
+<h1>9. Full Grammar specification<a class="headerlink" href="#full-grammar-specification" title="Permalink to this headline">¶</a></h1>
+<p>This is the full Python grammar, as it is read by the parser generator
+and used to parse Python source files:</p>
+<blockquote>
+<p># Grammar for Python</p>
+<p># Note:  Changing the grammar specified in this file will most likely
+#        require corresponding changes in the parser module
+#        (../Modules/parsermodule.c).  If you can&#8217;t make the changes to
+#        that module yourself, please co-ordinate the required changes
+#        with someone who can; ask around on python-dev for help.  Fred
+#        Drake &lt;<a class="reference external" href="mailto:fdrake&#37;&#52;&#48;acm&#46;org">fdrake<span>&#64;</span>acm<span>&#46;</span>org</a>&gt; will probably be listening there.</p>
+<p># NOTE WELL: You should also follow all the steps listed in PEP 306,
+# &#8220;How to Change Python&#8217;s Grammar&#8221;</p>
+<p># Commands for Kees Blom&#8217;s railroad program
+#diagram:token NAME
+#diagram:token NUMBER
+#diagram:token STRING
+#diagram:token NEWLINE
+#diagram:token ENDMARKER
+#diagram:token INDENT
+#diagram:outputinput python.bla
+#diagram:token DEDENT
+#diagram:outputtextwidth 20.04cmoddsidemargin  0.0cmevensidemargin 0.0cm
+#diagram:rules</p>
+<p># Start symbols for the grammar:
+#    single_input is a single interactive statement;
+#    file_input is a module or sequence of commands read from an input file;
+#    eval_input is the input for the eval() and input() functions.
+# NB: compound_stmt in single_input is followed by extra NEWLINE!
+single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
+file_input: (NEWLINE | stmt)* ENDMARKER
+eval_input: testlist NEWLINE* ENDMARKER</p>
+<p>decorator: &#8216;&#64;&#8217; dotted_name [ &#8216;(&#8216; [arglist] &#8216;)&#8217; ] NEWLINE
+decorators: decorator+
+decorated: decorators (classdef | funcdef)
+funcdef: &#8216;def&#8217; NAME parameters &#8216;:&#8217; suite
+parameters: &#8216;(&#8216; [varargslist] &#8216;)&#8217;
+varargslist: ((fpdef [&#8216;=&#8217; test] &#8216;,&#8217;)*</p>
+<blockquote>
+(&#8216;*&#8217; NAME [&#8216;,&#8217; &#8216;**&#8217; NAME] | &#8216;**&#8217; NAME) |
+fpdef [&#8216;=&#8217; test] (&#8216;,&#8217; fpdef [&#8216;=&#8217; test])* [&#8216;,&#8217;])</blockquote>
+<p>fpdef: NAME | &#8216;(&#8216; fplist &#8216;)&#8217;
+fplist: fpdef (&#8216;,&#8217; fpdef)* [&#8216;,&#8217;]</p>
+<p>stmt: simple_stmt | compound_stmt
+simple_stmt: small_stmt (&#8216;;&#8217; small_stmt)* [&#8216;;&#8217;] NEWLINE
+small_stmt: (expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt |</p>
+<blockquote>
+import_stmt | global_stmt | exec_stmt | assert_stmt)</blockquote>
+<dl class="docutils">
+<dt>expr_stmt: testlist (augassign (yield_expr|testlist) |</dt>
+<dd>(&#8216;=&#8217; (yield_expr|testlist))*)</dd>
+<dt>augassign: (&#8216;+=&#8217; | &#8216;-=&#8217; | &#8216;<a href="#id1"><span class="problematic" id="id2">*</span></a>=&#8217; | &#8216;/=&#8217; | &#8216;%=&#8217; | &#8216;&amp;=&#8217; | &#8216;<a href="#id3"><span class="problematic" id="id4">|</span></a>=&#8217; | &#8216;^=&#8217; |</dt>
+<dd>&#8216;&lt;&lt;=&#8217; | &#8216;&gt;&gt;=&#8217; | &#8216;<a href="#id5"><span class="problematic" id="id6">**</span></a>=&#8217; | &#8216;//=&#8217;)</dd>
+</dl>
+<p># For normal assignments, additional restrictions enforced by the interpreter
+print_stmt: &#8216;print&#8217; ( [ test (&#8216;,&#8217; test)* [&#8216;,&#8217;] ] |</p>
+<blockquote>
+&#8216;&gt;&gt;&#8217; test [ (&#8216;,&#8217; test)+ [&#8216;,&#8217;] ] )</blockquote>
+<p>del_stmt: &#8216;del&#8217; exprlist
+pass_stmt: &#8216;pass&#8217;
+flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt
+break_stmt: &#8216;break&#8217;
+continue_stmt: &#8216;continue&#8217;
+return_stmt: &#8216;return&#8217; [testlist]
+yield_stmt: yield_expr
+raise_stmt: &#8216;raise&#8217; [test [&#8216;,&#8217; test [&#8216;,&#8217; test]]]
+import_stmt: import_name | import_from
+import_name: &#8216;import&#8217; dotted_as_names
+import_from: (&#8216;from&#8217; (&#8216;.&#8217;* dotted_name | &#8216;.&#8217;+)</p>
+<blockquote>
+&#8216;import&#8217; (&#8216;*&#8217; | &#8216;(&#8216; import_as_names &#8216;)&#8217; | import_as_names))</blockquote>
+<p>import_as_name: NAME [&#8216;as&#8217; NAME]
+dotted_as_name: dotted_name [&#8216;as&#8217; NAME]
+import_as_names: import_as_name (&#8216;,&#8217; import_as_name)* [&#8216;,&#8217;]
+dotted_as_names: dotted_as_name (&#8216;,&#8217; dotted_as_name)*
+dotted_name: NAME (&#8216;.&#8217; NAME)*
+global_stmt: &#8216;global&#8217; NAME (&#8216;,&#8217; NAME)*
+exec_stmt: &#8216;exec&#8217; expr [&#8216;in&#8217; test [&#8216;,&#8217; test]]
+assert_stmt: &#8216;assert&#8217; test [&#8216;,&#8217; test]</p>
+<p>compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated
+if_stmt: &#8216;if&#8217; test &#8216;:&#8217; suite (&#8216;elif&#8217; test &#8216;:&#8217; suite)* [&#8216;else&#8217; &#8216;:&#8217; suite]
+while_stmt: &#8216;while&#8217; test &#8216;:&#8217; suite [&#8216;else&#8217; &#8216;:&#8217; suite]
+for_stmt: &#8216;for&#8217; exprlist &#8216;in&#8217; testlist &#8216;:&#8217; suite [&#8216;else&#8217; &#8216;:&#8217; suite]
+try_stmt: (&#8216;try&#8217; &#8216;:&#8217; suite</p>
+<blockquote>
+<blockquote>
+<blockquote>
+((except_clause &#8216;:&#8217; suite)+</blockquote>
+<p>[&#8216;else&#8217; &#8216;:&#8217; suite]
+[&#8216;finally&#8217; &#8216;:&#8217; suite] |</p>
+</blockquote>
+<p>&#8216;finally&#8217; &#8216;:&#8217; suite))</p>
+</blockquote>
+<p>with_stmt: &#8216;with&#8217; test [ with_var ] &#8216;:&#8217; suite
+with_var: &#8216;as&#8217; expr
+# NB compile.c makes sure that the default except clause is last
+except_clause: &#8216;except&#8217; [test [(&#8216;as&#8217; | &#8216;,&#8217;) test]]
+suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT</p>
+<p># Backward compatibility cruft to support:
+# [ x for x in lambda: True, lambda: False if x() ]
+# even while also allowing:
+# lambda x: 5 if x else 2
+# (But not a mix of the two)
+testlist_safe: old_test [(&#8216;,&#8217; old_test)+ [&#8216;,&#8217;]]
+old_test: or_test | old_lambdef
+old_lambdef: &#8216;lambda&#8217; [varargslist] &#8216;:&#8217; old_test</p>
+<p>test: or_test [&#8216;if&#8217; or_test &#8216;else&#8217; test] | lambdef
+or_test: and_test (&#8216;or&#8217; and_test)*
+and_test: not_test (&#8216;and&#8217; not_test)*
+not_test: &#8216;not&#8217; not_test | comparison
+comparison: expr (comp_op expr)*
+comp_op: &#8216;&lt;&#8217;|&#8217;&gt;&#8217;|&#8217;==&#8217;|&#8217;&gt;=&#8217;|&#8217;&lt;=&#8217;|&#8217;&lt;&gt;&#8217;|&#8217;!=&#8217;|&#8217;in&#8217;|&#8217;not&#8217; &#8216;in&#8217;|&#8217;is&#8217;|&#8217;is&#8217; &#8216;not&#8217;
+expr: xor_expr (&#8216;|&#8217; xor_expr)*
+xor_expr: and_expr (&#8216;^&#8217; and_expr)*
+and_expr: shift_expr (&#8216;&amp;&#8217; shift_expr)*
+shift_expr: arith_expr ((&#8216;&lt;&lt;&#8217;|&#8217;&gt;&gt;&#8217;) arith_expr)*
+arith_expr: term ((&#8216;+&#8217;|&#8217;-&#8216;) term)*
+term: factor ((&#8216;*&#8217;|&#8217;/&#8217;|&#8217;%&#8217;|&#8217;//&#8217;) factor)*
+factor: (&#8216;+&#8217;|&#8217;-&#8216;|&#8217;~&#8217;) factor | power
+power: atom trailer* [&#8216;**&#8217; factor]
+atom: (&#8216;(&#8216; [yield_expr|testlist_gexp] &#8216;)&#8217; |</p>
+<blockquote>
+&#8216;[&#8216; [listmaker] &#8216;]&#8217; |
+&#8216;{&#8216; [dictmaker] &#8216;}&#8217; |
+&#8216;`&#8217; testlist1 &#8216;`&#8217; |
+NAME | NUMBER | STRING+)</blockquote>
+<p>listmaker: test ( list_for | (&#8216;,&#8217; test)* [&#8216;,&#8217;] )
+testlist_gexp: test ( gen_for | (&#8216;,&#8217; test)* [&#8216;,&#8217;] )
+lambdef: &#8216;lambda&#8217; [varargslist] &#8216;:&#8217; test
+trailer: &#8216;(&#8216; [arglist] &#8216;)&#8217; | &#8216;[&#8216; subscriptlist &#8216;]&#8217; | &#8216;.&#8217; NAME
+subscriptlist: subscript (&#8216;,&#8217; subscript)* [&#8216;,&#8217;]
+subscript: &#8216;.&#8217; &#8216;.&#8217; &#8216;.&#8217; | test | [test] &#8216;:&#8217; [test] [sliceop]
+sliceop: &#8216;:&#8217; [test]
+exprlist: expr (&#8216;,&#8217; expr)* [&#8216;,&#8217;]
+testlist: test (&#8216;,&#8217; test)* [&#8216;,&#8217;]
+dictmaker: test &#8216;:&#8217; test (&#8216;,&#8217; test &#8216;:&#8217; test)* [&#8216;,&#8217;]</p>
+<p>classdef: &#8216;class&#8217; NAME [&#8216;(&#8216; [testlist] &#8216;)&#8217;] &#8216;:&#8217; suite</p>
+<dl class="docutils">
+<dt>arglist: (argument &#8216;,&#8217;)* (argument [&#8216;,&#8217;]</dt>
+<dd><a href="#id7"><span class="problematic" id="id8">|</span></a>&#8216;*&#8217; test (&#8216;,&#8217; argument)* [&#8216;,&#8217; &#8216;**&#8217; test]
+<a href="#id9"><span class="problematic" id="id10">|</span></a>&#8216;**&#8217; test)</dd>
+</dl>
+<p>argument: test [gen_for] | test &#8216;=&#8217; test  # Really [keyword &#8216;=&#8217;] test</p>
+<p>list_iter: list_for | list_if
+list_for: &#8216;for&#8217; exprlist &#8216;in&#8217; testlist_safe [list_iter]
+list_if: &#8216;if&#8217; old_test [list_iter]</p>
+<p>gen_iter: gen_for | gen_if
+gen_for: &#8216;for&#8217; exprlist &#8216;in&#8217; or_test [gen_iter]
+gen_if: &#8216;if&#8217; old_test [gen_iter]</p>
+<p>testlist1: test (&#8216;,&#8217; test)*</p>
+<p># not used in grammar, but may appear in &#8220;node&#8221; passed from Parser to Compiler
+encoding_decl: NAME</p>
+<p>yield_expr: &#8216;yield&#8217; [testlist]</p>
+</blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

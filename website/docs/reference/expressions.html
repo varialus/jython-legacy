@@ -1,0 +1,1120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5. Expressions &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">5. Expressions</a><ul>
+<li><a class="reference external" href="#arithmetic-conversions">5.1. Arithmetic conversions</a></li>
+<li><a class="reference external" href="#atoms">5.2. Atoms</a><ul>
+<li><a class="reference external" href="#identifiers-names">5.2.1. Identifiers (Names)</a></li>
+<li><a class="reference external" href="#literals">5.2.2. Literals</a></li>
+<li><a class="reference external" href="#parenthesized-forms">5.2.3. Parenthesized forms</a></li>
+<li><a class="reference external" href="#list-displays">5.2.4. List displays</a></li>
+<li><a class="reference external" href="#generator-expressions">5.2.5. Generator expressions</a></li>
+<li><a class="reference external" href="#dictionary-displays">5.2.6. Dictionary displays</a></li>
+<li><a class="reference external" href="#string-conversions">5.2.7. String conversions</a></li>
+<li><a class="reference external" href="#yield-expressions">5.2.8. Yield expressions</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#primaries">5.3. Primaries</a><ul>
+<li><a class="reference external" href="#attribute-references">5.3.1. Attribute references</a></li>
+<li><a class="reference external" href="#subscriptions">5.3.2. Subscriptions</a></li>
+<li><a class="reference external" href="#slicings">5.3.3. Slicings</a></li>
+<li><a class="reference external" href="#calls">5.3.4. Calls</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#the-power-operator">5.4. The power operator</a></li>
+<li><a class="reference external" href="#unary-arithmetic-and-bitwise-operations">5.5. Unary arithmetic and bitwise operations</a></li>
+<li><a class="reference external" href="#binary-arithmetic-operations">5.6. Binary arithmetic operations</a></li>
+<li><a class="reference external" href="#shifting-operations">5.7. Shifting operations</a></li>
+<li><a class="reference external" href="#binary-bitwise-operations">5.8. Binary bitwise operations</a></li>
+<li><a class="reference external" href="#comparisons">5.9. Comparisons</a></li>
+<li><a class="reference external" href="#boolean-operations">5.10. Boolean operations</a></li>
+<li><a class="reference external" href="#lambdas">5.11. Lambdas</a></li>
+<li><a class="reference external" href="#expression-lists">5.12. Expression lists</a></li>
+<li><a class="reference external" href="#evaluation-order">5.13. Evaluation order</a></li>
+<li><a class="reference external" href="#summary">5.14. Summary</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/expressions.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="expressions">
+<h1>5. Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h1>
+<p>This chapter explains the meaning of the elements of expressions in
+Python.</p>
+<p><strong>Syntax Notes:</strong> In this and the following chapters, extended BNF
+notation will be used to describe syntax, not lexical analysis.  When
+(one alternative of) a syntax rule has the form</p>
+<blockquote>
+name ::= othername</blockquote>
+<p>and no semantics are given, the semantics of this form of <tt class="docutils literal"><span class="pre">name</span></tt> are
+the same as for <tt class="docutils literal"><span class="pre">othername</span></tt>.</p>
+<div class="section" id="arithmetic-conversions">
+<h2>5.1. Arithmetic conversions<a class="headerlink" href="#arithmetic-conversions" title="Permalink to this headline">¶</a></h2>
+<p>When a description of an arithmetic operator below uses the phrase
+&#8220;the numeric arguments are converted to a common type,&#8221; the arguments
+are coerced using the coercion rules listed at  <em>Coercion rules</em>.  If
+both arguments are standard numeric types, the following coercions are
+applied:</p>
+<ul class="simple">
+<li>If either argument is a complex number, the other is converted to
+complex;</li>
+<li>otherwise, if either argument is a floating point number, the other
+is converted to floating point;</li>
+<li>otherwise, if either argument is a long integer, the other is
+converted to long integer;</li>
+<li>otherwise, both must be plain integers and no conversion is
+necessary.</li>
+</ul>
+<p>Some additional rules apply for certain operators (e.g., a string left
+argument to the &#8216;%&#8217; operator). Extensions can define their own
+coercions.</p>
+</div>
+<div class="section" id="atoms">
+<h2>5.2. Atoms<a class="headerlink" href="#atoms" title="Permalink to this headline">¶</a></h2>
+<p>Atoms are the most basic elements of expressions.  The simplest atoms
+are identifiers or literals.  Forms enclosed in reverse quotes or in
+parentheses, brackets or braces are also categorized syntactically as
+atoms.  The syntax for atoms is:</p>
+<blockquote>
+<p>atom      ::= identifier | literal | enclosure
+enclosure ::= parenth_form | list_display</p>
+<blockquote>
+<div class="line-block">
+<div class="line">generator_expression | dict_display</div>
+<div class="line">string_conversion | yield_atom</div>
+</div>
+</blockquote>
+</blockquote>
+<div class="section" id="identifiers-names">
+<h3>5.2.1. Identifiers (Names)<a class="headerlink" href="#identifiers-names" title="Permalink to this headline">¶</a></h3>
+<p>An identifier occurring as an atom is a name.  See section
+<em>Identifiers and keywords</em> for lexical definition and section <em>Naming
+and binding</em> for documentation of naming and binding.</p>
+<p>When the name is bound to an object, evaluation of the atom yields
+that object. When a name is not bound, an attempt to evaluate it
+raises a <tt class="docutils literal"><span class="pre">NameError</span></tt> exception.</p>
+<p><strong>Private name mangling:</strong> When an identifier that textually occurs in
+a class definition begins with two or more underscore characters and
+does not end in two or more underscores, it is considered a <em>private
+name</em> of that class. Private names are transformed to a longer form
+before code is generated for them.  The transformation inserts the
+class name in front of the name, with leading underscores removed, and
+a single underscore inserted in front of the class name.  For example,
+the identifier <tt class="docutils literal"><span class="pre">__spam</span></tt> occurring in a class named <tt class="docutils literal"><span class="pre">Ham</span></tt> will be
+transformed to <tt class="docutils literal"><span class="pre">_Ham__spam</span></tt>.  This transformation is independent of
+the syntactical context in which the identifier is used.  If the
+transformed name is extremely long (longer than 255 characters),
+implementation defined truncation may happen.  If the class name
+consists only of underscores, no transformation is done.</p>
+</div>
+<div class="section" id="literals">
+<h3>5.2.2. Literals<a class="headerlink" href="#literals" title="Permalink to this headline">¶</a></h3>
+<p>Python supports string literals and various numeric literals:</p>
+<blockquote>
+<dl class="docutils">
+<dt>literal ::= stringliteral | integer | longinteger</dt>
+<dd><div class="first last line-block">
+<div class="line">floatnumber | imagnumber</div>
+</div>
+</dd>
+</dl>
+</blockquote>
+<p>Evaluation of a literal yields an object of the given type (string,
+integer, long integer, floating point number, complex number) with the
+given value.  The value may be approximated in the case of floating
+point and imaginary (complex) literals.  See section <em>Literals</em> for
+details.</p>
+<p>All literals correspond to immutable data types, and hence the
+object&#8217;s identity is less important than its value.  Multiple
+evaluations of literals with the same value (either the same
+occurrence in the program text or a different occurrence) may obtain
+the same object or a different object with the same value.</p>
+</div>
+<div class="section" id="parenthesized-forms">
+<h3>5.2.3. Parenthesized forms<a class="headerlink" href="#parenthesized-forms" title="Permalink to this headline">¶</a></h3>
+<p>A parenthesized form is an optional expression list enclosed in
+parentheses:</p>
+<blockquote>
+parenth_form ::= &#8220;(&#8221; [expression_list] &#8220;)&#8221;</blockquote>
+<p>A parenthesized expression list yields whatever that expression list
+yields: if the list contains at least one comma, it yields a tuple;
+otherwise, it yields the single expression that makes up the
+expression list.</p>
+<p>An empty pair of parentheses yields an empty tuple object.  Since
+tuples are immutable, the rules for literals apply (i.e., two
+occurrences of the empty tuple may or may not yield the same object).</p>
+<p>Note that tuples are not formed by the parentheses, but rather by use
+of the comma operator.  The exception is the empty tuple, for which
+parentheses <em>are</em> required &#8212; allowing unparenthesized &#8220;nothing&#8221; in
+expressions would cause ambiguities and allow common typos to pass
+uncaught.</p>
+</div>
+<div class="section" id="list-displays">
+<h3>5.2.4. List displays<a class="headerlink" href="#list-displays" title="Permalink to this headline">¶</a></h3>
+<p>A list display is a possibly empty series of expressions enclosed in
+square brackets:</p>
+<blockquote>
+list_display        ::= &#8220;[&#8221; [expression_list | list_comprehension] &#8220;]&#8221;
+list_comprehension  ::= expression list_for
+list_for            ::= &#8220;for&#8221; target_list &#8220;in&#8221; old_expression_list [list_iter]
+old_expression_list ::= old_expression [(&#8220;,&#8221; old_expression)+ [&#8220;,&#8221;]]
+list_iter           ::= list_for | list_if
+list_if             ::= &#8220;if&#8221; old_expression [list_iter]</blockquote>
+<p>A list display yields a new list object.  Its contents are specified
+by providing either a list of expressions or a list comprehension.
+When a comma-separated list of expressions is supplied, its elements
+are evaluated from left to right and placed into the list object in
+that order.  When a list comprehension is supplied, it consists of a
+single expression followed by at least one <tt class="docutils literal"><span class="pre">for</span></tt> clause and zero or
+more <tt class="docutils literal"><span class="pre">for</span></tt> or <tt class="docutils literal"><span class="pre">if</span></tt> clauses.  In this case, the elements of the new
+list are those that would be produced by considering each of the
+<tt class="docutils literal"><span class="pre">for</span></tt> or <tt class="docutils literal"><span class="pre">if</span></tt> clauses a block, nesting from left to right, and
+evaluating the expression to produce a list element each time the
+innermost block is reached [1].</p>
+</div>
+<div class="section" id="generator-expressions">
+<h3>5.2.5. Generator expressions<a class="headerlink" href="#generator-expressions" title="Permalink to this headline">¶</a></h3>
+<p>A generator expression is a compact generator notation in parentheses:</p>
+<blockquote>
+generator_expression ::= &#8220;(&#8221; expression genexpr_for &#8220;)&#8221;
+genexpr_for          ::= &#8220;for&#8221; target_list &#8220;in&#8221; or_test [genexpr_iter]
+genexpr_iter         ::= genexpr_for | genexpr_if
+genexpr_if           ::= &#8220;if&#8221; old_expression [genexpr_iter]</blockquote>
+<p>A generator expression yields a new generator object.  It consists of
+a single expression followed by at least one <tt class="docutils literal"><span class="pre">for</span></tt> clause and zero
+or more <tt class="docutils literal"><span class="pre">for</span></tt> or <tt class="docutils literal"><span class="pre">if</span></tt> clauses.  The iterating values of the new
+generator are those that would be produced by considering each of the
+<tt class="docutils literal"><span class="pre">for</span></tt> or <tt class="docutils literal"><span class="pre">if</span></tt> clauses a block, nesting from left to right, and
+evaluating the expression to yield a value that is reached the
+innermost block for each iteration.</p>
+<p>Variables used in the generator expression are evaluated lazily in a
+separate scope when the <tt class="docutils literal"><span class="pre">next()</span></tt> method is called for the generator
+object (in the same fashion as for normal generators).  However, the
+<tt class="docutils literal"><span class="pre">in</span></tt> expression of the leftmost <tt class="docutils literal"><span class="pre">for</span></tt> clause is immediately
+evaluated in the current scope so that an error produced by it can be
+seen before any other possible error in the code that handles the
+generator expression.  Subsequent <tt class="docutils literal"><span class="pre">for</span></tt> and <tt class="docutils literal"><span class="pre">if</span></tt> clauses cannot be
+evaluated immediately since they may depend on the previous <tt class="docutils literal"><span class="pre">for</span></tt>
+loop.  For example: <tt class="docutils literal"><span class="pre">(x*y</span> <span class="pre">for</span> <span class="pre">x</span> <span class="pre">in</span> <span class="pre">range(10)</span> <span class="pre">for</span> <span class="pre">y</span> <span class="pre">in</span> <span class="pre">bar(x))</span></tt>.</p>
+<p>The parentheses can be omitted on calls with only one argument. See
+section <em>Calls</em> for the detail.</p>
+</div>
+<div class="section" id="dictionary-displays">
+<h3>5.2.6. Dictionary displays<a class="headerlink" href="#dictionary-displays" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary display is a possibly empty series of key/datum pairs
+enclosed in curly braces:</p>
+<blockquote>
+dict_display   ::= &#8220;{&#8221; [key_datum_list] &#8220;}&#8221;
+key_datum_list ::= key_datum (&#8220;,&#8221; key_datum)* [&#8220;,&#8221;]
+key_datum      ::= expression &#8220;:&#8221; expression</blockquote>
+<p>A dictionary display yields a new dictionary object.</p>
+<p>The key/datum pairs are evaluated from left to right to define the
+entries of the dictionary: each key object is used as a key into the
+dictionary to store the corresponding datum.</p>
+<p>Restrictions on the types of the key values are listed earlier in
+section <em>The standard type hierarchy</em>.  (To summarize, the key type
+should be <em>hashable</em>, which excludes all mutable objects.)  Clashes
+between duplicate keys are not detected; the last datum (textually
+rightmost in the display) stored for a given key value prevails.</p>
+</div>
+<div class="section" id="string-conversions">
+<h3>5.2.7. String conversions<a class="headerlink" href="#string-conversions" title="Permalink to this headline">¶</a></h3>
+<p>A string conversion is an expression list enclosed in reverse (a.k.a.
+backward) quotes:</p>
+<blockquote>
+string_conversion ::= &#8220;&#8217;&#8221; expression_list &#8220;&#8217;&#8221;</blockquote>
+<p>A string conversion evaluates the contained expression list and
+converts the resulting object into a string according to rules
+specific to its type.</p>
+<p>If the object is a string, a number, <tt class="xref docutils literal"><span class="pre">None</span></tt>, or a tuple, list or
+dictionary containing only objects whose type is one of these, the
+resulting string is a valid Python expression which can be passed to
+the built-in function <tt class="docutils literal"><span class="pre">eval()</span></tt> to yield an expression with the same
+value (or an approximation, if floating point numbers are involved).</p>
+<p>(In particular, converting a string adds quotes around it and converts
+&#8220;funny&#8221; characters to escape sequences that are safe to print.)</p>
+<p>Recursive objects (for example, lists or dictionaries that contain a
+reference to themselves, directly or indirectly) use <tt class="docutils literal"><span class="pre">...</span></tt> to
+indicate a recursive reference, and the result cannot be passed to
+<tt class="docutils literal"><span class="pre">eval()</span></tt> to get an equal value (<tt class="docutils literal"><span class="pre">SyntaxError</span></tt> will be raised
+instead).</p>
+<p>The built-in function <tt class="docutils literal"><span class="pre">repr()</span></tt> performs exactly the same conversion
+in its argument as enclosing it in parentheses and reverse quotes
+does.  The built-in function <tt class="docutils literal"><span class="pre">str()</span></tt> performs a similar but more
+user-friendly conversion.</p>
+</div>
+<div class="section" id="yield-expressions">
+<h3>5.2.8. Yield expressions<a class="headerlink" href="#yield-expressions" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+yield_atom       ::= &#8220;(&#8221; yield_expression &#8220;)&#8221;
+yield_expression ::= &#8220;yield&#8221; [expression_list]</blockquote>
+<p>New in version 2.5.</p>
+<p>The <tt class="docutils literal"><span class="pre">yield</span></tt> expression is only used when defining a generator
+function, and can only be used in the body of a function definition.
+Using a <tt class="docutils literal"><span class="pre">yield</span></tt> expression in a function definition is sufficient to
+cause that definition to create a generator function instead of a
+normal function.</p>
+<p>When a generator function is called, it returns an iterator known as a
+generator.  That generator then controls the execution of a generator
+function. The execution starts when one of the generator&#8217;s methods is
+called.  At that time, the execution proceeds to the first <tt class="docutils literal"><span class="pre">yield</span></tt>
+expression, where it is suspended again, returning the value of
+<strong>expression_list</strong> to generator&#8217;s caller.  By suspended we mean that
+all local state is retained, including the current bindings of local
+variables, the instruction pointer, and the internal evaluation stack.
+When the execution is resumed by calling one of the generator&#8217;s
+methods, the function can proceed exactly as if the <tt class="docutils literal"><span class="pre">yield</span></tt>
+expression was just another external call. The value of the <tt class="docutils literal"><span class="pre">yield</span></tt>
+expression after resuming depends on the method which resumed the
+execution.</p>
+<p>All of this makes generator functions quite similar to coroutines;
+they yield multiple times, they have more than one entry point and
+their execution can be suspended.  The only difference is that a
+generator function cannot control where should the execution continue
+after it yields; the control is always transfered to the generator&#8217;s
+caller.</p>
+<p>The following generator&#8217;s methods can be used to control the execution
+of a generator function:</p>
+<p>generator.next()</p>
+<blockquote>
+Starts the execution of a generator function or resumes it at the
+last executed <tt class="docutils literal"><span class="pre">yield</span></tt> expression.  When a generator function is
+resumed with a <tt class="docutils literal"><span class="pre">next()</span></tt> method, the current <tt class="docutils literal"><span class="pre">yield</span></tt> expression
+always evaluates to <tt class="xref docutils literal"><span class="pre">None</span></tt>.  The execution then continues to the
+next <tt class="docutils literal"><span class="pre">yield</span></tt> expression, where the generator is suspended again,
+and the value of the <strong>expression_list</strong> is returned to
+<tt class="docutils literal"><span class="pre">next()</span></tt>&#8216;s caller. If the generator exits without yielding
+another value, a <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exception is raised.</blockquote>
+<p>generator.send(value)</p>
+<blockquote>
+Resumes the execution and &#8220;sends&#8221; a value into the generator
+function.  The <tt class="docutils literal"><span class="pre">value</span></tt> argument becomes the result of the current
+<tt class="docutils literal"><span class="pre">yield</span></tt> expression.  The <tt class="docutils literal"><span class="pre">send()</span></tt> method returns the next value
+yielded by the generator, or raises <tt class="docutils literal"><span class="pre">StopIteration</span></tt> if the
+generator exits without yielding another value. When <tt class="docutils literal"><span class="pre">send()</span></tt> is
+called to start the generator, it must be called with <tt class="xref docutils literal"><span class="pre">None</span></tt> as
+the argument, because there is no <tt class="docutils literal"><span class="pre">yield</span></tt> expression that could
+receive the value.</blockquote>
+<p>generator.throw(type[, value[, traceback]])</p>
+<blockquote>
+Raises an exception of type <tt class="docutils literal"><span class="pre">type</span></tt> at the point where generator
+was paused, and returns the next value yielded by the generator
+function.  If the generator exits without yielding another value, a
+<tt class="docutils literal"><span class="pre">StopIteration</span></tt> exception is raised.  If the generator function
+does not catch the passed-in exception, or raises a different
+exception, then that exception propagates to the caller.</blockquote>
+<p>generator.close()</p>
+<blockquote>
+Raises a <tt class="docutils literal"><span class="pre">GeneratorExit</span></tt> at the point where the generator
+function was paused.  If the generator function then raises
+<tt class="docutils literal"><span class="pre">StopIteration</span></tt> (by exiting normally, or due to already being
+closed) or <tt class="docutils literal"><span class="pre">GeneratorExit</span></tt> (by not catching the exception), close
+returns to its caller.  If the generator yields a value, a
+<tt class="docutils literal"><span class="pre">RuntimeError</span></tt> is raised.  If the generator raises any other
+exception, it is propagated to the caller.  <tt class="docutils literal"><span class="pre">close()</span></tt> does
+nothing if the generator has already exited due to an exception or
+normal exit.</blockquote>
+<p>Here is a simple example that demonstrates the behavior of generators
+and generator functions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&quot;Execution starts when &#39;next()&#39; is called for the first time.&quot;</span>
+<span class="gp">... </span>    <span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="k">yield</span> <span class="n">value</span><span class="p">)</span>
+<span class="gp">... </span>            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>                <span class="n">value</span> <span class="o">=</span> <span class="n">e</span>
+<span class="gp">... </span>    <span class="k">finally</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&quot;Don&#39;t forget to clean up when &#39;close()&#39; is called.&quot;</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span> <span class="o">=</span> <span class="n">echo</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">generator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="go">Execution starts when &#39;next()&#39; is called for the first time.</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">generator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="go">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">generator</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span><span class="o">.</span><span class="n">throw</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="s">&quot;spam&quot;</span><span class="p">)</span>
+<span class="go">TypeError(&#39;spam&#39;,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">Don&#39;t forget to clean up when &#39;close()&#39; is called.</span>
+</pre></div>
+</div>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>PEP 0342</strong> - Coroutines via Enhanced Generators</dt>
+<dd>The proposal to enhance the API and syntax of generators, making
+them usable as simple coroutines.</dd>
+</dl>
+</blockquote>
+</div>
+</div>
+<div class="section" id="primaries">
+<h2>5.3. Primaries<a class="headerlink" href="#primaries" title="Permalink to this headline">¶</a></h2>
+<p>Primaries represent the most tightly bound operations of the language.
+Their syntax is:</p>
+<blockquote>
+primary ::= atom | attributeref | subscription | slicing | call</blockquote>
+<div class="section" id="attribute-references">
+<h3>5.3.1. Attribute references<a class="headerlink" href="#attribute-references" title="Permalink to this headline">¶</a></h3>
+<p>An attribute reference is a primary followed by a period and a name:</p>
+<blockquote>
+attributeref ::= primary &#8220;.&#8221; identifier</blockquote>
+<p>The primary must evaluate to an object of a type that supports
+attribute references, e.g., a module, list, or an instance.  This
+object is then asked to produce the attribute whose name is the
+identifier.  If this attribute is not available, the exception
+<tt class="docutils literal"><span class="pre">AttributeError</span></tt> is raised. Otherwise, the type and value of the
+object produced is determined by the object.  Multiple evaluations of
+the same attribute reference may yield different objects.</p>
+</div>
+<div class="section" id="subscriptions">
+<h3>5.3.2. Subscriptions<a class="headerlink" href="#subscriptions" title="Permalink to this headline">¶</a></h3>
+<p>A subscription selects an item of a sequence (string, tuple or list)
+or mapping (dictionary) object:</p>
+<blockquote>
+subscription ::= primary &#8220;[&#8221; expression_list &#8220;]&#8221;</blockquote>
+<p>The primary must evaluate to an object of a sequence or mapping type.</p>
+<p>If the primary is a mapping, the expression list must evaluate to an
+object whose value is one of the keys of the mapping, and the
+subscription selects the value in the mapping that corresponds to that
+key.  (The expression list is a tuple except if it has exactly one
+item.)</p>
+<p>If the primary is a sequence, the expression (list) must evaluate to a
+plain integer.  If this value is negative, the length of the sequence
+is added to it (so that, e.g., <tt class="docutils literal"><span class="pre">x[-1]</span></tt> selects the last item of
+<tt class="docutils literal"><span class="pre">x</span></tt>.)  The resulting value must be a nonnegative integer less than
+the number of items in the sequence, and the subscription selects the
+item whose index is that value (counting from zero).</p>
+<p>A string&#8217;s items are characters.  A character is not a separate data
+type but a string of exactly one character.</p>
+</div>
+<div class="section" id="slicings">
+<h3>5.3.3. Slicings<a class="headerlink" href="#slicings" title="Permalink to this headline">¶</a></h3>
+<p>A slicing selects a range of items in a sequence object (e.g., a
+string, tuple or list).  Slicings may be used as expressions or as
+targets in assignment or <tt class="docutils literal"><span class="pre">del</span></tt> statements.  The syntax for a
+slicing:</p>
+<blockquote>
+slicing          ::= simple_slicing | extended_slicing
+simple_slicing   ::= primary &#8220;[&#8221; short_slice &#8220;]&#8221;
+extended_slicing ::= primary &#8220;[&#8221; slice_list &#8220;]&#8221;
+slice_list       ::= slice_item (&#8220;,&#8221; slice_item)* [&#8220;,&#8221;]
+slice_item       ::= expression | proper_slice | ellipsis
+proper_slice     ::= short_slice | long_slice
+short_slice      ::= [lower_bound] &#8220;:&#8221; [upper_bound]
+long_slice       ::= short_slice &#8220;:&#8221; [stride]
+lower_bound      ::= expression
+upper_bound      ::= expression
+stride           ::= expression
+ellipsis         ::= &#8220;...&#8221;</blockquote>
+<p>There is ambiguity in the formal syntax here: anything that looks like
+an expression list also looks like a slice list, so any subscription
+can be interpreted as a slicing.  Rather than further complicating the
+syntax, this is disambiguated by defining that in this case the
+interpretation as a subscription takes priority over the
+interpretation as a slicing (this is the case if the slice list
+contains no proper slice nor ellipses).  Similarly, when the slice
+list has exactly one short slice and no trailing comma, the
+interpretation as a simple slicing takes priority over that as an
+extended slicing.</p>
+<p>The semantics for a simple slicing are as follows.  The primary must
+evaluate to a sequence object.  The lower and upper bound expressions,
+if present, must evaluate to plain integers; defaults are zero and the
+<tt class="docutils literal"><span class="pre">sys.maxint</span></tt>, respectively.  If either bound is negative, the
+sequence&#8217;s length is added to it.  The slicing now selects all items
+with index <em>k</em> such that <tt class="docutils literal"><span class="pre">i</span> <span class="pre">&lt;=</span> <span class="pre">k</span> <span class="pre">&lt;</span> <span class="pre">j</span></tt> where <em>i</em> and <em>j</em> are the
+specified lower and upper bounds.  This may be an empty sequence.  It
+is not an error if <em>i</em> or <em>j</em> lie outside the range of valid indexes
+(such items don&#8217;t exist so they aren&#8217;t selected).</p>
+<p>The semantics for an extended slicing are as follows.  The primary
+must evaluate to a mapping object, and it is indexed with a key that
+is constructed from the slice list, as follows.  If the slice list
+contains at least one comma, the key is a tuple containing the
+conversion of the slice items; otherwise, the conversion of the lone
+slice item is the key.  The conversion of a slice item that is an
+expression is that expression.  The conversion of an ellipsis slice
+item is the built-in <tt class="docutils literal"><span class="pre">Ellipsis</span></tt> object.  The conversion of a proper
+slice is a slice object (see section <em>The standard type hierarchy</em>)
+whose <tt class="docutils literal"><span class="pre">start</span></tt>, <tt class="docutils literal"><span class="pre">stop</span></tt> and <tt class="docutils literal"><span class="pre">step</span></tt> attributes are the values of
+the expressions given as lower bound, upper bound and stride,
+respectively, substituting <tt class="xref docutils literal"><span class="pre">None</span></tt> for missing expressions.</p>
+</div>
+<div class="section" id="calls">
+<h3>5.3.4. Calls<a class="headerlink" href="#calls" title="Permalink to this headline">¶</a></h3>
+<p>A call calls a callable object (e.g., a function) with a possibly
+empty series of arguments:</p>
+<blockquote>
+<dl class="docutils">
+<dt>call                 ::= primary &#8220;(&#8221; [argument_list [&#8220;,&#8221;]</dt>
+<dd><div class="first last line-block">
+<div class="line">expression genexpr_for] &#8220;)&#8221;</div>
+</div>
+</dd>
+<dt>argument_list        ::= positional_arguments [&#8220;,&#8221; keyword_arguments]</dt>
+<dd><blockquote class="first">
+[&#8220;,&#8221; &#8220;*&#8221; expression] [&#8220;,&#8221; keyword_arguments]
+[&#8220;,&#8221; &#8220;**&#8221; expression]</blockquote>
+<div class="last line-block">
+<div class="line">keyword_arguments [&#8220;,&#8221; &#8220;*&#8221; expression]
+[&#8220;,&#8221; &#8220;**&#8221; expression]</div>
+<div class="line">&#8220;*&#8221; expression [&#8220;,&#8221; &#8220;*&#8221; expression] [&#8220;,&#8221; &#8220;**&#8221; expression]</div>
+<div class="line">&#8220;**&#8221; expression</div>
+</div>
+</dd>
+</dl>
+<p>positional_arguments ::= expression (&#8220;,&#8221; expression)*
+keyword_arguments    ::= keyword_item (&#8220;,&#8221; keyword_item)*
+keyword_item         ::= identifier &#8220;=&#8221; expression</p>
+</blockquote>
+<p>A trailing comma may be present after the positional and keyword
+arguments but does not affect the semantics.</p>
+<p>The primary must evaluate to a callable object (user-defined
+functions, built-in functions, methods of built-in objects, class
+objects, methods of class instances, and certain class instances
+themselves are callable; extensions may define additional callable
+object types).  All argument expressions are evaluated before the call
+is attempted.  Please refer to section <em>Function definitions</em> for the
+syntax of formal parameter lists.</p>
+<p>If keyword arguments are present, they are first converted to
+positional arguments, as follows.  First, a list of unfilled slots is
+created for the formal parameters.  If there are N positional
+arguments, they are placed in the first N slots.  Next, for each
+keyword argument, the identifier is used to determine the
+corresponding slot (if the identifier is the same as the first formal
+parameter name, the first slot is used, and so on).  If the slot is
+already filled, a <tt class="docutils literal"><span class="pre">TypeError</span></tt> exception is raised. Otherwise, the
+value of the argument is placed in the slot, filling it (even if the
+expression is <tt class="xref docutils literal"><span class="pre">None</span></tt>, it fills the slot).  When all arguments have
+been processed, the slots that are still unfilled are filled with the
+corresponding default value from the function definition.  (Default
+values are calculated, once, when the function is defined; thus, a
+mutable object such as a list or dictionary used as default value will
+be shared by all calls that don&#8217;t specify an argument value for the
+corresponding slot; this should usually be avoided.)  If there are any
+unfilled slots for which no default value is specified, a
+<tt class="docutils literal"><span class="pre">TypeError</span></tt> exception is raised.  Otherwise, the list of filled
+slots is used as the argument list for the call.</p>
+<dl class="docutils">
+<dt>Note: An implementation may provide builtin functions whose positional</dt>
+<dd>parameters do not have names, even if they are &#8216;named&#8217; for the
+purpose of documentation, and which therefore cannot be supplied by
+keyword.  In CPython, this is the case for functions implemented in
+C that use <tt class="docutils literal"><span class="pre">PyArg_ParseTuple()</span></tt> to parse their arguments.</dd>
+</dl>
+<p>If there are more positional arguments than there are formal parameter
+slots, a <tt class="docutils literal"><span class="pre">TypeError</span></tt> exception is raised, unless a formal parameter
+using the syntax <tt class="docutils literal"><span class="pre">*identifier</span></tt> is present; in this case, that formal
+parameter receives a tuple containing the excess positional arguments
+(or an empty tuple if there were no excess positional arguments).</p>
+<p>If any keyword argument does not correspond to a formal parameter
+name, a <tt class="docutils literal"><span class="pre">TypeError</span></tt> exception is raised, unless a formal parameter
+using the syntax <tt class="docutils literal"><span class="pre">**identifier</span></tt> is present; in this case, that
+formal parameter receives a dictionary containing the excess keyword
+arguments (using the keywords as keys and the argument values as
+corresponding values), or a (new) empty dictionary if there were no
+excess keyword arguments.</p>
+<p>If the syntax <tt class="docutils literal"><span class="pre">*expression</span></tt> appears in the function call,
+<tt class="docutils literal"><span class="pre">expression</span></tt> must evaluate to a sequence.  Elements from this
+sequence are treated as if they were additional positional arguments;
+if there are positional arguments <em>x1</em>,..., <em>xN</em>, and <tt class="docutils literal"><span class="pre">expression</span></tt>
+evaluates to a sequence <em>y1</em>, ..., <em>yM</em>, this is equivalent to a call
+with M+N positional arguments <em>x1</em>, ..., <em>xN</em>, <em>y1</em>, ..., <em>yM</em>.</p>
+<p>A consequence of this is that although the <tt class="docutils literal"><span class="pre">*expression</span></tt> syntax may
+appear <em>after</em> some keyword arguments, it is processed <em>before</em> the
+keyword arguments (and the <tt class="docutils literal"><span class="pre">**expression</span></tt> argument, if any &#8211; see
+below).  So:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="gp">... </span> <span class="k">print</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="mf">2</span><span class="p">,))</span>
+<span class="go">2 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="mf">2</span><span class="p">,))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+<span class="nc">TypeError</span>: <span class="n-Identifier">f() got multiple values for keyword argument &#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="mf">2</span><span class="p">,))</span>
+<span class="go">1 2</span>
+</pre></div>
+</div>
+<p>It is unusual for both keyword arguments and the <tt class="docutils literal"><span class="pre">*expression</span></tt>
+syntax to be used in the same call, so in practice this confusion does
+not arise.</p>
+<p>If the syntax <tt class="docutils literal"><span class="pre">**expression</span></tt> appears in the function call,
+<tt class="docutils literal"><span class="pre">expression</span></tt> must evaluate to a mapping, the contents of which are
+treated as additional keyword arguments.  In the case of a keyword
+appearing in both <tt class="docutils literal"><span class="pre">expression</span></tt> and as an explicit keyword argument,
+a <tt class="docutils literal"><span class="pre">TypeError</span></tt> exception is raised.</p>
+<p>Formal parameters using the syntax <tt class="docutils literal"><span class="pre">*identifier</span></tt> or <tt class="docutils literal"><span class="pre">**identifier</span></tt>
+cannot be used as positional argument slots or as keyword argument
+names.  Formal parameters using the syntax <tt class="docutils literal"><span class="pre">(sublist)</span></tt> cannot be
+used as keyword argument names; the outermost sublist corresponds to a
+single unnamed argument slot, and the argument value is assigned to
+the sublist using the usual tuple assignment rules after all other
+parameter processing is done.</p>
+<p>A call always returns some value, possibly <tt class="xref docutils literal"><span class="pre">None</span></tt>, unless it raises
+an exception.  How this value is computed depends on the type of the
+callable object.</p>
+<p>If it is&#8212;</p>
+<dl class="docutils">
+<dt>a user-defined function:</dt>
+<dd>The code block for the function is executed, passing it the
+argument list.  The first thing the code block will do is bind the
+formal parameters to the arguments; this is described in section
+<em>Function definitions</em>.  When the code block executes a <tt class="docutils literal"><span class="pre">return</span></tt>
+statement, this specifies the return value of the function call.</dd>
+<dt>a built-in function or method:</dt>
+<dd>The result is up to the interpreter; see <em>Built-in Functions</em> for
+the descriptions of built-in functions and methods.</dd>
+<dt>a class object:</dt>
+<dd>A new instance of that class is returned.</dd>
+<dt>a class instance method:</dt>
+<dd>The corresponding user-defined function is called, with an argument
+list that is one longer than the argument list of the call: the
+instance becomes the first argument.</dd>
+<dt>a class instance:</dt>
+<dd>The class must define a <tt class="docutils literal"><span class="pre">__call__()</span></tt> method; the effect is then
+the same as if that method was called.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="the-power-operator">
+<h2>5.4. The power operator<a class="headerlink" href="#the-power-operator" title="Permalink to this headline">¶</a></h2>
+<p>The power operator binds more tightly than unary operators on its
+left; it binds less tightly than unary operators on its right.  The
+syntax is:</p>
+<blockquote>
+power ::= primary [&#8220;**&#8221; u_expr]</blockquote>
+<p>Thus, in an unparenthesized sequence of power and unary operators, the
+operators are evaluated from right to left (this does not constrain
+the evaluation order for the operands): <tt class="docutils literal"><span class="pre">-1**2</span></tt> results in <tt class="docutils literal"><span class="pre">-1</span></tt>.</p>
+<p>The power operator has the same semantics as the built-in <tt class="docutils literal"><span class="pre">pow()</span></tt>
+function, when called with two arguments: it yields its left argument
+raised to the power of its right argument.  The numeric arguments are
+first converted to a common type.  The result type is that of the
+arguments after coercion.</p>
+<p>With mixed operand types, the coercion rules for binary arithmetic
+operators apply. For int and long int operands, the result has the
+same type as the operands (after coercion) unless the second argument
+is negative; in that case, all arguments are converted to float and a
+float result is delivered. For example, <tt class="docutils literal"><span class="pre">10**2</span></tt> returns <tt class="docutils literal"><span class="pre">100</span></tt>, but
+<tt class="docutils literal"><span class="pre">10**-2</span></tt> returns <tt class="docutils literal"><span class="pre">0.01</span></tt>. (This last feature was added in Python
+2.2. In Python 2.1 and before, if both arguments were of integer types
+and the second argument was negative, an exception was raised).</p>
+<p>Raising <tt class="docutils literal"><span class="pre">0.0</span></tt> to a negative power results in a
+<tt class="docutils literal"><span class="pre">ZeroDivisionError</span></tt>. Raising a negative number to a fractional power
+results in a <tt class="docutils literal"><span class="pre">ValueError</span></tt>.</p>
+</div>
+<div class="section" id="unary-arithmetic-and-bitwise-operations">
+<h2>5.5. Unary arithmetic and bitwise operations<a class="headerlink" href="#unary-arithmetic-and-bitwise-operations" title="Permalink to this headline">¶</a></h2>
+<p>All unary arithmetic and bitwise operations have the same priority:</p>
+<blockquote>
+u_expr ::= power | &#8220;-&#8221; u_expr | &#8220;+&#8221; u_expr | &#8220;~&#8221; u_expr</blockquote>
+<p>The unary <tt class="docutils literal"><span class="pre">-</span></tt> (minus) operator yields the negation of its numeric
+argument.</p>
+<p>The unary <tt class="docutils literal"><span class="pre">+</span></tt> (plus) operator yields its numeric argument unchanged.</p>
+<p>The unary <tt class="docutils literal"><span class="pre">~</span></tt> (invert) operator yields the bitwise inversion of its
+plain or long integer argument.  The bitwise inversion of <tt class="docutils literal"><span class="pre">x</span></tt> is
+defined as <tt class="docutils literal"><span class="pre">-(x+1)</span></tt>.  It only applies to integral numbers.</p>
+<p>In all three cases, if the argument does not have the proper type, a
+<tt class="docutils literal"><span class="pre">TypeError</span></tt> exception is raised.</p>
+</div>
+<div class="section" id="binary-arithmetic-operations">
+<h2>5.6. Binary arithmetic operations<a class="headerlink" href="#binary-arithmetic-operations" title="Permalink to this headline">¶</a></h2>
+<p>The binary arithmetic operations have the conventional priority
+levels.  Note that some of these operations also apply to certain non-
+numeric types.  Apart from the power operator, there are only two
+levels, one for multiplicative operators and one for additive
+operators:</p>
+<blockquote>
+<dl class="docutils">
+<dt>m_expr ::= u_expr | m_expr &#8220;*&#8221; u_expr | m_expr &#8220;//&#8221; u_expr | m_expr &#8220;/&#8221; u_expr</dt>
+<dd><div class="first last line-block">
+<div class="line">m_expr &#8220;%&#8221; u_expr</div>
+</div>
+</dd>
+</dl>
+<p>a_expr ::= m_expr | a_expr &#8220;+&#8221; m_expr | a_expr &#8220;-&#8221; m_expr</p>
+</blockquote>
+<p>The <tt class="docutils literal"><span class="pre">*</span></tt> (multiplication) operator yields the product of its
+arguments.  The arguments must either both be numbers, or one argument
+must be an integer (plain or long) and the other must be a sequence.
+In the former case, the numbers are converted to a common type and
+then multiplied together.  In the latter case, sequence repetition is
+performed; a negative repetition factor yields an empty sequence.</p>
+<p>The <tt class="docutils literal"><span class="pre">/</span></tt> (division) and <tt class="docutils literal"><span class="pre">//</span></tt> (floor division) operators yield the
+quotient of their arguments.  The numeric arguments are first
+converted to a common type. Plain or long integer division yields an
+integer of the same type; the result is that of mathematical division
+with the &#8216;floor&#8217; function applied to the result. Division by zero
+raises the <tt class="docutils literal"><span class="pre">ZeroDivisionError</span></tt> exception.</p>
+<p>The <tt class="docutils literal"><span class="pre">%</span></tt> (modulo) operator yields the remainder from the division of
+the first argument by the second.  The numeric arguments are first
+converted to a common type.  A zero right argument raises the
+<tt class="docutils literal"><span class="pre">ZeroDivisionError</span></tt> exception.  The arguments may be floating point
+numbers, e.g., <tt class="docutils literal"><span class="pre">3.14%0.7</span></tt> equals <tt class="docutils literal"><span class="pre">0.34</span></tt> (since <tt class="docutils literal"><span class="pre">3.14</span></tt> equals
+<tt class="docutils literal"><span class="pre">4*0.7</span> <span class="pre">+</span> <span class="pre">0.34</span></tt>.)  The modulo operator always yields a result with
+the same sign as its second operand (or zero); the absolute value of
+the result is strictly smaller than the absolute value of the second
+operand [2].</p>
+<p>The integer division and modulo operators are connected by the
+following identity: <tt class="docutils literal"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">(x/y)*y</span> <span class="pre">+</span> <span class="pre">(x%y)</span></tt>.  Integer division and
+modulo are also connected with the built-in function <tt class="docutils literal"><span class="pre">divmod()</span></tt>:
+<tt class="docutils literal"><span class="pre">divmod(x,</span> <span class="pre">y)</span> <span class="pre">==</span> <span class="pre">(x/y,</span> <span class="pre">x%y)</span></tt>.  These identities don&#8217;t hold for
+floating point numbers; there similar identities hold approximately
+where <tt class="docutils literal"><span class="pre">x/y</span></tt> is replaced by <tt class="docutils literal"><span class="pre">floor(x/y)</span></tt> or <tt class="docutils literal"><span class="pre">floor(x/y)</span> <span class="pre">-</span> <span class="pre">1</span></tt> [3].</p>
+<p>In addition to performing the modulo operation on numbers, the <tt class="docutils literal"><span class="pre">%</span></tt>
+operator is also overloaded by string and unicode objects to perform
+string formatting (also known as interpolation). The syntax for string
+formatting is described in the Python Library Reference, section
+<em>String Formatting Operations</em>.</p>
+<p>Deprecated since version 2.3: The floor division operator, the modulo
+operator, and the <tt class="docutils literal"><span class="pre">divmod()</span></tt> function are no longer defined for
+complex numbers.  Instead, convert to a floating point number using
+the <tt class="docutils literal"><span class="pre">abs()</span></tt> function if appropriate.</p>
+<p>The <tt class="docutils literal"><span class="pre">+</span></tt> (addition) operator yields the sum of its arguments. The
+arguments must either both be numbers or both sequences of the same
+type.  In the former case, the numbers are converted to a common type
+and then added together.  In the latter case, the sequences are
+concatenated.</p>
+<p>The <tt class="docutils literal"><span class="pre">-</span></tt> (subtraction) operator yields the difference of its
+arguments.  The numeric arguments are first converted to a common
+type.</p>
+</div>
+<div class="section" id="shifting-operations">
+<h2>5.7. Shifting operations<a class="headerlink" href="#shifting-operations" title="Permalink to this headline">¶</a></h2>
+<p>The shifting operations have lower priority than the arithmetic
+operations:</p>
+<blockquote>
+shift_expr ::= a_expr | shift_expr ( &#8220;&lt;&lt;&#8221; | &#8220;&gt;&gt;&#8221; ) a_expr</blockquote>
+<p>These operators accept plain or long integers as arguments.  The
+arguments are converted to a common type.  They shift the first
+argument to the left or right by the number of bits given by the
+second argument.</p>
+<p>A right shift by <em>n</em> bits is defined as division by <tt class="docutils literal"><span class="pre">pow(2,</span> <span class="pre">n)</span></tt>.  A
+left shift by <em>n</em> bits is defined as multiplication with <tt class="docutils literal"><span class="pre">pow(2,</span>
+<span class="pre">n)</span></tt>.  Negative shift counts raise a <tt class="docutils literal"><span class="pre">ValueError</span></tt> exception.</p>
+</div>
+<div class="section" id="binary-bitwise-operations">
+<h2>5.8. Binary bitwise operations<a class="headerlink" href="#binary-bitwise-operations" title="Permalink to this headline">¶</a></h2>
+<p>Each of the three bitwise operations has a different priority level:</p>
+<blockquote>
+and_expr ::= shift_expr | and_expr &#8220;&amp;&#8221; shift_expr
+xor_expr ::= and_expr | xor_expr &#8220;^&#8221; and_expr
+or_expr  ::= xor_expr | or_expr &#8220;|&#8221; xor_expr</blockquote>
+<p>The <tt class="docutils literal"><span class="pre">&amp;</span></tt> operator yields the bitwise AND of its arguments, which must
+be plain or long integers.  The arguments are converted to a common
+type.</p>
+<p>The <tt class="docutils literal"><span class="pre">^</span></tt> operator yields the bitwise XOR (exclusive OR) of its
+arguments, which must be plain or long integers.  The arguments are
+converted to a common type.</p>
+<p>The <tt class="docutils literal"><span class="pre">|</span></tt> operator yields the bitwise (inclusive) OR of its arguments,
+which must be plain or long integers.  The arguments are converted to
+a common type.</p>
+</div>
+<div class="section" id="comparisons">
+<h2>5.9. Comparisons<a class="headerlink" href="#comparisons" title="Permalink to this headline">¶</a></h2>
+<p>Unlike C, all comparison operations in Python have the same priority,
+which is lower than that of any arithmetic, shifting or bitwise
+operation.  Also unlike C, expressions like <tt class="docutils literal"><span class="pre">a</span> <span class="pre">&lt;</span> <span class="pre">b</span> <span class="pre">&lt;</span> <span class="pre">c</span></tt> have the
+interpretation that is conventional in mathematics:</p>
+<blockquote>
+<p>comparison    ::= or_expr ( comp_operator or_expr )*
+comp_operator ::= &#8220;&lt;&#8221; | &#8220;&gt;&#8221; | &#8220;==&#8221; | &#8220;&gt;=&#8221; | &#8220;&lt;=&#8221; | &#8220;&lt;&gt;&#8221; | &#8220;!=&#8221;</p>
+<blockquote>
+<div class="line-block">
+<div class="line">&#8220;is&#8221; [&#8220;not&#8221;] | [&#8220;not&#8221;] &#8220;in&#8221;</div>
+</div>
+</blockquote>
+</blockquote>
+<p>Comparisons yield boolean values: <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Comparisons can be chained arbitrarily, e.g., <tt class="docutils literal"><span class="pre">x</span> <span class="pre">&lt;</span> <span class="pre">y</span> <span class="pre">&lt;=</span> <span class="pre">z</span></tt> is
+equivalent to <tt class="docutils literal"><span class="pre">x</span> <span class="pre">&lt;</span> <span class="pre">y</span> <span class="pre">and</span> <span class="pre">y</span> <span class="pre">&lt;=</span> <span class="pre">z</span></tt>, except that <tt class="docutils literal"><span class="pre">y</span></tt> is evaluated
+only once (but in both cases <tt class="docutils literal"><span class="pre">z</span></tt> is not evaluated at all when <tt class="docutils literal"><span class="pre">x</span> <span class="pre">&lt;</span>
+<span class="pre">y</span></tt> is found to be false).</p>
+<p>Formally, if <em>a</em>, <em>b</em>, <em>c</em>, ..., <em>y</em>, <em>z</em> are expressions and <em>op1</em>,
+<em>op2</em>, ..., <em>opN</em> are comparison operators, then <tt class="docutils literal"><span class="pre">a</span> <span class="pre">op1</span> <span class="pre">b</span> <span class="pre">op2</span> <span class="pre">c</span> <span class="pre">...</span> <span class="pre">y</span>
+<span class="pre">opN</span> <span class="pre">z</span></tt> is equivalent to <tt class="docutils literal"><span class="pre">a</span> <span class="pre">op1</span> <span class="pre">b</span> <span class="pre">and</span> <span class="pre">b</span> <span class="pre">op2</span> <span class="pre">c</span> <span class="pre">and</span> <span class="pre">...</span> <span class="pre">y</span> <span class="pre">opN</span> <span class="pre">z</span></tt>,
+except that each expression is evaluated at most once.</p>
+<p>Note that <tt class="docutils literal"><span class="pre">a</span> <span class="pre">op1</span> <span class="pre">b</span> <span class="pre">op2</span> <span class="pre">c</span></tt> doesn&#8217;t imply any kind of comparison
+between <em>a</em> and <em>c</em>, so that, e.g., <tt class="docutils literal"><span class="pre">x</span> <span class="pre">&lt;</span> <span class="pre">y</span> <span class="pre">&gt;</span> <span class="pre">z</span></tt> is perfectly legal
+(though perhaps not pretty).</p>
+<p>The forms <tt class="docutils literal"><span class="pre">&lt;&gt;</span></tt> and <tt class="docutils literal"><span class="pre">!=</span></tt> are equivalent; for consistency with C,
+<tt class="docutils literal"><span class="pre">!=</span></tt> is preferred; where <tt class="docutils literal"><span class="pre">!=</span></tt> is mentioned below <tt class="docutils literal"><span class="pre">&lt;&gt;</span></tt> is also
+accepted.  The <tt class="docutils literal"><span class="pre">&lt;&gt;</span></tt> spelling is considered obsolescent.</p>
+<p>The operators <tt class="docutils literal"><span class="pre">&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;</span></tt>, <tt class="docutils literal"><span class="pre">==</span></tt>, <tt class="docutils literal"><span class="pre">&gt;=</span></tt>, <tt class="docutils literal"><span class="pre">&lt;=</span></tt>, and <tt class="docutils literal"><span class="pre">!=</span></tt> compare
+the values of two objects.  The objects need not have the same type.
+If both are numbers, they are converted to a common type.  Otherwise,
+objects of different types <em>always</em> compare unequal, and are ordered
+consistently but arbitrarily. You can control comparison behavior of
+objects of non-builtin types by defining a <tt class="docutils literal"><span class="pre">__cmp__</span></tt> method or rich
+comparison methods like <tt class="docutils literal"><span class="pre">__gt__</span></tt>, described in section <em>Special
+method names</em>.</p>
+<p>(This unusual definition of comparison was used to simplify the
+definition of operations like sorting and the <tt class="docutils literal"><span class="pre">in</span></tt> and <tt class="docutils literal"><span class="pre">not</span> <span class="pre">in</span></tt>
+operators. In the future, the comparison rules for objects of
+different types are likely to change.)</p>
+<p>Comparison of objects of the same type depends on the type:</p>
+<ul>
+<li><p class="first">Numbers are compared arithmetically.</p>
+</li>
+<li><p class="first">Strings are compared lexicographically using the numeric equivalents
+(the result of the built-in function <tt class="docutils literal"><span class="pre">ord()</span></tt>) of their characters.
+Unicode and 8-bit strings are fully interoperable in this behavior.
+[4]</p>
+</li>
+<li><p class="first">Tuples and lists are compared lexicographically using comparison of
+corresponding elements.  This means that to compare equal, each
+element must compare equal and the two sequences must be of the same
+type and have the same length.</p>
+<p>If not equal, the sequences are ordered the same as their first
+differing elements.  For example, <tt class="docutils literal"><span class="pre">cmp([1,2,x],</span> <span class="pre">[1,2,y])</span></tt> returns
+the same as <tt class="docutils literal"><span class="pre">cmp(x,y)</span></tt>.  If the corresponding element does not
+exist, the shorter sequence is ordered first (for example, <tt class="docutils literal"><span class="pre">[1,2]</span> <span class="pre">&lt;</span>
+<span class="pre">[1,2,3]</span></tt>).</p>
+</li>
+<li><p class="first">Mappings (dictionaries) compare equal if and only if their sorted
+(key, value) lists compare equal. [5] Outcomes other than equality
+are resolved consistently, but are not otherwise defined. [6]</p>
+</li>
+<li><p class="first">Most other objects of builtin types compare unequal unless they are
+the same object; the choice whether one object is considered smaller
+or larger than another one is made arbitrarily but consistently
+within one execution of a program.</p>
+</li>
+</ul>
+<p>The operators <tt class="docutils literal"><span class="pre">in</span></tt> and <tt class="docutils literal"><span class="pre">not</span> <span class="pre">in</span></tt> test for collection membership.
+<tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">s</span></tt> evaluates to true if <em>x</em> is a member of the collection <em>s</em>,
+and false otherwise.  <tt class="docutils literal"><span class="pre">x</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">s</span></tt> returns the negation of <tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span>
+<span class="pre">s</span></tt>. The collection membership test has traditionally been bound to
+sequences; an object is a member of a collection if the collection is
+a sequence and contains an element equal to that object.  However, it
+make sense for many other object types to support membership tests
+without being a sequence.  In particular, dictionaries (for keys) and
+sets support membership testing.</p>
+<p>For the list and tuple types, <tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">y</span></tt> is true if and only if there
+exists an index <em>i</em> such that <tt class="docutils literal"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y[i]</span></tt> is true.</p>
+<p>For the Unicode and string types, <tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">y</span></tt> is true if and only if
+<em>x</em> is a substring of <em>y</em>.  An equivalent test is <tt class="docutils literal"><span class="pre">y.find(x)</span> <span class="pre">!=</span> <span class="pre">-1</span></tt>.
+Note, <em>x</em> and <em>y</em> need not be the same type; consequently, <tt class="docutils literal"><span class="pre">u'ab'</span> <span class="pre">in</span>
+<span class="pre">'abc'</span></tt> will return <tt class="xref docutils literal"><span class="pre">True</span></tt>. Empty strings are always considered to
+be a substring of any other string, so <tt class="docutils literal"><span class="pre">&quot;&quot;</span> <span class="pre">in</span> <span class="pre">&quot;abc&quot;</span></tt> will return
+<tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p>Changed in version 2.3: Previously, <em>x</em> was required to be a string of
+length <tt class="docutils literal"><span class="pre">1</span></tt>.</p>
+<p>For user-defined classes which define the <tt class="docutils literal"><span class="pre">__contains__()</span></tt> method,
+<tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">y</span></tt> is true if and only if <tt class="docutils literal"><span class="pre">y.__contains__(x)</span></tt> is true.</p>
+<p>For user-defined classes which do not define <tt class="docutils literal"><span class="pre">__contains__()</span></tt> and do
+define <tt class="docutils literal"><span class="pre">__getitem__()</span></tt>, <tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">y</span></tt> is true if and only if there is a
+non-negative integer index <em>i</em> such that <tt class="docutils literal"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y[i]</span></tt>, and all lower
+integer indices do not raise <tt class="docutils literal"><span class="pre">IndexError</span></tt> exception. (If any other
+exception is raised, it is as if <tt class="docutils literal"><span class="pre">in</span></tt> raised that exception).</p>
+<p>The operator <tt class="docutils literal"><span class="pre">not</span> <span class="pre">in</span></tt> is defined to have the inverse true value of
+<tt class="docutils literal"><span class="pre">in</span></tt>.</p>
+<p>The operators <tt class="docutils literal"><span class="pre">is</span></tt> and <tt class="docutils literal"><span class="pre">is</span> <span class="pre">not</span></tt> test for object identity: <tt class="docutils literal"><span class="pre">x</span> <span class="pre">is</span>
+<span class="pre">y</span></tt> is true if and only if <em>x</em> and <em>y</em> are the same object.  <tt class="docutils literal"><span class="pre">x</span> <span class="pre">is</span>
+<span class="pre">not</span> <span class="pre">y</span></tt> yields the inverse truth value. [7]</p>
+</div>
+<div class="section" id="boolean-operations">
+<h2>5.10. Boolean operations<a class="headerlink" href="#boolean-operations" title="Permalink to this headline">¶</a></h2>
+<p>Boolean operations have the lowest priority of all Python operations:</p>
+<blockquote>
+expression             ::= conditional_expression | lambda_form
+old_expression         ::= or_test | old_lambda_form
+conditional_expression ::= or_test [&#8220;if&#8221; or_test &#8220;else&#8221; expression]
+or_test                ::= and_test | or_test &#8220;or&#8221; and_test
+and_test               ::= not_test | and_test &#8220;and&#8221; not_test
+not_test               ::= comparison | &#8220;not&#8221; not_test</blockquote>
+<p>In the context of Boolean operations, and also when expressions are
+used by control flow statements, the following values are interpreted
+as false: <tt class="xref docutils literal"><span class="pre">False</span></tt>, <tt class="xref docutils literal"><span class="pre">None</span></tt>, numeric zero of all types, and empty
+strings and containers (including strings, tuples, lists,
+dictionaries, sets and frozensets).  All other values are interpreted
+as true.  (See the <tt class="docutils literal"><span class="pre">__nonzero__()</span></tt> special method for a way to
+change this.)</p>
+<p>The operator <tt class="docutils literal"><span class="pre">not</span></tt> yields <tt class="xref docutils literal"><span class="pre">True</span></tt> if its argument is false,
+<tt class="xref docutils literal"><span class="pre">False</span></tt> otherwise.</p>
+<p>The expression <tt class="docutils literal"><span class="pre">x</span> <span class="pre">if</span> <span class="pre">C</span> <span class="pre">else</span> <span class="pre">y</span></tt> first evaluates <em>C</em> (<em>not</em> <em>x</em>); if
+<em>C</em> is true, <em>x</em> is evaluated and its value is returned; otherwise,
+<em>y</em> is evaluated and its value is returned.</p>
+<p>New in version 2.5.</p>
+<p>The expression <tt class="docutils literal"><span class="pre">x</span> <span class="pre">and</span> <span class="pre">y</span></tt> first evaluates <em>x</em>; if <em>x</em> is false, its
+value is returned; otherwise, <em>y</em> is evaluated and the resulting value
+is returned.</p>
+<p>The expression <tt class="docutils literal"><span class="pre">x</span> <span class="pre">or</span> <span class="pre">y</span></tt> first evaluates <em>x</em>; if <em>x</em> is true, its
+value is returned; otherwise, <em>y</em> is evaluated and the resulting value
+is returned.</p>
+<p>(Note that neither <tt class="docutils literal"><span class="pre">and</span></tt> nor <tt class="docutils literal"><span class="pre">or</span></tt> restrict the value and type they
+return to <tt class="xref docutils literal"><span class="pre">False</span></tt> and <tt class="xref docutils literal"><span class="pre">True</span></tt>, but rather return the last evaluated
+argument. This is sometimes useful, e.g., if <tt class="docutils literal"><span class="pre">s</span></tt> is a string that
+should be replaced by a default value if it is empty, the expression
+<tt class="docutils literal"><span class="pre">s</span> <span class="pre">or</span> <span class="pre">'foo'</span></tt> yields the desired value.  Because <tt class="docutils literal"><span class="pre">not</span></tt> has to
+invent a value anyway, it does not bother to return a value of the
+same type as its argument, so e.g., <tt class="docutils literal"><span class="pre">not</span> <span class="pre">'foo'</span></tt> yields <tt class="xref docutils literal"><span class="pre">False</span></tt>,
+not <tt class="docutils literal"><span class="pre">''</span></tt>.)</p>
+</div>
+<div class="section" id="lambdas">
+<h2>5.11. Lambdas<a class="headerlink" href="#lambdas" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+lambda_form     ::= &#8220;lambda&#8221; [parameter_list]: expression
+old_lambda_form ::= &#8220;lambda&#8221; [parameter_list]: old_expression</blockquote>
+<p>Lambda forms (lambda expressions) have the same syntactic position as
+expressions.  They are a shorthand to create anonymous functions; the
+expression <tt class="docutils literal"><span class="pre">lambda</span> <span class="pre">arguments:</span> <span class="pre">expression</span></tt> yields a function object.
+The unnamed object behaves like a function object defined with</p>
+<blockquote>
+<dl class="docutils">
+<dt>def name(arguments):</dt>
+<dd>return expression</dd>
+</dl>
+</blockquote>
+<p>See section <em>Function definitions</em> for the syntax of parameter lists.
+Note that functions created with lambda forms cannot contain
+statements.</p>
+</div>
+<div class="section" id="expression-lists">
+<h2>5.12. Expression lists<a class="headerlink" href="#expression-lists" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+expression_list ::= expression ( &#8220;,&#8221; expression )* [&#8220;,&#8221;]</blockquote>
+<p>An expression list containing at least one comma yields a tuple.  The
+length of the tuple is the number of expressions in the list.  The
+expressions are evaluated from left to right.</p>
+<p>The trailing comma is required only to create a single tuple (a.k.a. a
+<em>singleton</em>); it is optional in all other cases.  A single expression
+without a trailing comma doesn&#8217;t create a tuple, but rather yields the
+value of that expression. (To create an empty tuple, use an empty pair
+of parentheses: <tt class="docutils literal"><span class="pre">()</span></tt>.)</p>
+</div>
+<div class="section" id="evaluation-order">
+<h2>5.13. Evaluation order<a class="headerlink" href="#evaluation-order" title="Permalink to this headline">¶</a></h2>
+<p>Python evaluates expressions from left to right. Notice that while
+evaluating an assignment, the right-hand side is evaluated before the
+left-hand side.</p>
+<p>In the following lines, expressions will be evaluated in the
+arithmetic order of their suffixes:</p>
+<blockquote>
+expr1, expr2, expr3, expr4
+(expr1, expr2, expr3, expr4)
+{expr1: expr2, expr3: expr4}
+expr1 + expr2 * (expr3 - expr4)
+expr1(expr2, expr3, <a href="#id1"><span class="problematic" id="id2">*</span></a>expr4, <a href="#id3"><span class="problematic" id="id4">**</span></a>expr5)
+expr3, expr4 = expr1, expr2</blockquote>
+</div>
+<div class="section" id="summary">
+<h2>5.14. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>The following table summarizes the operator precedences in Python,
+from lowest precedence (least binding) to highest precedence (most
+binding). Operators in the same box have the same precedence.  Unless
+the syntax is explicitly given, operators are binary.  Operators in
+the same box group left to right (except for comparisons, including
+tests, which all have the same precedence and chain from left to right
+&#8212; see section <em>Comparisons</em> &#8212; and exponentiation, which groups
+from right to left).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="56%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Operator</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">lambda</span></tt></td>
+<td>Lambda expression</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">or</span></tt></td>
+<td>Boolean OR</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">and</span></tt></td>
+<td>Boolean AND</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">not</span></tt> <em>x</em></td>
+<td>Boolean NOT</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">in</span></tt>, <tt class="docutils literal"><span class="pre">not</span></tt> <tt class="docutils literal"><span class="pre">in</span></tt>, <tt class="docutils literal"><span class="pre">is</span></tt>, <tt class="docutils literal"><span class="pre">is</span> <span class="pre">not</span></tt>,
+<tt class="docutils literal"><span class="pre">&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;=</span></tt>, <tt class="docutils literal"><span class="pre">&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;=</span></tt>, <tt class="docutils literal"><span class="pre">&lt;&gt;</span></tt>, <tt class="docutils literal"><span class="pre">!=</span></tt>,
+<tt class="docutils literal"><span class="pre">==</span></tt></td>
+<td>Comparisons, including membership
+tests and identity tests,</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">|</span></tt></td>
+<td>Bitwise OR</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">^</span></tt></td>
+<td>Bitwise XOR</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">&amp;</span></tt></td>
+<td>Bitwise AND</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">&lt;&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;&gt;</span></tt></td>
+<td>Shifts</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">+</span></tt>, <tt class="docutils literal"><span class="pre">-</span></tt></td>
+<td>Addition and subtraction</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">*</span></tt>, <tt class="docutils literal"><span class="pre">/</span></tt>, <tt class="docutils literal"><span class="pre">//</span></tt>, <tt class="docutils literal"><span class="pre">%</span></tt></td>
+<td>Multiplication, division, remainder</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">+x</span></tt>, <tt class="docutils literal"><span class="pre">-x</span></tt>, <tt class="docutils literal"><span class="pre">~x</span></tt></td>
+<td>Positive, negative, bitwise NOT</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">**</span></tt></td>
+<td>Exponentiation [8]</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">x[index]</span></tt>, <tt class="docutils literal"><span class="pre">x[index:index]</span></tt>,
+<tt class="docutils literal"><span class="pre">x(arguments...)</span></tt>, <tt class="docutils literal"><span class="pre">x.attribute</span></tt></td>
+<td>Subscription, slicing, call,
+attribute reference</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">(expressions...)</span></tt>, <tt class="docutils literal"><span class="pre">[expressions...]</span></tt>,
+<tt class="docutils literal"><span class="pre">{key:datum...}</span></tt>, <tt class="docutils literal"><span class="pre">`expressions...`</span></tt></td>
+<td>Binding or tuple display, list
+display, dictionary display, string
+conversion</td>
+</tr>
+</tbody>
+</table>
+<p>-[ Footnotes ]-</p>
+<dl class="docutils">
+<dt>[1] In Python 2.3 and later releases, a list comprehension &#8220;leaks&#8221; the</dt>
+<dd>control variables of each <tt class="docutils literal"><span class="pre">for</span></tt> it contains into the containing
+scope.  However, this behavior is deprecated, and relying on it
+will not work in Python 3.0</dd>
+<dt>[2] While <tt class="docutils literal"><span class="pre">abs(x%y)</span> <span class="pre">&lt;</span> <span class="pre">abs(y)</span></tt> is true mathematically, for floats it</dt>
+<dd>may not be true numerically due to roundoff.  For example, and
+assuming a platform on which a Python float is an IEEE 754 double-
+precision number, in order that <tt class="docutils literal"><span class="pre">-1e-100</span> <span class="pre">%</span> <span class="pre">1e100</span></tt> have the same
+sign as <tt class="docutils literal"><span class="pre">1e100</span></tt>, the computed result is <tt class="docutils literal"><span class="pre">-1e-100</span> <span class="pre">+</span> <span class="pre">1e100</span></tt>,
+which is numerically exactly equal to <tt class="docutils literal"><span class="pre">1e100</span></tt>.  Function
+<tt class="docutils literal"><span class="pre">fmod()</span></tt> in the <tt class="docutils literal"><span class="pre">math</span></tt> module returns a result whose sign
+matches the sign of the first argument instead, and so returns
+<tt class="docutils literal"><span class="pre">-1e-100</span></tt> in this case. Which approach is more appropriate
+depends on the application.</dd>
+<dt>[3] If x is very close to an exact integer multiple of y, it&#8217;s</dt>
+<dd>possible for <tt class="docutils literal"><span class="pre">floor(x/y)</span></tt> to be one larger than <tt class="docutils literal"><span class="pre">(x-x%y)/y</span></tt>
+due to rounding.  In such cases, Python returns the latter result,
+in order to preserve that <tt class="docutils literal"><span class="pre">divmod(x,y)[0]</span> <span class="pre">*</span> <span class="pre">y</span> <span class="pre">+</span> <span class="pre">x</span> <span class="pre">%</span> <span class="pre">y</span></tt> be very
+close to <tt class="docutils literal"><span class="pre">x</span></tt>.</dd>
+<dt>[4] While comparisons between unicode strings make sense at the byte</dt>
+<dd>level, they may be counter-intuitive to users. For example, the
+strings <tt class="docutils literal"><span class="pre">u&quot;\u00C7&quot;</span></tt> and <tt class="docutils literal"><span class="pre">u&quot;\u0043\u0327&quot;</span></tt> compare differently,
+even though they both represent the same unicode character (LATIN
+CAPTITAL LETTER C WITH CEDILLA). To compare strings in a human
+recognizable way, compare using <tt class="docutils literal"><span class="pre">unicodedata.normalize()</span></tt>.</dd>
+<dt>[5] The implementation computes this efficiently, without constructing</dt>
+<dd>lists or sorting.</dd>
+<dt>[6] Earlier versions of Python used lexicographic comparison of the</dt>
+<dd>sorted (key, value) lists, but this was very expensive for the
+common case of comparing for equality.  An even earlier version of
+Python compared dictionaries by identity only, but this caused
+surprises because people expected to be able to test a dictionary
+for emptiness by comparing it to <tt class="docutils literal"><span class="pre">{}</span></tt>.</dd>
+<dt>[7] Due to automatic garbage-collection, free lists, and the dynamic</dt>
+<dd>nature of descriptors, you may notice seemingly unusual behaviour
+in certain uses of the <tt class="docutils literal"><span class="pre">is</span></tt> operator, like those involving
+comparisons between instance methods, or constants.  Check their
+documentation for more info.</dd>
+<dt>[8] The power operator <tt class="docutils literal"><span class="pre">**</span></tt> binds less tightly than an arithmetic or</dt>
+<dd>bitwise unary operator on its right, that is, <tt class="docutils literal"><span class="pre">2**-1</span></tt> is
+<tt class="docutils literal"><span class="pre">0.5</span></tt>.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

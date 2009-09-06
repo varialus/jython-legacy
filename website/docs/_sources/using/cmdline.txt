@@ -1,0 +1,335 @@
+
+Command line and environment
+****************************
+
+The Jython interpreter scans the command line and the environment for
+various settings.
+
+Note: Other implementations' command line schemes may differ.  See
+  *Alternate Implementations* for further resources.
+
+
+Command line
+============
+
+When invoking Jython, you may specify any of these options:
+
+   jython [-c command | -m module-name | script | - ] [args]
+
+The most common use case is, of course, a simple invocation of a
+script:
+
+   jython myscript.py
+
+
+Interface options
+-----------------
+
+The interpreter interface resembles that of the UNIX shell, but
+provides some additional methods of invocation:
+
+* When called with standard input connected to a tty device, it
+  prompts for commands and executes them until an EOF (an end-of-file
+  character, you can produce that with *Ctrl-D* on UNIX or *Ctrl-Z,
+  Enter* on Windows) is read.
+
+* When called with a file name argument or with a file as standard
+  input, it reads and executes a script from that file.
+
+* When called with a directory name argument, it reads and executes an
+  appropriately named script from that directory.
+
+* When called with ``-c command``, it executes the Python statement(s)
+  given as *command*.  Here *command* may contain multiple statements
+  separated by newlines. Leading whitespace is significant in Python
+  statements!
+
+* When called with ``-m module-name``, the given module is located on
+  the Jython module path and executed as a script.
+
+In non-interactive mode, the entire input is parsed before it is
+executed.
+
+An interface option terminates the list of options consumed by the
+interpreter, all consecutive arguments will end up in ``sys.argv`` --
+note that the first element, subscript zero (``sys.argv[0]``), is a
+string reflecting the program's source.
+
+-c <command>
+
+   Execute the Jython code in *command*.  *command* can be one ore
+   more statements separated by newlines, with significant leading
+   whitespace as in normal module code.
+
+   If this option is given, the first element of ``sys.argv`` will be
+   ``"-c"`` and the current directory will be added to the start of
+   ``sys.path`` (allowing modules in that directory to be imported as
+   top level modules).
+
+-m <module-name>
+
+   Search ``sys.path`` for the named module and execute its contents
+   as the ``__main__`` module.
+
+   Since the argument is a *module* name, you must not give a file
+   extension (``.py``).  The ``module-name`` should be a valid Jython or Python
+   module name, but the implementation may not always enforce this
+   (e.g. it may allow you to use a name that includes a hyphen).
+
+   If this option is given, the first element of ``sys.argv`` will be
+   the full path to the module file. As with the *-c* option, the
+   current directory will be added to the start of ``sys.path``.
+
+   Many standard library modules contain code that is invoked on their
+   execution as a script.  An example is the ``timeit`` module:
+
+      jython -mtimeit -s 'setup here' 'benchmarked code here'
+      jython -mtimeit -h # for details
+
+   See also:
+
+      ``runpy.run_module()``    The actual implementation of this
+      feature.
+
+      **PEP 338** -- Executing modules as scripts
+
+
+<script>
+
+   Execute the Python code contained in *script*, which must be a
+   filesystem path (absolute or relative) referring to either a Python
+   file, a directory containing a ``__main__.py`` file, or a zipfile
+   containing a ``__main__.py`` file.
+
+   If this option is given, the first element of ``sys.argv`` will be
+   the script name as given on the command line.
+
+   If the script name refers directly to a Python file, the directory
+   containing that file is added to the start of ``sys.path``, and the
+   file is executed as the ``__main__`` module.
+
+   If the script name refers to a directory or zipfile, the script
+   name is added to the start of ``sys.path`` and the ``__main__.py``
+   file in that location is executed as the ``__main__`` module.
+
+   Changed in version 2.5: Directories and zipfiles containing a
+   ``__main__.py`` file at the top level are now considered valid
+   Python scripts.
+
+If no interface option is given, *-i* is implied, ``sys.argv[0]`` is
+an empty string (``""``) and the current directory will be added to
+the start of ``sys.path``.
+
+See also:
+
+   *Invoking the Interpreter*
+
+
+Generic options
+---------------
+
+-?
+-h
+--help
+
+   Print a short description of all command line options.
+
+   Changed in version 2.5: The ``--help`` variant.
+
+-V
+--version
+
+   Print the Jython version number and exit.  Example output could be:
+
+      Jython 2.5.0
+
+   Changed in version 2.5: The ``--version`` variant.
+
+
+Miscellaneous options
+---------------------
+
+-i
+
+   When a script is passed as first argument or the *-c* option is
+   used, enter interactive mode after executing the script or the
+   command, even when ``sys.stdin`` does not appear to be a terminal.
+   The **PYTHONSTARTUP** file is not read.
+
+   This can be useful to inspect global variables or a stack trace
+   when a script raises an exception.  See also **PYTHONINSPECT**.
+
+-Q <arg>
+
+   Division control. The argument must be one of the following:
+
+   ``old``
+      division of int/int and long/long return an int or long
+      (*default*)
+
+   ``new``
+      new division semantics, i.e. division of int/int and long/long
+      returns a float
+
+   ``warn``
+      old division semantics with a warning for int/int and long/long
+
+   ``warnall``
+      old division semantics with a warning for all uses of the
+      division operator
+
+   See also:
+
+      ``Tools/scripts/fixdiv.py``    for a use of ``warnall``
+
+      **PEP 238** -- Changing the division operator
+
+-S
+
+   Disable the import of the module ``site`` and the site-dependent
+   manipulations of ``sys.path`` that it entails.
+
+-u
+
+   Force stdin, stdout and stderr to be totally unbuffered.  On
+   systems where it matters, also put stdin, stdout and stderr in
+   binary mode.
+
+   Note that there is internal buffering in ``file.readlines()`` and
+   *File Objects* (``for line in sys.stdin``) which is not influenced
+   by this option.  To work around this, you will want to use
+   ``file.readline()`` inside a ``while 1:`` loop.
+
+   See also **PYTHONUNBUFFERED**.
+
+-v
+
+   Print a message each time a module is initialized, showing the
+   place (filename or built-in module) from which it is loaded.  When
+   given twice (*-vv*), print a message for each file that is checked
+   for when searching for a module.  Also provides information on
+   module cleanup at exit. See also **PYTHONVERBOSE**.
+
+-W arg
+
+   Warning control.  Jython's warning machinery by default prints
+   warning messages to ``sys.stderr``.  A typical warning message has
+   the following form:
+
+      file:line: category: message
+
+   By default, each warning is printed once for each source line where
+   it occurs.  This option controls how often warnings are printed.
+
+   Multiple *-W* options may be given; when a warning matches more
+   than one option, the action for the last matching option is
+   performed.  Invalid *-W* options are ignored (though, a warning
+   message is printed about invalid options when the first warning is
+   issued).
+
+   Warnings can also be controlled from within a Jython program using
+   the ``warnings`` module.
+
+   The simplest form of argument is one of the following action
+   strings (or a unique abbreviation):
+
+   ``ignore``
+      Ignore all warnings.
+
+   ``default``
+      Explicitly request the default behavior (printing each warning
+      once per source line).
+
+   ``all``
+      Print a warning each time it occurs (this may generate many
+      messages if a warning is triggered repeatedly for the same
+      source line, such as inside a loop).
+
+   ``module``
+      Print each warning only only the first time it occurs in each
+      module.
+
+   ``once``
+      Print each warning only the first time it occurs in the program.
+
+   ``error``
+      Raise an exception instead of printing a warning message.
+
+   The full form of argument is:
+
+      action:message:category:module:line
+
+   Here, *action* is as explained above but only applies to messages
+   that match the remaining fields.  Empty fields match all values;
+   trailing empty fields may be omitted.  The *message* field matches
+   the start of the warning message printed; this match is case-
+   insensitive.  The *category* field matches the warning category.
+   This must be a class name; the match test whether the actual
+   warning category of the message is a subclass of the specified
+   warning category.  The full class name must be given.  The *module*
+   field matches the (fully-qualified) module name; this match is
+   case-sensitive.  The *line* field matches the line number, where
+   zero matches all line numbers and is thus equivalent to an omitted
+   line number.
+
+   See also:
+
+      ``warnings`` -- the warnings module
+
+      **PEP 230** -- Warning framework
+
+-jar jar
+
+   Program read from __run__.py in jar file
+
+
+Environment variables
+=====================
+
+These environment variables influence Python's behavior.
+
+JYTHON_HOME
+
+   Jython installation directory
+
+JAVA_HOME
+
+   Java installation directory
+
+JYTHONPATH
+
+   Augment the default search path for module files.  The format is
+   the same as the shell's **PATH**: one or more directory pathnames
+   separated by ``os.pathsep`` (e.g. colons on Unix or semicolons on
+   Windows). Non-existent directories are silently ignored.
+
+JYTHON_OPTS
+
+   Default command line arguments
+
+Jython Launcher Options
+=======================
+
+-Jarg
+
+   Pass argument through to Java VM (e.g. -J-Xmx512m)
+
+--jdb
+
+   Run under JDB
+
+--print
+
+   Print the Java command instead of executing it
+
+--profile
+
+   Run with the Java interactive Profiler (http://jiprof.sf.net)
+
+--boot
+
+   Put Jython on the boot classpath (disables bytecode verifier)
+
+--
+
+   Pass remaining variables through to Jython

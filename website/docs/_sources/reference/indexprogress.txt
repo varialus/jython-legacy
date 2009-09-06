@@ -1,0 +1,20 @@
+.. _reference-index:
+
+#################################
+  The Python Language Reference
+#################################
+
+:Release: |version|
+:Date: |today|
+
+This portion of the documentation is currently in progress.  For some of the most up-to-date language references, please use the following:
+
+`The Python Documentation`_
+
+`The Jython Wiki`_
+
+`The Jython Book`_
+
+.. _The Python Documentation: http://docs.python.org/
+.. _The Jython Wiki: http://wiki.python.org/jython
+.. _The Jython Book: http://www.jythonbook.com

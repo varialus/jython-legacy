@@ -1,0 +1,23 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ Jython Documentation contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+.. toctree::
+
+   whatsnew/index.txt
+   tutorial/index.txt
+   using/index.txt
+   reference/index.txt
+   library/index.txt
+   extending/index.txt
+   java-api/index.txt
+   distutils/index.txt
+   install/index.txt
+   documenting/index.txt
+   howto/index.txt
+   glossary.txt
+
+   about.txt
+   bugs.txt
+   copyright.txt
+   license.txt

@@ -1,0 +1,13 @@
+
+Extending and Embedding the Jython Interpreter
+**********************************************
+
+Release:
+  2.5.0
+
+Date:
+   September 4, 2009
+
+This document is currently in progress, sorry for the inconvenience.  Check back soon or visit the `wiki`_ for more information.
+
+.. _wiki: http://wiki.python.org/jython

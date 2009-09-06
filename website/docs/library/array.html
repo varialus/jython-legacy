@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5. array — Efficient arrays of numeric values &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="The Python Standard Library and What Comes with Jython" href="indexprogress.html" />
+    <link rel="next" title="6. Abstract Syntax Trees" href="ast.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="ast.html" title="6. Abstract Syntax Trees"
+             accesskey="N">next</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" accesskey="U">The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="ast.html"
+                                  title="next chapter">6. Abstract Syntax Trees</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/array.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="array-efficient-arrays-of-numeric-values">
+<h1>5. <tt class="docutils literal"><span class="pre">array</span></tt> &#8212; Efficient arrays of numeric values<a class="headerlink" href="#array-efficient-arrays-of-numeric-values" title="Permalink to this headline">¶</a></h1>
+<p>This module defines an object type which can compactly represent an
+array of basic values: characters, integers, floating point numbers.
+Arrays are sequence types and behave very much like lists, except that
+the type of objects stored in them is constrained.  The type is
+specified at object creation time by using a <em>type code</em>, which is a
+single character.  The following type codes are defined:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="23%" />
+<col width="27%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Type code</th>
+<th class="head">C Type</th>
+<th class="head">Python Type</th>
+<th class="head">Minimum size in bytes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">'c'</span></tt></td>
+<td>char</td>
+<td>character</td>
+<td>1</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'b'</span></tt></td>
+<td>signed char</td>
+<td>int</td>
+<td>1</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'B'</span></tt></td>
+<td>unsigned char</td>
+<td>int</td>
+<td>1</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'u'</span></tt></td>
+<td>Py_UNICODE</td>
+<td>Unicode character</td>
+<td>2</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'h'</span></tt></td>
+<td>signed short</td>
+<td>int</td>
+<td>2</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'H'</span></tt></td>
+<td>unsigned short</td>
+<td>int</td>
+<td>2</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'i'</span></tt></td>
+<td>signed int</td>
+<td>int</td>
+<td>2</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'I'</span></tt></td>
+<td>unsigned int</td>
+<td>long</td>
+<td>2</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'l'</span></tt></td>
+<td>signed long</td>
+<td>int</td>
+<td>4</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'L'</span></tt></td>
+<td>unsigned long</td>
+<td>long</td>
+<td>4</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'f'</span></tt></td>
+<td>float</td>
+<td>float</td>
+<td>4</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">'d'</span></tt></td>
+<td>double</td>
+<td>float</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<p>In CPython, the actual representation of values is determined by the machine
+architecture (strictly speaking, by the C implementation).  Jython differs
+a bit because the array module is an implementation of jarray.</p>
+<p>The module defines the following type:</p>
+<p>array.array(typecode[, initializer])</p>
+<blockquote>
+<p>Return a new array whose items are restricted by <em>typecode</em>, and
+initialized from the optional <em>initializer</em> value, which must be a
+list, string, or iterable over elements of the appropriate type.</p>
+<p>Changed in version 2.4: Formerly, only lists or strings were
+accepted.</p>
+<p>If given a list or string, the initializer is passed to the new
+array&#8217;s <tt class="docutils literal"><span class="pre">fromlist()</span></tt>, <tt class="docutils literal"><span class="pre">fromstring()</span></tt>, or <tt class="docutils literal"><span class="pre">fromunicode()</span></tt>
+method (see below) to add initial items to the array.  Otherwise,
+the iterable initializer is passed to the <tt class="docutils literal"><span class="pre">extend()</span></tt> method.</p>
+</blockquote>
+<p>The following data items and methods are also supported:</p>
+<p>array.typecode</p>
+<blockquote>
+The typecode character used to create the array.</blockquote>
+<p>array.itemsize</p>
+<blockquote>
+The length in bytes of one array item in the internal
+representation.</blockquote>
+<p>array.append(x)</p>
+<blockquote>
+Append a new item with value <em>x</em> to the end of the array.</blockquote>
+<p>array.byteswap()</p>
+<blockquote>
+&#8220;Byteswap&#8221; all items of the array.  This is only supported for
+values which are 1, 2, 4, or 8 bytes in size; for other types of
+values, <tt class="docutils literal"><span class="pre">RuntimeError</span></tt> is raised.  It is useful when reading data
+from a file written on a machine with a different byte order.</blockquote>
+<p>array.count(x)</p>
+<blockquote>
+Return the number of occurrences of <em>x</em> in the array.</blockquote>
+<p>array.extend(iterable)</p>
+<blockquote>
+<p>Append items from <em>iterable</em> to the end of the array.  If
+<em>iterable</em> is another array, it must have <em>exactly</em> the same type
+code; if not, <tt class="docutils literal"><span class="pre">TypeError</span></tt> will be raised.  If <em>iterable</em> is not
+an array, it must be iterable and its elements must be the right
+type to be appended to the array.</p>
+<p>Changed in version 2.4: Formerly, the argument could only be
+another array.</p>
+</blockquote>
+<p>array.fromfile(f, n)</p>
+<blockquote>
+Read <em>n</em> items (as machine values) from the file object <em>f</em> and
+append them to the end of the array.  If less than <em>n</em> items are
+available, <tt class="docutils literal"><span class="pre">EOFError</span></tt> is raised, but the items that were
+available are still inserted into the array. <em>f</em> must be a real
+built-in file object; something else with a <tt class="docutils literal"><span class="pre">read()</span></tt> method won&#8217;t
+do.</blockquote>
+<p>array.fromlist(list)</p>
+<blockquote>
+Append items from the list.  This is equivalent to <tt class="docutils literal"><span class="pre">for</span> <span class="pre">x</span> <span class="pre">in</span> <span class="pre">list:</span>
+<span class="pre">a.append(x)</span></tt> except that if there is a type error, the array is
+unchanged.</blockquote>
+<p>array.fromstring(s)</p>
+<blockquote>
+Appends items from the string, interpreting the string as an array
+of machine values (as if it had been read from a file using the
+<tt class="docutils literal"><span class="pre">fromfile()</span></tt> method).</blockquote>
+<p>array.fromunicode(s)</p>
+<blockquote>
+Extends this array with data from the given unicode string.  The
+array must be a type <tt class="docutils literal"><span class="pre">'u'</span></tt> array; otherwise a <tt class="docutils literal"><span class="pre">ValueError</span></tt> is
+raised.  Use <tt class="docutils literal"><span class="pre">array.fromstring(unicodestring.encode(enc))</span></tt> to
+append Unicode data to an array of some other type.</blockquote>
+<p>array.index(x)</p>
+<blockquote>
+Return the smallest <em>i</em> such that <em>i</em> is the index of the first
+occurrence of <em>x</em> in the array.</blockquote>
+<p>array.insert(i, x)</p>
+<blockquote>
+Insert a new item with value <em>x</em> in the array before position <em>i</em>.
+Negative values are treated as being relative to the end of the
+array.</blockquote>
+<p>array.pop([i])</p>
+<blockquote>
+Removes the item with the index <em>i</em> from the array and returns it.
+The optional argument defaults to <tt class="docutils literal"><span class="pre">-1</span></tt>, so that by default the
+last item is removed and returned.</blockquote>
+<p>array.remove(x)</p>
+<blockquote>
+Remove the first occurrence of <em>x</em> from the array.</blockquote>
+<p>array.reverse()</p>
+<blockquote>
+Reverse the order of the items in the array.</blockquote>
+<p>array.tofile(f)</p>
+<blockquote>
+Write all items (as machine values) to the file object <em>f</em>.</blockquote>
+<p>array.tolist()</p>
+<blockquote>
+Convert the array to an ordinary list with the same items.</blockquote>
+<p>array.tostring()</p>
+<blockquote>
+Convert the array to an array of machine values and return the
+string representation (the same sequence of bytes that would be
+written to a file by the <tt class="docutils literal"><span class="pre">tofile()</span></tt> method.)</blockquote>
+<p>array.tounicode()</p>
+<blockquote>
+Convert the array to a unicode string.  The array must be a type
+<tt class="docutils literal"><span class="pre">'u'</span></tt> array; otherwise a <tt class="docutils literal"><span class="pre">ValueError</span></tt> is raised. Use
+<tt class="docutils literal"><span class="pre">array.tostring().decode(enc)</span></tt> to obtain a unicode string from an
+array of some other type.</blockquote>
+<p>array.write(f)</p>
+<blockquote>
+<p>Deprecated since version 1.5.1: Use the <tt class="docutils literal"><span class="pre">tofile()</span></tt> method.</p>
+<p>Write all items (as machine values) to the file object <em>f</em>.</p>
+</blockquote>
+<p>When an array object is printed or converted to a string, it is
+represented as <tt class="docutils literal"><span class="pre">array(typecode,</span> <span class="pre">initializer)</span></tt>.  The <em>initializer</em> is
+omitted if the array is empty, otherwise it is a string if the
+<em>typecode</em> is <tt class="docutils literal"><span class="pre">'c'</span></tt>, otherwise it is a list of numbers.  The string
+is guaranteed to be able to be converted back to an array with the
+same type and value using <tt class="docutils literal"><span class="pre">eval()</span></tt>, so long as the <tt class="docutils literal"><span class="pre">array()</span></tt>
+function has been imported using <tt class="docutils literal"><span class="pre">from</span> <span class="pre">array</span> <span class="pre">import</span> <span class="pre">array</span></tt>.
+Examples:</p>
+<blockquote>
+array(&#8216;l&#8217;)
+array(&#8216;c&#8217;, &#8216;hello world&#8217;)
+array(&#8216;u&#8217;, u&#8217;hello u2641&#8217;)
+array(&#8216;l&#8217;, [1, 2, 3, 4, 5])
+array(&#8216;d&#8217;, [1.0, 2.0, 3.14])</blockquote>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Module <tt class="docutils literal"><span class="pre">struct</span></tt></dt>
+<dd>Packing and unpacking of heterogeneous binary data.</dd>
+<dt>Module <tt class="docutils literal"><span class="pre">xdrlib</span></tt></dt>
+<dd>Packing and unpacking of External Data Representation (XDR) data
+as used in some remote procedure call systems.</dd>
+</dl>
+</blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ast.html" title="6. Abstract Syntax Trees"
+             >next</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" >The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

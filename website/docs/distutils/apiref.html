@@ -1,0 +1,1774 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API Reference &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">API Reference</a><ul>
+<li><a class="reference external" href="#distutils-core-core-distutils-functionality"><tt class="docutils literal"><span class="pre">distutils.core</span></tt> &#8212; Core Distutils functionality</a></li>
+<li><a class="reference external" href="#distutils-ccompiler-ccompiler-base-class"><tt class="docutils literal"><span class="pre">distutils.ccompiler</span></tt> &#8212; CCompiler base class</a></li>
+<li><a class="reference external" href="#distutils-unixccompiler-unix-c-compiler"><tt class="docutils literal"><span class="pre">distutils.unixccompiler</span></tt> &#8212; Unix C Compiler</a></li>
+<li><a class="reference external" href="#distutils-msvccompiler-microsoft-compiler"><tt class="docutils literal"><span class="pre">distutils.msvccompiler</span></tt> &#8212; Microsoft Compiler</a></li>
+<li><a class="reference external" href="#distutils-bcppcompiler-borland-compiler"><tt class="docutils literal"><span class="pre">distutils.bcppcompiler</span></tt> &#8212; Borland Compiler</a></li>
+<li><a class="reference external" href="#distutils-cygwincompiler-cygwin-compiler"><tt class="docutils literal"><span class="pre">distutils.cygwincompiler</span></tt> &#8212; Cygwin Compiler</a></li>
+<li><a class="reference external" href="#distutils-emxccompiler-os-2-emx-compiler"><tt class="docutils literal"><span class="pre">distutils.emxccompiler</span></tt> &#8212; OS/2 EMX Compiler</a></li>
+<li><a class="reference external" href="#distutils-mwerkscompiler-metrowerks-codewarrior-support"><tt class="docutils literal"><span class="pre">distutils.mwerkscompiler</span></tt> &#8212; Metrowerks CodeWarrior support</a></li>
+<li><a class="reference external" href="#distutils-archive-util-archiving-utilities"><tt class="docutils literal"><span class="pre">distutils.archive_util</span></tt> &#8212;  Archiving utilities</a></li>
+<li><a class="reference external" href="#distutils-dep-util-dependency-checking"><tt class="docutils literal"><span class="pre">distutils.dep_util</span></tt> &#8212; Dependency checking</a></li>
+<li><a class="reference external" href="#distutils-dir-util-directory-tree-operations"><tt class="docutils literal"><span class="pre">distutils.dir_util</span></tt> &#8212; Directory tree operations</a></li>
+<li><a class="reference external" href="#distutils-file-util-single-file-operations"><tt class="docutils literal"><span class="pre">distutils.file_util</span></tt> &#8212; Single file operations</a></li>
+<li><a class="reference external" href="#distutils-util-miscellaneous-other-utility-functions"><tt class="docutils literal"><span class="pre">distutils.util</span></tt> &#8212; Miscellaneous other utility functions</a></li>
+<li><a class="reference external" href="#distutils-dist-the-distribution-class"><tt class="docutils literal"><span class="pre">distutils.dist</span></tt> &#8212; The Distribution class</a></li>
+<li><a class="reference external" href="#distutils-extension-the-extension-class"><tt class="docutils literal"><span class="pre">distutils.extension</span></tt> &#8212; The Extension class</a></li>
+<li><a class="reference external" href="#distutils-debug-distutils-debug-mode"><tt class="docutils literal"><span class="pre">distutils.debug</span></tt> &#8212; Distutils debug mode</a></li>
+<li><a class="reference external" href="#distutils-errors-distutils-exceptions"><tt class="docutils literal"><span class="pre">distutils.errors</span></tt> &#8212; Distutils exceptions</a></li>
+<li><a class="reference external" href="#distutils-fancy-getopt-wrapper-around-the-standard-getopt-module"><tt class="docutils literal"><span class="pre">distutils.fancy_getopt</span></tt> &#8212; Wrapper around the standard getopt module</a></li>
+<li><a class="reference external" href="#distutils-filelist-the-filelist-class"><tt class="docutils literal"><span class="pre">distutils.filelist</span></tt> &#8212; The FileList class</a></li>
+<li><a class="reference external" href="#distutils-log-simple-pep-282-style-logging"><tt class="docutils literal"><span class="pre">distutils.log</span></tt> &#8212; Simple PEP 282-style logging</a></li>
+<li><a class="reference external" href="#distutils-spawn-spawn-a-sub-process"><tt class="docutils literal"><span class="pre">distutils.spawn</span></tt> &#8212; Spawn a sub-process</a></li>
+<li><a class="reference external" href="#distutils-sysconfig-system-configuration-information"><tt class="docutils literal"><span class="pre">distutils.sysconfig</span></tt> &#8212; System configuration information</a></li>
+<li><a class="reference external" href="#distutils-text-file-the-textfile-class"><tt class="docutils literal"><span class="pre">distutils.text_file</span></tt> &#8212; The TextFile class</a></li>
+<li><a class="reference external" href="#distutils-version-version-number-classes"><tt class="docutils literal"><span class="pre">distutils.version</span></tt> &#8212; Version number classes</a></li>
+<li><a class="reference external" href="#distutils-cmd-abstract-base-class-for-distutils-commands"><tt class="docutils literal"><span class="pre">distutils.cmd</span></tt> &#8212; Abstract base class for Distutils commands</a></li>
+<li><a class="reference external" href="#distutils-command-individual-distutils-commands"><tt class="docutils literal"><span class="pre">distutils.command</span></tt> &#8212; Individual Distutils commands</a></li>
+<li><a class="reference external" href="#distutils-command-bdist-build-a-binary-installer"><tt class="docutils literal"><span class="pre">distutils.command.bdist</span></tt> &#8212; Build a binary installer</a></li>
+<li><a class="reference external" href="#distutils-command-bdist-packager-abstract-base-class-for-packagers"><tt class="docutils literal"><span class="pre">distutils.command.bdist_packager</span></tt> &#8212; Abstract base class for packagers</a></li>
+<li><a class="reference external" href="#distutils-command-bdist-dumb-build-a-dumb-installer"><tt class="docutils literal"><span class="pre">distutils.command.bdist_dumb</span></tt> &#8212; Build a &#8220;dumb&#8221; installer</a></li>
+<li><a class="reference external" href="#distutils-command-bdist-msi-build-a-microsoft-installer-binary-package"><tt class="docutils literal"><span class="pre">distutils.command.bdist_msi</span></tt> &#8212; Build a Microsoft Installer binary package</a></li>
+<li><a class="reference external" href="#distutils-command-bdist-rpm-build-a-binary-distribution-as-a-redhat-rpm-and-srpm"><tt class="docutils literal"><span class="pre">distutils.command.bdist_rpm</span></tt> &#8212; Build a binary distribution as a Redhat RPM and SRPM</a></li>
+<li><a class="reference external" href="#distutils-command-bdist-wininst-build-a-windows-installer"><tt class="docutils literal"><span class="pre">distutils.command.bdist_wininst</span></tt> &#8212; Build a Windows installer</a></li>
+<li><a class="reference external" href="#distutils-command-sdist-build-a-source-distribution"><tt class="docutils literal"><span class="pre">distutils.command.sdist</span></tt> &#8212; Build a source distribution</a></li>
+<li><a class="reference external" href="#distutils-command-build-build-all-files-of-a-package"><tt class="docutils literal"><span class="pre">distutils.command.build</span></tt> &#8212; Build all files of a package</a></li>
+<li><a class="reference external" href="#distutils-command-build-clib-build-any-c-libraries-in-a-package"><tt class="docutils literal"><span class="pre">distutils.command.build_clib</span></tt> &#8212; Build any C libraries in a package</a></li>
+<li><a class="reference external" href="#distutils-command-build-ext-build-any-extensions-in-a-package"><tt class="docutils literal"><span class="pre">distutils.command.build_ext</span></tt> &#8212; Build any extensions in a package</a></li>
+<li><a class="reference external" href="#distutils-command-build-py-build-the-py-pyc-files-of-a-package"><tt class="docutils literal"><span class="pre">distutils.command.build_py</span></tt> &#8212; Build the .py/.pyc files of a package</a></li>
+<li><a class="reference external" href="#distutils-command-build-scripts-build-the-scripts-of-a-package"><tt class="docutils literal"><span class="pre">distutils.command.build_scripts</span></tt> &#8212; Build the scripts of a package</a></li>
+<li><a class="reference external" href="#distutils-command-clean-clean-a-package-build-area"><tt class="docutils literal"><span class="pre">distutils.command.clean</span></tt> &#8212; Clean a package build area</a></li>
+<li><a class="reference external" href="#distutils-command-config-perform-package-configuration"><tt class="docutils literal"><span class="pre">distutils.command.config</span></tt> &#8212; Perform package configuration</a></li>
+<li><a class="reference external" href="#distutils-command-install-install-a-package"><tt class="docutils literal"><span class="pre">distutils.command.install</span></tt> &#8212; Install a package</a></li>
+<li><a class="reference external" href="#distutils-command-install-data-install-data-files-from-a-package"><tt class="docutils literal"><span class="pre">distutils.command.install_data</span></tt> &#8212; Install data files from a package</a></li>
+<li><a class="reference external" href="#distutils-command-install-headers-install-c-c-header-files-from-a-package"><tt class="docutils literal"><span class="pre">distutils.command.install_headers</span></tt> &#8212; Install C/C++ header files from a package</a></li>
+<li><a class="reference external" href="#distutils-command-install-lib-install-library-files-from-a-package"><tt class="docutils literal"><span class="pre">distutils.command.install_lib</span></tt> &#8212; Install library files from a package</a></li>
+<li><a class="reference external" href="#distutils-command-install-scripts-install-script-files-from-a-package"><tt class="docutils literal"><span class="pre">distutils.command.install_scripts</span></tt> &#8212; Install script files from a package</a></li>
+<li><a class="reference external" href="#distutils-command-register-register-a-module-with-the-python-package-index"><tt class="docutils literal"><span class="pre">distutils.command.register</span></tt> &#8212; Register a module with the Python Package Index</a></li>
+<li><a class="reference external" href="#creating-a-new-distutils-command">Creating a new Distutils command</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/distutils/apiref.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="distutils-core-core-distutils-functionality">
+<h2><tt class="docutils literal"><span class="pre">distutils.core</span></tt> &#8212; Core Distutils functionality<a class="headerlink" href="#distutils-core-core-distutils-functionality" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">distutils.core</span></tt> module is the only module that needs to be
+installed to use the Distutils. It provides the <tt class="docutils literal"><span class="pre">setup()</span></tt> (which is
+called from the setup script). Indirectly provides the
+<tt class="docutils literal"><span class="pre">distutils.dist.Distribution</span></tt> and <tt class="docutils literal"><span class="pre">distutils.cmd.Command</span></tt> class.</p>
+<p>distutils.core.setup(arguments)</p>
+<blockquote>
+<p>The basic do-everything function that does most everything you
+could ever ask for from a Distutils method. See XXXXX</p>
+<p>The setup function takes a large number of arguments. These are
+laid out in the following table.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="29%" />
+<col width="53%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">argument name</th>
+<th class="head">value</th>
+<th class="head">type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><em>name</em></td>
+<td>The name of the package</td>
+<td>a string</td>
+</tr>
+<tr><td><em>version</em></td>
+<td>The version number of the
+package</td>
+<td>See <tt class="docutils literal"><span class="pre">distutils.version</span></tt></td>
+</tr>
+<tr><td><em>description</em></td>
+<td>A single line describing the
+package</td>
+<td>a string</td>
+</tr>
+<tr><td><em>long_description</em></td>
+<td>Longer description of the
+package</td>
+<td>a string</td>
+</tr>
+<tr><td><em>author</em></td>
+<td>The name of the package author</td>
+<td>a string</td>
+</tr>
+<tr><td><em>author_email</em></td>
+<td>The email address of the package
+author</td>
+<td>a string</td>
+</tr>
+<tr><td><em>maintainer</em></td>
+<td>The name of the current
+maintainer, if different from
+the author</td>
+<td>a string</td>
+</tr>
+<tr><td><em>maintainer_email</em></td>
+<td>The email address of the current
+maintainer, if different from
+the author</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td><em>url</em></td>
+<td>A URL for the package (homepage)</td>
+<td>a URL</td>
+</tr>
+<tr><td><em>download_url</em></td>
+<td>A URL to download the package</td>
+<td>a URL</td>
+</tr>
+<tr><td><em>packages</em></td>
+<td>A list of Python packages that
+distutils will manipulate</td>
+<td>a list of strings</td>
+</tr>
+<tr><td><em>py_modules</em></td>
+<td>A list of Python modules that
+distutils will manipulate</td>
+<td>a list of strings</td>
+</tr>
+<tr><td><em>scripts</em></td>
+<td>A list of standalone script
+files to be built and installed</td>
+<td>a list of strings</td>
+</tr>
+<tr><td><em>ext_modules</em></td>
+<td>A list of Python extensions to
+be built</td>
+<td>A list of  instances of <tt class="docutils literal"><span class="pre">distutils.core.Extension</span></tt></td>
+</tr>
+<tr><td><em>classifiers</em></td>
+<td>A list of categories for the
+package</td>
+<td>The list of available categorizations is at
+<a class="reference external" href="http://pypi.python.org/pypi?:action=list_classifiers">http://pypi.python.org/pypi?:action=list_classifiers</a>.</td>
+</tr>
+<tr><td><em>distclass</em></td>
+<td>the <tt class="docutils literal"><span class="pre">Distribution</span></tt> class to
+use</td>
+<td>A subclass of <tt class="docutils literal"><span class="pre">distutils.core.Distribution</span></tt></td>
+</tr>
+<tr><td><em>script_name</em></td>
+<td>The name of the setup.py script
+- defaults to <tt class="docutils literal"><span class="pre">sys.argv[0]</span></tt></td>
+<td>a string</td>
+</tr>
+<tr><td><em>script_args</em></td>
+<td>Arguments to supply to the setup
+script</td>
+<td>a list of strings</td>
+</tr>
+<tr><td><em>options</em></td>
+<td>default options for the setup
+script</td>
+<td>a string</td>
+</tr>
+<tr><td><em>license</em></td>
+<td>The license for the package</td>
+<td>a string</td>
+</tr>
+<tr><td><em>keywords</em></td>
+<td>Descriptive meta-data, see <strong>PEP
+314</strong></td>
+<td>&nbsp;</td>
+</tr>
+<tr><td><em>platforms</em></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td><em>cmdclass</em></td>
+<td>A mapping of command names to
+<tt class="docutils literal"><span class="pre">Command</span></tt> subclasses</td>
+<td>a dictionary</td>
+</tr>
+<tr><td><em>data_files</em></td>
+<td>A list of data files to install</td>
+<td>a list</td>
+</tr>
+<tr><td><em>package_dir</em></td>
+<td>A mapping of package to
+directory names</td>
+<td>a dictionary</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>distutils.core.run_setup(script_name[, script_args=None, stop_after=&#8217;run&#8217;])</p>
+<blockquote>
+<p>Run a setup script in a somewhat controlled environment, and return
+the <tt class="docutils literal"><span class="pre">distutils.dist.Distribution</span></tt> instance that drives things.
+This is useful if you need to find out the distribution meta-data
+(passed as keyword args from <em>script</em> to <tt class="docutils literal"><span class="pre">setup()</span></tt>), or  the
+contents of the config files or command-line.</p>
+<p><em>script_name</em> is a file that will be run with <tt class="docutils literal"><span class="pre">execfile()</span></tt>
+<tt class="docutils literal"><span class="pre">sys.argv[0]</span></tt> will be replaced with <em>script</em> for the duration of
+the call.  <em>script_args</em> is a list of strings; if supplied,
+<tt class="docutils literal"><span class="pre">sys.argv[1:]</span></tt> will be replaced by <em>script_args</em> for the duration
+of the call.</p>
+<p><em>stop_after</em> tells <tt class="docutils literal"><span class="pre">setup()</span></tt> when to stop processing; possible
+values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">value</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><em>init</em></td>
+<td>Stop after the <tt class="docutils literal"><span class="pre">Distribution</span></tt> instance has
+been created  and populated with the keyword
+arguments to <tt class="docutils literal"><span class="pre">setup()</span></tt></td>
+</tr>
+<tr><td><em>config</em></td>
+<td>Stop after config files have been parsed (and
+their data stored in the <tt class="docutils literal"><span class="pre">Distribution</span></tt>
+instance)</td>
+</tr>
+<tr><td><em>commandline</em></td>
+<td>Stop after the command-line (<tt class="docutils literal"><span class="pre">sys.argv[1:]</span></tt>
+or  <em>script_args</em>) have been parsed (and the
+data stored in the <tt class="docutils literal"><span class="pre">Distribution</span></tt>
+instance.)</td>
+</tr>
+<tr><td><em>run</em></td>
+<td>Stop after all commands have been run (the
+same as  if <tt class="docutils literal"><span class="pre">setup()</span></tt> had been called in
+the usual way). This is the default value.</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>In addition, the <tt class="docutils literal"><span class="pre">distutils.core</span></tt> module exposed a number of
+classes that live elsewhere.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Extension</span></tt> from <tt class="docutils literal"><span class="pre">distutils.extension</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Command</span></tt> from <tt class="docutils literal"><span class="pre">distutils.cmd</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Distribution</span></tt> from <tt class="docutils literal"><span class="pre">distutils.dist</span></tt></li>
+</ul>
+<p>A short description of each of these follows, but see the relevant
+module for the full reference.</p>
+<p>class class distutils.core.Extension</p>
+<blockquote>
+<p>The Extension class describes a single C or C++extension module in
+a setup script. It accepts the following keyword arguments in its
+constructor</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="38%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">argument name</th>
+<th class="head">value</th>
+<th class="head">type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><em>name</em></td>
+<td>the full name of the extension,
+including any packages &#8212; ie.
+<em>not</em> a filename or pathname,
+but Python dotted name</td>
+<td>string</td>
+</tr>
+<tr><td><em>sources</em></td>
+<td>list of source filenames,
+relative to the distribution
+root (where the setup script
+lives), in Unix form (slash-
+separated) for portability.
+Source files may be C, C++, SWIG
+(.i), platform- specific
+resource files, or whatever else
+is recognized by the
+<strong>build_ext</strong> command as source
+for a Python extension.</td>
+<td>string</td>
+</tr>
+<tr><td><em>include_dirs</em></td>
+<td>list of directories to search
+for C/C++ header files (in Unix
+form for portability)</td>
+<td>string</td>
+</tr>
+<tr><td><em>define_macros</em></td>
+<td>list of macros to define; each
+macro is defined using a 2-tuple
+<tt class="docutils literal"><span class="pre">(name,</span> <span class="pre">value)</span></tt>, where <em>value</em>
+is either the string to define
+it to or <tt class="xref docutils literal"><span class="pre">None</span></tt> to define it
+without a particular value
+(equivalent of <tt class="docutils literal"><span class="pre">#define</span> <span class="pre">FOO</span></tt>
+in source or <em>-DFOO</em> on Unix C
+compiler command line)</td>
+<td>(string, string) tuple or
+(name, <tt class="xref docutils literal"><span class="pre">None</span></tt>)</td>
+</tr>
+<tr><td><em>undef_macros</em></td>
+<td>list of macros to undefine
+explicitly</td>
+<td>string</td>
+</tr>
+<tr><td><em>library_dirs</em></td>
+<td>list of directories to search
+for C/C++ libraries at link time</td>
+<td>string</td>
+</tr>
+<tr><td><em>libraries</em></td>
+<td>list of library names (not
+filenames or paths) to link
+against</td>
+<td>string</td>
+</tr>
+<tr><td><em>runtime_library_dirs</em></td>
+<td>list of directories to search
+for C/C++ libraries at run time
+(for shared extensions, this is
+when the extension is loaded)</td>
+<td>string</td>
+</tr>
+<tr><td><em>extra_objects</em></td>
+<td>list of extra files to link with
+(eg. object files not implied by
+&#8216;sources&#8217;, static library that
+must be explicitly specified,
+binary resource files, etc.)</td>
+<td>string</td>
+</tr>
+<tr><td><em>extra_compile_args</em></td>
+<td>any extra platform- and
+compiler-specific information to
+use when compiling the source
+files in &#8216;sources&#8217;. For
+platforms and compilers where a
+command line makes sense, this
+is typically a list of command-
+line arguments, but for other
+platforms it could be anything.</td>
+<td>string</td>
+</tr>
+<tr><td><em>extra_link_args</em></td>
+<td>any extra platform- and
+compiler-specific information to
+use when linking object files
+together to create the extension
+(or to create a new static
+Python interpreter). Similar
+interpretation as for
+&#8216;extra_compile_args&#8217;.</td>
+<td>string</td>
+</tr>
+<tr><td><em>export_symbols</em></td>
+<td>list of symbols to be exported
+from a shared extension. Not
+used on all platforms, and not
+generally necessary for Python
+extensions, which typically
+export exactly one symbol:
+<tt class="docutils literal"><span class="pre">init</span></tt> + extension_name.</td>
+<td>string</td>
+</tr>
+<tr><td><em>depends</em></td>
+<td>list of files that the extension
+depends on</td>
+<td>string</td>
+</tr>
+<tr><td><em>language</em></td>
+<td>extension language (i.e.
+<tt class="docutils literal"><span class="pre">'c'</span></tt>, <tt class="docutils literal"><span class="pre">'c++'</span></tt>, <tt class="docutils literal"><span class="pre">'objc'</span></tt>).
+Will be detected from the source
+extensions if not provided.</td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>class class distutils.core.Distribution</p>
+<blockquote>
+<p>A <tt class="docutils literal"><span class="pre">Distribution</span></tt> describes how to build, install and package up a
+Python software package.</p>
+<p>See the <tt class="docutils literal"><span class="pre">setup()</span></tt> function for a list of keyword arguments
+accepted  by the Distribution constructor. <tt class="docutils literal"><span class="pre">setup()</span></tt> creates a
+Distribution instance.</p>
+</blockquote>
+<p>class class distutils.core.Command</p>
+<blockquote>
+A <tt class="docutils literal"><span class="pre">Command</span></tt> class (or rather, an instance of one of its
+subclasses) implement a single distutils command.</blockquote>
+</div>
+<div class="section" id="distutils-ccompiler-ccompiler-base-class">
+<h2><tt class="docutils literal"><span class="pre">distutils.ccompiler</span></tt> &#8212; CCompiler base class<a class="headerlink" href="#distutils-ccompiler-ccompiler-base-class" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the abstract base class for the <tt class="docutils literal"><span class="pre">CCompiler</span></tt>
+classes.  A <tt class="docutils literal"><span class="pre">CCompiler</span></tt> instance can be used for all the compile
+and link steps needed to build a single project. Methods are provided
+to  set options for the compiler &#8212; macro definitions, include
+directories,  link path, libraries and the like.</p>
+<p>This module provides the following functions.</p>
+<p>distutils.ccompiler.gen_lib_options(compiler, library_dirs, runtime_library_dirs, libraries)</p>
+<blockquote>
+Generate linker options for searching library directories and
+linking with specific libraries.  <em>libraries</em> and <em>library_dirs</em>
+are, respectively, lists of library names (not filenames!) and
+search directories.  Returns a list of command-line options
+suitable for use with some compiler (depending on the two format
+strings passed in).</blockquote>
+<p>distutils.ccompiler.gen_preprocess_options(macros, include_dirs)</p>
+<blockquote>
+Generate C pre-processor options (<em>-D</em>, <em>-U</em>, <em>-I</em>) as used by at
+least two types of compilers: the typical Unix compiler and Visual
+C++. <em>macros</em> is the usual thing, a list of 1- or 2-tuples, where
+<tt class="docutils literal"><span class="pre">(name,)</span></tt> means undefine (<em>-U</em>) macro <em>name</em>, and <tt class="docutils literal"><span class="pre">(name,</span>
+<span class="pre">value)</span></tt> means define (<em>-D</em>) macro <em>name</em> to <em>value</em>.
+<em>include_dirs</em> is just a list of directory names to be added to the
+header file search path (<em>-I</em>). Returns a list of command-line
+options suitable for either Unix compilers or Visual C++.</blockquote>
+<p>distutils.ccompiler.get_default_compiler(osname, platform)</p>
+<blockquote>
+<p>Determine the default compiler to use for the given platform.</p>
+<p><em>osname</em> should be one of the standard Python OS names (i.e. the
+ones returned by <tt class="docutils literal"><span class="pre">os.name</span></tt>) and <em>platform</em> the common value
+returned by <tt class="docutils literal"><span class="pre">sys.platform</span></tt> for the platform in question.</p>
+<p>The default values are <tt class="docutils literal"><span class="pre">os.name</span></tt> and <tt class="docutils literal"><span class="pre">sys.platform</span></tt> in case the
+parameters are not given.</p>
+</blockquote>
+<p>distutils.ccompiler.new_compiler(plat=None, compiler=None, verbose=0, dry_run=0, force=0)</p>
+<blockquote>
+Factory function to generate an instance of some CCompiler subclass
+for the supplied platform/compiler combination. <em>plat</em> defaults to
+<tt class="docutils literal"><span class="pre">os.name</span></tt> (eg. <tt class="docutils literal"><span class="pre">'posix'</span></tt>, <tt class="docutils literal"><span class="pre">'nt'</span></tt>), and <em>compiler</em>  defaults
+to the default compiler for that platform. Currently only
+<tt class="docutils literal"><span class="pre">'posix'</span></tt> and <tt class="docutils literal"><span class="pre">'nt'</span></tt> are supported, and the default compilers
+are &#8220;traditional Unix interface&#8221; (<tt class="docutils literal"><span class="pre">UnixCCompiler</span></tt> class) and
+Visual C++ (<tt class="docutils literal"><span class="pre">MSVCCompiler</span></tt> class).  Note that it&#8217;s perfectly
+possible to ask for a Unix compiler object under Windows, and a
+Microsoft compiler object under Unix&#8212;if you supply a value for
+<em>compiler</em>, <em>plat</em> is ignored.</blockquote>
+<p>distutils.ccompiler.show_compilers()</p>
+<blockquote>
+Print list of available compilers (used by the <em>&#8211;help-compiler</em>
+options to <strong>build</strong>, <strong>build_ext</strong>, <strong>build_clib</strong>).</blockquote>
+<p>class class distutils.ccompiler.CCompiler([verbose=0, dry_run=0, force=0])</p>
+<blockquote>
+<p>The abstract base class <tt class="docutils literal"><span class="pre">CCompiler</span></tt> defines the interface that
+must be implemented by real compiler classes.  The class also has
+some utility methods used by several compiler classes.</p>
+<p>The basic idea behind a compiler abstraction class is that each
+instance can be used for all the compile/link steps in building a
+single project.  Thus, attributes common to all of those compile
+and link steps &#8212; include directories, macros to define, libraries
+to link against, etc. &#8212; are attributes of the compiler instance.
+To allow for variability in how individual files are treated, most
+of those attributes may be varied on a per-compilation or per-link
+basis.</p>
+<p>The constructor for each subclass creates an instance of the
+Compiler object. Flags are <em>verbose</em> (show verbose output),
+<em>dry_run</em> (don&#8217;t actually execute the steps) and <em>force</em> (rebuild
+everything, regardless of dependencies). All of these flags default
+to <tt class="docutils literal"><span class="pre">0</span></tt> (off). Note that you probably don&#8217;t want to instantiate
+<tt class="docutils literal"><span class="pre">CCompiler</span></tt> or one of its subclasses directly - use the
+<tt class="docutils literal"><span class="pre">distutils.CCompiler.new_compiler()</span></tt> factory function instead.</p>
+<p>The following methods allow you to manually alter compiler options
+for  the instance of the Compiler class.</p>
+<p>add_include_dir(dir)</p>
+<blockquote>
+Add <em>dir</em> to the list of directories that will be searched for
+header files. The compiler is instructed to search directories
+in the order in which they are supplied by successive calls to
+<tt class="docutils literal"><span class="pre">add_include_dir()</span></tt>.</blockquote>
+<p>set_include_dirs(dirs)</p>
+<blockquote>
+Set the list of directories that will be searched to <em>dirs</em> (a
+list of strings). Overrides any preceding calls to
+<tt class="docutils literal"><span class="pre">add_include_dir()</span></tt>; subsequent calls to <tt class="docutils literal"><span class="pre">add_include_dir()</span></tt>
+add to the list passed to <tt class="docutils literal"><span class="pre">set_include_dirs()</span></tt>. This does not
+affect any list of standard include directories that the
+compiler may search by default.</blockquote>
+<p>add_library(libname)</p>
+<blockquote>
+<p>Add <em>libname</em> to the list of libraries that will be included in
+all links driven by this compiler object.  Note that <em>libname</em>
+should <em>not</em> be the name of a file containing a library, but the
+name of the library itself: the actual filename will be inferred
+by the linker, the compiler, or the compiler class (depending on
+the platform).</p>
+<p>The linker will be instructed to link against libraries in the
+order they were supplied to <tt class="docutils literal"><span class="pre">add_library()</span></tt> and/or
+<tt class="docutils literal"><span class="pre">set_libraries()</span></tt>.  It is perfectly valid to duplicate library
+names; the linker will be instructed to link against libraries
+as many times as they are mentioned.</p>
+</blockquote>
+<p>set_libraries(libnames)</p>
+<blockquote>
+Set the list of libraries to be included in all links driven by
+this compiler object to <em>libnames</em> (a list of strings).  This
+does not affect any standard system libraries that the linker
+may include by default.</blockquote>
+<p>add_library_dir(dir)</p>
+<blockquote>
+Add <em>dir</em> to the list of directories that will be searched for
+libraries specified to <tt class="docutils literal"><span class="pre">add_library()</span></tt> and
+<tt class="docutils literal"><span class="pre">set_libraries()</span></tt>.  The linker will be instructed to search
+for libraries in the order they are supplied to
+<tt class="docutils literal"><span class="pre">add_library_dir()</span></tt> and/or <tt class="docutils literal"><span class="pre">set_library_dirs()</span></tt>.</blockquote>
+<p>set_library_dirs(dirs)</p>
+<blockquote>
+Set the list of library search directories to <em>dirs</em> (a list of
+strings).  This does not affect any standard library search path
+that the linker may search by default.</blockquote>
+<p>add_runtime_library_dir(dir)</p>
+<blockquote>
+Add <em>dir</em> to the list of directories that will be searched for
+shared libraries at runtime.</blockquote>
+<p>set_runtime_library_dirs(dirs)</p>
+<blockquote>
+Set the list of directories to search for shared libraries at
+runtime to <em>dirs</em> (a list of strings).  This does not affect any
+standard search path that the runtime linker may search by
+default.</blockquote>
+<p>define_macro(name[, value=None])</p>
+<blockquote>
+Define a preprocessor macro for all compilations driven by this
+compiler object. The optional parameter <em>value</em> should be a
+string; if it is not supplied, then the macro will be defined
+without an explicit value and the exact outcome depends on the
+compiler used (XXX true? does ANSI say anything about this?)</blockquote>
+<p>undefine_macro(name)</p>
+<blockquote>
+Undefine a preprocessor macro for all compilations driven by
+this compiler object.  If the same macro is defined by
+<tt class="docutils literal"><span class="pre">define_macro()</span></tt> and undefined by <tt class="docutils literal"><span class="pre">undefine_macro()</span></tt> the
+last call takes precedence (including multiple redefinitions or
+undefinitions).  If the macro is redefined/undefined on a per-
+compilation basis (ie. in the call to <tt class="docutils literal"><span class="pre">compile()</span></tt>), then that
+takes precedence.</blockquote>
+<p>add_link_object(object)</p>
+<blockquote>
+Add <em>object</em> to the list of object files (or analogues, such as
+explicitly named library files or the output of &#8220;resource
+compilers&#8221;) to be included in every link driven by this compiler
+object.</blockquote>
+<p>set_link_objects(objects)</p>
+<blockquote>
+Set the list of object files (or analogues) to be included in
+every link to <em>objects</em>.  This does not affect any standard
+object files that the linker may include by default (such as
+system libraries).</blockquote>
+<p>The following methods implement methods for autodetection of
+compiler  options, providing some functionality similar to GNU
+<strong>autoconf</strong>.</p>
+<p>detect_language(sources)</p>
+<blockquote>
+Detect the language of a given file, or list of files. Uses the
+instance attributes <tt class="docutils literal"><span class="pre">language_map</span></tt> (a dictionary), and
+<tt class="docutils literal"><span class="pre">language_order</span></tt> (a list) to do the job.</blockquote>
+<p>find_library_file(dirs, lib[, debug=0])</p>
+<blockquote>
+Search the specified list of directories for a static or shared
+library file <em>lib</em> and return the full path to that file.  If
+<em>debug</em> is true, look for a debugging version (if that makes
+sense on the current platform).  Return <tt class="xref docutils literal"><span class="pre">None</span></tt> if <em>lib</em> wasn&#8217;t
+found in any of the specified directories.</blockquote>
+<p>has_function(funcname[, includes=None, include_dirs=None, libraries=None, library_dirs=None])</p>
+<blockquote>
+Return a boolean indicating whether <em>funcname</em> is supported on
+the current platform.  The optional arguments can be used to
+augment the compilation environment by providing additional
+include files and paths and libraries and paths.</blockquote>
+<p>library_dir_option(dir)</p>
+<blockquote>
+Return the compiler option to add <em>dir</em> to the list of
+directories searched for libraries.</blockquote>
+<p>library_option(lib)</p>
+<blockquote>
+Return the compiler option to add <em>dir</em> to the list of libraries
+linked into the shared library or executable.</blockquote>
+<p>runtime_library_dir_option(dir)</p>
+<blockquote>
+Return the compiler option to add <em>dir</em> to the list of
+directories searched for runtime libraries.</blockquote>
+<p>set_executables(<a href="#id1"><span class="problematic" id="id2">**</span></a>args)</p>
+<blockquote>
+<p>Define the executables (and options for them) that will be run
+to perform the various stages of compilation.  The exact set of
+executables that may be specified here depends on the compiler
+class (via the &#8216;executables&#8217; class attribute), but most will
+have:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">attribute</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><em>compiler</em></td>
+<td>the C/C++ compiler</td>
+</tr>
+<tr><td><em>linker_so</em></td>
+<td>linker used to create shared objects and
+libraries</td>
+</tr>
+<tr><td><em>linker_exe</em></td>
+<td>linker used to create binary executables</td>
+</tr>
+<tr><td><em>archiver</em></td>
+<td>static library creator</td>
+</tr>
+</tbody>
+</table>
+<p>On platforms with a command-line (Unix, DOS/Windows), each of
+these is a string that will be split into executable name and
+(optional) list of arguments. (Splitting the string is done
+similarly to how Unix shells operate: words are delimited by
+spaces, but quotes and backslashes can override this.  See
+<tt class="docutils literal"><span class="pre">distutils.util.split_quoted()</span></tt>.)</p>
+</blockquote>
+<p>The following methods invoke stages in the build process.</p>
+<p>compile(sources[, output_dir=None, macros=None, include_dirs=None, debug=0, extra_preargs=None, extra_postargs=None, depends=None])</p>
+<blockquote>
+<p>Compile one or more source files. Generates object files (e.g.
+transforms a <tt class="docutils literal"><span class="pre">.c</span></tt> file to a <tt class="docutils literal"><span class="pre">.o</span></tt> file.)</p>
+<p><em>sources</em> must be a list of filenames, most likely C/C++ files,
+but in reality anything that can be handled by a particular
+compiler and compiler class (eg. <tt class="docutils literal"><span class="pre">MSVCCompiler</span></tt> can handle
+resource files in <em>sources</em>).  Return a list of object
+filenames, one per source filename in <em>sources</em>.  Depending on
+the implementation, not all source files will necessarily be
+compiled, but all corresponding object filenames will be
+returned.</p>
+<p>If <em>output_dir</em> is given, object files will be put under it,
+while retaining their original path component.  That is,
+<tt class="docutils literal"><span class="pre">foo/bar.c</span></tt> normally compiles to <tt class="docutils literal"><span class="pre">foo/bar.o</span></tt> (for a Unix
+implementation); if <em>output_dir</em> is <em>build</em>, then it would
+compile to <tt class="docutils literal"><span class="pre">build/foo/bar.o</span></tt>.</p>
+<p><em>macros</em>, if given, must be a list of macro definitions.  A
+macro definition is either a <tt class="docutils literal"><span class="pre">(name,</span> <span class="pre">value)</span></tt> 2-tuple or a
+<tt class="docutils literal"><span class="pre">(name,)</span></tt> 1-tuple. The former defines a macro; if the value is
+<tt class="xref docutils literal"><span class="pre">None</span></tt>, the macro is defined without an explicit value.  The
+1-tuple case undefines a macro.  Later
+definitions/redefinitions/undefinitions take precedence.</p>
+<p><em>include_dirs</em>, if given, must be a list of strings, the
+directories to add to the default include file search path for
+this compilation only.</p>
+<p><em>debug</em> is a boolean; if true, the compiler will be instructed
+to output debug symbols in (or alongside) the object file(s).</p>
+<p><em>extra_preargs</em> and <em>extra_postargs</em> are implementation-
+dependent. On platforms that have the notion of a command-line
+(e.g. Unix, DOS/Windows), they are most likely lists of strings:
+extra command-line arguments to prepend/append to the compiler
+command line.  On other platforms, consult the implementation
+class documentation.  In any event, they are intended as an
+escape hatch for those occasions when the abstract compiler
+framework doesn&#8217;t cut the mustard.</p>
+<p><em>depends</em>, if given, is a list of filenames that all targets
+depend on.  If a source file is older than any file in depends,
+then the source file will be recompiled.  This supports
+dependency tracking, but only at a coarse granularity.</p>
+<p>Raises <tt class="docutils literal"><span class="pre">CompileError</span></tt> on failure.</p>
+</blockquote>
+<p>create_static_lib(objects, output_libname[, output_dir=None, debug=0, target_lang=None])</p>
+<blockquote>
+<p>Link a bunch of stuff together to create a static library file.
+The &#8220;bunch of stuff&#8221; consists of the list of object files
+supplied as <em>objects</em>, the extra object files supplied to
+<tt class="docutils literal"><span class="pre">add_link_object()</span></tt> and/or <tt class="docutils literal"><span class="pre">set_link_objects()</span></tt>, the
+libraries supplied to <tt class="docutils literal"><span class="pre">add_library()</span></tt> and/or
+<tt class="docutils literal"><span class="pre">set_libraries()</span></tt>, and the libraries supplied as <em>libraries</em>
+(if any).</p>
+<p><em>output_libname</em> should be a library name, not a filename; the
+filename will be inferred from the library name.  <em>output_dir</em>
+is the directory where the library file will be put. XXX
+defaults to what?</p>
+<p><em>debug</em> is a boolean; if true, debugging information will be
+included in the library (note that on most platforms, it is the
+compile step where this matters: the <em>debug</em> flag is included
+here just for consistency).</p>
+<p><em>target_lang</em> is the target language for which the given objects
+are being compiled. This allows specific linkage time treatment
+of certain languages.</p>
+<p>Raises <tt class="docutils literal"><span class="pre">LibError</span></tt> on failure.</p>
+</blockquote>
+<p>link(target_desc, objects, output_filename[, output_dir=None, libraries=None, library_dirs=None, runtime_library_dirs=None, export_symbols=None, debug=0, extra_preargs=None, extra_postargs=None, build_temp=None, target_lang=None])</p>
+<blockquote>
+<p>Link a bunch of stuff together to create an executable or shared
+library file.</p>
+<p>The &#8220;bunch of stuff&#8221; consists of the list of object files
+supplied as <em>objects</em>. <em>output_filename</em> should be a filename.
+If <em>output_dir</em> is supplied, <em>output_filename</em> is relative to it
+(i.e. <em>output_filename</em> can provide directory components if
+needed).</p>
+<p><em>libraries</em> is a list of libraries to link against.  These are
+library names, not filenames, since they&#8217;re translated into
+filenames in a platform-specific way (eg. <em>foo</em> becomes
+<tt class="docutils literal"><span class="pre">libfoo.a</span></tt> on Unix and <tt class="docutils literal"><span class="pre">foo.lib</span></tt> on DOS/Windows).  However,
+they can include a directory component, which means the linker
+will look in that specific directory rather than searching all
+the normal locations.</p>
+<p><em>library_dirs</em>, if supplied, should be a list of directories to
+search for libraries that were specified as bare library names
+(ie. no directory component).  These are on top of the system
+default and those supplied to <tt class="docutils literal"><span class="pre">add_library_dir()</span></tt> and/or
+<tt class="docutils literal"><span class="pre">set_library_dirs()</span></tt>.  <em>runtime_library_dirs</em> is a list of
+directories that will be embedded into the shared library and
+used to search for other shared libraries that <em>it</em> depends on
+at run-time.  (This may only be relevant on Unix.)</p>
+<p><em>export_symbols</em> is a list of symbols that the shared library
+will export. (This appears to be relevant only on Windows.)</p>
+<p><em>debug</em> is as for <tt class="docutils literal"><span class="pre">compile()</span></tt> and <tt class="docutils literal"><span class="pre">create_static_lib()</span></tt>,
+with the slight distinction that it actually matters on most
+platforms (as opposed to <tt class="docutils literal"><span class="pre">create_static_lib()</span></tt>, which includes
+a <em>debug</em> flag mostly for form&#8217;s sake).</p>
+<p><em>extra_preargs</em> and <em>extra_postargs</em> are as for <tt class="docutils literal"><span class="pre">compile()</span></tt>
+(except of course that they supply command-line arguments for
+the particular linker being used).</p>
+<p><em>target_lang</em> is the target language for which the given objects
+are being compiled. This allows specific linkage time treatment
+of certain languages.</p>
+<p>Raises <tt class="docutils literal"><span class="pre">LinkError</span></tt> on failure.</p>
+</blockquote>
+<p>link_executable(objects, output_progname[, output_dir=None, libraries=None, library_dirs=None, runtime_library_dirs=None, debug=0, extra_preargs=None, extra_postargs=None, target_lang=None])</p>
+<blockquote>
+Link an executable.  <em>output_progname</em> is the name of the file
+executable, while <em>objects</em> are a list of object filenames to
+link in. Other arguments  are as for the <tt class="docutils literal"><span class="pre">link()</span></tt> method.</blockquote>
+<p>link_shared_lib(objects, output_libname[, output_dir=None, libraries=None, library_dirs=None, runtime_library_dirs=None, export_symbols=None, debug=0, extra_preargs=None, extra_postargs=None, build_temp=None, target_lang=None])</p>
+<blockquote>
+Link a shared library. <em>output_libname</em> is the name of the
+output  library, while <em>objects</em> is a list of object filenames
+to link in.  Other arguments are as for the <tt class="docutils literal"><span class="pre">link()</span></tt> method.</blockquote>
+<p>link_shared_object(objects, output_filename[, output_dir=None, libraries=None, library_dirs=None, runtime_library_dirs=None, export_symbols=None, debug=0, extra_preargs=None, extra_postargs=None, build_temp=None, target_lang=None])</p>
+<blockquote>
+Link a shared object. <em>output_filename</em> is the name of the
+shared object that will be created, while <em>objects</em> is a list of
+object filenames  to link in. Other arguments are as for the
+<tt class="docutils literal"><span class="pre">link()</span></tt> method.</blockquote>
+<p>preprocess(source[, output_file=None, macros=None, include_dirs=None, extra_preargs=None, extra_postargs=None])</p>
+<blockquote>
+<p>Preprocess a single C/C++ source file, named in <em>source</em>. Output
+will be written to file named <em>output_file</em>, or <em>stdout</em> if
+<em>output_file</em> not supplied. <em>macros</em> is a list of macro
+definitions as for <tt class="docutils literal"><span class="pre">compile()</span></tt>, which will augment the macros
+set with <tt class="docutils literal"><span class="pre">define_macro()</span></tt> and <tt class="docutils literal"><span class="pre">undefine_macro()</span></tt>.
+<em>include_dirs</em> is a list of directory names that will be added
+to the  default list, in the same way as <tt class="docutils literal"><span class="pre">add_include_dir()</span></tt>.</p>
+<p>Raises <tt class="docutils literal"><span class="pre">PreprocessError</span></tt> on failure.</p>
+</blockquote>
+<p>The following utility methods are defined by the <tt class="docutils literal"><span class="pre">CCompiler</span></tt>
+class, for use by the various concrete subclasses.</p>
+<p>executable_filename(basename[, strip_dir=0, output_dir=&#8217;&#8216;])</p>
+<blockquote>
+Returns the filename of the executable for the given <em>basename</em>.
+Typically for non-Windows platforms this is the same as the
+basename,  while Windows will get a <tt class="docutils literal"><span class="pre">.exe</span></tt> added.</blockquote>
+<p>library_filename(libname[, lib_type=&#8217;static&#8217;, strip_dir=0, output_dir=&#8217;&#8216;])</p>
+<blockquote>
+Returns the filename for the given library name on the current
+platform. On Unix a library with <em>lib_type</em> of <tt class="docutils literal"><span class="pre">'static'</span></tt> will
+typically  be of the form <tt class="docutils literal"><span class="pre">liblibname.a</span></tt>, while a <em>lib_type</em>
+of <tt class="docutils literal"><span class="pre">'dynamic'</span></tt>  will be of the form <tt class="docutils literal"><span class="pre">liblibname.so</span></tt>.</blockquote>
+<p>object_filenames(source_filenames[, strip_dir=0, output_dir=&#8217;&#8216;])</p>
+<blockquote>
+Returns the name of the object files for the given source files.
+<em>source_filenames</em> should be a list of filenames.</blockquote>
+<p>shared_object_filename(basename[, strip_dir=0, output_dir=&#8217;&#8216;])</p>
+<blockquote>
+Returns the name of a shared object file for the given file name
+<em>basename</em>.</blockquote>
+<p>execute(func, args[, msg=None, level=1])</p>
+<blockquote>
+Invokes <tt class="docutils literal"><span class="pre">distutils.util.execute()</span></tt> This method invokes a
+Python function <em>func</em> with the given arguments <em>args</em>, after
+logging and taking into account the <em>dry_run</em> flag. XXX see
+also.</blockquote>
+<p>spawn(cmd)</p>
+<blockquote>
+Invokes <tt class="docutils literal"><span class="pre">distutils.util.spawn()</span></tt>. This invokes an external
+process to run the given command. XXX see also.</blockquote>
+<p>mkpath(name[, mode=511])</p>
+<blockquote>
+Invokes <tt class="docutils literal"><span class="pre">distutils.dir_util.mkpath()</span></tt>. This creates a
+directory  and any missing ancestor directories. XXX see also.</blockquote>
+<p>move_file(src, dst)</p>
+<blockquote>
+Invokes <tt class="docutils literal"><span class="pre">distutils.file_util.move_file()</span></tt>. Renames <em>src</em> to
+<em>dst</em>.  XXX see also.</blockquote>
+<p>announce(msg[, level=1])</p>
+<blockquote>
+Write a message using <tt class="docutils literal"><span class="pre">distutils.log.debug()</span></tt>. XXX see also.</blockquote>
+<p>warn(msg)</p>
+<blockquote>
+Write a warning message <em>msg</em> to standard error.</blockquote>
+<p>debug_print(msg)</p>
+<blockquote>
+If the <em>debug</em> flag is set on this <tt class="docutils literal"><span class="pre">CCompiler</span></tt> instance, print
+<em>msg</em> to standard output, otherwise do nothing.</blockquote>
+</blockquote>
+</div>
+<div class="section" id="distutils-unixccompiler-unix-c-compiler">
+<h2><tt class="docutils literal"><span class="pre">distutils.unixccompiler</span></tt> &#8212; Unix C Compiler<a class="headerlink" href="#distutils-unixccompiler-unix-c-compiler" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">UnixCCompiler</span></tt> class, a subclass of
+<tt class="docutils literal"><span class="pre">CCompiler</span></tt> that handles the typical Unix-style command-line  C
+compiler:</p>
+<ul class="simple">
+<li>macros defined with <em>-Dname[=value]</em></li>
+<li>macros undefined with <em>-Uname</em></li>
+<li>include search directories specified with <em>-Idir</em></li>
+<li>libraries specified with <em>-llib</em></li>
+<li>library search directories specified with <em>-Ldir</em></li>
+<li>compile handled by <strong>cc</strong> (or similar) executable with <em>-c</em> option:
+compiles <tt class="docutils literal"><span class="pre">.c</span></tt> to <tt class="docutils literal"><span class="pre">.o</span></tt></li>
+<li>link static library handled by <strong>ar</strong> command (possibly with
+<strong>ranlib</strong>)</li>
+<li>link shared library handled by <strong>cc</strong> <em>-shared</em></li>
+</ul>
+</div>
+<div class="section" id="distutils-msvccompiler-microsoft-compiler">
+<h2><tt class="docutils literal"><span class="pre">distutils.msvccompiler</span></tt> &#8212; Microsoft Compiler<a class="headerlink" href="#distutils-msvccompiler-microsoft-compiler" title="Permalink to this headline">¶</a></h2>
+<p>This module provides <tt class="docutils literal"><span class="pre">MSVCCompiler</span></tt>, an implementation of the
+abstract <tt class="docutils literal"><span class="pre">CCompiler</span></tt> class for Microsoft Visual Studio. Typically,
+extension modules need to be compiled with the same compiler that was
+used to compile Python. For Python 2.3 and earlier, the compiler was
+Visual Studio 6. For Python 2.4 and 2.5, the compiler is Visual Studio
+.NET 2003. The AMD64 and Itanium binaries are created using the
+Platform SDK.</p>
+<p><tt class="docutils literal"><span class="pre">MSVCCompiler</span></tt> will normally choose the right compiler, linker etc.
+on its own. To override this choice, the environment variables
+<em>DISTUTILS_USE_SDK</em> and <em>MSSdk</em> must be both set. <em>MSSdk</em> indicates
+that the current environment has been setup by the SDK&#8217;s
+<tt class="docutils literal"><span class="pre">SetEnv.Cmd</span></tt> script, or that the environment variables had been
+registered when the SDK was installed; <em>DISTUTILS_USE_SDK</em> indicates
+that the distutils user has made an explicit choice to override the
+compiler selection by <tt class="docutils literal"><span class="pre">MSVCCompiler</span></tt>.</p>
+</div>
+<div class="section" id="distutils-bcppcompiler-borland-compiler">
+<h2><tt class="docutils literal"><span class="pre">distutils.bcppcompiler</span></tt> &#8212; Borland Compiler<a class="headerlink" href="#distutils-bcppcompiler-borland-compiler" title="Permalink to this headline">¶</a></h2>
+<p>This module provides <tt class="docutils literal"><span class="pre">BorlandCCompiler</span></tt>, an subclass of the abstract
+<tt class="docutils literal"><span class="pre">CCompiler</span></tt> class for the Borland C++ compiler.</p>
+</div>
+<div class="section" id="distutils-cygwincompiler-cygwin-compiler">
+<h2><tt class="docutils literal"><span class="pre">distutils.cygwincompiler</span></tt> &#8212; Cygwin Compiler<a class="headerlink" href="#distutils-cygwincompiler-cygwin-compiler" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">CygwinCCompiler</span></tt> class, a subclass of
+<tt class="docutils literal"><span class="pre">UnixCCompiler</span></tt> that handles the Cygwin port of the GNU C compiler
+to Windows.  It also contains the Mingw32CCompiler class which handles
+the mingw32 port of GCC (same as cygwin in no-cygwin mode).</p>
+</div>
+<div class="section" id="distutils-emxccompiler-os-2-emx-compiler">
+<h2><tt class="docutils literal"><span class="pre">distutils.emxccompiler</span></tt> &#8212; OS/2 EMX Compiler<a class="headerlink" href="#distutils-emxccompiler-os-2-emx-compiler" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the EMXCCompiler class, a subclass of
+<tt class="docutils literal"><span class="pre">UnixCCompiler</span></tt> that handles the EMX port of the GNU C compiler to
+OS/2.</p>
+</div>
+<div class="section" id="distutils-mwerkscompiler-metrowerks-codewarrior-support">
+<h2><tt class="docutils literal"><span class="pre">distutils.mwerkscompiler</span></tt> &#8212; Metrowerks CodeWarrior support<a class="headerlink" href="#distutils-mwerkscompiler-metrowerks-codewarrior-support" title="Permalink to this headline">¶</a></h2>
+<p>Contains <tt class="docutils literal"><span class="pre">MWerksCompiler</span></tt>, an implementation of the abstract
+<tt class="docutils literal"><span class="pre">CCompiler</span></tt> class for MetroWerks CodeWarrior on the pre-Mac OS X
+Macintosh. Needs work to support CW on Windows or Mac OS X.</p>
+</div>
+<div class="section" id="distutils-archive-util-archiving-utilities">
+<h2><tt class="docutils literal"><span class="pre">distutils.archive_util</span></tt> &#8212;  Archiving utilities<a class="headerlink" href="#distutils-archive-util-archiving-utilities" title="Permalink to this headline">¶</a></h2>
+<p>This module provides a few functions for creating archive files, such
+as tarballs or zipfiles.</p>
+<p>distutils.archive_util.make_archive(base_name, format[, root_dir=None, base_dir=None, verbose=0, dry_run=0])</p>
+<blockquote>
+Create an archive file (eg. <tt class="docutils literal"><span class="pre">zip</span></tt> or <tt class="docutils literal"><span class="pre">tar</span></tt>).  <em>base_name</em>  is
+the name of the file to create, minus any format-specific
+extension;  <em>format</em> is the archive format: one of <tt class="docutils literal"><span class="pre">zip</span></tt>,
+<tt class="docutils literal"><span class="pre">tar</span></tt>,  <tt class="docutils literal"><span class="pre">ztar</span></tt>, or <tt class="docutils literal"><span class="pre">gztar</span></tt>. <em>root_dir</em> is a directory that
+will be the root directory of the archive; ie. we typically
+<tt class="docutils literal"><span class="pre">chdir</span></tt> into <em>root_dir</em> before  creating the archive.  <em>base_dir</em>
+is the directory where we start  archiving from; ie. <em>base_dir</em>
+will be the common prefix of all files and directories in the
+archive.  <em>root_dir</em> and <em>base_dir</em> both default to the current
+directory.  Returns the name of the archive file.</blockquote>
+<p>distutils.archive_util.make_tarball(base_name, base_dir[, compress=&#8217;gzip&#8217;, verbose=0, dry_run=0])</p>
+<blockquote>
+&#8216;Create an (optional compressed) archive as a tar file from all
+files in and under <em>base_dir</em>. <em>compress</em> must be <tt class="docutils literal"><span class="pre">'gzip'</span></tt> (the
+default),  <tt class="docutils literal"><span class="pre">'compress'</span></tt>, <tt class="docutils literal"><span class="pre">'bzip2'</span></tt>, or <tt class="xref docutils literal"><span class="pre">None</span></tt>.  Both <strong>tar</strong>
+and the compression utility named by <em>compress</em> must be on the
+default program search path, so this is probably Unix-specific.
+The  output tar file will be named <tt class="docutils literal"><span class="pre">base_dir.tar</span></tt>, possibly plus
+the appropriate compression extension (<tt class="docutils literal"><span class="pre">.gz</span></tt>, <tt class="docutils literal"><span class="pre">.bz2</span></tt> or
+<tt class="docutils literal"><span class="pre">.Z</span></tt>).  Return the output filename.</blockquote>
+<p>distutils.archive_util.make_zipfile(base_name, base_dir[, verbose=0, dry_run=0])</p>
+<blockquote>
+Create a zip file from all files in and under <em>base_dir</em>.  The
+output zip file will be named <em>base_dir</em> + <tt class="docutils literal"><span class="pre">.zip</span></tt>.  Uses either
+the  <tt class="docutils literal"><span class="pre">zipfile</span></tt> Python module (if available) or the InfoZIP
+<tt class="docutils literal"><span class="pre">zip</span></tt>  utility (if installed and found on the default search
+path).  If neither  tool is available, raises
+<tt class="docutils literal"><span class="pre">DistutilsExecError</span></tt>.   Returns the name of the output zip file.</blockquote>
+</div>
+<div class="section" id="distutils-dep-util-dependency-checking">
+<h2><tt class="docutils literal"><span class="pre">distutils.dep_util</span></tt> &#8212; Dependency checking<a class="headerlink" href="#distutils-dep-util-dependency-checking" title="Permalink to this headline">¶</a></h2>
+<p>This module provides functions for performing simple, timestamp-based
+dependency of files and groups of files; also, functions based
+entirely  on such timestamp dependency analysis.</p>
+<p>distutils.dep_util.newer(source, target)</p>
+<blockquote>
+Return true if <em>source</em> exists and is more recently modified than
+<em>target</em>, or if <em>source</em> exists and <em>target</em> doesn&#8217;t. Return false
+if both exist and <em>target</em> is the same age or newer  than <em>source</em>.
+Raise <tt class="docutils literal"><span class="pre">DistutilsFileError</span></tt> if <em>source</em> does not exist.</blockquote>
+<p>distutils.dep_util.newer_pairwise(sources, targets)</p>
+<blockquote>
+Walk two filename lists in parallel, testing if each source is
+newer than its corresponding target.  Return a pair of lists
+(<em>sources</em>, <em>targets</em>) where source is newer than target, according
+to the semantics of <tt class="docutils literal"><span class="pre">newer()</span></tt></blockquote>
+<p>distutils.dep_util.newer_group(sources, target[, missing=&#8217;error&#8217;])</p>
+<blockquote>
+Return true if <em>target</em> is out-of-date with respect to any file
+listed in <em>sources</em>  In other words, if <em>target</em> exists and is
+newer than every file in <em>sources</em>, return false; otherwise return
+true. <em>missing</em> controls what we do when a source file is missing;
+the default (<tt class="docutils literal"><span class="pre">'error'</span></tt>) is to blow up with an <tt class="docutils literal"><span class="pre">OSError</span></tt> from
+inside <tt class="docutils literal"><span class="pre">os.stat()</span></tt>; if it is <tt class="docutils literal"><span class="pre">'ignore'</span></tt>, we silently drop any
+missing source files; if it is <tt class="docutils literal"><span class="pre">'newer'</span></tt>, any missing source
+files make us assume that <em>target</em> is out-of-date (this is handy in
+&#8220;dry-run&#8221; mode: it&#8217;ll make you pretend to carry out commands that
+wouldn&#8217;t work because inputs are missing, but that doesn&#8217;t matter
+because you&#8217;re not actually going to run the commands).</blockquote>
+</div>
+<div class="section" id="distutils-dir-util-directory-tree-operations">
+<h2><tt class="docutils literal"><span class="pre">distutils.dir_util</span></tt> &#8212; Directory tree operations<a class="headerlink" href="#distutils-dir-util-directory-tree-operations" title="Permalink to this headline">¶</a></h2>
+<p>This module provides functions for operating on directories and trees
+of directories.</p>
+<p>distutils.dir_util.mkpath(name[, mode=0777, verbose=0, dry_run=0])</p>
+<blockquote>
+Create a directory and any missing ancestor directories.  If the
+directory already exists (or if <em>name</em> is the empty string, which
+means the current directory, which of course exists), then do
+nothing.  Raise <tt class="docutils literal"><span class="pre">DistutilsFileError</span></tt> if unable to create some
+directory along the way (eg. some sub-path exists, but is a file
+rather than a directory).  If <em>verbose</em> is true, print a one-line
+summary of each mkdir to stdout.  Return the list of directories
+actually created.</blockquote>
+<p>distutils.dir_util.create_tree(base_dir, files[, mode=0777, verbose=0, dry_run=0])</p>
+<blockquote>
+Create all the empty directories under <em>base_dir</em> needed to put
+<em>files</em> there. <em>base_dir</em> is just the a name of a directory which
+doesn&#8217;t necessarily exist yet; <em>files</em> is a list of filenames to be
+interpreted relative to <em>base_dir</em>. <em>base_dir</em> + the directory
+portion of every file in <em>files</em> will be created if it doesn&#8217;t
+already exist.  <em>mode</em>, <em>verbose</em> and <em>dry_run</em> flags  are as for
+<tt class="docutils literal"><span class="pre">mkpath()</span></tt>.</blockquote>
+<p>distutils.dir_util.copy_tree(src, dst[, preserve_mode=1, preserve_times=1, preserve_symlinks=0, update=0, verbose=0, dry_run=0])</p>
+<blockquote>
+<p>Copy an entire directory tree <em>src</em> to a new location <em>dst</em>.  Both
+<em>src</em> and <em>dst</em> must be directory names.  If <em>src</em> is not a
+directory, raise <tt class="docutils literal"><span class="pre">DistutilsFileError</span></tt>.  If <em>dst</em> does  not exist,
+it is created with <tt class="docutils literal"><span class="pre">mkpath()</span></tt>.  The end result of the  copy is
+that every file in <em>src</em> is copied to <em>dst</em>, and  directories under
+<em>src</em> are recursively copied to <em>dst</em>. Return the list of files
+that were copied or might have been copied, using their output
+name. The return value is unaffected by <em>update</em> or <em>dry_run</em>: it
+is simply the list of all files under <em>src</em>, with the names changed
+to be under <em>dst</em>.</p>
+<p><em>preserve_mode</em> and <em>preserve_times</em> are the same as for
+<tt class="docutils literal"><span class="pre">copy_file()</span></tt> in <tt class="docutils literal"><span class="pre">distutils.file_util</span></tt>; note that they only
+apply to regular files, not to directories.  If <em>preserve_symlinks</em>
+is true, symlinks will be copied as symlinks (on platforms that
+support them!); otherwise (the default), the destination of the
+symlink will be copied.  <em>update</em> and <em>verbose</em> are the same as for
+<tt class="docutils literal"><span class="pre">copy_file()</span></tt>.</p>
+</blockquote>
+<p>distutils.dir_util.remove_tree(directory[, verbose=0, dry_run=0])</p>
+<blockquote>
+Recursively remove <em>directory</em> and all files and directories
+underneath it. Any errors are ignored (apart from being reported to
+<tt class="docutils literal"><span class="pre">sys.stdout</span></tt> if <em>verbose</em> is true).</blockquote>
+<p><strong>**</strong> Some of this could be replaced with the shutil module? <strong>**</strong></p>
+</div>
+<div class="section" id="distutils-file-util-single-file-operations">
+<h2><tt class="docutils literal"><span class="pre">distutils.file_util</span></tt> &#8212; Single file operations<a class="headerlink" href="#distutils-file-util-single-file-operations" title="Permalink to this headline">¶</a></h2>
+<p>This module contains some utility functions for operating on
+individual files.</p>
+<p>distutils.file_util.copy_file(src, dst[, preserve_mode=1, preserve_times=1, update=0, link=None, verbose=0, dry_run=0])</p>
+<blockquote>
+<p>Copy file <em>src</em> to <em>dst</em>. If <em>dst</em> is a directory, then <em>src</em> is
+copied there with the same name; otherwise, it must be a filename.
+(If the file exists, it will be ruthlessly clobbered.) If
+<em>preserve_mode</em> is true (the default), the file&#8217;s mode (type and
+permission bits, or whatever is analogous on the current platform)
+is copied. If <em>preserve_times</em> is true (the default), the last-
+modified and last-access times are copied as well. If <em>update</em> is
+true, <em>src</em> will only be copied if <em>dst</em> does not exist, or if
+<em>dst</em> does exist but is older than <em>src</em>.</p>
+<p><em>link</em> allows you to make hard links (using <tt class="docutils literal"><span class="pre">os.link()</span></tt>) or
+symbolic links (using <tt class="docutils literal"><span class="pre">os.symlink()</span></tt>) instead of copying: set it
+to <tt class="docutils literal"><span class="pre">'hard'</span></tt> or <tt class="docutils literal"><span class="pre">'sym'</span></tt>; if it is <tt class="xref docutils literal"><span class="pre">None</span></tt> (the default), files
+are copied. Don&#8217;t set <em>link</em> on systems that don&#8217;t support it:
+<tt class="docutils literal"><span class="pre">copy_file()</span></tt> doesn&#8217;t check if hard or symbolic linking is
+available.  It uses <tt class="docutils literal"><span class="pre">_copy_file_contents()</span></tt> to copy file
+contents.</p>
+<p>Return a tuple <tt class="docutils literal"><span class="pre">(dest_name,</span> <span class="pre">copied)</span></tt>: <em>dest_name</em> is the actual
+name of the output file, and <em>copied</em> is true if the file was
+copied  (or would have been copied, if <em>dry_run</em> true).</p>
+</blockquote>
+<p>distutils.file_util.move_file(src, dst[, verbose, dry_run])</p>
+<blockquote>
+<p>Move file <em>src</em> to <em>dst</em>. If <em>dst</em> is a directory, the file will be
+moved into it with the same name; otherwise, <em>src</em> is just renamed
+to <em>dst</em>.  Returns the new full name of the file.</p>
+<dl class="docutils">
+<dt>Warning: Handles cross-device moves on Unix using <tt class="docutils literal"><span class="pre">copy_file()</span></tt>.  What</dt>
+<dd>about other systems?</dd>
+</dl>
+</blockquote>
+<p>distutils.file_util.write_file(filename, contents)</p>
+<blockquote>
+Create a file called <em>filename</em> and write <em>contents</em> (a sequence of
+strings without line terminators) to it.</blockquote>
+</div>
+<div class="section" id="distutils-util-miscellaneous-other-utility-functions">
+<h2><tt class="docutils literal"><span class="pre">distutils.util</span></tt> &#8212; Miscellaneous other utility functions<a class="headerlink" href="#distutils-util-miscellaneous-other-utility-functions" title="Permalink to this headline">¶</a></h2>
+<p>This module contains other assorted bits and pieces that don&#8217;t fit
+into  any other utility module.</p>
+<p>distutils.util.get_platform()</p>
+<blockquote>
+<p>Return a string that identifies the current platform.  This is used
+mainly to distinguish platform-specific build directories and
+platform-specific built distributions.  Typically includes the OS
+name and version and the architecture (as supplied by
+&#8216;os.uname()&#8217;), although the exact information included depends on
+the OS; eg. for IRIX the architecture isn&#8217;t particularly important
+(IRIX only runs on SGI hardware), but for Linux the kernel version
+isn&#8217;t particularly important.</p>
+<p>Examples of returned values:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">linux-i586</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">linux-alpha</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">solaris-2.6-sun4u</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">irix-5.3</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">irix64-6.2</span></tt></li>
+</ul>
+<p>For non-POSIX platforms, currently just returns <tt class="docutils literal"><span class="pre">sys.platform</span></tt>.</p>
+<p>For Mac OS X systems the OS version reflects the minimal version on
+which binaries will run (that is, the value of
+<tt class="docutils literal"><span class="pre">MACOSX_DEPLOYMENT_TARGET</span></tt> during the build of Python), not the
+OS version of the current system.</p>
+<p>For universal binary builds on Mac OS X the architecture value
+reflects the univeral binary status instead of the architecture of
+the current processor. For 32-bit universal binaries the
+architecture is <tt class="docutils literal"><span class="pre">fat</span></tt>, for 64-bit universal binaries the
+architecture is <tt class="docutils literal"><span class="pre">fat64</span></tt>, and for 4-way universal binaries the
+architecture is <tt class="docutils literal"><span class="pre">universal</span></tt>.</p>
+<p>Examples of returned values on Mac OS X:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">macosx-10.3-ppc</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">macosx-10.3-fat</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">macosx-10.5-universal</span></tt></li>
+</ul>
+</blockquote>
+<p>distutils.util.convert_path(pathname)</p>
+<blockquote>
+Return &#8216;pathname&#8217; as a name that will work on the native
+filesystem, i.e. split it on &#8216;/&#8217; and put it back together again
+using the current directory separator. Needed because filenames in
+the setup script are always supplied in Unix style, and have to be
+converted to the local convention before we can actually use them
+in the filesystem.  Raises <tt class="docutils literal"><span class="pre">ValueError</span></tt> on non-Unix-ish systems
+if <em>pathname</em> either  starts or ends with a slash.</blockquote>
+<p>distutils.util.change_root(new_root, pathname)</p>
+<blockquote>
+Return <em>pathname</em> with <em>new_root</em> prepended.  If <em>pathname</em> is
+relative, this is equivalent to <tt class="docutils literal"><span class="pre">os.path.join(new_root,pathname)</span></tt>
+Otherwise, it requires making <em>pathname</em> relative and then joining
+the two, which is tricky on DOS/Windows.</blockquote>
+<p>distutils.util.check_environ()</p>
+<blockquote>
+<p>Ensure that &#8216;os.environ&#8217; has all the environment variables we
+guarantee that users can use in config files, command-line options,
+etc.  Currently this includes:</p>
+<ul class="simple">
+<li><strong>HOME</strong> - user&#8217;s home directory (Unix only)</li>
+<li><strong>PLAT</strong> - description of the current platform, including
+hardware and OS (see <tt class="docutils literal"><span class="pre">get_platform()</span></tt>)</li>
+</ul>
+</blockquote>
+<p>distutils.util.subst_vars(s, local_vars)</p>
+<blockquote>
+<p>Perform shell/Perl-style variable substitution on <em>s</em>.  Every
+occurrence of <tt class="docutils literal"><span class="pre">$</span></tt> followed by a name is considered a variable,
+and variable is substituted by the value found in the <em>local_vars</em>
+dictionary, or in <tt class="docutils literal"><span class="pre">os.environ</span></tt> if it&#8217;s not in <em>local_vars</em>.
+<em>os.environ</em> is first checked/augmented to guarantee that it
+contains certain values: see <tt class="docutils literal"><span class="pre">check_environ()</span></tt>.  Raise
+<tt class="docutils literal"><span class="pre">ValueError</span></tt> for any variables not found in either <em>local_vars</em>
+or <tt class="docutils literal"><span class="pre">os.environ</span></tt>.</p>
+<p>Note that this is not a fully-fledged string interpolation
+function. A valid <tt class="docutils literal"><span class="pre">$variable</span></tt> can consist only of upper and lower
+case letters, numbers and an underscore. No { } or ( ) style
+quoting is available.</p>
+</blockquote>
+<p>distutils.util.grok_environment_error(exc[, prefix=&#8217;error: &#8216;])</p>
+<blockquote>
+Generate a useful error message from an <tt class="docutils literal"><span class="pre">EnvironmentError</span></tt>
+(<tt class="docutils literal"><span class="pre">IOError</span></tt> or <tt class="docutils literal"><span class="pre">OSError</span></tt>) exception object.   Handles Python
+1.5.1 and later styles, and does what it can to deal with
+exception objects that don&#8217;t have a filename (which happens when
+the error  is due to a two-file operation, such as <tt class="docutils literal"><span class="pre">rename()</span></tt> or
+<tt class="docutils literal"><span class="pre">link()</span></tt>).  Returns the error message as a string prefixed  with
+<em>prefix</em>.</blockquote>
+<p>distutils.util.split_quoted(s)</p>
+<blockquote>
+Split a string up according to Unix shell-like rules for quotes and
+backslashes. In short: words are delimited by spaces, as long as
+those spaces are not escaped by a backslash, or inside a quoted
+string. Single and double quotes are equivalent, and the quote
+characters can be backslash-escaped.  The backslash is stripped
+from any two-character escape sequence, leaving only the escaped
+character.  The quote characters are stripped from any quoted
+string.  Returns a list of words.</blockquote>
+<p>distutils.util.execute(func, args[, msg=None, verbose=0, dry_run=0])</p>
+<blockquote>
+Perform some action that affects the outside world (for instance,
+writing to the filesystem).  Such actions are special because they
+are disabled by the <em>dry_run</em> flag.  This method takes  care of all
+that bureaucracy for you; all you have to do is supply the function
+to call and an argument tuple for it (to embody the &#8220;external
+action&#8221; being performed), and an optional message to print.</blockquote>
+<p>distutils.util.strtobool(val)</p>
+<blockquote>
+<p>Convert a string representation of truth to true (1) or false (0).</p>
+<p>True values are <tt class="docutils literal"><span class="pre">y</span></tt>, <tt class="docutils literal"><span class="pre">yes</span></tt>, <tt class="docutils literal"><span class="pre">t</span></tt>, <tt class="docutils literal"><span class="pre">true</span></tt>, <tt class="docutils literal"><span class="pre">on</span></tt>  and <tt class="docutils literal"><span class="pre">1</span></tt>;
+false values are <tt class="docutils literal"><span class="pre">n</span></tt>, <tt class="docutils literal"><span class="pre">no</span></tt>, <tt class="docutils literal"><span class="pre">f</span></tt>, <tt class="docutils literal"><span class="pre">false</span></tt>,  <tt class="docutils literal"><span class="pre">off</span></tt> and
+<tt class="docutils literal"><span class="pre">0</span></tt>.  Raises <tt class="docutils literal"><span class="pre">ValueError</span></tt> if <em>val</em>  is anything else.</p>
+</blockquote>
+<p>distutils.util.byte_compile(py_files[, optimize=0, force=0, prefix=None, base_dir=None, verbose=1, dry_run=0, direct=None])</p>
+<blockquote>
+<p>Byte-compile a collection of Python source files to either <tt class="docutils literal"><span class="pre">.pyc</span></tt>
+or <tt class="docutils literal"><span class="pre">.pyo</span></tt> files in the same directory.  <em>py_files</em> is a list of
+files to compile; any files that don&#8217;t end in <tt class="docutils literal"><span class="pre">.py</span></tt> are silently
+skipped. <em>optimize</em> must be one of the following:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">0</span></tt> - don&#8217;t optimize (generate <tt class="docutils literal"><span class="pre">.pyc</span></tt>)</li>
+<li><tt class="docutils literal"><span class="pre">1</span></tt> - normal optimization (like <tt class="docutils literal"><span class="pre">python</span> <span class="pre">-O</span></tt>)</li>
+<li><tt class="docutils literal"><span class="pre">2</span></tt> - extra optimization (like <tt class="docutils literal"><span class="pre">python</span> <span class="pre">-OO</span></tt>)</li>
+</ul>
+<p>If <em>force</em> is true, all files are recompiled regardless of
+timestamps.</p>
+<p>The source filename encoded in each <em>bytecode</em> file defaults to the
+filenames listed in <em>py_files</em>; you can modify these with <em>prefix</em>
+and <em>basedir</em>. <em>prefix</em> is a string that will be stripped off of
+each source filename, and <em>base_dir</em> is a directory name that will
+be prepended (after <em>prefix</em> is stripped).  You can supply either
+or both (or neither) of <em>prefix</em> and <em>base_dir</em>, as you wish.</p>
+<p>If <em>dry_run</em> is true, doesn&#8217;t actually do anything that would
+affect the filesystem.</p>
+<p>Byte-compilation is either done directly in this interpreter
+process with the standard <tt class="docutils literal"><span class="pre">py_compile</span></tt> module, or indirectly by
+writing a temporary script and executing it.  Normally, you should
+let <tt class="docutils literal"><span class="pre">byte_compile()</span></tt> figure out to use direct compilation or not
+(see the source for details).  The <em>direct</em> flag is used by the
+script generated in indirect mode; unless you know what you&#8217;re
+doing, leave it set to <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
+</blockquote>
+<p>distutils.util.rfc822_escape(header)</p>
+<blockquote>
+Return a version of <em>header</em> escaped for inclusion in an <strong>RFC
+822</strong> header, by ensuring there are 8 spaces space after each
+newline. Note that it does no other modification of the string.</blockquote>
+</div>
+<div class="section" id="distutils-dist-the-distribution-class">
+<h2><tt class="docutils literal"><span class="pre">distutils.dist</span></tt> &#8212; The Distribution class<a class="headerlink" href="#distutils-dist-the-distribution-class" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">Distribution</span></tt> class, which represents the
+module distribution being built/installed/distributed.</p>
+</div>
+<div class="section" id="distutils-extension-the-extension-class">
+<h2><tt class="docutils literal"><span class="pre">distutils.extension</span></tt> &#8212; The Extension class<a class="headerlink" href="#distutils-extension-the-extension-class" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">Extension</span></tt> class, used to describe C/C++
+extension modules in setup scripts.</p>
+</div>
+<div class="section" id="distutils-debug-distutils-debug-mode">
+<h2><tt class="docutils literal"><span class="pre">distutils.debug</span></tt> &#8212; Distutils debug mode<a class="headerlink" href="#distutils-debug-distutils-debug-mode" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the DEBUG flag.</p>
+</div>
+<div class="section" id="distutils-errors-distutils-exceptions">
+<h2><tt class="docutils literal"><span class="pre">distutils.errors</span></tt> &#8212; Distutils exceptions<a class="headerlink" href="#distutils-errors-distutils-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Provides exceptions used by the Distutils modules.  Note that
+Distutils modules may raise standard exceptions; in particular,
+SystemExit is usually raised for errors that are obviously the end-
+user&#8217;s fault (eg. bad command-line arguments).</p>
+<p>This module is safe to use in <tt class="docutils literal"><span class="pre">from</span> <span class="pre">...</span> <span class="pre">import</span> <span class="pre">*</span></tt> mode; it only
+exports symbols whose names start with <tt class="docutils literal"><span class="pre">Distutils</span></tt> and end with
+<tt class="docutils literal"><span class="pre">Error</span></tt>.</p>
+</div>
+<div class="section" id="distutils-fancy-getopt-wrapper-around-the-standard-getopt-module">
+<h2><tt class="docutils literal"><span class="pre">distutils.fancy_getopt</span></tt> &#8212; Wrapper around the standard getopt module<a class="headerlink" href="#distutils-fancy-getopt-wrapper-around-the-standard-getopt-module" title="Permalink to this headline">¶</a></h2>
+<p>This module provides a wrapper around the standard <tt class="docutils literal"><span class="pre">getopt</span></tt>  module
+that provides the following additional features:</p>
+<ul class="simple">
+<li>short and long options are tied together</li>
+<li>options have help strings, so <tt class="docutils literal"><span class="pre">fancy_getopt()</span></tt> could potentially
+create a complete usage summary</li>
+<li>options set attributes of a passed-in object</li>
+<li>boolean options can have &#8220;negative aliases&#8221; &#8212; eg. if <em>&#8211;quiet</em> is
+the &#8220;negative alias&#8221; of <em>&#8211;verbose</em>, then <em>&#8211;quiet</em> on the command
+line sets <em>verbose</em> to false.</li>
+</ul>
+<p><strong>**</strong> Should be replaced with <tt class="docutils literal"><span class="pre">optik</span></tt> (which is also now known as
+<tt class="docutils literal"><span class="pre">optparse</span></tt> in Python 2.3 and later). <strong>**</strong></p>
+<p>distutils.fancy_getopt.fancy_getopt(options, negative_opt, object, args)</p>
+<blockquote>
+Wrapper function. <em>options</em> is a list of <tt class="docutils literal"><span class="pre">(long_option,</span>
+<span class="pre">short_option,</span> <span class="pre">help_string)</span></tt> 3-tuples as described in the
+constructor for <tt class="docutils literal"><span class="pre">FancyGetopt</span></tt>. <em>negative_opt</em> should be a
+dictionary mapping option names to option names, both the key and
+value should be in the <em>options</em> list. <em>object</em> is an object which
+will be used to store values (see the <tt class="docutils literal"><span class="pre">getopt()</span></tt> method of the
+<tt class="docutils literal"><span class="pre">FancyGetopt</span></tt> class). <em>args</em> is the argument list. Will use
+<tt class="docutils literal"><span class="pre">sys.argv[1:]</span></tt> if you  pass <tt class="xref docutils literal"><span class="pre">None</span></tt> as <em>args</em>.</blockquote>
+<p>distutils.fancy_getopt.wrap_text(text, width)</p>
+<blockquote>
+Wraps <em>text</em> to less than <em>width</em> wide.</blockquote>
+<p>class class distutils.fancy_getopt.FancyGetopt([option_table=None])</p>
+<blockquote>
+<p>The option_table is a list of 3-tuples: <tt class="docutils literal"><span class="pre">(long_option,</span>
+<span class="pre">short_option,</span> <span class="pre">help_string)</span></tt></p>
+<p>If an option takes an argument, its <em>long_option</em> should have
+<tt class="docutils literal"><span class="pre">'='</span></tt> appended; <em>short_option</em> should just be a single character,
+no <tt class="docutils literal"><span class="pre">':'</span></tt> in any case. <em>short_option</em> should be <tt class="xref docutils literal"><span class="pre">None</span></tt> if a
+<em>long_option</em>  doesn&#8217;t have a corresponding <em>short_option</em>. All
+option tuples must have long options.</p>
+</blockquote>
+<p>The <tt class="docutils literal"><span class="pre">FancyGetopt</span></tt> class provides the following methods:</p>
+<p>FancyGetopt.getopt([args=None, object=None])</p>
+<blockquote>
+<p>Parse command-line options in args. Store as attributes on
+<em>object</em>.</p>
+<p>If <em>args</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt> or not supplied, uses <tt class="docutils literal"><span class="pre">sys.argv[1:]</span></tt>.  If
+<em>object</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt> or not supplied, creates a new <tt class="docutils literal"><span class="pre">OptionDummy</span></tt>
+instance, stores option values there, and returns a tuple <tt class="docutils literal"><span class="pre">(args,</span>
+<span class="pre">object)</span></tt>.  If <em>object</em> is supplied, it is modified in place and
+<tt class="docutils literal"><span class="pre">getopt()</span></tt> just returns <em>args</em>; in both cases, the returned
+<em>args</em> is a modified copy of the passed-in <em>args</em> list, which is
+left untouched.</p>
+</blockquote>
+<p>FancyGetopt.get_option_order()</p>
+<blockquote>
+Returns the list of <tt class="docutils literal"><span class="pre">(option,</span> <span class="pre">value)</span></tt> tuples processed by the
+previous run of <tt class="docutils literal"><span class="pre">getopt()</span></tt>  Raises <tt class="docutils literal"><span class="pre">RuntimeError</span></tt> if
+<tt class="docutils literal"><span class="pre">getopt()</span></tt> hasn&#8217;t been called yet.</blockquote>
+<p>FancyGetopt.generate_help([header=None])</p>
+<blockquote>
+<p>Generate help text (a list of strings, one per suggested line of
+output) from the option table for this <tt class="docutils literal"><span class="pre">FancyGetopt</span></tt> object.</p>
+<p>If supplied, prints the supplied <em>header</em> at the top of the help.</p>
+</blockquote>
+</div>
+<div class="section" id="distutils-filelist-the-filelist-class">
+<h2><tt class="docutils literal"><span class="pre">distutils.filelist</span></tt> &#8212; The FileList class<a class="headerlink" href="#distutils-filelist-the-filelist-class" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">FileList</span></tt> class, used for poking about the
+filesystem and building lists of files.</p>
+</div>
+<div class="section" id="distutils-log-simple-pep-282-style-logging">
+<h2><tt class="docutils literal"><span class="pre">distutils.log</span></tt> &#8212; Simple PEP 282-style logging<a class="headerlink" href="#distutils-log-simple-pep-282-style-logging" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-spawn-spawn-a-sub-process">
+<h2><tt class="docutils literal"><span class="pre">distutils.spawn</span></tt> &#8212; Spawn a sub-process<a class="headerlink" href="#distutils-spawn-spawn-a-sub-process" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">spawn()</span></tt> function, a front-end to  various
+platform-specific functions for launching another program in a  sub-
+process. Also provides <tt class="docutils literal"><span class="pre">find_executable()</span></tt> to search the path for a
+given executable name.</p>
+</div>
+<div class="section" id="distutils-sysconfig-system-configuration-information">
+<h2><tt class="docutils literal"><span class="pre">distutils.sysconfig</span></tt> &#8212; System configuration information<a class="headerlink" href="#distutils-sysconfig-system-configuration-information" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">distutils.sysconfig</span></tt> module provides access to Python&#8217;s low-
+level configuration information.  The specific configuration variables
+available depend heavily on the platform and configuration. The
+specific variables depend on the build process for the specific
+version of Python being run; the variables are those found in the
+<tt class="docutils literal"><span class="pre">Makefile</span></tt> and configuration header that are installed with Python
+on Unix systems.  The configuration header is called <tt class="docutils literal"><span class="pre">pyconfig.h</span></tt>
+for Python versions starting with 2.2, and <tt class="docutils literal"><span class="pre">config.h</span></tt> for earlier
+versions of Python.</p>
+<p>Some additional functions are provided which perform some useful
+manipulations for other parts of the <tt class="docutils literal"><span class="pre">distutils</span></tt> package.</p>
+<p>distutils.sysconfig.PREFIX</p>
+<blockquote>
+The result of <tt class="docutils literal"><span class="pre">os.path.normpath(sys.prefix)</span></tt>.</blockquote>
+<p>distutils.sysconfig.EXEC_PREFIX</p>
+<blockquote>
+The result of <tt class="docutils literal"><span class="pre">os.path.normpath(sys.exec_prefix)</span></tt>.</blockquote>
+<p>distutils.sysconfig.get_config_var(name)</p>
+<blockquote>
+Return the value of a single variable.  This is equivalent to
+<tt class="docutils literal"><span class="pre">get_config_vars().get(name)</span></tt>.</blockquote>
+<p>distutils.sysconfig.get_config_vars(...)</p>
+<blockquote>
+Return a set of variable definitions.  If there are no arguments,
+this returns a dictionary mapping names of configuration variables
+to values.  If arguments are provided, they should be strings, and
+the return value will be a sequence giving the associated values.
+If a given name does not have a corresponding value, <tt class="xref docutils literal"><span class="pre">None</span></tt> will
+be included for that variable.</blockquote>
+<p>distutils.sysconfig.get_config_h_filename()</p>
+<blockquote>
+Return the full path name of the configuration header.  For Unix,
+this will be the header generated by the <strong>configure</strong> script; for
+other platforms the header will have been supplied directly by the
+Python source distribution.  The file is a platform-specific text
+file.</blockquote>
+<p>distutils.sysconfig.get_makefile_filename()</p>
+<blockquote>
+Return the full path name of the <tt class="docutils literal"><span class="pre">Makefile</span></tt> used to build Python.
+For Unix, this will be a file generated by the <strong>configure</strong>
+script; the meaning for other platforms will vary.  The file is a
+platform-specific text file, if it exists. This function is only
+useful on POSIX platforms.</blockquote>
+<p>distutils.sysconfig.get_python_inc([plat_specific[, prefix]])</p>
+<blockquote>
+Return the directory for either the general or platform-dependent C
+include files.  If <em>plat_specific</em> is true, the platform-dependent
+include directory is returned; if false or omitted, the platform-
+independent directory is returned. If <em>prefix</em> is given, it is used
+as either the prefix instead of <tt class="docutils literal"><span class="pre">PREFIX</span></tt>, or as the exec-prefix
+instead of <tt class="docutils literal"><span class="pre">EXEC_PREFIX</span></tt> if <em>plat_specific</em> is true.</blockquote>
+<p>distutils.sysconfig.get_python_lib([plat_specific[, standard_lib[, prefix]]])</p>
+<blockquote>
+Return the directory for either the general or platform-dependent
+library installation.  If <em>plat_specific</em> is true, the platform-
+dependent include directory is returned; if false or omitted, the
+platform-independent directory is returned.  If <em>prefix</em> is given,
+it is used as either the prefix instead of <tt class="docutils literal"><span class="pre">PREFIX</span></tt>, or as the
+exec-prefix instead of <tt class="docutils literal"><span class="pre">EXEC_PREFIX</span></tt> if <em>plat_specific</em> is true.
+If <em>standard_lib</em> is true, the directory for the standard library
+is returned rather than the directory for the installation of
+third-party extensions.</blockquote>
+<p>The following function is only intended for use within the
+<tt class="docutils literal"><span class="pre">distutils</span></tt> package.</p>
+<p>distutils.sysconfig.customize_compiler(compiler)</p>
+<blockquote>
+<p>Do any platform-specific customization of a
+<tt class="docutils literal"><span class="pre">distutils.ccompiler.CCompiler</span></tt> instance.</p>
+<p>This function is only needed on Unix at this time, but should be
+called consistently to support forward-compatibility.  It inserts
+the information that varies across Unix flavors and is stored in
+Python&#8217;s <tt class="docutils literal"><span class="pre">Makefile</span></tt>.  This information includes the selected
+compiler, compiler and linker options, and the extension used by
+the linker for shared objects.</p>
+</blockquote>
+<p>This function is even more special-purpose, and should only be used
+from Python&#8217;s own build procedures.</p>
+<p>distutils.sysconfig.set_python_build()</p>
+<blockquote>
+Inform the <tt class="docutils literal"><span class="pre">distutils.sysconfig</span></tt> module that it is being used as
+part of the build process for Python.  This changes a lot of
+relative locations for files, allowing them to be located in the
+build area rather than in an installed Python.</blockquote>
+</div>
+<div class="section" id="distutils-text-file-the-textfile-class">
+<h2><tt class="docutils literal"><span class="pre">distutils.text_file</span></tt> &#8212; The TextFile class<a class="headerlink" href="#distutils-text-file-the-textfile-class" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <tt class="docutils literal"><span class="pre">TextFile</span></tt> class, which gives an interface
+to text files that (optionally) takes care of stripping comments,
+ignoring  blank lines, and joining lines with backslashes.</p>
+<p>class class distutils.text_file.TextFile([filename=None, file=None, <a href="#id3"><span class="problematic" id="id4">**</span></a>options])</p>
+<blockquote>
+<p>This class provides a file-like object that takes care of all  the
+things you commonly want to do when processing a text file  that
+has some line-by-line syntax: strip comments (as long as <tt class="docutils literal"><span class="pre">#</span></tt>  is
+your comment character), skip blank lines, join adjacent lines by
+escaping the newline (ie. backslash at end of line), strip leading
+and/or trailing whitespace.  All of these are optional and
+independently controllable.</p>
+<p>The class provides a <tt class="docutils literal"><span class="pre">warn()</span></tt> method so you can generate  warning
+messages that report physical line number, even if the  logical
+line in question spans multiple physical lines.  Also  provides
+<tt class="docutils literal"><span class="pre">unreadline()</span></tt> for implementing line-at-a-time lookahead.</p>
+<p><tt class="docutils literal"><span class="pre">TextFile</span></tt> instances are create with either <em>filename</em>, <em>file</em>,
+or both. <tt class="docutils literal"><span class="pre">RuntimeError</span></tt> is raised if both are <tt class="xref docutils literal"><span class="pre">None</span></tt>.
+<em>filename</em> should be a string, and <em>file</em> a file object (or
+something that provides <tt class="docutils literal"><span class="pre">readline()</span></tt> and <tt class="docutils literal"><span class="pre">close()</span></tt>  methods).
+It is recommended that you supply at least <em>filename</em>,  so that
+<tt class="docutils literal"><span class="pre">TextFile</span></tt> can include it in warning messages.  If <em>file</em> is not
+supplied, <tt class="docutils literal"><span class="pre">TextFile</span></tt> creates its own using the <tt class="docutils literal"><span class="pre">open()</span></tt> built-
+in function.</p>
+<p>The options are all boolean, and affect the values returned by
+<tt class="docutils literal"><span class="pre">readline()</span></tt></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="52%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">option name</th>
+<th class="head">description</th>
+<th class="head">default</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><em>strip_comments</em></td>
+<td>strip from <tt class="docutils literal"><span class="pre">'#'</span></tt> to end-of-
+line, as well as any whitespace
+leading up to the
+<tt class="docutils literal"><span class="pre">'#'</span></tt>&#8212;unless it is escaped
+by a backslash</td>
+<td>true</td>
+</tr>
+<tr><td><em>lstrip_ws</em></td>
+<td>strip leading whitespace from
+each line before returning it</td>
+<td>false</td>
+</tr>
+<tr><td><em>rstrip_ws</em></td>
+<td>strip trailing whitespace
+(including line terminator!)
+from each line before returning
+it.</td>
+<td>true</td>
+</tr>
+<tr><td><em>skip_blanks</em></td>
+<td>skip lines that are empty
+<em>after</em> stripping comments and
+whitespace.  (If both lstrip_ws
+and rstrip_ws are false, then
+some lines may consist of solely
+whitespace: these will <em>not</em> be
+skipped, even if <em>skip_blanks</em>
+is true.)</td>
+<td>true</td>
+</tr>
+<tr><td><em>join_lines</em></td>
+<td>if a backslash is the last non-
+newline character on a line
+after stripping comments and
+whitespace, join the following
+line to it to form one logical
+line; if N consecutive lines end
+with a backslash, then N+1
+physical lines will be joined to
+form one logical line.</td>
+<td>false</td>
+</tr>
+<tr><td><em>collapse_join</em></td>
+<td>strip leading whitespace from
+lines that are joined to their
+predecessor; only matters if
+<tt class="docutils literal"><span class="pre">(join_lines</span> <span class="pre">and</span> <span class="pre">not</span>
+<span class="pre">lstrip_ws)</span></tt></td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p>Note that since <em>rstrip_ws</em> can strip the trailing newline, the
+semantics of <tt class="docutils literal"><span class="pre">readline()</span></tt> must differ from those of the builtin
+file object&#8217;s <tt class="docutils literal"><span class="pre">readline()</span></tt> method!  In particular, <tt class="docutils literal"><span class="pre">readline()</span></tt>
+returns <tt class="xref docutils literal"><span class="pre">None</span></tt> for end-of-file: an empty string might just be a
+blank line (or an all-whitespace line), if <em>rstrip_ws</em> is true  but
+<em>skip_blanks</em> is not.</p>
+<p>open(filename)</p>
+<blockquote>
+Open a new file <em>filename</em>. This overrides any <em>file</em> or
+<em>filename</em> constructor arguments.</blockquote>
+<p>close()</p>
+<blockquote>
+Close the current file and forget everything we know about it
+(including the filename and the current line number).</blockquote>
+<p>warn(msg[, line=None])</p>
+<blockquote>
+Print (to stderr) a warning message tied to the current logical
+line in the current file.  If the current logical line in the
+file spans multiple physical lines, the warning refers to the
+whole range, such as <tt class="docutils literal"><span class="pre">&quot;lines</span> <span class="pre">3-5&quot;</span></tt>.  If <em>line</em> is supplied,
+it overrides the current line number; it may be a list or tuple
+to indicate a range of physical lines, or an integer for a
+single physical line.</blockquote>
+<p>readline()</p>
+<blockquote>
+Read and return a single logical line from the current file (or
+from an internal buffer if lines have previously been &#8220;unread&#8221;
+with <tt class="docutils literal"><span class="pre">unreadline()</span></tt>).  If the <em>join_lines</em> option  is true,
+this may involve reading multiple physical lines concatenated
+into a single string.  Updates the current line number,  so
+calling <tt class="docutils literal"><span class="pre">warn()</span></tt> after <tt class="docutils literal"><span class="pre">readline()</span></tt> emits a warning  about
+the physical line(s) just read.  Returns <tt class="xref docutils literal"><span class="pre">None</span></tt> on end-of-
+file,  since the empty string can occur if <em>rstrip_ws</em> is true
+but  <em>strip_blanks</em> is not.</blockquote>
+<p>readlines()</p>
+<blockquote>
+Read and return the list of all logical lines remaining in the
+current file. This updates the current line number to the last
+line of the file.</blockquote>
+<p>unreadline(line)</p>
+<blockquote>
+Push <em>line</em> (a string) onto an internal buffer that will be
+checked by future <tt class="docutils literal"><span class="pre">readline()</span></tt> calls.  Handy for implementing
+a parser with line-at-a-time lookahead. Note that lines that are
+&#8220;unread&#8221; with <tt class="docutils literal"><span class="pre">unreadline()</span></tt> are not subsequently re-cleansed
+(whitespace  stripped, or whatever) when read with
+<tt class="docutils literal"><span class="pre">readline()</span></tt>. If multiple calls are made to <tt class="docutils literal"><span class="pre">unreadline()</span></tt>
+before a call to <tt class="docutils literal"><span class="pre">readline()</span></tt>, the lines will be returned most
+in most recent first order.</blockquote>
+</blockquote>
+</div>
+<div class="section" id="distutils-version-version-number-classes">
+<h2><tt class="docutils literal"><span class="pre">distutils.version</span></tt> &#8212; Version number classes<a class="headerlink" href="#distutils-version-version-number-classes" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-cmd-abstract-base-class-for-distutils-commands">
+<h2><tt class="docutils literal"><span class="pre">distutils.cmd</span></tt> &#8212; Abstract base class for Distutils commands<a class="headerlink" href="#distutils-cmd-abstract-base-class-for-distutils-commands" title="Permalink to this headline">¶</a></h2>
+<p>This module supplies the abstract base class <tt class="docutils literal"><span class="pre">Command</span></tt>.</p>
+<p>class class distutils.cmd.Command(dist)</p>
+<blockquote>
+<p>Abstract base class for defining command classes, the &#8220;worker bees&#8221;
+of the Distutils.  A useful analogy for command classes is to think
+of them as subroutines with local variables called <em>options</em>.  The
+options are declared in <tt class="docutils literal"><span class="pre">initialize_options()</span></tt> and defined (given
+their final values) in <tt class="docutils literal"><span class="pre">finalize_options()</span></tt>, both of which must
+be defined by every command class. The distinction between the two
+is necessary because option values might come from the outside
+world (command line, config file, ...), and any options dependent
+on other options must be computed after these outside influences
+have been processed &#8212; hence <tt class="docutils literal"><span class="pre">finalize_options()</span></tt>.  The body of
+the subroutine, where it does all its work based on the values of
+its options, is the <tt class="docutils literal"><span class="pre">run()</span></tt> method, which must also be
+implemented by every command class.</p>
+<p>The class constructor takes a single argument <em>dist</em>, a
+<tt class="docutils literal"><span class="pre">Distribution</span></tt> instance.</p>
+</blockquote>
+</div>
+<div class="section" id="distutils-command-individual-distutils-commands">
+<h2><tt class="docutils literal"><span class="pre">distutils.command</span></tt> &#8212; Individual Distutils commands<a class="headerlink" href="#distutils-command-individual-distutils-commands" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-bdist-build-a-binary-installer">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.bdist</span></tt> &#8212; Build a binary installer<a class="headerlink" href="#distutils-command-bdist-build-a-binary-installer" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-bdist-packager-abstract-base-class-for-packagers">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.bdist_packager</span></tt> &#8212; Abstract base class for packagers<a class="headerlink" href="#distutils-command-bdist-packager-abstract-base-class-for-packagers" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-bdist-dumb-build-a-dumb-installer">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.bdist_dumb</span></tt> &#8212; Build a &#8220;dumb&#8221; installer<a class="headerlink" href="#distutils-command-bdist-dumb-build-a-dumb-installer" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-bdist-msi-build-a-microsoft-installer-binary-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.bdist_msi</span></tt> &#8212; Build a Microsoft Installer binary package<a class="headerlink" href="#distutils-command-bdist-msi-build-a-microsoft-installer-binary-package" title="Permalink to this headline">¶</a></h2>
+<p>class class distutils.command.bdist_msi.bdist_msi(Command)</p>
+<blockquote>
+<p>Builds a Windows Installer (.msi) binary package.</p>
+<p>In most cases, the <tt class="docutils literal"><span class="pre">bdist_msi</span></tt> installer is a better choice than
+the <tt class="docutils literal"><span class="pre">bdist_wininst</span></tt> installer, because it provides better support
+for Win64 platforms, allows administrators to perform non-
+interactive installations, and allows installation through group
+policies.</p>
+</blockquote>
+</div>
+<div class="section" id="distutils-command-bdist-rpm-build-a-binary-distribution-as-a-redhat-rpm-and-srpm">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.bdist_rpm</span></tt> &#8212; Build a binary distribution as a Redhat RPM and SRPM<a class="headerlink" href="#distutils-command-bdist-rpm-build-a-binary-distribution-as-a-redhat-rpm-and-srpm" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-bdist-wininst-build-a-windows-installer">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.bdist_wininst</span></tt> &#8212; Build a Windows installer<a class="headerlink" href="#distutils-command-bdist-wininst-build-a-windows-installer" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-sdist-build-a-source-distribution">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.sdist</span></tt> &#8212; Build a source distribution<a class="headerlink" href="#distutils-command-sdist-build-a-source-distribution" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-build-build-all-files-of-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.build</span></tt> &#8212; Build all files of a package<a class="headerlink" href="#distutils-command-build-build-all-files-of-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-build-clib-build-any-c-libraries-in-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.build_clib</span></tt> &#8212; Build any C libraries in a package<a class="headerlink" href="#distutils-command-build-clib-build-any-c-libraries-in-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-build-ext-build-any-extensions-in-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.build_ext</span></tt> &#8212; Build any extensions in a package<a class="headerlink" href="#distutils-command-build-ext-build-any-extensions-in-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-build-py-build-the-py-pyc-files-of-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.build_py</span></tt> &#8212; Build the .py/.pyc files of a package<a class="headerlink" href="#distutils-command-build-py-build-the-py-pyc-files-of-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-build-scripts-build-the-scripts-of-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.build_scripts</span></tt> &#8212; Build the scripts of a package<a class="headerlink" href="#distutils-command-build-scripts-build-the-scripts-of-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-clean-clean-a-package-build-area">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.clean</span></tt> &#8212; Clean a package build area<a class="headerlink" href="#distutils-command-clean-clean-a-package-build-area" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-config-perform-package-configuration">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.config</span></tt> &#8212; Perform package configuration<a class="headerlink" href="#distutils-command-config-perform-package-configuration" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-install-install-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.install</span></tt> &#8212; Install a package<a class="headerlink" href="#distutils-command-install-install-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-install-data-install-data-files-from-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.install_data</span></tt> &#8212; Install data files from a package<a class="headerlink" href="#distutils-command-install-data-install-data-files-from-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-install-headers-install-c-c-header-files-from-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.install_headers</span></tt> &#8212; Install C/C++ header files from a package<a class="headerlink" href="#distutils-command-install-headers-install-c-c-header-files-from-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-install-lib-install-library-files-from-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.install_lib</span></tt> &#8212; Install library files from a package<a class="headerlink" href="#distutils-command-install-lib-install-library-files-from-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-install-scripts-install-script-files-from-a-package">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.install_scripts</span></tt> &#8212; Install script files from a package<a class="headerlink" href="#distutils-command-install-scripts-install-script-files-from-a-package" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="distutils-command-register-register-a-module-with-the-python-package-index">
+<h2><tt class="docutils literal"><span class="pre">distutils.command.register</span></tt> &#8212; Register a module with the Python Package Index<a class="headerlink" href="#distutils-command-register-register-a-module-with-the-python-package-index" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">register</span></tt> command registers the package with the Python Package
+Index. This is described in more detail in <strong>PEP 301</strong>.</p>
+</div>
+<div class="section" id="creating-a-new-distutils-command">
+<h2>Creating a new Distutils command<a class="headerlink" href="#creating-a-new-distutils-command" title="Permalink to this headline">¶</a></h2>
+<p>This section outlines the steps to create a new Distutils command.</p>
+<p>A new command lives in a module in the <tt class="docutils literal"><span class="pre">distutils.command</span></tt> package.
+There is a sample template in that directory called
+<tt class="docutils literal"><span class="pre">command_template</span></tt>. Copy this file to a new module with the same
+name as the new command you&#8217;re implementing. This module should
+implement a class with the same name as the module (and the command).
+So, for instance, to create the command <tt class="docutils literal"><span class="pre">peel_banana</span></tt> (so that users
+can run <tt class="docutils literal"><span class="pre">setup.py</span> <span class="pre">peel_banana</span></tt>), you&#8217;d copy <tt class="docutils literal"><span class="pre">command_template</span></tt>  to
+<tt class="docutils literal"><span class="pre">distutils/command/peel_banana.py</span></tt>, then edit it so that it&#8217;s
+implementing the class <tt class="docutils literal"><span class="pre">peel_banana</span></tt>, a subclass of
+<tt class="docutils literal"><span class="pre">distutils.cmd.Command</span></tt>.</p>
+<p>Subclasses of <tt class="docutils literal"><span class="pre">Command</span></tt> must define the following methods.</p>
+<p>Command.initialize_options()(S)</p>
+<blockquote>
+et default values for all the options that this command supports.
+Note that these defaults may be overridden by other commands, by
+the setup script, by config files, or by the command-line.  Thus,
+this is not the place to code dependencies between options;
+generally, <tt class="docutils literal"><span class="pre">initialize_options()</span></tt> implementations are just a
+bunch of <tt class="docutils literal"><span class="pre">self.foo</span> <span class="pre">=</span> <span class="pre">None</span></tt> assignments.</blockquote>
+<p>Command.finalize_options()</p>
+<blockquote>
+Set final values for all the options that this command supports.
+This is always called as late as possible, ie.  after any option
+assignments from the command-line or from other commands have been
+done.  Thus, this is the place to to code option dependencies: if
+<em>foo</em> depends on <em>bar</em>, then it is safe to set <em>foo</em> from <em>bar</em> as
+long as <em>foo</em> still has the same value it was assigned in
+<tt class="docutils literal"><span class="pre">initialize_options()</span></tt>.</blockquote>
+<p>Command.run()</p>
+<blockquote>
+A command&#8217;s raison d&#8217;etre: carry out the action it exists to
+perform, controlled by the options initialized in
+<tt class="docutils literal"><span class="pre">initialize_options()</span></tt>, customized by other commands, the setup
+script, the command-line, and config files, and finalized in
+<tt class="docutils literal"><span class="pre">finalize_options()</span></tt>.  All terminal output and filesystem
+interaction should be done by <tt class="docutils literal"><span class="pre">run()</span></tt>.</blockquote>
+<p><em>sub_commands</em> formalizes the notion of a &#8220;family&#8221; of commands, eg.
+<tt class="docutils literal"><span class="pre">install</span></tt> as the parent with sub-commands <tt class="docutils literal"><span class="pre">install_lib</span></tt>,
+<tt class="docutils literal"><span class="pre">install_headers</span></tt>, etc.  The parent of a family of commands defines
+<em>sub_commands</em> as a class attribute; it&#8217;s a list of 2-tuples
+<tt class="docutils literal"><span class="pre">(command_name,</span> <span class="pre">predicate)</span></tt>, with <em>command_name</em> a string and
+<em>predicate</em> an unbound method, a string or None. <em>predicate</em> is a
+method of the parent command that determines whether the corresponding
+command is applicable in the current situation.  (Eg. we
+<tt class="docutils literal"><span class="pre">install_headers</span></tt> is only applicable if we have any C header files
+to install.)  If <em>predicate</em> is None, that command is always
+applicable.</p>
+<p><em>sub_commands</em> is usually defined at the <em>end</em> of a class, because
+predicates can be unbound methods, so they must already have been
+defined.  The canonical example is the <strong>install</strong> command.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

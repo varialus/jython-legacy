@@ -1,0 +1,538 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. Compound statements &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">7. Compound statements</a><ul>
+<li><a class="reference external" href="#the-if-statement">7.1. The <tt class="docutils literal"><span class="pre">if</span></tt> statement</a></li>
+<li><a class="reference external" href="#the-while-statement">7.2. The <tt class="docutils literal"><span class="pre">while</span></tt> statement</a></li>
+<li><a class="reference external" href="#the-for-statement">7.3. The <tt class="docutils literal"><span class="pre">for</span></tt> statement</a></li>
+<li><a class="reference external" href="#the-try-statement">7.4. The <tt class="docutils literal"><span class="pre">try</span></tt> statement</a></li>
+<li><a class="reference external" href="#the-with-statement">7.5. The <tt class="docutils literal"><span class="pre">with</span></tt> statement</a></li>
+<li><a class="reference external" href="#function-definitions">7.6. Function definitions</a></li>
+<li><a class="reference external" href="#class-definitions">7.7. Class definitions</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/compound_stmts.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="compound-statements">
+<h1>7. Compound statements<a class="headerlink" href="#compound-statements" title="Permalink to this headline">¶</a></h1>
+<p>Compound statements contain (groups of) other statements; they affect
+or control the execution of those other statements in some way.  In
+general, compound statements span multiple lines, although in simple
+incarnations a whole compound statement may be contained in one line.</p>
+<p>The <tt class="docutils literal"><span class="pre">if</span></tt>, <tt class="docutils literal"><span class="pre">while</span></tt> and <tt class="docutils literal"><span class="pre">for</span></tt> statements implement traditional
+control flow constructs.  <tt class="docutils literal"><span class="pre">try</span></tt> specifies exception handlers and/or
+cleanup code for a group of statements.  Function and class
+definitions are also syntactically compound statements.</p>
+<p>Compound statements consist of one or more &#8216;clauses.&#8217;  A clause
+consists of a header and a &#8216;suite.&#8217;  The clause headers of a
+particular compound statement are all at the same indentation level.
+Each clause header begins with a uniquely identifying keyword and ends
+with a colon.  A suite is a group of statements controlled by a
+clause.  A suite can be one or more semicolon-separated simple
+statements on the same line as the header, following the header&#8217;s
+colon, or it can be one or more indented statements on subsequent
+lines.  Only the latter form of suite can contain nested compound
+statements; the following is illegal, mostly because it wouldn&#8217;t be
+clear to which <tt class="docutils literal"><span class="pre">if</span></tt> clause a following <tt class="docutils literal"><span class="pre">else</span></tt> clause would belong:</p>
+<blockquote>
+if test1: if test2: print x</blockquote>
+<p>Also note that the semicolon binds tighter than the colon in this
+context, so that in the following example, either all or none of the
+<tt class="docutils literal"><span class="pre">print</span></tt> statements are executed:</p>
+<blockquote>
+if x &lt; y &lt; z: print x; print y; print z</blockquote>
+<p>Summarizing:</p>
+<blockquote>
+<dl class="docutils">
+<dt>compound_stmt ::= if_stmt</dt>
+<dd><div class="first last line-block">
+<div class="line">while_stmt</div>
+<div class="line">for_stmt</div>
+<div class="line">try_stmt</div>
+<div class="line">with_stmt</div>
+<div class="line">funcdef</div>
+<div class="line">classdef</div>
+<div class="line">decorated</div>
+</div>
+</dd>
+</dl>
+<p>suite         ::= stmt_list NEWLINE | NEWLINE INDENT statement+ DEDENT
+statement     ::= stmt_list NEWLINE | compound_stmt
+stmt_list     ::= simple_stmt (&#8220;;&#8221; simple_stmt)* [&#8220;;&#8221;]</p>
+</blockquote>
+<p>Note that statements always end in a <tt class="docutils literal"><span class="pre">NEWLINE</span></tt> possibly followed by
+a <tt class="docutils literal"><span class="pre">DEDENT</span></tt>. Also note that optional continuation clauses always
+begin with a keyword that cannot start a statement, thus there are no
+ambiguities (the &#8216;dangling <tt class="docutils literal"><span class="pre">else</span></tt>&#8216; problem is solved in Python by
+requiring nested <tt class="docutils literal"><span class="pre">if</span></tt> statements to be indented).</p>
+<p>The formatting of the grammar rules in the following sections places
+each clause on a separate line for clarity.</p>
+<div class="section" id="the-if-statement">
+<h2>7.1. The <tt class="docutils literal"><span class="pre">if</span></tt> statement<a class="headerlink" href="#the-if-statement" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">if</span></tt> statement is used for conditional execution:</p>
+<blockquote>
+<dl class="docutils">
+<dt>if_stmt ::= &#8220;if&#8221; expression &#8220;:&#8221; suite</dt>
+<dd>( &#8220;elif&#8221; expression &#8220;:&#8221; suite )*
+[&#8220;else&#8221; &#8220;:&#8221; suite]</dd>
+</dl>
+</blockquote>
+<p>It selects exactly one of the suites by evaluating the expressions one
+by one until one is found to be true (see section <em>Boolean operations</em>
+for the definition of true and false); then that suite is executed
+(and no other part of the <tt class="docutils literal"><span class="pre">if</span></tt> statement is executed or evaluated).
+If all expressions are false, the suite of the <tt class="docutils literal"><span class="pre">else</span></tt> clause, if
+present, is executed.</p>
+</div>
+<div class="section" id="the-while-statement">
+<h2>7.2. The <tt class="docutils literal"><span class="pre">while</span></tt> statement<a class="headerlink" href="#the-while-statement" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">while</span></tt> statement is used for repeated execution as long as an
+expression is true:</p>
+<blockquote>
+<dl class="docutils">
+<dt>while_stmt ::= &#8220;while&#8221; expression &#8220;:&#8221; suite</dt>
+<dd>[&#8220;else&#8221; &#8220;:&#8221; suite]</dd>
+</dl>
+</blockquote>
+<p>This repeatedly tests the expression and, if it is true, executes the
+first suite; if the expression is false (which may be the first time
+it is tested) the suite of the <tt class="docutils literal"><span class="pre">else</span></tt> clause, if present, is
+executed and the loop terminates.</p>
+<p>A <tt class="docutils literal"><span class="pre">break</span></tt> statement executed in the first suite terminates the loop
+without executing the <tt class="docutils literal"><span class="pre">else</span></tt> clause&#8217;s suite.  A <tt class="docutils literal"><span class="pre">continue</span></tt>
+statement executed in the first suite skips the rest of the suite and
+goes back to testing the expression.</p>
+</div>
+<div class="section" id="the-for-statement">
+<h2>7.3. The <tt class="docutils literal"><span class="pre">for</span></tt> statement<a class="headerlink" href="#the-for-statement" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">for</span></tt> statement is used to iterate over the elements of a
+sequence (such as a string, tuple or list) or other iterable object:</p>
+<blockquote>
+<dl class="docutils">
+<dt>for_stmt ::= &#8220;for&#8221; target_list &#8220;in&#8221; expression_list &#8220;:&#8221; suite</dt>
+<dd>[&#8220;else&#8221; &#8220;:&#8221; suite]</dd>
+</dl>
+</blockquote>
+<p>The expression list is evaluated once; it should yield an iterable
+object.  An iterator is created for the result of the
+<tt class="docutils literal"><span class="pre">expression_list</span></tt>.  The suite is then executed once for each item
+provided by the iterator, in the order of ascending indices.  Each
+item in turn is assigned to the target list using the standard rules
+for assignments, and then the suite is executed.  When the items are
+exhausted (which is immediately when the sequence is empty), the suite
+in the <tt class="docutils literal"><span class="pre">else</span></tt> clause, if present, is executed, and the loop
+terminates.</p>
+<p>A <tt class="docutils literal"><span class="pre">break</span></tt> statement executed in the first suite terminates the loop
+without executing the <tt class="docutils literal"><span class="pre">else</span></tt> clause&#8217;s suite.  A <tt class="docutils literal"><span class="pre">continue</span></tt>
+statement executed in the first suite skips the rest of the suite and
+continues with the next item, or with the <tt class="docutils literal"><span class="pre">else</span></tt> clause if there was
+no next item.</p>
+<p>The suite may assign to the variable(s) in the target list; this does
+not affect the next item assigned to it.</p>
+<p>The target list is not deleted when the loop is finished, but if the
+sequence is empty, it will not have been assigned to at all by the
+loop.  Hint: the built-in function <tt class="docutils literal"><span class="pre">range()</span></tt> returns a sequence of
+integers suitable to emulate the effect of Pascal&#8217;s <tt class="docutils literal"><span class="pre">for</span> <span class="pre">i</span> <span class="pre">:=</span> <span class="pre">a</span> <span class="pre">to</span> <span class="pre">b</span>
+<span class="pre">do</span></tt>; e.g., <tt class="docutils literal"><span class="pre">range(3)</span></tt> returns the list <tt class="docutils literal"><span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">2]</span></tt>.</p>
+<dl class="docutils">
+<dt>Note: There is a subtlety when the sequence is being modified by the loop</dt>
+<dd><p class="first">(this can only occur for mutable sequences, i.e. lists). An internal
+counter is used to keep track of which item is used next, and this
+is incremented on each iteration.  When this counter has reached the
+length of the sequence the loop terminates.  This means that if the
+suite deletes the current (or a previous) item from the sequence,
+the next item will be skipped (since it gets the index of the
+current item which has already been treated).  Likewise, if the
+suite inserts an item in the sequence before the current item, the
+current item will be treated again the next time through the loop.
+This can lead to nasty bugs that can be avoided by making a
+temporary copy using a slice of the whole sequence, e.g.,</p>
+<blockquote class="last">
+<dl class="docutils">
+<dt>for x in a[:]:</dt>
+<dd>if x &lt; 0: a.remove(x)</dd>
+</dl>
+</blockquote>
+</dd>
+</dl>
+</div>
+<div class="section" id="the-try-statement">
+<h2>7.4. The <tt class="docutils literal"><span class="pre">try</span></tt> statement<a class="headerlink" href="#the-try-statement" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">try</span></tt> statement specifies exception handlers and/or cleanup code
+for a group of statements:</p>
+<blockquote>
+<p>try_stmt  ::= try1_stmt | try2_stmt
+try1_stmt ::= &#8220;try&#8221; &#8220;:&#8221; suite</p>
+<blockquote>
+(&#8220;except&#8221; [expression [(&#8220;as&#8221; | &#8220;,&#8221;) target]] &#8220;:&#8221; suite)+
+[&#8220;else&#8221; &#8220;:&#8221; suite]
+[&#8220;finally&#8221; &#8220;:&#8221; suite]</blockquote>
+<dl class="docutils">
+<dt>try2_stmt ::= &#8220;try&#8221; &#8220;:&#8221; suite</dt>
+<dd>&#8220;finally&#8221; &#8220;:&#8221; suite</dd>
+</dl>
+</blockquote>
+<p>Changed in version 2.5: In previous versions of Python,
+<tt class="docutils literal"><span class="pre">try</span></tt>...``except``...``finally`` did not work. <tt class="docutils literal"><span class="pre">try</span></tt>...``except``
+had to be nested in <tt class="docutils literal"><span class="pre">try</span></tt>...``finally``.</p>
+<p>The <tt class="docutils literal"><span class="pre">except</span></tt> clause(s) specify one or more exception handlers. When
+no exception occurs in the <tt class="docutils literal"><span class="pre">try</span></tt> clause, no exception handler is
+executed. When an exception occurs in the <tt class="docutils literal"><span class="pre">try</span></tt> suite, a search for
+an exception handler is started.  This search inspects the except
+clauses in turn until one is found that matches the exception.  An
+expression-less except clause, if present, must be last; it matches
+any exception.  For an except clause with an expression, that
+expression is evaluated, and the clause matches the exception if the
+resulting object is &#8220;compatible&#8221; with the exception.  An object is
+compatible with an exception if it is the class or a base class of the
+exception object, a tuple containing an item compatible with the
+exception, or, in the (deprecated) case of string exceptions, is the
+raised string itself (note that the object identities must match, i.e.
+it must be the same string object, not just a string with the same
+value).</p>
+<p>If no except clause matches the exception, the search for an exception
+handler continues in the surrounding code and on the invocation stack.
+[1]</p>
+<p>If the evaluation of an expression in the header of an except clause
+raises an exception, the original search for a handler is canceled and
+a search starts for the new exception in the surrounding code and on
+the call stack (it is treated as if the entire <tt class="docutils literal"><span class="pre">try</span></tt> statement
+raised the exception).</p>
+<p>When a matching except clause is found, the exception is assigned to
+the target specified in that except clause, if present, and the except
+clause&#8217;s suite is executed.  All except clauses must have an
+executable block.  When the end of this block is reached, execution
+continues normally after the entire try statement.  (This means that
+if two nested handlers exist for the same exception, and the exception
+occurs in the try clause of the inner handler, the outer handler will
+not handle the exception.)</p>
+<p>Before an except clause&#8217;s suite is executed, details about the
+exception are assigned to three variables in the <tt class="docutils literal"><span class="pre">sys</span></tt> module:
+<tt class="docutils literal"><span class="pre">sys.exc_type</span></tt> receives the object identifying the exception;
+<tt class="docutils literal"><span class="pre">sys.exc_value</span></tt> receives the exception&#8217;s parameter;
+<tt class="docutils literal"><span class="pre">sys.exc_traceback</span></tt> receives a traceback object (see section <em>The
+standard type hierarchy</em>) identifying the point in the program where
+the exception occurred. These details are also available through the
+<tt class="docutils literal"><span class="pre">sys.exc_info()</span></tt> function, which returns a tuple <tt class="docutils literal"><span class="pre">(exc_type,</span>
+<span class="pre">exc_value,</span> <span class="pre">exc_traceback)</span></tt>.  Use of the corresponding variables is
+deprecated in favor of this function, since their use is unsafe in a
+threaded program.  As of Python 1.5, the variables are restored to
+their previous values (before the call) when returning from a function
+that handled an exception.</p>
+<p>The optional <tt class="docutils literal"><span class="pre">else</span></tt> clause is executed if and when control flows off
+the end of the <tt class="docutils literal"><span class="pre">try</span></tt> clause. [2] Exceptions in the <tt class="docutils literal"><span class="pre">else</span></tt> clause
+are not handled by the preceding <tt class="docutils literal"><span class="pre">except</span></tt> clauses.</p>
+<p>If <tt class="docutils literal"><span class="pre">finally</span></tt> is present, it specifies a &#8216;cleanup&#8217; handler.  The
+<tt class="docutils literal"><span class="pre">try</span></tt> clause is executed, including any <tt class="docutils literal"><span class="pre">except</span></tt> and <tt class="docutils literal"><span class="pre">else</span></tt>
+clauses.  If an exception occurs in any of the clauses and is not
+handled, the exception is temporarily saved. The <tt class="docutils literal"><span class="pre">finally</span></tt> clause is
+executed.  If there is a saved exception, it is re-raised at the end
+of the <tt class="docutils literal"><span class="pre">finally</span></tt> clause. If the <tt class="docutils literal"><span class="pre">finally</span></tt> clause raises another
+exception or executes a <tt class="docutils literal"><span class="pre">return</span></tt> or <tt class="docutils literal"><span class="pre">break</span></tt> statement, the saved
+exception is lost.  The exception information is not available to the
+program during execution of the <tt class="docutils literal"><span class="pre">finally</span></tt> clause.</p>
+<p>When a <tt class="docutils literal"><span class="pre">return</span></tt>, <tt class="docutils literal"><span class="pre">break</span></tt> or <tt class="docutils literal"><span class="pre">continue</span></tt> statement is executed in
+the <tt class="docutils literal"><span class="pre">try</span></tt> suite of a <tt class="docutils literal"><span class="pre">try</span></tt>...``finally`` statement, the
+<tt class="docutils literal"><span class="pre">finally</span></tt> clause is also executed &#8216;on the way out.&#8217; A <tt class="docutils literal"><span class="pre">continue</span></tt>
+statement is illegal in the <tt class="docutils literal"><span class="pre">finally</span></tt> clause. (The reason is a
+problem with the current implementation &#8212; this restriction may be
+lifted in the future).</p>
+<p>Additional information on exceptions can be found in section
+<em>Exceptions</em>, and information on using the <tt class="docutils literal"><span class="pre">raise</span></tt> statement to
+generate exceptions may be found in section <em>The raise statement</em>.</p>
+</div>
+<div class="section" id="the-with-statement">
+<h2>7.5. The <tt class="docutils literal"><span class="pre">with</span></tt> statement<a class="headerlink" href="#the-with-statement" title="Permalink to this headline">¶</a></h2>
+<p>New in version 2.5.</p>
+<p>The <tt class="docutils literal"><span class="pre">with</span></tt> statement is used to wrap the execution of a block with
+methods defined by a context manager (see section <em>With Statement
+Context Managers</em>). This allows common
+<tt class="docutils literal"><span class="pre">try</span></tt>...``except``...``finally`` usage patterns to be encapsulated
+for convenient reuse.</p>
+<blockquote>
+with_stmt ::= &#8220;with&#8221; expression [&#8220;as&#8221; target] &#8220;:&#8221; suite</blockquote>
+<p>The execution of the <tt class="docutils literal"><span class="pre">with</span></tt> statement proceeds as follows:</p>
+<ol class="arabic">
+<li><p class="first">The context expression is evaluated to obtain a context manager.</p>
+</li>
+<li><p class="first">The context manager&#8217;s <tt class="docutils literal"><span class="pre">__enter__()</span></tt> method is invoked.</p>
+</li>
+<li><p class="first">If a target was included in the <tt class="docutils literal"><span class="pre">with</span></tt> statement, the return
+value from <tt class="docutils literal"><span class="pre">__enter__()</span></tt> is assigned to it.</p>
+<dl class="docutils">
+<dt>Note: The <tt class="docutils literal"><span class="pre">with</span></tt> statement guarantees that if the <tt class="docutils literal"><span class="pre">__enter__()</span></tt></dt>
+<dd><p class="first last">method returns without an error, then <tt class="docutils literal"><span class="pre">__exit__()</span></tt> will always
+be called. Thus, if an error occurs during the assignment to the
+target list, it will be treated the same as an error occurring
+within the suite would be. See step 5 below.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">The suite is executed.</p>
+</li>
+<li><p class="first">The context manager&#8217;s <tt class="docutils literal"><span class="pre">__exit__()</span></tt> method is invoked. If an
+exception caused the suite to be exited, its type, value, and
+traceback are passed as arguments to <tt class="docutils literal"><span class="pre">__exit__()</span></tt>. Otherwise,
+three <tt class="xref docutils literal"><span class="pre">None</span></tt> arguments are supplied.</p>
+<p>If the suite was exited due to an exception, and the return value
+from the <tt class="docutils literal"><span class="pre">__exit__()</span></tt> method was false, the exception is
+reraised. If the return value was true, the exception is
+suppressed, and execution continues with the statement following
+the <tt class="docutils literal"><span class="pre">with</span></tt> statement.</p>
+<p>If the suite was exited for any reason other than an exception, the
+return value from <tt class="docutils literal"><span class="pre">__exit__()</span></tt> is ignored, and execution proceeds
+at the normal location for the kind of exit that was taken.</p>
+</li>
+</ol>
+<dl class="docutils">
+<dt>Note: In Python 2.5, the <tt class="docutils literal"><span class="pre">with</span></tt> statement is only allowed when the</dt>
+<dd><tt class="docutils literal"><span class="pre">with_statement</span></tt> feature has been enabled.  It is always enabled
+in Python 2.6.</dd>
+</dl>
+<p>See also:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>PEP 0343</strong> - The &#8220;with&#8221; statement</dt>
+<dd>The specification, background, and examples for the Python
+<tt class="docutils literal"><span class="pre">with</span></tt> statement.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="function-definitions">
+<h2>7.6. Function definitions<a class="headerlink" href="#function-definitions" title="Permalink to this headline">¶</a></h2>
+<p>A function definition defines a user-defined function object (see
+section <em>The standard type hierarchy</em>):</p>
+<blockquote>
+<p>decorated      ::= decorators (classdef | funcdef)
+decorators     ::= decorator+
+decorator      ::= &#8220;&#64;&#8221; dotted_name [&#8220;(&#8221; [argument_list [&#8220;,&#8221;]] &#8220;)&#8221;] NEWLINE
+funcdef        ::= &#8220;def&#8221; funcname &#8220;(&#8221; [parameter_list] &#8220;)&#8221; &#8220;:&#8221; suite
+dotted_name    ::= identifier (&#8220;.&#8221; identifier)*
+parameter_list ::= (defparameter &#8220;,&#8221;)*</p>
+<blockquote>
+(  &#8220;*&#8221; identifier [, &#8220;**&#8221; identifier]
+| &#8220;**&#8221; identifier
+| defparameter [&#8220;,&#8221;] )</blockquote>
+<p>defparameter   ::= parameter [&#8220;=&#8221; expression]
+sublist        ::= parameter (&#8220;,&#8221; parameter)* [&#8220;,&#8221;]
+parameter      ::= identifier | &#8220;(&#8221; sublist &#8220;)&#8221;
+funcname       ::= identifier</p>
+</blockquote>
+<p>A function definition is an executable statement.  Its execution binds
+the function name in the current local namespace to a function object
+(a wrapper around the executable code for the function).  This
+function object contains a reference to the current global namespace
+as the global namespace to be used when the function is called.</p>
+<p>The function definition does not execute the function body; this gets
+executed only when the function is called. [3]</p>
+<p>A function definition may be wrapped by one or more <em>decorator</em>
+expressions. Decorator expressions are evaluated when the function is
+defined, in the scope that contains the function definition.  The
+result must be a callable, which is invoked with the function object
+as the only argument. The returned value is bound to the function name
+instead of the function object.  Multiple decorators are applied in
+nested fashion. For example, the following code:</p>
+<blockquote>
+&#64;f1(arg)
+&#64;f2
+def func(): pass</blockquote>
+<p>is equivalent to:</p>
+<blockquote>
+def func(): pass
+func = f1(arg)(f2(func))</blockquote>
+<p>When one or more top-level parameters have the form <em>parameter</em> <tt class="docutils literal"><span class="pre">=</span></tt>
+<em>expression</em>, the function is said to have &#8220;default parameter values.&#8221;
+For a parameter with a default value, the corresponding argument may
+be omitted from a call, in which case the parameter&#8217;s default value is
+substituted.  If a parameter has a default value, all following
+parameters must also have a default value &#8212; this is a syntactic
+restriction that is not expressed by the grammar.</p>
+<p><strong>Default parameter values are evaluated when the function definition
+is executed.</strong>  This means that the expression is evaluated once, when
+the function is defined, and that that same &#8220;pre-computed&#8221; value is
+used for each call.  This is especially important to understand when a
+default parameter is a mutable object, such as a list or a dictionary:
+if the function modifies the object (e.g. by appending an item to a
+list), the default value is in effect modified. This is generally not
+what was intended.  A way around this  is to use <tt class="xref docutils literal"><span class="pre">None</span></tt> as the
+default, and explicitly test for it in the body of the function, e.g.:</p>
+<blockquote>
+<dl class="docutils">
+<dt>def whats_on_the_telly(penguin=None):</dt>
+<dd><dl class="first docutils">
+<dt>if penguin is None:</dt>
+<dd>penguin = []</dd>
+</dl>
+<p class="last">penguin.append(&#8220;property of the zoo&#8221;)
+return penguin</p>
+</dd>
+</dl>
+</blockquote>
+<p>Function call semantics are described in more detail in section
+<em>Calls</em>. A function call always assigns values to all parameters
+mentioned in the parameter list, either from position arguments, from
+keyword arguments, or from default values.  If the form
+&#8220;<tt class="docutils literal"><span class="pre">*identifier</span></tt>&#8221; is present, it is initialized to a tuple receiving
+any excess positional parameters, defaulting to the empty tuple.  If
+the form &#8220;<tt class="docutils literal"><span class="pre">**identifier</span></tt>&#8221; is present, it is initialized to a new
+dictionary receiving any excess keyword arguments, defaulting to a new
+empty dictionary.</p>
+<p>It is also possible to create anonymous functions (functions not bound
+to a name), for immediate use in expressions.  This uses lambda forms,
+described in section <em>Lambdas</em>.  Note that the lambda form is merely a
+shorthand for a simplified function definition; a function defined in
+a &#8220;<tt class="docutils literal"><span class="pre">def</span></tt>&#8221; statement can be passed around or assigned to another name
+just like a function defined by a lambda form.  The &#8220;<tt class="docutils literal"><span class="pre">def</span></tt>&#8221; form is
+actually more powerful since it allows the execution of multiple
+statements.</p>
+<p><strong>Programmer&#8217;s note:</strong> Functions are first-class objects.  A &#8220;<tt class="docutils literal"><span class="pre">def</span></tt>&#8221;
+form executed inside a function definition defines a local function
+that can be returned or passed around.  Free variables used in the
+nested function can access the local variables of the function
+containing the def.  See section <em>Naming and binding</em> for details.</p>
+</div>
+<div class="section" id="class-definitions">
+<h2>7.7. Class definitions<a class="headerlink" href="#class-definitions" title="Permalink to this headline">¶</a></h2>
+<p>A class definition defines a class object (see section <em>The standard
+type hierarchy</em>):</p>
+<blockquote>
+classdef    ::= &#8220;class&#8221; classname [inheritance] &#8220;:&#8221; suite
+inheritance ::= &#8220;(&#8221; [expression_list] &#8220;)&#8221;
+classname   ::= identifier</blockquote>
+<p>A class definition is an executable statement.  It first evaluates the
+inheritance list, if present.  Each item in the inheritance list
+should evaluate to a class object or class type which allows
+subclassing.  The class&#8217;s suite is then executed in a new execution
+frame (see section <em>Naming and binding</em>), using a newly created local
+namespace and the original global namespace. (Usually, the suite
+contains only function definitions.)  When the class&#8217;s suite finishes
+execution, its execution frame is discarded but its local namespace is
+saved. [4] A class object is then created using the inheritance list
+for the base classes and the saved local namespace for the attribute
+dictionary.  The class name is bound to this class object in the
+original local namespace.</p>
+<p><strong>Programmer&#8217;s note:</strong> Variables defined in the class definition are
+class variables; they are shared by all instances.  To create instance
+variables, they can be set in a method with <tt class="docutils literal"><span class="pre">self.name</span> <span class="pre">=</span> <span class="pre">value</span></tt>.
+Both class and instance variables are accessible through the notation
+&#8220;<tt class="docutils literal"><span class="pre">self.name</span></tt>&#8220;, and an instance variable hides a class variable with
+the same name when accessed in this way. Class variables can be used
+as defaults for instance variables, but using mutable values there can
+lead to unexpected results.  For <a href="#id1"><span class="problematic" id="id2">*</span></a>new-style class*es, descriptors can
+be used to create instance variables with different implementation
+details.</p>
+<p>Class definitions, like function definitions, may be wrapped by one or
+more <em>decorator</em> expressions.  The evaluation rules for the decorator
+expressions are the same as for functions.  The result must be a class
+object, which is then bound to the class name.</p>
+<p>-[ Footnotes ]-</p>
+<dl class="docutils">
+<dt>[1] The exception is propagated to the invocation stack only if there</dt>
+<dd>is no <tt class="docutils literal"><span class="pre">finally</span></tt> clause that negates the exception.</dd>
+<dt>[2] Currently, control &#8220;flows off the end&#8221; except in the case of an</dt>
+<dd>exception or the execution of a <tt class="docutils literal"><span class="pre">return</span></tt>, <tt class="docutils literal"><span class="pre">continue</span></tt>, or
+<tt class="docutils literal"><span class="pre">break</span></tt> statement.</dd>
+<dt>[3] A string literal appearing as the first statement in the function</dt>
+<dd>body is transformed into the function&#8217;s <tt class="docutils literal"><span class="pre">__doc__</span></tt> attribute and
+therefore the function&#8217;s <em>docstring</em>.</dd>
+<dt>[4] A string literal appearing as the first statement in the class</dt>
+<dd>body is transformed into the namespace&#8217;s <tt class="docutils literal"><span class="pre">__doc__</span></tt> item and
+therefore the class&#8217;s <em>docstring</em>.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

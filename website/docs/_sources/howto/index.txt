@@ -1,0 +1,25 @@
+***************
+ Python HOWTOs
+***************
+
+Python HOWTOs are documents that cover a single, specific topic,
+and attempt to cover it fairly completely. Modelled on the Linux
+Documentation Project's HOWTO collection, this collection is an
+effort to foster documentation that's more detailed than the
+Python Library Reference.
+
+Currently, the HOWTOs are:
+
+.. toctree::
+   :maxdepth: 1
+
+   advocacy.txt
+   cporting.txt
+   curses.txt
+   doanddont.txt
+   functional.txt
+   regex.txt
+   sockets.txt
+   unicode.txt
+   urllib2.txt
+   webservers.txt

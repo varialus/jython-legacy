@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Registering with the Package Index &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Registering with the Package Index</a><ul>
+<li><a class="reference external" href="#the-pypirc-file">The .pypirc file</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/distutils/packageindex.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="registering-with-the-package-index">
+<h1>Registering with the Package Index<a class="headerlink" href="#registering-with-the-package-index" title="Permalink to this headline">¶</a></h1>
+<p>The Python Package Index (PyPI) holds meta-data describing
+distributions packaged with distutils. The distutils command
+<strong>register</strong> is used to submit your distribution&#8217;s meta-data to the
+index. It is invoked as follows:</p>
+<blockquote>
+python setup.py register</blockquote>
+<p>Distutils will respond with the following prompt:</p>
+<blockquote>
+<p>running register
+We need to know who you are, so please choose either:</p>
+<blockquote>
+<ol class="arabic simple">
+<li>use your existing login,</li>
+<li>register as a new user,</li>
+<li>have the server generate a new password for you (and email it to you), or</li>
+<li>quit</li>
+</ol>
+</blockquote>
+<p>Your selection [default 1]:</p>
+</blockquote>
+<p>Note: if your username and password are saved locally, you will not
+see this menu.</p>
+<p>If you have not registered with PyPI, then you will need to do so now.
+You should choose option 2, and enter your details as required. Soon
+after submitting your details, you will receive an email which will be
+used to confirm your registration.</p>
+<p>Once you are registered, you may choose option 1 from the menu. You
+will be prompted for your PyPI username and password, and <strong>register</strong>
+will then submit your meta-data to the index.</p>
+<p>You may submit any number of versions of your distribution to the
+index. If you alter the meta-data for a particular version, you may
+submit it again and the index will be updated.</p>
+<p>PyPI holds a record for each (name, version) combination submitted.
+The first user to submit information for a given name is designated
+the Owner of that name. They may submit changes through the
+<strong>register</strong> command or through the web interface. They may also
+designate other users as Owners or Maintainers. Maintainers may edit
+the package information, but not designate other Owners or
+Maintainers.</p>
+<p>By default PyPI will list all versions of a given package. To hide
+certain versions, the Hidden property should be set to yes. This must
+be edited through the web interface.</p>
+<div class="section" id="the-pypirc-file">
+<h2>The .pypirc file<a class="headerlink" href="#the-pypirc-file" title="Permalink to this headline">¶</a></h2>
+<p>The format of the <tt class="docutils literal"><span class="pre">.pypirc</span></tt> file is as follows:</p>
+<blockquote>
+<p>[distutils]
+index-servers =</p>
+<blockquote>
+pypi</blockquote>
+<p>[pypi]
+repository: &lt;repository-url&gt;
+username: &lt;username&gt;
+password: &lt;password&gt;</p>
+</blockquote>
+<p><em>repository</em> can be omitted and defaults to
+<tt class="docutils literal"><span class="pre">http://www.python.org/pypi</span></tt>.</p>
+<p>If you want to define another server a new section can be created:</p>
+<blockquote>
+<p>[distutils]
+index-servers =</p>
+<blockquote>
+pypi
+other</blockquote>
+<p>[pypi]
+repository: &lt;repository-url&gt;
+username: &lt;username&gt;
+password: &lt;password&gt;</p>
+<p>[other]
+repository: <a class="reference external" href="http://example.com/pypi">http://example.com/pypi</a>
+username: &lt;username&gt;
+password: &lt;password&gt;</p>
+</blockquote>
+<p>The command can then be called with the -r option:</p>
+<blockquote>
+python setup.py register -r <a class="reference external" href="http://example.com/pypi">http://example.com/pypi</a></blockquote>
+<p>Or even with the section name:</p>
+<blockquote>
+python setup.py register -r other</blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

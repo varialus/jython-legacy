@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. aifc — Read and write AIFF and AIFC files &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="The Python Standard Library and What Comes with Jython" href="indexprogress.html" />
+    <link rel="next" title="2. Generic Operating System Services" href="allos.html" />
+    <link rel="prev" title="The Python Standard Library and What Comes with Jython" href="indexprogress.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="allos.html" title="2. Generic Operating System Services"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="indexprogress.html" title="The Python Standard Library and What Comes with Jython"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" accesskey="U">The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="indexprogress.html"
+                                  title="previous chapter">The Python Standard Library and What Comes with Jython</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="allos.html"
+                                  title="next chapter">2. Generic Operating System Services</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/aifc.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="aifc-read-and-write-aiff-and-aifc-files">
+<h1>1. <tt class="docutils literal"><span class="pre">aifc</span></tt> &#8212; Read and write AIFF and AIFC files<a class="headerlink" href="#aifc-read-and-write-aiff-and-aifc-files" title="Permalink to this headline">¶</a></h1>
+<p>This module provides support for reading and writing AIFF and AIFF-C
+files. AIFF is Audio Interchange File Format, a format for storing
+digital audio samples in a file.  AIFF-C is a newer version of the
+format that includes the ability to compress the audio data.</p>
+<dl class="docutils">
+<dt>Note: Some operations may only work under IRIX; these will raise</dt>
+<dd><tt class="docutils literal"><span class="pre">ImportError</span></tt> when attempting to import the <tt class="docutils literal"><span class="pre">cl</span></tt> module, which
+is only available on IRIX.</dd>
+</dl>
+<p>Audio files have a number of parameters that describe the audio data.
+The sampling rate or frame rate is the number of times per second the
+sound is sampled.  The number of channels indicate if the audio is
+mono, stereo, or quadro.  Each frame consists of one sample per
+channel.  The sample size is the size in bytes of each sample.  Thus a
+frame consists of <em>nchannels***samplesize</em> bytes, and a second&#8217;s worth
+of audio consists of <em>nchannels***samplesize***framerate</em> bytes.</p>
+<p>For example, CD quality audio has a sample size of two bytes (16
+bits), uses two channels (stereo) and has a frame rate of 44,100
+frames/second.  This gives a frame size of 4 bytes (2*2), and a
+second&#8217;s worth occupies 2*2*44100 bytes (176,400 bytes).</p>
+<p>Module <tt class="docutils literal"><span class="pre">aifc</span></tt> defines the following function:</p>
+<p>aifc.open(file[, mode])</p>
+<blockquote>
+Open an AIFF or AIFF-C file and return an object instance with
+methods that are described below.  The argument <em>file</em> is either a
+string naming a file or a file object.  <em>mode</em> must be <tt class="docutils literal"><span class="pre">'r'</span></tt> or
+<tt class="docutils literal"><span class="pre">'rb'</span></tt> when the file must be opened for reading, or <tt class="docutils literal"><span class="pre">'w'</span></tt>  or
+<tt class="docutils literal"><span class="pre">'wb'</span></tt> when the file must be opened for writing.  If omitted,
+<tt class="docutils literal"><span class="pre">file.mode</span></tt> is used if it exists, otherwise <tt class="docutils literal"><span class="pre">'rb'</span></tt> is used.
+When used for writing, the file object should be seekable, unless
+you know ahead of time how many samples you are going to write in
+total and use <tt class="docutils literal"><span class="pre">writeframesraw()</span></tt> and <tt class="docutils literal"><span class="pre">setnframes()</span></tt>.</blockquote>
+<p>Objects returned by <tt class="docutils literal"><span class="pre">open()</span></tt> when a file is opened for reading have
+the following methods:</p>
+<p>aifc.getnchannels()</p>
+<blockquote>
+Return the number of audio channels (1 for mono, 2 for stereo).</blockquote>
+<p>aifc.getsampwidth()</p>
+<blockquote>
+Return the size in bytes of individual samples.</blockquote>
+<p>aifc.getframerate()</p>
+<blockquote>
+Return the sampling rate (number of audio frames per second).</blockquote>
+<p>aifc.getnframes()</p>
+<blockquote>
+Return the number of audio frames in the file.</blockquote>
+<p>aifc.getcomptype()</p>
+<blockquote>
+Return a four-character string describing the type of compression
+used in the audio file.  For AIFF files, the returned value is
+<tt class="docutils literal"><span class="pre">'NONE'</span></tt>.</blockquote>
+<p>aifc.getcompname()</p>
+<blockquote>
+Return a human-readable description of the type of compression used
+in the audio file.  For AIFF files, the returned value is <tt class="docutils literal"><span class="pre">'not</span>
+<span class="pre">compressed'</span></tt>.</blockquote>
+<p>aifc.getparams()</p>
+<blockquote>
+Return a tuple consisting of all of the above values in the above
+order.</blockquote>
+<p>aifc.getmarkers()</p>
+<blockquote>
+Return a list of markers in the audio file.  A marker consists of a
+tuple of three elements.  The first is the mark ID (an integer),
+the second is the mark position in frames from the beginning of the
+data (an integer), the third is the name of the mark (a string).</blockquote>
+<p>aifc.getmark(id)</p>
+<blockquote>
+Return the tuple as described in <tt class="docutils literal"><span class="pre">getmarkers()</span></tt> for the mark with
+the given <em>id</em>.</blockquote>
+<p>aifc.readframes(nframes)</p>
+<blockquote>
+Read and return the next <em>nframes</em> frames from the audio file.  The
+returned data is a string containing for each frame the
+uncompressed samples of all channels.</blockquote>
+<p>aifc.rewind()</p>
+<blockquote>
+Rewind the read pointer.  The next <tt class="docutils literal"><span class="pre">readframes()</span></tt> will start from
+the beginning.</blockquote>
+<p>aifc.setpos(pos)</p>
+<blockquote>
+Seek to the specified frame number.</blockquote>
+<p>aifc.tell()</p>
+<blockquote>
+Return the current frame number.</blockquote>
+<p>aifc.close()</p>
+<blockquote>
+Close the AIFF file.  After calling this method, the object can no
+longer be used.</blockquote>
+<p>Objects returned by <tt class="docutils literal"><span class="pre">open()</span></tt> when a file is opened for writing have
+all the above methods, except for <tt class="docutils literal"><span class="pre">readframes()</span></tt> and <tt class="docutils literal"><span class="pre">setpos()</span></tt>.
+In addition the following methods exist.  The <tt class="docutils literal"><span class="pre">get*()</span></tt> methods can
+only be called after the corresponding <tt class="docutils literal"><span class="pre">set*()</span></tt> methods have been
+called.  Before the first <tt class="docutils literal"><span class="pre">writeframes()</span></tt> or <tt class="docutils literal"><span class="pre">writeframesraw()</span></tt>,
+all parameters except for the number of frames must be filled in.</p>
+<p>aifc.aiff()</p>
+<blockquote>
+Create an AIFF file.  The default is that an AIFF-C file is
+created, unless the name of the file ends in <tt class="docutils literal"><span class="pre">'.aiff'</span></tt> in which
+case the default is an AIFF file.</blockquote>
+<p>aifc.aifc()</p>
+<blockquote>
+Create an AIFF-C file.  The default is that an AIFF-C file is
+created, unless the name of the file ends in <tt class="docutils literal"><span class="pre">'.aiff'</span></tt> in which
+case the default is an AIFF file.</blockquote>
+<p>aifc.setnchannels(nchannels)</p>
+<blockquote>
+Specify the number of channels in the audio file.</blockquote>
+<p>aifc.setsampwidth(width)</p>
+<blockquote>
+Specify the size in bytes of audio samples.</blockquote>
+<p>aifc.setframerate(rate)</p>
+<blockquote>
+Specify the sampling frequency in frames per second.</blockquote>
+<p>aifc.setnframes(nframes)</p>
+<blockquote>
+Specify the number of frames that are to be written to the audio
+file. If this parameter is not set, or not set correctly, the file
+needs to support seeking.</blockquote>
+<p>aifc.setcomptype(type, name)</p>
+<blockquote>
+Specify the compression type.  If not specified, the audio data
+will not be compressed.  In AIFF files, compression is not
+possible.  The name parameter should be a human-readable
+description of the compression type, the type parameter should be a
+four-character string.  Currently the following compression types
+are supported: NONE, ULAW, ALAW, G722.</blockquote>
+<p>aifc.setparams(nchannels, sampwidth, framerate, comptype, compname)</p>
+<blockquote>
+Set all the above parameters at once.  The argument is a tuple
+consisting of the various parameters.  This means that it is
+possible to use the result of a <tt class="docutils literal"><span class="pre">getparams()</span></tt> call as argument to
+<tt class="docutils literal"><span class="pre">setparams()</span></tt>.</blockquote>
+<p>aifc.setmark(id, pos, name)</p>
+<blockquote>
+Add a mark with the given id (larger than 0), and the given name at
+the given position.  This method can be called at any time before
+<tt class="docutils literal"><span class="pre">close()</span></tt>.</blockquote>
+<p>aifc.tell()</p>
+<blockquote>
+Return the current write position in the output file.  Useful in
+combination with <tt class="docutils literal"><span class="pre">setmark()</span></tt>.</blockquote>
+<p>aifc.writeframes(data)</p>
+<blockquote>
+Write data to the output file.  This method can only be called
+after the audio file parameters have been set.</blockquote>
+<p>aifc.writeframesraw(data)</p>
+<blockquote>
+Like <tt class="docutils literal"><span class="pre">writeframes()</span></tt>, except that the header of the audio file is
+not updated.</blockquote>
+<p>aifc.close()</p>
+<blockquote>
+Close the AIFF file.  The header of the file is updated to reflect
+the actual size of the audio data. After calling this method, the
+object can no longer be used.</blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="allos.html" title="2. Generic Operating System Services"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="indexprogress.html" title="The Python Standard Library and What Comes with Jython"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" >The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

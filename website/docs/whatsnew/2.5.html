@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>What’s New in Jython 2.5 &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="What’s New in Jython" href="index.html" />
+    <link rel="next" title="Reference Material for Python 2.2" href="2.2.html" />
+    <link rel="prev" title="What’s New in Jython" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="2.2.html" title="Reference Material for Python 2.2"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="What’s New in Jython"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">What&#8217;s New in Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">What&#8217;s New in Jython 2.5</a><ul>
+<li><a class="reference external" href="#new-features-quick-look">New Features - Quick Look</a></li>
+<li><a class="reference external" href="#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">What&#8217;s New in Jython</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="2.2.html"
+                                  title="next chapter">Reference Material for Python 2.2</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/whatsnew/2.5.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="what-s-new-in-jython-2-5">
+<h1>What&#8217;s New in Jython 2.5<a class="headerlink" href="#what-s-new-in-jython-2-5" title="Permalink to this headline">¶</a></h1>
+<p>Author:</p>
+<blockquote>
+Josh Juneau</blockquote>
+<p>Date:  08/20/2009</p>
+<p>There are many new features in Jython 2.5, the intention of this article is to cover the new additions available with the 2.5 release.  The previous release of Jython was 2.2.1, and this release takes a significant step forward adding language constructs and features bringing Jython in-line with more current versions of the CPython implementation.</p>
+<p>Below is a quick reference for those new features that have been added to Jython with the 2.5 release.  In the coming weeks, new content will be added to this article that explains each of the new features in greater detail.</p>
+<div class="section" id="new-features-quick-look">
+<h2>New Features - Quick Look<a class="headerlink" href="#new-features-quick-look" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>yield is always a keyword</li>
+<li>int() will now return a long instead of raising OverflowError if a number is too large</li>
+<li>list.insert() changed to be consistent with negative slice indexing</li>
+<li>list.index() takes optional start, stop arguments.</li>
+<li>Dictionaries gained a pop() method and .fromkeys() class method.</li>
+<li>dict() constructor takes keyword arguments.</li>
+<li>Many type objects are now callable.</li>
+<li>PEP 279: enumerate() built-in added.</li>
+<li>PEP 218: A Standard Set Datatype</li>
+<li>PEP 273: Importing Modules from Zip Archives</li>
+<li>PEP 278: Universal Newline Support</li>
+<li>PEP 282: logging package</li>
+<li>PEP 285: A Boolean Type</li>
+<li>PEP 293: Codec Error Handling Callbacks</li>
+<li>PEP 302: New Import Hooks</li>
+<li>PEP 307: Pickle Enhancements</li>
+<li>PEP 324: subprocess module</li>
+<li>optparse module</li>
+<li>ExposeAnnotations</li>
+<li>Move antlr parser in /trunk/sandbox/ast to trunk</li>
+<li>Hookup asm compiler to antlr, solidify and add 2.5 features</li>
+<li>PEP 289: Generator expressions</li>
+<li>PEP 263: Defining Python Source Code Encodings</li>
+<li>PEP 318: Function/method decorators</li>
+<li>PEP 308: Conditional expressions</li>
+<li>PEP 343: &#8216;with&#8217; statement</li>
+<li>PEP 342: Coroutines via generators</li>
+<li>PEP 341: Unified try/except/finally</li>
+<li>PEP 352: Exceptions as new-style classes</li>
+<li>UpgradeTo25CPythonLib</li>
+<li>PEP 292: Simpler String Substitutions</li>
+<li>PEP 327: decimal type</li>
+<li>Ongoing parser fixes (universal newlines, line numbering, newline handling, interactive interpreter bugs)</li>
+<li>PEP 237: Unifying int/long</li>
+<li>PEP 357: Allowing Any Object to be Used for Slicing</li>
+<li>PEP 309: Partial Function Application</li>
+<li>PEP 305: csv module</li>
+<li>PEP 338: Executing modules as scripts</li>
+<li>unicodedata module</li>
+<li>PEP 328: Multi-line and absolute/relative imports</li>
+<li>elementtree module -&gt; jython-elementtree</li>
+<li>New Java integration (based on new style classes)</li>
+<li>cjkcodecs</li>
+<li>bz2 module</li>
+<li>ReplaceJythonc (Not yet complete)</li>
+</ul>
+</div>
+<div class="section" id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="2.2.html" title="Reference Material for Python 2.2"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="What’s New in Jython"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >What&#8217;s New in Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

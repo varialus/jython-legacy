@@ -1,0 +1,116 @@
+
+``site`` --- Site-specific configuration hook
+*********************************************
+
+**This module is automatically imported during initialization.** The
+automatic import can be suppressed using the interpreter's *-S*
+option.
+
+Importing this module will append site-specific paths to the module
+search path.
+
+It starts by constructing up to four directories from a head and a
+tail part. For the head part, it uses ``sys.prefix`` and
+``sys.exec_prefix``; empty heads are skipped.  For the tail part, it
+uses the empty string and then ``lib/site-packages`` (on Windows) or
+``lib/python|version|/site-packages`` and then ``lib/site-python`` (on
+Unix and Macintosh).  For each of the distinct head-tail combinations,
+it sees if it refers to an existing directory, and if so, adds it to
+``sys.path`` and also inspects the newly added path for configuration
+files.
+
+A path configuration file is a file whose name has the form
+``package.pth`` and exists in one of the four directories mentioned
+above; its contents are additional items (one per line) to be added to
+``sys.path``.  Non-existing items are never added to ``sys.path``, but
+no check is made that the item refers to a directory (rather than a
+file).  No item is added to ``sys.path`` more than once.  Blank lines
+and lines beginning with ``#`` are skipped.  Lines starting with
+``import`` (followed by space or tab) are executed.
+
+Changed in version 2.6: A space or tab is now required after the
+import keyword.
+
+For example, suppose ``sys.prefix`` and ``sys.exec_prefix`` are set to
+``/usr/local``.  The Python X.Y library is then installed in
+``/usr/local/lib/python*X.Y*`` (where only the first three characters
+of ``sys.version`` are used to form the installation path name).
+Suppose this has a subdirectory
+``/usr/local/lib/python*X.Y*/site-packages`` with three
+subsubdirectories, ``foo``, ``bar`` and ``spam``, and two path
+configuration files, ``foo.pth`` and ``bar.pth``.  Assume ``foo.pth``
+contains the following:
+
+   # foo package configuration
+
+   foo
+   bar
+   bletch
+
+and ``bar.pth`` contains:
+
+   # bar package configuration
+
+   bar
+
+Then the following version-specific directories are added to
+``sys.path``, in this order:
+
+   /usr/local/lib/pythonX.Y/site-packages/bar
+   /usr/local/lib/pythonX.Y/site-packages/foo
+
+Note that ``bletch`` is omitted because it doesn't exist; the ``bar``
+directory precedes the ``foo`` directory because ``bar.pth`` comes
+alphabetically before ``foo.pth``; and ``spam`` is omitted because it
+is not mentioned in either path configuration file.
+
+After these path manipulations, an attempt is made to import a module
+named ``sitecustomize``, which can perform arbitrary site-specific
+customizations. If this import fails with an ``ImportError``
+exception, it is silently ignored.
+
+Note that for some non-Unix systems, ``sys.prefix`` and
+``sys.exec_prefix`` are empty, and the path manipulations are skipped;
+however the import of ``sitecustomize`` is still attempted.
+
+site.PREFIXES
+
+   A list of prefixes for site package directories
+
+   New in version 2.6.
+
+site.ENABLE_USER_SITE
+
+   Flag showing the status of the user site directory. True means the
+   user site directory is enabled and added to sys.path. When the flag
+   is None the user site directory is disabled for security reasons.
+
+   New in version 2.6.
+
+site.USER_SITE
+
+   Path to the user site directory for the current Python version or
+   None
+
+   New in version 2.6.
+
+site.USER_BASE
+
+   Path to the base directory for user site directories
+
+   New in version 2.6.
+
+PYTHONNOUSERSITE
+
+   New in version 2.6.
+
+PYTHONUSERBASE
+
+   New in version 2.6.
+
+site.addsitedir(sitedir, known_paths=None)
+
+   Adds a directory to sys.path and processes its pth files.
+
+XXX Update documentation XXX document python -m site --user-base
+--user-site

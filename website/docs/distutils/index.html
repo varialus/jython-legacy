@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Distributing Python Modules &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/distutils/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="distributing-python-modules">
+<h1>Distributing Python Modules<a class="headerlink" href="#distributing-python-modules" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt>Authors:</dt>
+<dd>Greg Ward, Anthony Baxter</dd>
+<dt>Email:</dt>
+<dd><a class="reference external" href="mailto:distutils-sig&#37;&#52;&#48;python&#46;org">distutils-sig<span>&#64;</span>python<span>&#46;</span>org</a></dd>
+<dt>Release:</dt>
+<dd>2.6</dd>
+<dt>Date:</dt>
+<dd>July 31, 2009</dd>
+</dl>
+<p>This document describes the Python Distribution Utilities
+(&#8220;Distutils&#8221;) from the module developer&#8217;s point of view, describing
+how to use the Distutils to make Python modules and extensions easily
+available to a wider audience with very little overhead for
+build/release/install mechanics.</p>
+<ul>
+<li><p class="first">An Introduction to Distutils
+* Concepts &amp; Terminology
+* A Simple Example
+* General Python terminology
+* Distutils-specific terminology</p>
+</li>
+<li><p class="first">Writing the Setup Script
+* Listing whole packages
+* Listing individual modules
+* Describing extension modules
+* Relationships between Distributions and Packages
+* Installing Scripts
+* Installing Package Data
+* Installing Additional Files
+* Additional meta-data
+* Debugging the setup script</p>
+</li>
+<li><p class="first">Writing the Setup Configuration File</p>
+</li>
+<li><p class="first">Creating a Source Distribution
+* Specifying the files to distribute
+* Manifest-related options</p>
+</li>
+<li><p class="first">Creating Built Distributions
+* Creating dumb built distributions
+* Creating RPM packages
+* Creating Windows Installers
+* Cross-compiling on Windows
+* Vista User Access Control (UAC)</p>
+</li>
+<li><p class="first">Registering with the Package Index
+* The .pypirc file</p>
+</li>
+<li><p class="first">Uploading Packages to the Package Index</p>
+</li>
+<li><p class="first">Examples
+* Pure Python distribution (by module)
+* Pure Python distribution (by package)
+* Single extension module</p>
+</li>
+<li><p class="first">Extending Distutils
+* Integrating new commands
+* Adding new distribution types</p>
+</li>
+<li><p class="first">Command Reference
+* Installing modules: the <strong>install</strong> command family
+* Creating a source distribution: the <strong>sdist</strong> command</p>
+</li>
+<li><p class="first">API Reference
+* <tt class="docutils literal"><span class="pre">distutils.core</span></tt> &#8212; Core Distutils functionality
+* <tt class="docutils literal"><span class="pre">distutils.ccompiler</span></tt> &#8212; CCompiler base class
+* <tt class="docutils literal"><span class="pre">distutils.unixccompiler</span></tt> &#8212; Unix C Compiler
+* <tt class="docutils literal"><span class="pre">distutils.msvccompiler</span></tt> &#8212; Microsoft Compiler
+* <tt class="docutils literal"><span class="pre">distutils.bcppcompiler</span></tt> &#8212; Borland Compiler
+* <tt class="docutils literal"><span class="pre">distutils.cygwincompiler</span></tt> &#8212; Cygwin Compiler
+* <tt class="docutils literal"><span class="pre">distutils.emxccompiler</span></tt> &#8212; OS/2 EMX Compiler
+* <tt class="docutils literal"><span class="pre">distutils.mwerkscompiler</span></tt> &#8212; Metrowerks CodeWarrior support
+* <tt class="docutils literal"><span class="pre">distutils.archive_util</span></tt> &#8212;  Archiving utilities
+* <tt class="docutils literal"><span class="pre">distutils.dep_util</span></tt> &#8212; Dependency checking
+* <tt class="docutils literal"><span class="pre">distutils.dir_util</span></tt> &#8212; Directory tree operations
+* <tt class="docutils literal"><span class="pre">distutils.file_util</span></tt> &#8212; Single file operations
+* <tt class="docutils literal"><span class="pre">distutils.util</span></tt> &#8212; Miscellaneous other utility functions
+* <tt class="docutils literal"><span class="pre">distutils.dist</span></tt> &#8212; The Distribution class
+* <tt class="docutils literal"><span class="pre">distutils.extension</span></tt> &#8212; The Extension class
+* <tt class="docutils literal"><span class="pre">distutils.debug</span></tt> &#8212; Distutils debug mode
+* <tt class="docutils literal"><span class="pre">distutils.errors</span></tt> &#8212; Distutils exceptions
+* <tt class="docutils literal"><span class="pre">distutils.fancy_getopt</span></tt> &#8212; Wrapper around the standard getopt</p>
+<blockquote>
+<p>module</p>
+</blockquote>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">distutils.filelist</span></tt> &#8212; The FileList class</li>
+<li><tt class="docutils literal"><span class="pre">distutils.log</span></tt> &#8212; Simple PEP 282-style logging</li>
+<li><tt class="docutils literal"><span class="pre">distutils.spawn</span></tt> &#8212; Spawn a sub-process</li>
+<li><tt class="docutils literal"><span class="pre">distutils.sysconfig</span></tt> &#8212; System configuration information</li>
+<li><tt class="docutils literal"><span class="pre">distutils.text_file</span></tt> &#8212; The TextFile class</li>
+<li><tt class="docutils literal"><span class="pre">distutils.version</span></tt> &#8212; Version number classes</li>
+<li><tt class="docutils literal"><span class="pre">distutils.cmd</span></tt> &#8212; Abstract base class for Distutils commands</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command</span></tt> &#8212; Individual Distutils commands</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.bdist</span></tt> &#8212; Build a binary installer</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.bdist_packager</span></tt> &#8212; Abstract base class for
+packagers</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.bdist_dumb</span></tt> &#8212; Build a &#8220;dumb&#8221; installer</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.bdist_msi</span></tt> &#8212; Build a Microsoft Installer
+binary package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.bdist_rpm</span></tt> &#8212; Build a binary distribution as
+a Redhat RPM and SRPM</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.bdist_wininst</span></tt> &#8212; Build a Windows installer</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.sdist</span></tt> &#8212; Build a source distribution</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.build</span></tt> &#8212; Build all files of a package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.build_clib</span></tt> &#8212; Build any C libraries in a
+package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.build_ext</span></tt> &#8212; Build any extensions in a
+package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.build_py</span></tt> &#8212; Build the .py/.pyc files of a
+package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.build_scripts</span></tt> &#8212; Build the scripts of a
+package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.clean</span></tt> &#8212; Clean a package build area</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.config</span></tt> &#8212; Perform package configuration</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.install</span></tt> &#8212; Install a package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.install_data</span></tt> &#8212; Install data files from a
+package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.install_headers</span></tt> &#8212; Install C/C++ header
+files from a package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.install_lib</span></tt> &#8212; Install library files from a
+package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.install_scripts</span></tt> &#8212; Install script files
+from a package</li>
+<li><tt class="docutils literal"><span class="pre">distutils.command.register</span></tt> &#8212; Register a module with the
+Python Package Index</li>
+<li>Creating a new Distutils command</li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

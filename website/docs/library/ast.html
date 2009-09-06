@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>6. Abstract Syntax Trees &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" />
+    <link rel="up" title="The Python Standard Library and What Comes with Jython" href="indexprogress.html" />
+    <link rel="next" title="7. __builtin__ — Built-in objects" href="__builtin__.html" />
+    <link rel="prev" title="5. array — Efficient arrays of numeric values" href="array.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="__builtin__.html" title="7. __builtin__ — Built-in objects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="array.html" title="5. array — Efficient arrays of numeric values"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" accesskey="U">The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">6. Abstract Syntax Trees</a><ul>
+<li><a class="reference external" href="#node-classes">6.1. Node classes</a></li>
+<li><a class="reference external" href="#abstract-grammar">6.2. Abstract Grammar</a></li>
+<li><a class="reference external" href="#ast-helpers">6.3. <tt class="docutils literal"><span class="pre">ast</span></tt> Helpers</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="array.html"
+                                  title="previous chapter">5. <tt class="docutils literal docutils literal"><span class="pre">array</span></tt> &#8212; Efficient arrays of numeric values</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="__builtin__.html"
+                                  title="next chapter">7. <tt class="docutils literal docutils literal docutils literal"><span class="pre">__builtin__</span></tt> &#8212; Built-in objects</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/ast.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="abstract-syntax-trees">
+<h1>6. Abstract Syntax Trees<a class="headerlink" href="#abstract-syntax-trees" title="Permalink to this headline">¶</a></h1>
+<p>New in version 2.5: The low-level <tt class="docutils literal"><span class="pre">_ast</span></tt> module containing only the
+node classes.</p>
+<p>New in version 2.6: The high-level <tt class="docutils literal"><span class="pre">ast</span></tt> module containing all
+helpers.</p>
+<p>The <tt class="docutils literal"><span class="pre">ast</span></tt> module helps Python applications to process trees of the
+Python abstract syntax grammar.  The abstract syntax itself might
+change with each Python release; this module helps to find out
+programmatically what the current grammar looks like.</p>
+<p>An abstract syntax tree can be generated by passing
+<tt class="docutils literal"><span class="pre">ast.PyCF_ONLY_AST</span></tt> as a flag to the <tt class="docutils literal"><span class="pre">compile()</span></tt> builtin function,
+or using the <tt class="docutils literal"><span class="pre">parse()</span></tt> helper provided in this module.  The result
+will be a tree of objects whose classes all inherit from <tt class="docutils literal"><span class="pre">ast.AST</span></tt>.
+An abstract syntax tree can be compiled into a Python code object
+using the built-in <tt class="docutils literal"><span class="pre">compile()</span></tt> function.</p>
+<div class="section" id="node-classes">
+<h2>6.1. Node classes<a class="headerlink" href="#node-classes" title="Permalink to this headline">¶</a></h2>
+<p>class class ast.AST</p>
+<blockquote>
+<p>This is the base of all AST node classes.  The actual node classes
+are derived from the <tt class="docutils literal"><span class="pre">Parser/Python.asdl</span></tt> file, which is
+reproduced <em>below</em>.  They are defined in the <tt class="docutils literal"><span class="pre">_ast</span></tt> C module and
+re-exported in <tt class="docutils literal"><span class="pre">ast</span></tt>.</p>
+<p>There is one class defined for each left-hand side symbol in the
+abstract grammar (for example, <tt class="docutils literal"><span class="pre">ast.stmt</span></tt> or <tt class="docutils literal"><span class="pre">ast.expr</span></tt>).  In
+addition, there is one class defined for each constructor on the
+right-hand side; these classes inherit from the classes for the
+left-hand side trees.  For example, <tt class="docutils literal"><span class="pre">ast.BinOp</span></tt> inherits from
+<tt class="docutils literal"><span class="pre">ast.expr</span></tt>.  For production rules with alternatives (aka &#8220;sums&#8221;),
+the left-hand side class is abstract: only instances of specific
+constructor nodes are ever created.</p>
+<p>_fields</p>
+<blockquote>
+<p>Each concrete class has an attribute <tt class="docutils literal"><span class="pre">_fields</span></tt> which gives the
+names of all child nodes.</p>
+<p>Each instance of a concrete class has one attribute for each
+child node, of the type as defined in the grammar.  For example,
+<tt class="docutils literal"><span class="pre">ast.BinOp</span></tt> instances have an attribute <tt class="docutils literal"><span class="pre">left</span></tt> of type
+<tt class="docutils literal"><span class="pre">ast.expr</span></tt>.</p>
+<p>If these attributes are marked as optional in the grammar (using
+a question mark), the value might be <tt class="xref docutils literal"><span class="pre">None</span></tt>.  If the
+attributes can have zero-or-more values (marked with an
+asterisk), the values are represented as Python lists.  All
+possible attributes must be present and have valid values when
+compiling an AST with <tt class="docutils literal"><span class="pre">compile()</span></tt>.</p>
+</blockquote>
+<p>lineno
+col_offset</p>
+<blockquote>
+Instances of <tt class="docutils literal"><span class="pre">ast.expr</span></tt> and <tt class="docutils literal"><span class="pre">ast.stmt</span></tt> subclasses have
+<tt class="docutils literal"><span class="pre">lineno</span></tt> and <tt class="docutils literal"><span class="pre">col_offset</span></tt> attributes.  The <tt class="docutils literal"><span class="pre">lineno</span></tt> is the
+line number of source text (1-indexed so the first line is line
+1) and the <tt class="docutils literal"><span class="pre">col_offset</span></tt> is the UTF-8 byte offset of the first
+token that generated the node.  The UTF-8 offset is recorded
+because the parser uses UTF-8 internally.</blockquote>
+<p>The constructor of a class <tt class="docutils literal"><span class="pre">ast.T</span></tt> parses its arguments as
+follows:</p>
+<ul class="simple">
+<li>If there are positional arguments, there must be as many as there
+are items in <tt class="docutils literal"><span class="pre">T._fields</span></tt>; they will be assigned as attributes
+of these names.</li>
+<li>If there are keyword arguments, they will set the attributes of
+the same names to the given values.</li>
+</ul>
+<p>For example, to create and populate an <tt class="docutils literal"><span class="pre">ast.UnaryOp</span></tt> node, you
+could use</p>
+<blockquote>
+node = ast.UnaryOp()
+node.op = ast.USub()
+node.operand = ast.Num()
+node.operand.n = 5
+node.operand.lineno = 0
+node.operand.col_offset = 0
+node.lineno = 0
+node.col_offset = 0</blockquote>
+<p>or the more compact</p>
+<blockquote>
+<dl class="docutils">
+<dt>node = ast.UnaryOp(ast.USub(), ast.Num(5, lineno=0, col_offset=0),</dt>
+<dd>lineno=0, col_offset=0)</dd>
+</dl>
+</blockquote>
+<p>New in version 2.6: The constructor as explained above was added.
+In Python 2.5 nodes had to be created by calling the class
+constructor without arguments and setting the attributes
+afterwards.</p>
+</blockquote>
+</div>
+<div class="section" id="abstract-grammar">
+<h2>6.2. Abstract Grammar<a class="headerlink" href="#abstract-grammar" title="Permalink to this headline">¶</a></h2>
+<p>The module defines a string constant <tt class="docutils literal"><span class="pre">__version__</span></tt> which is the
+decimal Subversion revision number of the file shown below.</p>
+<p>The abstract grammar is currently defined as follows:</p>
+<blockquote>
+<p>&#8211; ASDL&#8217;s five builtin types are identifier, int, string, object, bool</p>
+<p>module Python version &#8220;$Revision: 62047 $&#8221;
+{</p>
+<blockquote>
+<dl class="docutils">
+<dt>mod = Module(stmt* body)</dt>
+<dd><div class="first line-block">
+<div class="line">Interactive(stmt* body)</div>
+<div class="line">Expression(expr body)</div>
+</div>
+<p class="last">&#8211; not really an actual node but useful in Jython&#8217;s typesystem.
+| Suite(stmt* body)</p>
+</dd>
+<dt>stmt = FunctionDef(identifier name, arguments args,</dt>
+<dd><blockquote class="first">
+stmt* body, expr* decorator_list)</blockquote>
+<div class="line-block">
+<div class="line">ClassDef(identifier name, expr* bases, stmt* body, expr <a href="#id1"><span class="problematic" id="id2">*</span></a>decorator_list)</div>
+<div class="line">Return(expr? value)</div>
+</div>
+<div class="line-block">
+<div class="line">Delete(expr* targets)</div>
+<div class="line">Assign(expr* targets, expr value)</div>
+<div class="line">AugAssign(expr target, operator op, expr value)</div>
+</div>
+<p>&#8211; not sure if bool is allowed, can always use int
+| Print(expr? dest, expr* values, bool nl)</p>
+<p>&#8211; use &#8216;orelse&#8217; because else is a keyword in target languages
+| For(expr target, expr iter, stmt* body, stmt* orelse)
+| While(expr test, stmt* body, stmt* orelse)
+| If(expr test, stmt* body, stmt* orelse)
+| With(expr context_expr, expr? optional_vars, stmt* body)</p>
+<p>&#8211; &#8216;type&#8217; is a bad name
+| Raise(expr? type, expr? inst, expr? tback)
+| TryExcept(stmt* body, excepthandler* handlers, stmt* orelse)
+| TryFinally(stmt* body, stmt* finalbody)
+| Assert(expr test, expr? msg)</p>
+<div class="line-block">
+<div class="line">Import(alias* names)</div>
+<div class="line">ImportFrom(identifier module, alias* names, int? level)</div>
+</div>
+<p>&#8211; Doesn&#8217;t capture requirement that locals must be
+&#8211; defined if globals is
+&#8211; still supports use as a function!
+| Exec(expr body, expr? globals, expr? locals)</p>
+<div class="line-block">
+<div class="line">Global(identifier* names)</div>
+<div class="line">Expr(expr value)</div>
+<div class="line">Pass | Break | Continue</div>
+</div>
+<p>&#8211; XXX Jython will be different
+&#8211; col_offset is the byte offset in the utf8 string the parser uses
+attributes (int lineno, int col_offset)</p>
+<p class="last">&#8211; BoolOp() can use left &amp; right?</p>
+</dd>
+<dt>expr = BoolOp(boolop op, expr* values)</dt>
+<dd><div class="first line-block">
+<div class="line">BinOp(expr left, operator op, expr right)</div>
+<div class="line">UnaryOp(unaryop op, expr operand)</div>
+<div class="line">Lambda(arguments args, expr body)</div>
+<div class="line">IfExp(expr test, expr body, expr orelse)</div>
+<div class="line">Dict(expr* keys, expr* values)</div>
+<div class="line">ListComp(expr elt, comprehension* generators)</div>
+<div class="line">GeneratorExp(expr elt, comprehension* generators)</div>
+</div>
+<p>&#8211; the grammar constrains where yield expressions can occur
+| Yield(expr? value)
+&#8211; need sequences for compare to distinguish between
+&#8211; x &lt; 4 &lt; 3 and (x &lt; 4) &lt; 3
+| Compare(expr left, cmpop* ops, expr* comparators)
+| Call(expr func, expr* args, keyword* keywords,</p>
+<blockquote>
+expr? starargs, expr? kwargs)</blockquote>
+<div class="line-block">
+<div class="line">Repr(expr value)</div>
+<div class="line">Num(object n) &#8211; a number as a PyObject.</div>
+<div class="line">Str(string s) &#8211; need to specify raw, unicode, etc?</div>
+</div>
+<p>&#8211; other literals? bools?</p>
+<p>&#8211; the following expression can appear in assignment context
+| Attribute(expr value, identifier attr, expr_context ctx)
+| Subscript(expr value, slice slice, expr_context ctx)
+| Name(identifier id, expr_context ctx)
+| List(expr* elts, expr_context ctx)
+| Tuple(expr* elts, expr_context ctx)</p>
+<blockquote class="last">
+&#8211; col_offset is the byte offset in the utf8 string the parser uses
+attributes (int lineno, int col_offset)</blockquote>
+</dd>
+</dl>
+<p>expr_context = Load | Store | Del | AugLoad | AugStore | Param</p>
+<dl class="docutils">
+<dt>slice = Ellipsis | Slice(expr? lower, expr? upper, expr? step)</dt>
+<dd><div class="first last line-block">
+<div class="line">ExtSlice(slice* dims)</div>
+<div class="line">Index(expr value)</div>
+</div>
+</dd>
+</dl>
+<p>boolop = And | Or</p>
+<dl class="docutils">
+<dt>operator = Add | Sub | Mult | Div | Mod | Pow | LShift</dt>
+<dd><div class="first last line-block">
+<div class="line">RShift | BitOr | BitXor | BitAnd | FloorDiv</div>
+</div>
+</dd>
+</dl>
+<p>unaryop = Invert | Not | UAdd | USub</p>
+<p>cmpop = Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn</p>
+<p>comprehension = (expr target, expr iter, expr* ifs)</p>
+<p>&#8211; not sure what to call the first argument for raise and except
+excepthandler = ExceptHandler(expr? type, expr? name, stmt* body)</p>
+<blockquote>
+attributes (int lineno, int col_offset)</blockquote>
+<dl class="docutils">
+<dt>arguments = (expr* args, identifier? vararg,</dt>
+<dd><blockquote class="first">
+identifier? kwarg, expr* defaults)</blockquote>
+<p>&#8211; keyword arguments supplied to call
+keyword = (identifier arg, expr value)</p>
+<p class="last">&#8211; import name with optional &#8216;as&#8217; alias.
+alias = (identifier name, identifier? asname)</p>
+</dd>
+</dl>
+</blockquote>
+<p>}</p>
+</blockquote>
+</div>
+<div class="section" id="ast-helpers">
+<h2>6.3. <tt class="docutils literal"><span class="pre">ast</span></tt> Helpers<a class="headerlink" href="#ast-helpers" title="Permalink to this headline">¶</a></h2>
+<p>New in version 2.6.</p>
+<p>Apart from the node classes, <tt class="docutils literal"><span class="pre">ast</span></tt> module defines these utility
+functions and classes for traversing abstract syntax trees:</p>
+<p>ast.parse(expr, filename=&#8217;&lt;unknown&gt;&#8217;, mode=&#8217;exec&#8217;)</p>
+<blockquote>
+Parse an expression into an AST node.  Equivalent to
+<tt class="docutils literal"><span class="pre">compile(expr,</span> <span class="pre">filename,</span> <span class="pre">mode,</span> <span class="pre">ast.PyCF_ONLY_AST)</span></tt>.</blockquote>
+<p>ast.literal_eval(node_or_string)</p>
+<blockquote>
+<p>Safely evaluate an expression node or a string containing a Python
+expression.  The string or node provided may only consist of the
+following Python literal structures: strings, numbers, tuples,
+lists, dicts, booleans, and <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
+<p>This can be used for safely evaluating strings containing Python
+expressions from untrusted sources without the need to parse the
+values oneself.</p>
+</blockquote>
+<p>ast.get_docstring(node, clean=True)</p>
+<blockquote>
+Return the docstring of the given <em>node</em> (which must be a
+<tt class="docutils literal"><span class="pre">FunctionDef</span></tt>, <tt class="docutils literal"><span class="pre">ClassDef</span></tt> or <tt class="docutils literal"><span class="pre">Module</span></tt> node), or <tt class="xref docutils literal"><span class="pre">None</span></tt> if
+it has no docstring.  If <em>clean</em> is true, clean up the docstring&#8217;s
+indentation with <tt class="docutils literal"><span class="pre">inspect.cleandoc()</span></tt>.</blockquote>
+<p>ast.fix_missing_locations(node)</p>
+<blockquote>
+When you compile a node tree with <tt class="docutils literal"><span class="pre">compile()</span></tt>, the compiler
+expects <tt class="docutils literal"><span class="pre">lineno</span></tt> and <tt class="docutils literal"><span class="pre">col_offset</span></tt> attributes for every node
+that supports them.  This is rather tedious to fill in for
+generated nodes, so this helper adds these attributes recursively
+where not already set, by setting them to the values of the parent
+node.  It works recursively starting at <em>node</em>.</blockquote>
+<p>ast.increment_lineno(node, n=1)</p>
+<blockquote>
+Increment the line number of each node in the tree starting at
+<em>node</em> by <em>n</em>. This is useful to &#8220;move code&#8221; to a different
+location in a file.</blockquote>
+<p>ast.copy_location(new_node, old_node)</p>
+<blockquote>
+Copy source location (<tt class="docutils literal"><span class="pre">lineno</span></tt> and <tt class="docutils literal"><span class="pre">col_offset</span></tt>) from
+<em>old_node</em> to <em>new_node</em> if possible, and return <em>new_node</em>.</blockquote>
+<p>ast.iter_fields(node)</p>
+<blockquote>
+Yield a tuple of <tt class="docutils literal"><span class="pre">(fieldname,</span> <span class="pre">value)</span></tt> for each field in
+<tt class="docutils literal"><span class="pre">node._fields</span></tt> that is present on <em>node</em>.</blockquote>
+<p>ast.iter_child_nodes(node)</p>
+<blockquote>
+Yield all direct child nodes of <em>node</em>, that is, all fields that
+are nodes and all items of fields that are lists of nodes.</blockquote>
+<p>ast.walk(node)</p>
+<blockquote>
+Recursively yield all child nodes of <em>node</em>, in no specified order.
+This is useful if you only want to modify nodes in place and don&#8217;t
+care about the context.</blockquote>
+<p>class class ast.NodeVisitor</p>
+<blockquote>
+<p>A node visitor base class that walks the abstract syntax tree and
+calls a visitor function for every node found.  This function may
+return a value which is forwarded by the <tt class="docutils literal"><span class="pre">visit()</span></tt> method.</p>
+<p>This class is meant to be subclassed, with the subclass adding
+visitor methods.</p>
+<p>visit(node)</p>
+<blockquote>
+Visit a node.  The default implementation calls the method
+called <tt class="docutils literal"><span class="pre">self.visit_*classname*</span></tt> where <em>classname</em> is the name
+of the node class, or <tt class="docutils literal"><span class="pre">generic_visit()</span></tt> if that method doesn&#8217;t
+exist.</blockquote>
+<p>generic_visit(node)</p>
+<blockquote>
+<p>This visitor calls <tt class="docutils literal"><span class="pre">visit()</span></tt> on all children of the node.</p>
+<p>Note that child nodes of nodes that have a custom visitor method
+won&#8217;t be visited unless the visitor calls <tt class="docutils literal"><span class="pre">generic_visit()</span></tt> or
+visits them itself.</p>
+</blockquote>
+<p>Don&#8217;t use the <tt class="docutils literal"><span class="pre">NodeVisitor</span></tt> if you want to apply changes to nodes
+during traversal.  For this a special visitor exists
+(<tt class="docutils literal"><span class="pre">NodeTransformer</span></tt>) that allows modifications.</p>
+</blockquote>
+<p>class class ast.NodeTransformer</p>
+<blockquote>
+<p>A <tt class="docutils literal"><span class="pre">NodeVisitor</span></tt> subclass that walks the abstract syntax tree and
+allows modification of nodes.</p>
+<p>The <tt class="docutils literal"><span class="pre">NodeTransformer</span></tt> will walk the AST and use the return value
+of the visitor methods to replace or remove the old node.  If the
+return value of the visitor method is <tt class="xref docutils literal"><span class="pre">None</span></tt>, the node will be
+removed from its location, otherwise it is replaced with the return
+value.  The return value may be the original node in which case no
+replacement takes place.</p>
+<p>Here is an example transformer that rewrites all occurrences of
+name lookups (<tt class="docutils literal"><span class="pre">foo</span></tt>) to <tt class="docutils literal"><span class="pre">data['foo']</span></tt>:</p>
+<blockquote>
+<p>class RewriteName(NodeTransformer):</p>
+<blockquote>
+<dl class="docutils">
+<dt>def visit_Name(self, node):</dt>
+<dd><dl class="first docutils">
+<dt>return copy_location(Subscript(</dt>
+<dd>value=Name(id=&#8217;data&#8217;, ctx=Load()),
+slice=Index(value=Str(s=node.id)),
+ctx=node.ctx</dd>
+</dl>
+<p class="last">), node)</p>
+</dd>
+</dl>
+</blockquote>
+</blockquote>
+<p>Keep in mind that if the node you&#8217;re operating on has child nodes
+you must either transform the child nodes yourself or call the
+<tt class="docutils literal"><span class="pre">generic_visit()</span></tt> method for the node first.</p>
+<p>For nodes that were part of a collection of statements (that
+applies to all statement nodes), the visitor may also return a list
+of nodes rather than just a single node.</p>
+<p>Usually you use the transformer like this:</p>
+<blockquote>
+node = YourTransformer().visit(node)</blockquote>
+</blockquote>
+<p>ast.dump(node, annotate_fields=True, include_attributes=False)</p>
+<blockquote>
+Return a formatted dump of the tree in <em>node</em>.  This is mainly
+useful for debugging purposes.  The returned string will show the
+names and the values for fields.  This makes the code impossible to
+evaluate, so if evaluation is wanted <em>annotate_fields</em> must be set
+to False.  Attributes such as line numbers and column offsets are
+not dumped by default.  If this is wanted, <em>include_attributes</em> can
+be set to <tt class="xref docutils literal"><span class="pre">True</span></tt>.</blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="__builtin__.html" title="7. __builtin__ — Built-in objects"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="array.html" title="5. array — Efficient arrays of numeric values"
+             >previous</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li>
+          <li><a href="indexprogress.html" >The Python Standard Library and What Comes with Jython</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

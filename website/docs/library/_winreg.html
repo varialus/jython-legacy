@@ -1,0 +1,525 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>_winreg – Windows registry access &mdash; Jython v2.5.0 documentation</title>
+    <link rel="stylesheet" href="../_static/green-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.5.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="Jython v2.5.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/jython.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">_winreg</span></tt> &#8211; Windows registry access</a><ul>
+<li><a class="reference external" href="#registry-handle-objects">Registry Handle Objects</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/library/_winreg.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="winreg-windows-registry-access">
+<h1><tt class="docutils literal"><span class="pre">_winreg</span></tt> &#8211; Windows registry access<a class="headerlink" href="#winreg-windows-registry-access" title="Permalink to this headline">¶</a></h1>
+<p>Platform: Windows</p>
+<p><a href="#id1"><span class="problematic" id="id2">*</span></a>Platforms: <a href="#id3"><span class="problematic" id="id4">*</span></a>Windows</p>
+<dl class="docutils">
+<dt>Note: The <tt class="docutils literal"><span class="pre">_winreg</span></tt> module has been renamed to <tt class="docutils literal"><span class="pre">winreg</span></tt> in Python 3.0.</dt>
+<dd>The <em>2to3</em> tool will automatically adapt imports when converting
+your sources to 3.0.</dd>
+</dl>
+<p>New in version 2.0.</p>
+<p>These functions expose the Windows registry API to Python.  Instead of
+using an integer as the registry handle, a handle object is used to
+ensure that the handles are closed correctly, even if the programmer
+neglects to explicitly close them.</p>
+<p>This module exposes a very low-level interface to the Windows
+registry; it is expected that in the future a new <tt class="docutils literal"><span class="pre">winreg</span></tt>  module
+will be created offering a higher-level interface to the registry API.</p>
+<p>This module offers the following functions:</p>
+<p>_winreg.CloseKey(hkey)</p>
+<blockquote>
+<p>Closes a previously opened registry key. The hkey argument
+specifies a previously opened key.</p>
+<p>Note that if <em>hkey</em> is not closed using this method (or via
+<tt class="docutils literal"><span class="pre">handle.Close()</span></tt>), it is closed when the <em>hkey</em> object is
+destroyed by Python.</p>
+</blockquote>
+<p>_winreg.ConnectRegistry(computer_name, key)</p>
+<blockquote>
+<p>Establishes a connection to a predefined registry handle on
+another computer, and returns a <em>handle object</em></p>
+<p><em>computer_name</em> is the name of the remote computer, of the  form
+<tt class="docutils literal"><span class="pre">r&quot;\\computername&quot;</span></tt>.  If <tt class="xref docutils literal"><span class="pre">None</span></tt>, the local computer is used.</p>
+<p><em>key</em> is the predefined handle to connect to.</p>
+<p>The return value is the handle of the opened key. If the function
+fails, a <tt class="docutils literal"><span class="pre">WindowsError</span></tt> exception is  raised.</p>
+</blockquote>
+<p>_winreg.CreateKey(key, sub_key)</p>
+<blockquote>
+<p>Creates or opens the specified key, returning a <em>handle object</em></p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>sub_key</em> is a string that names the key this method opens  or
+creates.</p>
+<p>If <em>key</em> is one of the predefined keys, <em>sub_key</em> may  be <tt class="xref docutils literal"><span class="pre">None</span></tt>.
+In that case, the handle returned is the same key handle  passed in
+to the function.</p>
+<p>If the key already exists, this function opens the existing key.</p>
+<p>The return value is the handle of the opened key. If the function
+fails, a <tt class="docutils literal"><span class="pre">WindowsError</span></tt> exception is  raised.</p>
+</blockquote>
+<p>_winreg.DeleteKey(key, sub_key)</p>
+<blockquote>
+<p>Deletes the specified key.</p>
+<p><em>key</em> is an already open key, or any one of the predefined
+<tt class="docutils literal"><span class="pre">HKEY_*</span></tt> constants.</p>
+<p><em>sub_key</em> is a string that must be a subkey of the key  identified
+by the <em>key</em> parameter.  This value must not be  <tt class="xref docutils literal"><span class="pre">None</span></tt>, and the
+key may not have subkeys.</p>
+<p><em>This method can not delete keys with subkeys.</em></p>
+<p>If the method succeeds, the entire key, including all of its
+values, is removed. If the method fails, a <tt class="docutils literal"><span class="pre">WindowsError</span></tt>
+exception is raised.</p>
+</blockquote>
+<p>_winreg.DeleteValue(key, value)</p>
+<blockquote>
+<p>Removes a named value from a registry key.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>value</em> is a string that identifies the value to remove.</p>
+</blockquote>
+<p>_winreg.EnumKey(key, index)</p>
+<blockquote>
+<p>Enumerates subkeys of an open registry key, returning a string.</p>
+<p><em>key</em> is an already open key, or any one of the predefined
+<tt class="docutils literal"><span class="pre">HKEY_*</span></tt> constants.</p>
+<p><em>index</em> is an integer that identifies the index of the key to
+retrieve.</p>
+<p>The function retrieves the name of one subkey each time it  is
+called.  It is typically called repeatedly until a
+<tt class="docutils literal"><span class="pre">WindowsError</span></tt> exception  is raised, indicating, no more values
+are available.</p>
+</blockquote>
+<p>_winreg.EnumValue(key, index)</p>
+<blockquote>
+<p>Enumerates values of an open registry key, returning a tuple.</p>
+<p><em>key</em> is an already open key, or any one of the predefined
+<tt class="docutils literal"><span class="pre">HKEY_*</span></tt> constants.</p>
+<p><em>index</em> is an integer that identifies the index of the value  to
+retrieve.</p>
+<p>The function retrieves the name of one subkey each time it is
+called. It is typically called repeatedly, until a
+<tt class="docutils literal"><span class="pre">WindowsError</span></tt> exception is raised, indicating  no more values.</p>
+<p>The result is a tuple of 3 items:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Index</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">0</span></tt></td>
+<td>A string that identifies the value name</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+<td>An object that holds the value data, and
+whose type depends on the underlying
+registry type</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">2</span></tt></td>
+<td>An integer that identifies the type of the
+value data</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>_winreg.ExpandEnvironmentStrings(unicode)</p>
+<blockquote>
+<p>Expands environment strings %NAME% in unicode string like
+const:<em>REG_EXPAND_SZ</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ExpandEnvironmentStrings</span><span class="p">(</span><span class="s">u&quot;%windir%&quot;</span><span class="p">)</span>
+<span class="go">u&quot;C:\\Windows&quot;</span>
+</pre></div>
+</div>
+<p>New in version 2.6.</p>
+</blockquote>
+<p>_winreg.FlushKey(key)</p>
+<blockquote>
+<p>Writes all the attributes of a key to the registry.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p>It is not necessary to call <tt class="docutils literal"><span class="pre">FlushKey()</span></tt> to change a key.
+Registry changes are flushed to disk by the registry using its lazy
+flusher.  Registry changes are also flushed to disk at system
+shutdown.  Unlike <tt class="docutils literal"><span class="pre">CloseKey()</span></tt>, the <tt class="docutils literal"><span class="pre">FlushKey()</span></tt> method
+returns only when all the data has been written to the registry. An
+application should only call <tt class="docutils literal"><span class="pre">FlushKey()</span></tt> if it requires absolute
+certainty that registry changes are on disk.</p>
+<dl class="docutils">
+<dt>Note: If you don&#8217;t know whether a <tt class="docutils literal"><span class="pre">FlushKey()</span></tt> call is required, it</dt>
+<dd>probably isn&#8217;t.</dd>
+</dl>
+</blockquote>
+<p>_winreg.LoadKey(key, sub_key, file_name)</p>
+<blockquote>
+<p>Creates a subkey under the specified key and stores registration
+information from a specified file into that subkey.</p>
+<p><em>key</em> is an already open key, or any of the predefined <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>sub_key</em> is a string that identifies the sub_key to load.</p>
+<p><em>file_name</em> is the name of the file to load registry data from.
+This file must have been created with the <tt class="docutils literal"><span class="pre">SaveKey()</span></tt> function.
+Under the file allocation table (FAT) file system, the filename may
+not have an extension.</p>
+<p>A call to LoadKey() fails if the calling process does not have the
+<tt class="docutils literal"><span class="pre">SE_RESTORE_PRIVILEGE</span></tt> privilege. Note that privileges are
+different than permissions - see the Win32 documentation for more
+details.</p>
+<p>If <em>key</em> is a handle returned by <tt class="docutils literal"><span class="pre">ConnectRegistry()</span></tt>,  then the
+path specified in <em>fileName</em> is relative to the  remote computer.</p>
+<p>The Win32 documentation implies <em>key</em> must be in the  <tt class="docutils literal"><span class="pre">HKEY_USER</span></tt>
+or <tt class="docutils literal"><span class="pre">HKEY_LOCAL_MACHINE</span></tt> tree. This may or may not be true.</p>
+</blockquote>
+<p>_winreg.OpenKey(key, sub_key[, res=0][, sam=KEY_READ])</p>
+<blockquote>
+<p>Opens the specified key, returning a <em>handle object</em></p>
+<p><em>key</em> is an already open key, or any one of the predefined
+<tt class="docutils literal"><span class="pre">HKEY_*</span></tt> constants.</p>
+<p><em>sub_key</em> is a string that identifies the sub_key to open.</p>
+<p><em>res</em> is a reserved integer, and must be zero.  The default is
+zero.</p>
+<p><em>sam</em> is an integer that specifies an access mask that describes
+the desired security access for the key.  Default is <tt class="docutils literal"><span class="pre">KEY_READ</span></tt></p>
+<p>The result is a new handle to the specified key.</p>
+<p>If the function fails, <tt class="docutils literal"><span class="pre">WindowsError</span></tt> is raised.</p>
+</blockquote>
+<p>_winreg.OpenKeyEx()</p>
+<blockquote>
+The functionality of <tt class="docutils literal"><span class="pre">OpenKeyEx()</span></tt> is provided via <tt class="docutils literal"><span class="pre">OpenKey()</span></tt>,
+by the use of default arguments.</blockquote>
+<p>_winreg.QueryInfoKey(key)</p>
+<blockquote>
+<p>Returns information about a key, as a tuple.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p>The result is a tuple of 3 items:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Index</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">0</span></tt></td>
+<td>An integer giving the number of sub keys this
+key has.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+<td>An integer giving the number of values this
+key has.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">2</span></tt></td>
+<td>A long integer giving when the key was last
+modified (if available) as 100&#8217;s of
+nanoseconds since Jan 1, 1600.</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>_winreg.QueryValue(key, sub_key)</p>
+<blockquote>
+<p>Retrieves the unnamed value for a key, as a string</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>sub_key</em> is a string that holds the name of the subkey with which
+the value is associated.  If this parameter is <tt class="xref docutils literal"><span class="pre">None</span></tt> or empty,
+the  function retrieves the value set by the <tt class="docutils literal"><span class="pre">SetValue()</span></tt> method
+for the key identified by <em>key</em>.</p>
+<p>Values in the registry have name, type, and data components. This
+method retrieves the data for a key&#8217;s first value that has a NULL
+name. But the underlying API call doesn&#8217;t return the type, so
+always use <tt class="docutils literal"><span class="pre">QueryValueEx()</span></tt> if possible.</p>
+</blockquote>
+<p>_winreg.QueryValueEx(key, value_name)</p>
+<blockquote>
+<p>Retrieves the type and data for a specified value name associated
+with  an open registry key.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>value_name</em> is a string indicating the value to query.</p>
+<p>The result is a tuple of 2 items:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Index</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">0</span></tt></td>
+<td>The value of the registry item.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+<td>An integer giving the registry type for
+this value.</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>_winreg.SaveKey(key, file_name)</p>
+<blockquote>
+<p>Saves the specified key, and all its subkeys to the specified file.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>file_name</em> is the name of the file to save registry data to. This
+file cannot already exist. If this filename includes an extension,
+it cannot be used on file allocation table (FAT) file systems by
+the <tt class="docutils literal"><span class="pre">LoadKey()</span></tt>, <tt class="docutils literal"><span class="pre">ReplaceKey()</span></tt> or  <tt class="docutils literal"><span class="pre">RestoreKey()</span></tt> methods.</p>
+<p>If <em>key</em> represents a key on a remote computer, the path  described
+by <em>file_name</em> is relative to the remote computer. The caller of
+this method must possess the <tt class="docutils literal"><span class="pre">SeBackupPrivilege</span></tt>  security
+privilege.  Note that privileges are different than permissions  -
+see the Win32 documentation for more details.</p>
+<p>This function passes NULL for <em>security_attributes</em> to the API.</p>
+</blockquote>
+<p>_winreg.SetValue(key, sub_key, type, value)</p>
+<blockquote>
+<p>Associates a value with a specified key.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>sub_key</em> is a string that names the subkey with which the value
+is associated.</p>
+<p><em>type</em> is an integer that specifies the type of the data. Currently
+this must be <tt class="docutils literal"><span class="pre">REG_SZ</span></tt>, meaning only strings are supported.  Use
+the <tt class="docutils literal"><span class="pre">SetValueEx()</span></tt> function for support for other data types.</p>
+<p><em>value</em> is a string that specifies the new value.</p>
+<p>If the key specified by the <em>sub_key</em> parameter does not exist, the
+SetValue function creates it.</p>
+<p>Value lengths are limited by available memory. Long values (more
+than 2048 bytes) should be stored as files with the filenames
+stored in the configuration registry.  This helps the registry
+perform efficiently.</p>
+<p>The key identified by the <em>key</em> parameter must have been  opened
+with <tt class="docutils literal"><span class="pre">KEY_SET_VALUE</span></tt> access.</p>
+</blockquote>
+<p>_winreg.SetValueEx(key, value_name, reserved, type, value)</p>
+<blockquote>
+<p>Stores data in the value field of an open registry key.</p>
+<p><em>key</em> is an already open key, or one of the predefined  <tt class="docutils literal"><span class="pre">HKEY_*</span></tt>
+constants.</p>
+<p><em>value_name</em> is a string that names the subkey with which the
+value is associated.</p>
+<p><em>type</em> is an integer that specifies the type of the data.   This
+should be one of the following constants defined in this module:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="43%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Constant</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">REG_BINARY</span></tt></td>
+<td>Binary data in any form.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_DWORD</span></tt></td>
+<td>A 32-bit number.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_DWORD_LITTLE_ENDIAN</span></tt></td>
+<td>A 32-bit number in little-endian format.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_DWORD_BIG_ENDIAN</span></tt></td>
+<td>A 32-bit number in big-endian format.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_EXPAND_SZ</span></tt></td>
+<td>Null-terminated string containing references
+to environment variables (<tt class="docutils literal"><span class="pre">%PATH%</span></tt>).</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_LINK</span></tt></td>
+<td>A Unicode symbolic link.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_MULTI_SZ</span></tt></td>
+<td>A sequence of null-terminated strings,
+terminated by two null characters.  (Python
+handles  this termination automatically.)</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_NONE</span></tt></td>
+<td>No defined value type.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_RESOURCE_LIST</span></tt></td>
+<td>A device-driver resource list.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">REG_SZ</span></tt></td>
+<td>A null-terminated string.</td>
+</tr>
+</tbody>
+</table>
+<p><em>reserved</em> can be anything - zero is always passed to the  API.</p>
+<p><em>value</em> is a string that specifies the new value.</p>
+<p>This method can also set additional value and type information for
+the specified key.  The key identified by the key parameter must
+have been opened with <tt class="docutils literal"><span class="pre">KEY_SET_VALUE</span></tt> access.</p>
+<p>To open the key, use the <tt class="docutils literal"><span class="pre">CreateKeyEx()</span></tt> or  <tt class="docutils literal"><span class="pre">OpenKey()</span></tt>
+methods.</p>
+<p>Value lengths are limited by available memory. Long values (more
+than 2048 bytes) should be stored as files with the filenames
+stored in the configuration registry.  This helps the registry
+perform efficiently.</p>
+</blockquote>
+<div class="section" id="registry-handle-objects">
+<h2>Registry Handle Objects<a class="headerlink" href="#registry-handle-objects" title="Permalink to this headline">¶</a></h2>
+<p>This object wraps a Windows HKEY object, automatically closing it when
+the object is destroyed.  To guarantee cleanup, you can call either
+the <tt class="docutils literal"><span class="pre">Close()</span></tt> method on the object, or the  <tt class="docutils literal"><span class="pre">CloseKey()</span></tt> function.</p>
+<p>All registry functions in this module return one of these objects.</p>
+<p>All registry functions in this module which accept a handle object
+also accept an integer, however, use of the handle object is
+encouraged.</p>
+<p>Handle objects provide semantics for <tt class="docutils literal"><span class="pre">__nonzero__()</span></tt> - thus</p>
+<blockquote>
+<dl class="docutils">
+<dt>if handle:</dt>
+<dd>print &#8220;Yes&#8221;</dd>
+</dl>
+</blockquote>
+<p>will print <tt class="docutils literal"><span class="pre">Yes</span></tt> if the handle is currently valid (has not been
+closed or detached).</p>
+<p>The object also support comparison semantics, so handle objects will
+compare true if they both reference the same underlying Windows handle
+value.</p>
+<p>Handle objects can be converted to an integer (e.g., using the builtin
+<tt class="docutils literal"><span class="pre">int()</span></tt> function), in which case the underlying Windows handle value
+is returned.  You can also use the  <tt class="docutils literal"><span class="pre">Detach()</span></tt> method to return the
+integer handle, and also disconnect the Windows handle from the handle
+object.</p>
+<p>PyHKEY.Close()</p>
+<blockquote>
+<p>Closes the underlying Windows handle.</p>
+<p>If the handle is already closed, no error is raised.</p>
+</blockquote>
+<p>PyHKEY.Detach()</p>
+<blockquote>
+<p>Detaches the Windows handle from the handle object.</p>
+<p>The result is an integer (or long on 64 bit Windows) that holds the
+value of the handle before it is detached.  If the handle is
+already detached or closed, this will return zero.</p>
+<p>After calling this function, the handle is effectively invalidated,
+but the handle is not closed.  You would call this function when
+you need the underlying Win32 handle to exist beyond the lifetime
+of the handle object.</p>
+</blockquote>
+<p>PyHKEY.__enter__()
+PyHKEY.__exit__(<a href="#id5"><span class="problematic" id="id6">*</span></a>exc_info)</p>
+<blockquote>
+<p>The HKEY object implements <tt class="docutils literal"><span class="pre">__enter__()</span></tt> and <tt class="docutils literal"><span class="pre">__exit__()</span></tt> and
+thus supports the context protocol for the <tt class="docutils literal"><span class="pre">with</span></tt> statement:</p>
+<blockquote>
+<dl class="docutils">
+<dt>with OpenKey(HKEY_LOCAL_MACHINE, &#8220;foo&#8221;) as key:</dt>
+<dd># ... work with key ...</dd>
+</dl>
+</blockquote>
+<p>will automatically close <em>key</em> when control leaves the <tt class="docutils literal"><span class="pre">with</span></tt>
+block.</p>
+<p>New in version 2.6.</p>
+</blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Jython v2.5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; <a href="../copyright.html">Copyright</a> 2009, Jython Project.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>
