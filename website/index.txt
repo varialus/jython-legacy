@@ -4,6 +4,14 @@ The Jython Project
 Latest News
 ~~~~~~~~~~~
 
+**Jython 2.5.1 rc2 is now available for download**
+
+`Download 2.5.1 rc2 today`_ and check it out.  See the `wiki instructions`_ for installation details.  Jython 2.5.1rc2 fixes bugs that we found when testing rc1, including
+some db, codec, and locking issues. Please see the NEWS file for
+detailed release notes.  Also, please report any bugs that are found to http://bugs.jython.org
+
+
+
 **Jython 2.5.1 rc1 is available for download**
 
 `Download 2.5.1 rc1 today`_ and check it out.  See the `wiki instructions`_ for installation details.  Jython 2.5.1rc1 fixes a number of bugs, including some major errors when using coroutines and when using relative imports.  Please see the NEWS file for detailed release notes.  Also, please report any bugs that are found to http://bugs.jython.org
@@ -44,6 +52,7 @@ You may also wish to check the `jython-users`_ mailing list archives as many que
 .. _"The Definitive Guide to Jython": http://developers.apress.com/book/view/9781430225270
 .. _Download 2.5.1 rc1 today: https://sourceforge.net/projects/jython/files/jython/2.5.1rc1/jython_installer-2.5.1rc1.jar/download
 .. _wiki instructions: http://wiki.python.org/jython/InstallationInstructions
+.. _Download 2.5.1 rc2 today: https://sourceforge.net/projects/jython/files/jython-dev/2.5.1rc2/jython_installer-2.5.1rc2.jar/download
 
 
 
