@@ -1,5 +1,8 @@
 This sandbox contains Tobias projects. Most notably the "advanced" compiler.
 
+The most recent version can be found at:
+    https://jython.svn.sourceforge.net/svnroot/jython/trunk/sandbox/tobias
+
 Here double version control systems are used. Subversion is used at the base.
 All sub projects are managed in subversion. The main Jython code is linked
 using svn:externals.

@@ -1,8 +1,5 @@
 <project name="advanced" default="all" basedir=".">
   <target name="all" depends="jython,compiler,frame,util,bytecode,agent"/>
-  <target name="version">
-    <echo message="${ant.version.minor}"/>
-  </target>
   
   <property name="target.dir" location="${basedir}/target"/>
   
@@ -54,6 +51,32 @@
   </target>
 
   <target name="source dist">
+    <tar destfile="${target.dir}/Tobias_Ivarsson.tar.gz" compression="gzip">
+      <tarfileset dir="${basedir}">
+	<not>
+	  <filename name="**/.svn/**" />
+	</not>
+	<or>
+	  <!-- files -->
+	  <filename name="README.txt" />
+	  <filename name="bootstrap" />
+	  <filename name="build.xml" />
+	  <!-- subdirectories -->
+	  <filename name="agent/**" />
+	  <filename name="bytecode/**" />
+	  <filename name="compiler/**" />
+	  <filename name="frame/**" />
+	  <filename name="lib/**" />
+	  <filename name="mlvm/**" />
+	  <filename name="ssa/**" />
+	  <filename name="tests/**" />
+	  <filename name="util/**" />
+	</or>
+      </tarfileset>
+      <tarfileset dir="${basedir}/.hg/patches" prefix="patches/">
+	<filename name="*.patch" />
+      </tarfileset>
+    </tar>
   </target>
 
   <target name="setup target">
