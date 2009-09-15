@@ -18,7 +18,7 @@ detailed release notes.  Also, please report any bugs that are found to http://b
 
 **Have Your Jython Example Published!**
 
-Submit your best Jython example to the wiki and it may be published in the upcoming Apress book:  `"The Definitive Guide to Jython"`_.  Post your example to the `wiki examples page`_ today!
+Submit your best Jython example to the wiki by September 30, 2009 and it may be published in the upcoming Apress book:  `"The Definitive Guide to Jython"`_.  Post your example to the `wiki examples page`_ today!
 
 
 **Jython 2.5.0 Final**
