@@ -1,7 +1,0 @@
-This page has been retired for versions of Jython older than 2.1.
-
-If you want the archived web page:
-
-`2.1 docs/interpreter`_
-
-.. _2.1 docs/interpreter: ../archive/21/docs/interpreter.html

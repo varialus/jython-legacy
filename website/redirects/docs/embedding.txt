@@ -1,7 +1,0 @@
-This page has been retired for versions of Jython older than 2.1.
-
-If you want the archived web page:
-
-`2.1 docs/embedding`_
-
-.. _2.1 docs/embedding: ../archive/21/docs/embedding.html
