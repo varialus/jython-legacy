@@ -11,7 +11,7 @@ FieldVisitor fv;
 MethodVisitor mv;
 AnnotationVisitor av0;
 
-cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "Hello", null, "org/python/core/PyFunctionTable", new String[] { "org/python/core/PyRunnable" });
+cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "Hello", null, "org/python/core/IndyFunctionTable", new String[] { "org/python/core/PyRunnable" });
 
 {
 av0 = cw.visitAnnotation("Lorg/python/compiler/APIVersion;", true);
@@ -112,7 +112,7 @@ mv.visitEnd();
 mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(Ljava/lang/String;)V", null, null);
 mv.visitCode();
 mv.visitVarInsn(ALOAD, 0);
-mv.visitMethodInsn(INVOKESPECIAL, "org/python/core/PyFunctionTable", "<init>", "()V");
+mv.visitMethodInsn(INVOKESPECIAL, "org/python/core/IndyFunctionTable", "<init>", "()V");
 mv.visitVarInsn(ALOAD, 0);
 mv.visitFieldInsn(PUTSTATIC, "Hello", "self", "LHello;");
 mv.visitLdcInsn("Frank");
@@ -135,12 +135,15 @@ mv.visitInsn(ICONST_0);
 mv.visitInsn(ICONST_0);
 mv.visitInsn(ICONST_0);
 mv.visitFieldInsn(GETSTATIC, "Hello", "self", "LHello;");
-mv.visitInsn(ICONST_0);
+
+mv.visitInsn(ACONST_NULL);
+////mv.visitInsn(ICONST_0);
+
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ICONST_0);
 mv.visitIntInsn(SIPUSH, 4096);
-mv.visitMethodInsn(INVOKESTATIC, "org/python/core/Py", "newCode", "(I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZZLorg/python/core/PyFunctionTable;I[Ljava/lang/String;[Ljava/lang/String;II)Lorg/python/core/PyCode;");
+mv.visitMethodInsn(INVOKESTATIC, "org/python/core/Py", "newCode", "(I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZZLorg/python/core/IndyFunctionTable;Ljava/dyn/MethodHandle;[Ljava/lang/String;[Ljava/lang/String;II)Lorg/python/core/PyCode;");
 mv.visitFieldInsn(PUTSTATIC, "Hello", "f$0", "Lorg/python/core/PyCode;");
 mv.visitInsn(ICONST_1);
 mv.visitInsn(ICONST_1);
@@ -157,12 +160,15 @@ mv.visitInsn(ICONST_1);
 mv.visitInsn(ICONST_0);
 mv.visitInsn(ICONST_0);
 mv.visitFieldInsn(GETSTATIC, "Hello", "self", "LHello;");
-mv.visitInsn(ICONST_1);
+
+mv.visitInsn(ACONST_NULL);
+////mv.visitInsn(ICONST_1);
+
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ICONST_0);
 mv.visitIntInsn(SIPUSH, 4097);
-mv.visitMethodInsn(INVOKESTATIC, "org/python/core/Py", "newCode", "(I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZZLorg/python/core/PyFunctionTable;I[Ljava/lang/String;[Ljava/lang/String;II)Lorg/python/core/PyCode;");
+mv.visitMethodInsn(INVOKESTATIC, "org/python/core/Py", "newCode", "(I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZZLorg/python/core/IndyFunctionTable;Ljava/dyn/MethodHandle;[Ljava/lang/String;[Ljava/lang/String;II)Lorg/python/core/PyCode;");
 mv.visitFieldInsn(PUTSTATIC, "Hello", "greet$1", "Lorg/python/core/PyCode;");
 mv.visitInsn(RETURN);
 mv.visitMaxs(13, 3);

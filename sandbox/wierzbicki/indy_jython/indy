@@ -1,5 +1,8 @@
-JYTHON_HOME=/Users/frank/svn/jython/trunk/jython
+JYTHON_HOME=/Users/frank/svn/jython/branches/indy
+JAVA_HOME=/Users/frank/work/davinci/sources/build/bsd-i586
 
-$JAVA_HOME/bin/javac -classpath $JYTHON_HOME/extlibs/asm-3.1.jar:asm-util-3.1.jar:. IndyDump.java 
-$JAVA_HOME/bin/java -classpath $JYTHON_HOME/extlibs/asm-3.1.jar:asm-util-3.1.jar:. IndyDump
-$JAVA_HOME/bin/java -classpath $JYTHON_HOME/extlibs/asm-3.1.jar:asm-util-3.1.jar:$JYTHON_HOME/dist/jython.jar:. Hello
+JARS=$JYTHON_HOME/dist/jython-dev.jar:$JYTHON_HOME/extlibs/antlr-runtime-3.1.3.jar:$JYTHON_HOME/extlibs/constantine-0.4.jar:$JYTHON_HOME/extlibs/jna-posix.jar:$JYTHON_HOME/extlibs/jna.jar:$JYTHON_HOME/extlibs/asm-all-3.2.jar
+
+$JAVA_HOME/bin/javac -classpath $JARS:. IndyDump.java 
+$JAVA_HOME/bin/java -classpath $JARS:. IndyDump
+$JAVA_HOME/bin/java -classpath $JARS:. Hello
