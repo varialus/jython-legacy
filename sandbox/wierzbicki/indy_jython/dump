@@ -1,0 +1,5 @@
+JYTHON_HOME=/Users/frank/svn/jython/trunk/jython
+
+$JAVA_HOME/bin/javac -classpath $JYTHON_HOME/extlibs/asm-3.1.jar:asm-util-3.1.jar:. HelloDump.java 
+$JAVA_HOME/bin/java -classpath $JYTHON_HOME/extlibs/asm-3.1.jar:asm-util-3.1.jar:. HelloDump
+$JAVA_HOME/bin/java -classpath $JYTHON_HOME/extlibs/asm-3.1.jar:asm-util-3.1.jar:$JYTHON_HOME/dist/jython.jar:. Hello
