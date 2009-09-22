@@ -136,8 +136,8 @@ mv.visitInsn(ICONST_0);
 mv.visitInsn(ICONST_0);
 mv.visitFieldInsn(GETSTATIC, "Hello", "self", "LHello;");
 
+////MethodHandle goes here
 mv.visitInsn(ACONST_NULL);
-////mv.visitInsn(ICONST_0);
 
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
@@ -161,8 +161,8 @@ mv.visitInsn(ICONST_0);
 mv.visitInsn(ICONST_0);
 mv.visitFieldInsn(GETSTATIC, "Hello", "self", "LHello;");
 
+////MethodHandle goes here
 mv.visitInsn(ACONST_NULL);
-////mv.visitInsn(ICONST_1);
 
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
@@ -207,13 +207,17 @@ mv.visitMaxs(1, 0);
 mv.visitEnd();
 }
 {
-mv = cw.visitMethod(ACC_PUBLIC, "call_function", "(ILorg/python/core/PyFrame;Lorg/python/core/ThreadState;)Lorg/python/core/PyObject;", null, null);
+mv = cw.visitMethod(ACC_PUBLIC, "call_function", "(Ljava/dyn/MethodHandle;Lorg/python/core/PyFrame;Lorg/python/core/ThreadState;)Lorg/python/core/PyObject;", null, null);
 mv.visitCode();
 mv.visitFrame(Opcodes.F_NEW, 0, new Object[] {}, 0, new Object[] {});
 mv.visitVarInsn(ALOAD, 0);
 mv.visitVarInsn(ALOAD, 2);
 mv.visitVarInsn(ALOAD, 3);
-mv.visitVarInsn(ILOAD, 1);
+
+//MethodHandle
+mv.visitVarInsn(ALOAD, 1);
+
+/*
 Label l0 = new Label();
 Label l1 = new Label();
 Label l2 = new Label();
@@ -228,9 +232,10 @@ mv.visitMethodInsn(INVOKEVIRTUAL, "Hello", "greet$1", "(Lorg/python/core/PyFrame
 mv.visitInsn(ARETURN);
 mv.visitLabel(l2);
 mv.visitFrame(Opcodes.F_NEW, 4, new Object[] {"Hello", Opcodes.INTEGER, "org/python/core/PyFrame", "org/python/core/ThreadState"}, 3, new Object[] {"Hello", "org/python/core/PyFrame", "org/python/core/ThreadState"});
+*/
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ARETURN);
-mv.visitMaxs(4, 4);
+mv.visitMaxs(5, 4);
 mv.visitEnd();
 }
 cw.visitEnd();
