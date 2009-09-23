@@ -150,7 +150,7 @@ mv.visitInsn(ICONST_0);
 mv.visitLdcInsn(Type.getType("Lorg/python/core/ThreadState;"));
 mv.visitInsn(AASTORE);
 mv.visitMethodInsn(INVOKESTATIC, "java/dyn/MethodType", "make", "(Ljava/lang/Class;Ljava/lang/Class;[Ljava/lang/Class;)Ljava/dyn/MethodType;");
-mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/dyn/MethodType;)Ljava/dyn/MethodHandle;");
+mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandles$Lookup", "findVirtual", "(Ljava/lang/Class;Ljava/lang/String;Ljava/dyn/MethodType;)Ljava/dyn/MethodHandle;");
 
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
@@ -188,7 +188,7 @@ mv.visitInsn(ICONST_0);
 mv.visitLdcInsn(Type.getType("Lorg/python/core/ThreadState;"));
 mv.visitInsn(AASTORE);
 mv.visitMethodInsn(INVOKESTATIC, "java/dyn/MethodType", "make", "(Ljava/lang/Class;Ljava/lang/Class;[Ljava/lang/Class;)Ljava/dyn/MethodType;");
-mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/dyn/MethodType;)Ljava/dyn/MethodHandle;");
+mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandles$Lookup", "findVirtual", "(Ljava/lang/Class;Ljava/lang/String;Ljava/dyn/MethodType;)Ljava/dyn/MethodHandle;");
 
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
@@ -197,7 +197,7 @@ mv.visitIntInsn(SIPUSH, 4097);
 mv.visitMethodInsn(INVOKESTATIC, "org/python/core/Py", "newCode", "(I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZZLorg/python/core/IndyFunctionTable;Ljava/dyn/MethodHandle;[Ljava/lang/String;[Ljava/lang/String;II)Lorg/python/core/PyCode;");
 mv.visitFieldInsn(PUTSTATIC, "Hello", "greet$1", "Lorg/python/core/PyCode;");
 mv.visitInsn(RETURN);
-mv.visitMaxs(13, 3);
+mv.visitMaxs(17, 3);
 mv.visitEnd();
 }
 {
@@ -236,12 +236,11 @@ mv.visitEnd();
 mv = cw.visitMethod(ACC_PUBLIC, "call_function", "(Ljava/dyn/MethodHandle;Lorg/python/core/PyFrame;Lorg/python/core/ThreadState;)Lorg/python/core/PyObject;", null, null);
 mv.visitCode();
 mv.visitFrame(Opcodes.F_NEW, 0, new Object[] {}, 0, new Object[] {});
+mv.visitVarInsn(ALOAD, 1);
 mv.visitVarInsn(ALOAD, 0);
 mv.visitVarInsn(ALOAD, 2);
 mv.visitVarInsn(ALOAD, 3);
-
-//MethodHandle
-mv.visitVarInsn(ALOAD, 1);
+mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandle", "invoke", "(LHello;Lorg/python/core/PyFrame;Lorg/python/core/ThreadState;)Lorg/python/core/PyObject;");
 
 /*
 Label l0 = new Label();
