@@ -137,7 +137,20 @@ mv.visitInsn(ICONST_0);
 mv.visitFieldInsn(GETSTATIC, "Hello", "self", "LHello;");
 
 ////MethodHandle goes here
-mv.visitInsn(ACONST_NULL);
+////mv.visitInsn(ACONST_NULL);
+mv.visitMethodInsn(INVOKESTATIC, "java/dyn/MethodHandles", "lookup", "()Ljava/dyn/MethodHandles$Lookup;");
+mv.visitLdcInsn(Type.getType("LHello;"));
+mv.visitLdcInsn("f$0");
+mv.visitLdcInsn(Type.getType("Lorg/python/core/PyObject;"));
+mv.visitLdcInsn(Type.getType("Lorg/python/core/PyFrame;"));
+mv.visitInsn(ICONST_1);
+mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
+mv.visitInsn(DUP);
+mv.visitInsn(ICONST_0);
+mv.visitLdcInsn(Type.getType("Lorg/python/core/ThreadState;"));
+mv.visitInsn(AASTORE);
+mv.visitMethodInsn(INVOKESTATIC, "java/dyn/MethodType", "make", "(Ljava/lang/Class;Ljava/lang/Class;[Ljava/lang/Class;)Ljava/dyn/MethodType;");
+mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/dyn/MethodType;)Ljava/dyn/MethodHandle;");
 
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
@@ -162,7 +175,20 @@ mv.visitInsn(ICONST_0);
 mv.visitFieldInsn(GETSTATIC, "Hello", "self", "LHello;");
 
 ////MethodHandle goes here
-mv.visitInsn(ACONST_NULL);
+////mv.visitInsn(ACONST_NULL);
+mv.visitMethodInsn(INVOKESTATIC, "java/dyn/MethodHandles", "lookup", "()Ljava/dyn/MethodHandles$Lookup;");
+mv.visitLdcInsn(Type.getType("LHello;"));
+mv.visitLdcInsn("greet$1");
+mv.visitLdcInsn(Type.getType("Lorg/python/core/PyObject;"));
+mv.visitLdcInsn(Type.getType("Lorg/python/core/PyFrame;"));
+mv.visitInsn(ICONST_1);
+mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
+mv.visitInsn(DUP);
+mv.visitInsn(ICONST_0);
+mv.visitLdcInsn(Type.getType("Lorg/python/core/ThreadState;"));
+mv.visitInsn(AASTORE);
+mv.visitMethodInsn(INVOKESTATIC, "java/dyn/MethodType", "make", "(Ljava/lang/Class;Ljava/lang/Class;[Ljava/lang/Class;)Ljava/dyn/MethodType;");
+mv.visitMethodInsn(INVOKEVIRTUAL, "java/dyn/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/dyn/MethodType;)Ljava/dyn/MethodHandle;");
 
 mv.visitInsn(ACONST_NULL);
 mv.visitInsn(ACONST_NULL);
