@@ -4,6 +4,14 @@ The Jython Project
 Latest News
 ~~~~~~~~~~~
 
+**Jython 2.5.1 Final** (September 26, 2009)
+
+The Jython development team is proud to announce the release of `Jython 2.5.1`_ final!
+
+**Jython 2.5.1 rc3 is now available for download** (September 23, 2009)
+
+`Download 2.5.1 rc3`_ today and check it out. See the `wiki instructions`_ for installation details. Jython 2.5.1rc3 fixes bugs that we found when testing rc2, including a data loss issue. Please see the NEWS file for detailed release notes. Also, please report any bugs that are found to http://bugs.jython.org
+
 **Jython 2.5.1 rc2 is now available for download**
 
 `Download 2.5.1 rc2 today`_ and check it out.  See the `wiki instructions`_ for installation details.  Jython 2.5.1rc2 fixes bugs that we found when testing rc1, including
@@ -53,7 +61,8 @@ You may also wish to check the `jython-users`_ mailing list archives as many que
 .. _Download 2.5.1 rc1 today: https://sourceforge.net/projects/jython/files/jython/2.5.1rc1/jython_installer-2.5.1rc1.jar/download
 .. _wiki instructions: http://wiki.python.org/jython/InstallationInstructions
 .. _Download 2.5.1 rc2 today: https://sourceforge.net/projects/jython/files/jython-dev/2.5.1rc2/jython_installer-2.5.1rc2.jar/download
-
+.. _Jython 2.5.1: https://sourceforge.net/projects/jython/files/jython/2.5.1/jython_installer-2.5.1.jar/download
+.. _Download 2.5.1 rc3: https://sourceforge.net/projects/jython/files/jython-dev/2.5.1rc3/jython_installer-2.5.1rc3.jar/download
 
 
 
