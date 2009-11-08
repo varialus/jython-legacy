@@ -4,6 +4,10 @@ The Jython Project
 Latest News
 ~~~~~~~~~~~
 
+**Jython Doc Set Updated** (November 08, 2009)
+
+The Jython `documentation`_ set has been updated to include all modules contained within the Jython standard library.  However, it should be noted that this is still a work in progress since many of these documents have not yet been parsed and tested completely with Jython 2.5.1.  Stay tuned for more updates on the doc set!
+
 **Jython 2.5.1 Final** (September 26, 2009)
 
 The Jython development team is proud to announce the release of `Jython 2.5.1`_ final!
