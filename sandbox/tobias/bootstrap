@@ -71,7 +71,7 @@ jython()
 	build
     elif [ 0 -eq 0 ]; then
 	# disable the next branch - it is too slow...
-	echo -n
+	false
     elif [ -n "`which svn`" ]; then
 	# TODO: speed up this comparison - then it can be enabled...
 	BASE_REVISION=`svn info | grep ^Revision`
