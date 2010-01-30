@@ -5,9 +5,10 @@ set _INSTALL_DIR={0}
 set _SCRIPT={1}
 set _JAVA_HOME={2}
 
-rem save old home env vars:
+rem save old home env vars and classpath:
 set _OLD_JAVA_HOME=%JAVA_HOME%
 set _OLD_JYTHON_HOME=%JYTHON_HOME%
+set _OLD_CLASSPATH=%CLASSPATH%
 
 cd /d "%_INSTALL_DIR%\bin"
 
@@ -57,8 +58,16 @@ set JYTHON_HOME=
 call "%_INSTALL_DIR%\bin\jython.bat" "%_SCRIPT%"
 set E=%ERRORLEVEL%
 
+echo {3}: no home, setting CLASSPATH, calling /jython.bat from another working dir:"
+set JAVA_HOME=
+set JYTHON_HOME=
+set CLASSPATH=.;C:\Program Files (x86)\Java\jre6\lib\ext\QTJava.zip
+call "%_INSTALL_DIR%\jython.bat" "%_SCRIPT%"
+set E=%ERRORLEVEL%
+
 rem cleanup:
 set JAVA_HOME=%_OLD_JAVA_HOME%
 set JYTHON_HOME=%_OLD_JYTHON_HOME%
+set CLASSPATH=%_OLD_CLASSPATH%
 cd /d "%~dp0%"
 exit /b %E%
