@@ -83,7 +83,7 @@ if (typeof renderTwitters != 'function') (function () {
             if (options.template) {
                 flag = true;
                 innerdiv.innerHTML = options.template.replace(/%([a-z_\-\.]*)%/ig, function (m, l) {
-		    var image = "<div background='##F0EDED' style='font-size:9pt;border-bottom: 1px solid black; padding-top:2px;'><div><img style='float:left; padding:1px 2px 1px 0px;' src='" + obj[i].profile_image_url + "'/>";
+		    var image = "<div background='##F0EDED' style='font-size:9pt;border-bottom: 1px solid black; padding-top:2px;'><div><img width=50 height=58 style='float:left; padding:1px 2px 1px 0px;' src='" + obj[i].profile_image_url + "'/>";
 		    var user = obj[i].from_user;
 		    var time = obj[i].created_at;
                     var text = obj[i].text;
