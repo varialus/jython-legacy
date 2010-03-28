@@ -1,8 +1,10 @@
-Current
--------
+Current Documentation
+---------------------
 
 The Jython 2.5.1 documentation set is currently in progress.  Check back often for updates.  The latest update occurred on 11/08/2009 and the entire standard library is now included in the doc set.  However it should be noted that not all of the libraries have been completely tested yet so the library documentation is still considered **In Progress**.
 
 `Jython 2.5.1 Documentation`_
+
+**For details on learning the Python language, using Java and Jython together, or developing apps, please refer to the *Using Jython* section in the collapsable menu.**
 
 .. _Jython 2.5.1 Documentation: ./docs/index.html

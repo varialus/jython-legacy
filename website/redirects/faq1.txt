@@ -5,4 +5,15 @@ Using Java from Jython is as simple as importing the Java package that you'd lik
 
 Tips for Scripting Java with Jython | http://www.onjava.com/pub/a/onjava/2002/03/27/jython.html
 
+`Using Java in Jython Applications`_ from the Jython Book.
+
+`Learn to use JSR-223`_, and make your Jython callable from Java.
+
+`Utilizing the PythonInterpreter`_
+
+.. _Using Java in Jython Applications: http://jythonpodcast.hostjava.net/jythonbook/en/1.0/JythonAndJavaIntegration.html#using-java-within-jython-applications
+
+.. _Learn to use JSR-223: http://jythonpodcast.hostjava.net/jythonbook/en/1.0/JythonAndJavaIntegration.html#jsr-223
+
+.. _Utilizing the PythonInterpreter: http://jythonpodcast.hostjava.net/jythonbook/en/1.0/JythonAndJavaIntegration.html#utilizing-pythoninterpreter
 

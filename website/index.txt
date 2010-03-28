@@ -4,6 +4,14 @@ The Jython Project
 Latest News
 ~~~~~~~~~~~
 
+**The Definitive Guide to Jython is Published** (February 6, 2010)
+
+`The Definitive Guide to Jython`_ , written by the official Jython team leads, covers the latest Jython 2.5 (or 2.5.x) from the basics to the advanced features. This book begins with a brief introduction to the language and then journeys through Jythons different features and uses.
+
+`The Definitive Guide to Jython`_ is organized for beginners as well as advanced users of the language. The book provides a general overview of the Jython language itself, but it also includes intermediate and advanced topics regarding database, web, and GUI applications; frameworks; and integration, concurrency, and parallelism, to name a few.
+
+This book is available in open-source format at `jythonbook.com`_.
+
 **Websphere Application Server Administration Using Jython** (January 30, 2010)
 
 Utilizing Jython scripting, you can dramatically reduce the effort, resources, and expense associated with managing WebSphere Application Server. WebSphere Application Server Administration Using Jython will show you how.  Read more about it at `ibmpressbooks.com`_ today.
@@ -52,5 +60,7 @@ You may also wish to check the `jython-users`_ mailing list archives as many que
 .. _ibmpressbooks.com: http://www.ibmpressbooks.com/bookstore/product.asp?isbn=9780137009527
 .. _Sikuli:  http://groups.csail.mit.edu/uid/sikuli/
 .. _documentation: http://jython.org/currentdocs.html
+.. _The Definitive Guide to Jython: http://apress.com/book/view/9781430225270
+.. _jythonbook.com:  http://jythonbook.com
 
 

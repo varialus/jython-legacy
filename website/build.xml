@@ -94,7 +94,7 @@
 
             </fileset>
         </copy>
-        <apply verbose="true" executable="${rst2jysite.command}" dest="dist">
+        <apply verbose="true" executable="${rst2jysite.command}" dir="." dest="dist">
             <arg line="--link-stylesheet" />
             <arg line="--stylesheet=../cssold/html4css1.css" />
             <srcfile />

@@ -171,8 +171,7 @@ class HTMLTranslator(html4css1.HTMLTranslator):
             buffer.append('</div>')
             
             buffer.append('<div id="extra">')
-	    buffer.append('<div id="pycon" class="pycon"><a href="http://us.pycon.org/"><img height="50" width="175" src="http://python.org/images/pycon-2010-banner.png" alt="PyCon 2010: Atlanta"></a></div>')
-            buffer.append('<div class="applemenu">')
+	    buffer.append('<div class="applemenu">')
             buffer.append('<div class="silverheader"><a>Twitter Updates</a></div>')
             buffer.append('<div class="submenu"  style="height: 375px;">')
             buffer.append('<a style="font-size:8pt; color: green;" href="http://www.twitter.com/jython">Follow Jython</a><br/><br/>')

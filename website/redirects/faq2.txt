@@ -5,7 +5,12 @@ There are a variety of ways to use Jython from within Java.  Perhaps the most wi
 
 If you are interested in making use of Jython Object Factories and you would like to see some example code, please take a look at the `plyjy`_ project as it contains working implementations that can be used out of the box. 
 
-Please see the articles below for more details on implementing object factories. 
+Please see the book references and articles below for more details on implementing object factories. 
+
+Jython Book 
+-----------
+
+`Using Jython Within Java Applications`_ - from the Jython Book.
 
 Valuable Articles
 -----------------
@@ -13,6 +18,8 @@ Valuable Articles
 Simple and Efficient Jython Object Factories | http://wiki.python.org/jython/JythonMonthly/Articles/October2006/3
 
 .. _plyjy: http://kenai.com/projects/plyjy
+
+.. _Using Jython Within Java Applications: http://jythonpodcast.hostjava.net/jythonbook/en/1.0/JythonAndJavaIntegration.html#using-jython-within-java-applications
 
 
 

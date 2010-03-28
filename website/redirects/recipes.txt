@@ -1,0 +1,11 @@
+Jython Recipes
+==============
+
+The following are some examples of using Jython.  
+
+If you have a useful example to post, please send mail to the python-users mailing list.
+
+`Jython Book - Recipes`_
+
+
+.. _Jython Book - Recipes: http://jythonpodcast.hostjava.net/jythonbook/en/1.0/appendixB.html

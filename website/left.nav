@@ -6,6 +6,7 @@ menupageitem     | Mailing Lists      | http://sourceforge.net/mail/?group_id=12
 menupageitem     | License            | license.html
 menupageitem     | Foundation         | http://www.python.org/psf/
 menupageitem     | Archived Sites     | oldsites.html
+menupageitem     | Acknowledgments    | acknowledgments.html
 section  | Documentation
 menupageitem     | Current Docs       | currentdocs.html
 section  | Wiki links
