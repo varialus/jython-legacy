@@ -111,7 +111,13 @@ public class JarInfo {
         URL url = getClass().getResource(className + ".class");
         // we expect an URL like:
         // jar:file:/C:/stuff/jython21i.jar!/org/python/util/install/JarInfo.class
-        String urlString = URLDecoder.decode(url.toString(), "UTF-8");
+        // escape plus signs, since the URLDecoder would turn them into spaces
+        final String plus = "\\+";
+        final String escapedPlus = "__ppluss__";
+        String rawUrl = url.toString();
+        rawUrl = rawUrl.replaceAll(plus, escapedPlus);
+        String urlString = URLDecoder.decode(rawUrl, "UTF-8");
+        urlString = urlString.replaceAll(escapedPlus, plus);
         int jarSeparatorIndex = urlString.lastIndexOf(JAR_SEPARATOR);
         if (!urlString.startsWith(JAR_URL_PREFIX) || jarSeparatorIndex <= 0) {
             throw new InstallerException(Installation.getText(TextKeys.UNEXPECTED_URL, urlString));
