@@ -1,7 +1,94 @@
+Jython 2.5.2 Release Notes
+==========================
+
+The following features have been added and bugs have been repaired for 2.5.2.  For a look at the complete roadmap for Jython along with links for the PEPs and other information, please look at the `roadmap`_:
+
+Bugs Fixed
+----------
+
+2.5.2-b2
+~~~~~~~~
+ - [ 1327 ] Classloaders cannot GC, which exhausts permgen (partial  bug fix)
+ - [ 1604 ] PyBuiltinCallable.Info should be serializable
+ - [ 1397 ] Bugs in PyList and PyJavaType.ListIndexDelegate slice setting
+ - [ 1503 ] Java constructors should take keyword arguments
+ - [ 1648,1495,1516 ] Incomplete implementation of pep328 for relative imports
+ - [ 1611 ] Jython bytecode violated JLS, causing NPE on Sun's JVM when using -Xcomp option
+ - [ 1643 ] Tools subdirectory still exists in trunk
+ - [ 1455 ] Classes loaded dynamically from sys.path do not have their package defined
+ - [ 1555 ] Jython does not publish MIME types via JSR 223 (ScriptEngine.getFactory().getMimeTypes() is empty).
+ - [ 1632 ] cPickle.Unpickler does not allow assignment of find_global
+ - [ 1395 ] PyList.indexOf() and PyTuple.indexOf() do not function properly
+ - [ 1373 ] Jython ClassLoader getResource does not work
+ - [ 1506 ] Jython applies PEP263 pattern for determining source-code encoding on noncomments
+ - [ 1630 ] threading.Thread lacks __tojava__ method
+ - [ 1558 ] PyFunction to single method interface wrapping does not andle java.lang.Object methods
+ - [ 1622 ] array type prevents __radd__ fallback
+
+2.5.2-b1
+~~~~~~~~
+ - [ 1614 ] minidom chunks the character input on multi-line values
+ - [ 1615 ] Can't invoke Java method that takes a variable number of arguments with zero arguments
+ - [ 1605 ] float preference over PyComplex as arg to __call__ breaks logic
+ - [ 1586 ] weakref reference count leak when kwargs are used
+ - [ 1601 ] Can't serialize PyCode object
+ - [ 1551 ] Java objects cannot be copied by the copy module
+ - [ 1375 ] XML SAX: attrs.get((None, 'attr')) gives NPE
+ - [ 1488 ] sax JyInputSourceWrapper does not support unicode strings
+ - [ 1510 ] minidom is not parsing comment information correctly
+ - [ 1549 ] Wrapping an InputStream with a PyFile wrongly carries out line-ending translation.
+ - [ 1583 ] xml.dom.Node.data returns bytestrings of decoded unicode
+ - [ 1515 ] modjy sometimes adds None to the sys.path
+ - [ 1507 ] modjy crashes if any query string parameters are not set with '='
+ - [ 1473 ] modjy servlet doesn't import site-packages by default
+ - [ 1474 ] modjy servlet doesn't call atexit handlers
+ - [ 1225 ] socket.getservbyname/port() not yet supported
+ - [ 1532 ] Cannot use docstring when defining class
+ - [ 1530 ] BoolOp in multiple assign causes VerifyError
+ - [ 1478 ] defaultdict & weakref.WeakKeyDictionary [TypeError: first argument must be callable]
+ - [ 1487 ] Import of module with latin-1 chars fails on utf-8 file encoding
+ - [ 1449 ] Ellipsis comparison different from Python 2.5 to Jython 2.5
+ - [ 1493 ] tarfile.extractall() throws "AttributeError: 'module' object has no attribute 'chown'" when called by root
+ - [ 1470 ] os.mkdir Errno difference from cpython
+ - [ 1496 ] fix os.listdir errno for non-existing dirs
+ - [ 1499 ] PostgreSQL datahandler should return Decimals instead of floats for NUMERIC/DECIMAL columns
+ - [ 1477 ] os.setpgrp and posix.setpgrp fail with TypeError
+ - [ 1396 ] Assigning os module funcs as class attributes incompatible with CPython
+ - [ 1504 ] Inheriting twice from the same Java interface causes MRO problems
+ - [ 1511 ] PySet doesn't support Java serialization
+ - [ 1426 ] JSR 223 Bindings changes not taking effect and leaking between threads; unnecessary synchronization
+ - [ 1548 ] Parentheses in CLASSPATH cause errors in jython.bat
+ - [ 1576 ] files opened in 'a+' mode not readable
+ - [ 1563 ] unicode() for Java objects working differently in 2.2 and 2.5
+ - [ 1566 ] os.popen(cmd).read() returns `\r\n` as newline on Windows with Jython 2.5
+ - [ 1517 ] TypeError: get_referrers
+ - [ 1502 ] string-escape codec incorrect
+ - [ 1534 ] new style object __dict__[name] ignored
+ - [ 1479 ] xml parser file lock
+ - [ 1582 ] com.ziclix.python.sql.PyConnection leaks memory
+ - [ 1520 ] os.listdir doesn't return unicode when requested
+ - [ 1483 ] optparse std module dies on non-ASCII unicode data
+ - [ 1390 ] ihooks fails due to unimplemented methods in imp module
+ - [ 1456 ] sys.trace/profile attributes cause: AttributeError: write-only attr: trace in PyAMF
+ - [ 1385 ] generator.throw uncaught on new generator doesn't stop the generator
+ - [ 1596 ] SynchronizedCallable does not report that it is callable [suggested fix]
+ - [ 1557 ] jython.bat doesn't work in 4nt
+ - [ 1567 ] [Windows] Wildcard Parameter * gets expanded to filename
+ - [ 1594 ] Glob patterns like .txt processed incorrectly on startup
+ - [ 1356 ] [Windows] test_subprocess test_communicate_pipe_buf fails
+ - [ 1595 ] [patch] CachedJarsPackageManager cannot write cache for packages in jar over 64k
+ - [ 1522 ] repeated execution of external python scripts causing PermGen out of memory exception
+ - Fix runtime issues during exitfuncs triggered via SystemRestart (such as
+   during Django or Pylons development mode reloading)
+ - Fix pickling of collections.defaultdict objects
+ - Fix the cmath module to accept objects implementing the __float__ method
+ - Add google indexer (by Yin Wang and Steve Yegge)
+
+
 Jython 2.5.1 Release Notes
 ==========================
 
-The following features have been added and bugs have been repaired for 2.5.1.  For a look at the complete roadmap for Jython along iwth links for the PEPs and other information, please look at the `roadmap`_:
+The following features have been added and bugs have been repaired for 2.5.1.  For a look at the complete roadmap for Jython along with links for the PEPs and other information, please look at the `roadmap`_:
 
 New Features
 ------------

@@ -9,12 +9,12 @@ menupageitem     | Archived Sites     | oldsites.html
 menupageitem     | Acknowledgments    | acknowledgments.html
 section  | Documentation
 menupageitem     | Current Docs       | currentdocs.html
+menupageitem     | Jython Book        | http://www.jython.org/jythonbook/en/1.0
 section  | Wiki links
 menupageitem     | Front page/News    | http://wiki.python.org/jython/
 menupageitem     | FAQ                | http://wiki.python.org/jython/JythonFaq
 menupageitem     | Why Jython?        | http://wiki.python.org/jython/WhyJython
 menupageitem     | User Guide         | http://wiki.python.org/jython/UserGuide
 menupageitem     | Books and Articles | http://wiki.python.org/jython/JythonBibliography
-#menupageitem     | CPython comparison | http://wiki.python.org/jython/FIXME
 menupageitem     | Jython Monthly     | http://wiki.python.org/jython/JythonMonthly/Newsletters
 menupageitem     | Reporting Bugs     | http://wiki.python.org/jython/ReportingBugs

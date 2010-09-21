@@ -5,6 +5,10 @@ The Jython 2.5.1 documentation set is currently in progress.  Check back often f
 
 `Jython 2.5.1 Documentation`_
 
+`Jython 2.5.1 JavaDoc`_
+
 **For details on learning the Python language, using Java and Jython together, or developing apps, please refer to the *Using Jython* section in the collapsable menu.**
 
 .. _Jython 2.5.1 Documentation: ./docs/index.html
+
+.. _Jython 2.5.1 JavaDoc: ../javadoc/index.html

@@ -35,6 +35,7 @@
                 <include name="faq.htm"/>
                 <include name="developer.htm"/>
                 <include name="latest_release_bg.jpg"/>
+                <include name="javadoc"/>
             </fileset>
         </copy>
         <copy todir="dist">
