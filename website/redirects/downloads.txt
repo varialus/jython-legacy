@@ -29,8 +29,8 @@ Previous Releases
 - SHA1: ``6fea1e8985af955fc843789e2d60fcfc38a76fd8``
 
 .. _Download Jython 2.5.2: http://sourceforge.net/projects/jython/files/jython-dev/2.5.2b2/jython_installer-2.5.2b2.jar/download
-.. _Jython 2.5.1: http://sourceforge.net/projects/jython/files/jython/jython_installer-2.5.1.jar
-.. _Jython 2.5.0: http://sourceforge.net/projects/jython/files/jython/jython_installer-2.5.0.jar
+.. _Jython 2.5.1: http://sourceforge.net/projects/jython/files/jython/2.5.1/jython_installer-2.5.1.jar/download
+.. _Jython 2.5.0: http://sourceforge.net/projects/jython/files/jython/2.5.0/jython_installer-2.5.0.jar/download
 .. _Jython 2.2.1: http://sourceforge.net/projects/jython/files/jython/jython_installer-2.2.1.jar
 .. _Installation instructions: http://wiki.python.org/jython/InstallationInstructions
 .. _Release Notes: http://www.jython.org/latest.html
