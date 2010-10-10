@@ -95,7 +95,7 @@ public class JarInstaller {
                 // handle exclusion of directories
                 Iterator<String> excludeDirsAsIterator = excludeDirs.iterator();
                 while (excludeDirsAsIterator.hasNext()) {
-                    if (zipEntryName.startsWith((String)excludeDirsAsIterator.next()
+                    if (zipEntryName.startsWith(excludeDirsAsIterator.next()
                             + PATH_SEPARATOR)) {
                         exclude = true;
                     }
@@ -178,22 +178,22 @@ public class JarInstaller {
     }
 
     private int approximateNumberOfEntries(InstallationType installationType) {
-        int numberOfEntries = 150; // core (minimum)
+        int numberOfEntries = 200; // core (minimum)
         if (installationType.installLibraryModules()) {
             if (installationType.isStandalone()) {
-                numberOfEntries += 540;
+                numberOfEntries += 450;
             } else {
                 numberOfEntries += 1300;
             }
         }
         if (installationType.installDemosAndExamples()) {
-            numberOfEntries += 60;
+            numberOfEntries += 70;
         }
         if (installationType.installDocumentation()) {
-            numberOfEntries += 250;
+            numberOfEntries += 500;
         }
         if (installationType.installSources()) {
-            numberOfEntries += 800;
+            numberOfEntries += 1000;
         }
         return numberOfEntries;
     }
@@ -269,7 +269,7 @@ public class JarInstaller {
                         exclude = true;
                         Iterator<String> coreLibFilesAsIterator = coreLibFiles.iterator();
                         while (coreLibFilesAsIterator.hasNext()) {
-                            String coreFileName = (String)coreLibFilesAsIterator.next();
+                            String coreFileName = coreLibFilesAsIterator.next();
                             if (zipEntryName.endsWith(PATH_SEPARATOR + coreFileName)) {
                                 exclude = false;
                             }
