@@ -71,7 +71,7 @@ public class Installation {
         _textConstants = ResourceBundle.getBundle(RESOURCE_CLASS, locale);
     }
 
-    protected static boolean isValidOs() {
+    public static boolean isValidOs() {
         String osName = System.getProperty(OS_NAME, "");
         String lowerOs = osName.toLowerCase();
         if (isWindows()) {

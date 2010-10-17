@@ -188,12 +188,7 @@ public class InstallationDriver {
         test1.addAnswer("3"); // type: minimum
         test1.addAnswer("n"); // include: nothing
         test1.addAnswer(test1.getTargetDir().getAbsolutePath()); // target directory
-        JavaHomeHandler javaHomeHandler = test1.getJavaHomeHandler();
-        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
-            test1.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
-        } else {
-            test1.addAnswer(ConsoleInstaller.CURRENT_JRE);
-        }
+        addJavaAndOSAnswers(test1);
         test1.addAnswer("y"); // confirm copying
         test1.addAnswer("n"); // no readme
         test1.setVerifier(new NormalVerifier());
@@ -215,12 +210,7 @@ public class InstallationDriver {
         test2.addAnswer("wrongAnswer"); // wrong answer
         test2.addAnswer("n"); // no further excludes
         test2.addAnswer(test2.getTargetDir().getAbsolutePath()); // target directory
-        javaHomeHandler = test2.getJavaHomeHandler();
-        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
-            test2.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
-        } else {
-            test2.addAnswer(ConsoleInstaller.CURRENT_JRE);
-        }
+        addJavaAndOSAnswers(test2);
         test2.addAnswer("y"); // confirm copying
         test2.addAnswer("n"); // no readme
         test2.setVerifier(new NormalVerifier());
@@ -233,12 +223,7 @@ public class InstallationDriver {
         test3.addAnswer("y"); // accept license
         test3.addAnswer("9"); // type: standalone
         test3.addAnswer(test3.getTargetDir().getAbsolutePath()); // target directory
-        javaHomeHandler = test3.getJavaHomeHandler();
-        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
-            test3.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
-        } else {
-            test3.addAnswer(ConsoleInstaller.CURRENT_JRE);
-        }
+        addJavaAndOSAnswers(test3);
         test3.addAnswer("y"); // confirm copying
         test3.addAnswer("n"); // no readme
         test3.setVerifier(new StandaloneVerifier());
@@ -255,12 +240,7 @@ public class InstallationDriver {
         test4.addAnswer("y"); // exclude
         test4.addAnswer("n"); // no further excludes
         test4.addAnswer(test4.getTargetDir().getAbsolutePath()); // target directory
-        javaHomeHandler = test4.getJavaHomeHandler();
-        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
-            test4.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
-        } else {
-            test4.addAnswer(ConsoleInstaller.CURRENT_JRE);
-        }
+        addJavaAndOSAnswers(test4);
         test4.addAnswer("y"); // confirm copying
         test4.addAnswer("n"); // no readme
         test4.setVerifier(new NormalVerifier());
@@ -272,6 +252,18 @@ public class InstallationDriver {
         Iterator<ConsoleAutotest> consoleIterator = consoleTests.iterator();
         for (int i = 0; i < size; i++) {
             _consoleTests[i] = consoleIterator.next();
+        }
+    }
+
+    private void addJavaAndOSAnswers(ConsoleAutotest test) {
+        JavaHomeHandler javaHomeHandler = test.getJavaHomeHandler();
+        if (javaHomeHandler.isDeviation() && javaHomeHandler.isValidHome()) {
+            test.addAnswer(javaHomeHandler.getHome().getAbsolutePath()); // different jre
+        } else {
+            test.addAnswer(ConsoleInstaller.CURRENT_JRE);
+        }
+        if (!Installation.isValidOs()) {
+            test.addAnswer(""); // enter to proceed anyway
         }
     }
 
