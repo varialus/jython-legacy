@@ -1,14 +1,14 @@
 Downloads
 ---------
 
-The current version of Jython is 2.5.2 - Beta 2, please use the link below to download the Java installer. 
+The current version of Jython is 2.5.2 - Release Candidate 1, please use the link below to download the Java installer. 
 Once downloaded, please double-click on the JAR file to start the installation process.
 You may also want to read the `Installation instructions`_ or the `Release Notes`_.
 
-`Download Jython 2.5.2`_ Beta 2
+`Download Jython 2.5.2`_ RC 1
 
-- MD5:  ``560b43678059fd41a374a9487517235c``
-- SHA1: ``0c41db0e5d275bff80a2c4f9bc3de2e48969d0a6``
+- MD5:  ``4067d89c58d5596ce85611b2defd0333``
+- SHA1: ``6545eda94e5f3a55cc392c59d1ffa683e094eca3``
 
 Previous Releases
 -----------------
@@ -28,7 +28,7 @@ Previous Releases
 - MD5: ``774543534bef2d68247953882237d448``
 - SHA1: ``6fea1e8985af955fc843789e2d60fcfc38a76fd8``
 
-.. _Download Jython 2.5.2: http://sourceforge.net/projects/jython/files/jython-dev/2.5.2b2/jython_installer-2.5.2b2.jar/download
+.. _Download Jython 2.5.2: http://sourceforge.net/projects/jython/files/jython-dev/2.5.2rc1/jython_installer-2.5.2rc1.jar/download
 .. _Jython 2.5.1: http://sourceforge.net/projects/jython/files/jython/2.5.1/jython_installer-2.5.1.jar/download
 .. _Jython 2.5.0: http://sourceforge.net/projects/jython/files/jython/2.5.0/jython_installer-2.5.0.jar/download
 .. _Jython 2.2.1: http://sourceforge.net/projects/jython/files/jython/jython_installer-2.2.1.jar

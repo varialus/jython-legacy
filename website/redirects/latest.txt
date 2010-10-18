@@ -6,6 +6,20 @@ The following features have been added and bugs have been repaired for 2.5.2.  F
 Bugs Fixed
 ----------
 
+2.5.2-rc1
+~~~~~~~~~
+ - [  1133 ] Support ipython and other completers with readline emulation
+ - [  1642 ] JSR223 PyScriptEngine#getInterface returns a NPE when called with zero args
+ - [  1662 ] time.strptime does not use Java date format strings properly
+ - [  1543 ] PyArray fails to clean up pre-allocated space
+ - [  1661 ] Error at on exit in TCC/LE
+ - [  1639 ] JBoss 5, vfszip protocol in use for jarFileName in PySystemState
+ - [  1660 ] threading module memory leak
+ - [  1452 ] pydoc help() function fails because sys.executable is None in stand-alone Jython
+ - [  1568 ] sys.stdout.encoding returns wrong value in Windows with Jython 2.5.1 (fixed on Java 6 only)
+ - [  1647 ] zxJDBC does not handle NVARCHAR
+ - SocketServer module now supports ephemeral server ports (by using port  0); see discussion for #1660
+
 2.5.2-b2
 ~~~~~~~~
  - [ 1327 ] Classloaders cannot GC, which exhausts permgen (partial  bug fix)
