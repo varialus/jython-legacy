@@ -6,6 +6,12 @@ The following features have been added and bugs have been repaired for 2.5.2.  F
 Bugs Fixed
 ----------
 
+2.5.2-rc2
+~~~~~~~~~
+ - [ 1665 ] cPickle calls __import__ with illegal parameters
+ - [ 1628 ] getpass.getpass echoes input
+ - Fix logic to detect that a console is interactive (related to #1133)
+
 2.5.2-rc1
 ~~~~~~~~~
  - [  1133 ] Support ipython and other completers with readline emulation
