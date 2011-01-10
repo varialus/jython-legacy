@@ -6,6 +6,16 @@ The following features have been added and bugs have been repaired for 2.5.2.  F
 Bugs Fixed
 ----------
 
+2.5.2-rc3
+~~~~~~~~~
+ - [ 1674 ] PDB crashes under the JSR-223 scripting engine
+ - [ 1680 ] jython -c option is not parsed right
+ - [ 1681 ] JSR-223, Jython 2.5.2 and implementing Java Interfaces from Python
+ - [ 1675 ] Jython exits prematurely when executing a file, thus killing Swing windows
+ - [ 1682 ] exit code of 0 on unhandled exception
+ - [ 1668 ] strptime('','') works on cpython but not on jython
+ - [ 1693 ] Unicode sys.path elements cause UnicodeErrors on import
+
 2.5.2-rc2
 ~~~~~~~~~
  - [ 1665 ] cPickle calls __import__ with illegal parameters
