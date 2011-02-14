@@ -80,9 +80,9 @@ class HTMLTranslator(html4css1.HTMLTranslator):
         buffer.append('<a href="./" ><img class="logoImage" alt="Jython" style="border: 0px; padding-top: 20px; position:absolute; left: 35px" src="css/jython.png" title="Jython"></a>')
         buffer.append('</div>')
         buffer.append('<div class="latest_release" style="position:absolute; color:#000; width:180px; top: 15px; right: 30px; padding:0px 10px 10px 30px; font-size:11px; background:url(\'css/latest_release_bg.png\') no-repeat">')
-        buffer.append('<p style="top: 25px; color:#000">Latest release - 2.5.2 - RC 3<br/>')
+        buffer.append('<p style="top: 25px; color:#000">Latest release - 2.5.2 - RC 4<br/>')
         buffer.append('<a style="color:#000" href="latest.html">View Release Notes</a><br/>')
-        buffer.append('Download: <a style="color:#000" href="http://sourceforge.net/projects/jython/files/jython-dev/2.5.2rc3/jython_installer-2.5.2rc3.jar/download">.jar</a>')
+        buffer.append('Download: <a style="color:#000" href="http://sourceforge.net/projects/jython/files/jython-dev/2.5.2rc4/jython_installer-2.5.2rc4.jar/download">.jar</a>')
         buffer.append('</div>')
         
         buffer.append('<div class="searchbox">')
