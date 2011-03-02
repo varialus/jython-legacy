@@ -3,6 +3,19 @@ Jython 2.5.2 Release Notes
 
 The following features have been added and bugs have been repaired for 2.5.2.  For a look at the complete roadmap for Jython along with links for the PEPs and other information, please look at the `roadmap`_:
 
+New Features
+------------
+ - The socket module now includes ipv6 support
+ - The socket module now also includes Internationalized Domain Names (RFC 3490) support on Java 6
+ - Performance improvements around method invocation. 2.5.2 runs the richards benchmark 3x faster and the pystone benchmark 20% faster than 2.5.1
+ - The posix/nt module was rewritten in Java and the performance of its often performance-critical stat function has significantly improved
+ - Improved OSError errno messages on Windows
+ - Slightly improved startup time (ongoing Issue #1380)
+ - Better readline module emulation (required for IPython support)
+ - Python functions can be directly passed to Java methods that take a single method interface (such as Callable or Runnable)
+ - Add google indexer (by Yin Wang and Steve Yegge) 
+
+
 Bugs Fixed
 ----------
 

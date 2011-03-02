@@ -4,10 +4,13 @@ The Jython Project
 Latest News
 ~~~~~~~~~~~
 
+**Jython 2.5.2 Has Been Released** (March 3, 2011)
+
+The Jython development team is proud to announce the final 2.5.2 release!  For a complete listing of changes, please visit the `Release Notes`_.
+
 **Jython 2.5.2 RC 4 Has Been Released** (February 15, 2011)
 
 The Jython development team would like to announce the release of 2.5.2 Release Candidate 4.  For a complete listing of changes, please visit the `Release Notes`_.
-
 
 **Jython 2.5.2 RC 3 Has Been Released** (January 11, 2011)
 
@@ -102,7 +105,7 @@ You may also wish to check the `jython-users`_ mailing list archives as many que
 .. _this post: http://blog.springpython.webfactional.com/2009/10/15/see-how-spring-python-works-with-jython/
 .. _Release Notes: http://www.jython.org/latest.html
 .. _the bug tracker: http://bugs.jython.org
-.. _download the installer by clicking here: http://sourceforge.net/projects/jython/files/jython-dev/2.5.2rc4/jython_installer-2.5.2rc4.jar/download
+.. _download the installer by clicking here: http://sourceforge.net/projects/jython/files/jython/2.5.2/jython_installer-2.5.2.jar/download
 
 
 
