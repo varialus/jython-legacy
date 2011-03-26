@@ -69,6 +69,7 @@ grammar Python;
 tokens {
     INDENT;
     DEDENT;
+    TRAILBACKSLASH; //For dangling backslashes when partial parsing.
 }
 
 @lexer::members {

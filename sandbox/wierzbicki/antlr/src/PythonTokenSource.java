@@ -79,7 +79,7 @@ public class PythonTokenSource implements TokenSource {
     int sp=-1; // grow upwards
 
     /** The queue of tokens */
-    Vector tokens = new Vector();
+    Vector<Token> tokens = new Vector<Token>();
 
     /** We pull real tokens from this lexer */
     CommonTokenStream stream;
@@ -130,7 +130,7 @@ public class PythonTokenSource implements TokenSource {
     public Token nextToken() {
         // if something in queue, just remove and return it
         if (tokens.size() > 0) {
-            Token t = (Token)tokens.firstElement();
+            Token t = tokens.firstElement();
             tokens.removeElementAt(0);
             //System.out.println(filename + t);
             return t;
@@ -142,10 +142,21 @@ public class PythonTokenSource implements TokenSource {
     }
 
     private void generateNewline(Token t) {
+        //System.out.println("generating newline from token: " + t);
         CommonToken newline = new CommonToken(PythonLexer.NEWLINE, "\n");
         newline.setLine(t.getLine());
         newline.setCharPositionInLine(t.getCharPositionInLine());
         tokens.addElement(newline);
+    }
+
+    private void handleEOF(CommonToken eof, CommonToken prev) {
+        //System.out.println("processing eof with token: " + prev);
+        if (prev != null) {
+            eof.setStartIndex(prev.getStopIndex());
+            eof.setStopIndex(prev.getStopIndex());
+            eof.setLine(prev.getLine());
+            eof.setCharPositionInLine(prev.getCharPositionInLine());
+        }
     }
 
     protected void insertImaginaryIndentDedentTokens() {
@@ -153,14 +164,21 @@ public class PythonTokenSource implements TokenSource {
         stream.consume();
 
         if (t.getType() == Token.EOF) {
+            Token prev = stream.LT(-1);
+            handleEOF((CommonToken)t, (CommonToken)prev);
             if (!inSingle) {
-                Token prev = stream.LT(-1);
-                if (prev == null || prev.getType() != PythonLexer.NEWLINE) {
+                if (prev == null) {
                     generateNewline(t);
+                } else if (prev.getType() == PythonLexer.LEADING_WS) {
+                    handleDedents(-1, (CommonToken)t);
+                    generateNewline(t);
+                } else if (prev.getType() != PythonLexer.NEWLINE) {
+                    generateNewline(t);
+                    handleDedents(-1, (CommonToken)t);
                 }
+            } else {
+                handleDedents(-1, (CommonToken)t);
             }
-
-            handleDedents(-1, (CommonToken)t);
             enqueue(t);
         } else if (t.getType() == PythonLexer.NEWLINE) {
             // save NEWLINE in the queue
@@ -173,11 +191,12 @@ public class PythonTokenSource implements TokenSource {
             t = stream.LT(1);
             stream.consume();
 
-            enqueueHiddens(t);
+            List<Token> commentedNewlines = enqueueHiddens(t);
 
             // compute cpos as the char pos of next non-WS token in line
             int cpos = t.getCharPositionInLine(); // column dictates indent/dedent
             if (t.getType() == Token.EOF) {
+                handleEOF((CommonToken)t, (CommonToken)newline);
                 cpos = -1; // pretend EOF always happens at left edge
             }
             else if (t.getType() == PythonLexer.LEADING_WS) {
@@ -207,6 +226,9 @@ public class PythonTokenSource implements TokenSource {
                 for(int i=1;i<newlines.length();i++) {
                     generateNewline(newline);
                 }
+                for (Token c : commentedNewlines) {
+                    generateNewline(c);
+                }
             }
 
             if (t.getType() != PythonLexer.LEADING_WS) { // discard WS
@@ -223,7 +245,8 @@ public class PythonTokenSource implements TokenSource {
         tokens.addElement(t);
     }
 
-    private void enqueueHiddens(Token t) {
+    private List<Token> enqueueHiddens(Token t) {
+        List<Token> newlines = new ArrayList<Token>();
         if (inSingle && t.getType() == Token.EOF) {
             if (stream.size() > lastTokenAddedIndex + 1) {
                 Token hidden = stream.get(lastTokenAddedIndex + 1);
@@ -231,25 +254,28 @@ public class PythonTokenSource implements TokenSource {
                     String text = hidden.getText();
                     int i = text.indexOf("\n");
                     while(i != -1) {
-                        generateNewline(hidden);
+                        newlines.add(hidden);
                         i = text.indexOf("\n", i + 1);
                     }
                 }
             }
         }
-        List hiddenTokens = stream.getTokens(lastTokenAddedIndex + 1,t.getTokenIndex() - 1);
+        List<Token> hiddenTokens = stream.getTokens(lastTokenAddedIndex + 1,t.getTokenIndex() - 1);
         if (hiddenTokens != null) {
             tokens.addAll(hiddenTokens);
         }
         lastTokenAddedIndex = t.getTokenIndex();
+        return newlines;
     }
 
     private void handleIndents(int cpos, CommonToken t) {
         push(cpos);
         //System.out.println("push("+cpos+"): "+stackString());
-        Token indent = new CommonToken(PythonParser.INDENT,"");
+        CommonToken indent = new CommonToken(PythonParser.INDENT,"");
         indent.setCharPositionInLine(t.getCharPositionInLine());
         indent.setLine(t.getLine());
+        indent.setStartIndex(t.getStartIndex() - 1);
+        indent.setStopIndex(t.getStartIndex() - 1);
         tokens.addElement(indent);
     }
 
@@ -263,9 +289,8 @@ public class PythonTokenSource implements TokenSource {
             dedent.setCharPositionInLine(t.getCharPositionInLine());
             dedent.setLine(t.getLine());
 
-            //XXX: this will get messed up by comments.
-            dedent.setStartIndex(t.getStartIndex());
-            dedent.setStopIndex(t.getStopIndex());
+            dedent.setStartIndex(t.getStartIndex() - 1);
+            dedent.setStopIndex(t.getStartIndex() - 1);
 
             tokens.addElement(dedent);
         }
@@ -306,11 +331,8 @@ public class PythonTokenSource implements TokenSource {
         if (i == -1 || i == -2) {
             return FIRST_CHAR_POSITION;
         }
-        /* ParseException p = new ParseException("unindent does not match any outer indentation level", t.getLine(), t.getCharPositionInLine());
-        p.setType(Py.IndentationError);
+        RuntimeException p = new RuntimeException("unindent does not match any outer indentation level");//, t.getLine(), t.getCharPositionInLine());
         throw p;
-        */
-        throw new RuntimeException("unindent does not match any outer indentation level");
     }
 
     public String stackString() {
@@ -322,7 +344,6 @@ public class PythonTokenSource implements TokenSource {
         return buf.toString();
     }
 
-    //FIXME: needed this for the Antlr 3.1b interface change.
     public String getSourceName() {
         return filename;
     }

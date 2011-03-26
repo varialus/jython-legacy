@@ -8,22 +8,22 @@
     </path>
 
     <target name="init">
-        <mkdir dir="build/gensrc/org/python/antlr/ast"/>
+        <mkdir dir="build/gensrc"/>
     </target>
 
     <target name="antlr_gen" depends="init">
         <java classname="org.antlr.Tool">
             <arg value="-fo"/>
-            <arg path="build/gensrc/org/python/antlr"/>
+            <arg path="build/gensrc"/>
             <arg value="-lib"/>
-            <arg path="build/gensrc/org/python/antlr"/>
+            <arg path="build/gensrc"/>
             <arg file="grammar/Python.g"/>
             <classpath refid="main.classpath"/>
         </java>
         
         <!-- copy the .tokens to /grammar, for usage in ANTLRWorks -->
         <copy todir="grammar" preservelastmodified="true">
-            <fileset dir="build/gensrc/org/python/antlr">
+            <fileset dir="build/gensrc">
                 <include name="Python.tokens" />
             </fileset>
         </copy>

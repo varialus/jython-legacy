@@ -42,7 +42,7 @@ public class Main {
         CharStream input = new ANTLRFileStream(path);
         PythonLexer lexer = new MyLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        tokens.discardOffChannelTokens(true);
+        //tokens.discardOffChannelTokens(true);
         PythonTokenSource indentedSource = new PythonTokenSource(tokens, "<test>");
         tokens = new CommonTokenStream(indentedSource);
         PythonParser parser = new PythonParser(tokens);

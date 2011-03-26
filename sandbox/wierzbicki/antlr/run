@@ -1,1 +1,1 @@
-java -classpath lib/antlr-3.1.jar:build Main /home/frank/svn/python/release26-maint
+java -classpath lib/antlr-runtime-3.3.jar:build Main /home/frank/svn/python/release26-maint
